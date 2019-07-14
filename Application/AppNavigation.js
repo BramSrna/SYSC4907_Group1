@@ -3,6 +3,7 @@ import { createStackNavigator, createAppContainer, createDrawerNavigator } from 
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import BramPage from './pages/BramPage';
+import JobinPage from './pages/JobinPage';
 import { Text, Animated, Easing } from 'react-native'
 
 // drawer stack
