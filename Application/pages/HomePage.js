@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import styles from '../pages/pageStyles/HomePageStyle';
 
-export default class HomePage extends Component {
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.whiteText}>HomePage</Text>
-      </View>
-    );
-  }
+const HomePage = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.whiteText}>HomePage</Text>
+    </View>
+  );
 }
+
+export default HomePage
