@@ -1,15 +1,6 @@
-import React, { Component } from 'react';
-import {
-  Text,
-  View,
-  TextInput,
-  Button,
-  TouchableHighlight,
-  Image,
-  Alert
-} from 'react-native';
-import styles from '../pages/pageStyles/HomePageStyle';
-
+import React from "react";
+import { Text, View } from "react-native";
+import styles from "../pages/pageStyles/HomePageStyle";
 
 const HomePage = () => {
   return (
@@ -17,6 +8,6 @@ const HomePage = () => {
       <Text style={styles.whiteText}>HomePage</Text>
     </View>
   );
-}
+};
 
-export default HomePage
+export default HomePage;

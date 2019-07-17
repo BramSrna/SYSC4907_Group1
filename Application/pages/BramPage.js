@@ -1,14 +1,6 @@
-import React, { Component } from 'react';
-import {
-  Text,
-  View,
-  TextInput,
-  Button,
-  TouchableHighlight,
-  Image,
-  Alert
-} from 'react-native';
-import styles from '../pages/pageStyles/BramPageStyle';
+import React from "react";
+import { Text, View } from "react-native";
+import styles from "../pages/pageStyles/BramPageStyle";
 
 const BramPage = () => {
   return (
@@ -16,6 +8,6 @@ const BramPage = () => {
       <Text style={styles.whiteText}>BramPage</Text>
     </View>
   );
-}
+};
 
-export default BramPage
+export default BramPage;
