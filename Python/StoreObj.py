@@ -1,5 +1,9 @@
-#import cv2
 import numpy
+import os
+import sys
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
 
 import MiscFuncs as mc
 

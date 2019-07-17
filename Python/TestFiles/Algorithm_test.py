@@ -1,4 +1,10 @@
 import unittest
+import os
+import sys
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+sys.path.append(os.path.join(file_dir, ".."))
 
 from YamlParser import parseTestYamlFile
 from Algorithm import estimateLoc
@@ -15,7 +21,7 @@ class TestAlgorithmMethods(unittest.TestCase):
     that the parser is working properly.
     """
     def testParse(self):
-        stores = parseTestYamlFile("TestParamFiles/Test1.yaml")
+        stores = parseTestYamlFile(os.path.join(file_dir, "..", "TestParamFiles/Test1.yaml"))
 
         for store in stores:
             print(store)
@@ -27,7 +33,7 @@ class TestAlgorithmMethods(unittest.TestCase):
     Output needs to be checked to ensure estimation is working.
     """
     def testEstimateLoc(self):
-        stores = parseTestYamlFile("TestParamFiles/Test1.yaml")
+        stores = parseTestYamlFile(os.path.join(file_dir, "..", "TestParamFiles/Test1.yaml"))
 
         knownItems = []
 
