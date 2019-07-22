@@ -1,13 +1,18 @@
-import React from "react";
+import React, { Component } from "react";
 import { Text, View } from "react-native";
 import styles from "./pageStyles/RegisterPageStyle";
 
-const RegisterPage = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.whiteText}>RegisterPage</Text>
-    </View>
-  );
-};
+class RegisterPage extends Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.whiteText}>RegisterPage</Text>
+      </View>
+    );
+  }
+}
 
 export default RegisterPage;

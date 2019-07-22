@@ -1,13 +1,19 @@
-import React from "react";
+import React, { Component } from "react";
 import { Text, View } from "react-native";
 import styles from "../pages/pageStyles/HomePageStyle";
 
-const HomePage = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.whiteText}>HomePage</Text>
-    </View>
-  );
-};
+class HomePage extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.whiteText}>HomePage</Text>
+      </View>
+    );
+  }
+}
 
 export default HomePage;

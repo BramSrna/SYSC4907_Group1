@@ -8,12 +8,14 @@ import HomePage from "./pages/HomePage";
 import BramPage from "./pages/BramPage";
 import JobinPage from "./pages/JobinPage";
 import RegisterPage from "./pages/RegisterPage";
+import YourLists from "./pages/YourLists";
 
 const DrawerStack = createDrawerNavigator(
   {
     HomePage: { screen: HomePage },
     BramPage: { screen: BramPage },
-    JobinPage: { screen: JobinPage }
+    JobinPage: { screen: JobinPage },
+    "Your Lists": { screen: YourLists }
   },
   {
     gesturesEnabled: false
