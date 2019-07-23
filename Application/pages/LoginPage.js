@@ -11,7 +11,7 @@ import styles from "../pages/pageStyles/LoginPageStyle";
 const LOGIN = "Login";
 const FORGOT_PASSWORD = "Forgot your password?";
 const REGISTER = "RegisterPage";
-const HOMEPAGE = "HomePage";
+const HOMEPAGE = "Homepage";
 
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;

@@ -5,24 +5,14 @@ import styles from "./pageStyles/YourListsPageStyle";
 class YourLists extends Component {
   constructor(props) {
     super(props);
-    this.lists = [
-      {
-        title: "List One"
-      },
-      {
-        title: "List Two"
-      },
-      {
-        title: "List Three"
-      }
-    ];
+
     this.state = {
-      listHolder: []
+      listTitles: []
     };
   }
 
   componentDidMount() {
-    this.setState({ arrayHolder: [...this.lists] });
+    this.setState({ listTitles: ["List One", "List Two", "List Three"] });
   }
 
   GetItem(item) {
@@ -43,20 +33,20 @@ class YourLists extends Component {
 
   render() {
     return (
-      <View style={styles.MainContainer}>
+      <View style={styles.ListContainer}>
+        <Text style={styles.pageTitle}>
+          Your Lists: {this.state.listTitles.length}
+        </Text>
         <FlatList
-          data={this.state.arrayHolder}
+          style={styles.flatList}
+          data={this.state.listTitles}
           width="100%"
           extraData={this.state.arrayHolder}
           keyExtractor={index => index.toString()}
           ItemSeparatorComponent={this.FlatListItemSeparator}
           renderItem={({ item }) => (
-            <Text
-              style={styles.item}
-              onPress={this.GetItem.bind(this, item.title)}
-            >
-              {" "}
-              {item.title}{" "}
+            <Text style={styles.item} onPress={this.GetItem.bind(this, item)}>
+              {item}
             </Text>
           )}
         />

@@ -7,14 +7,16 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import BramPage from "./pages/BramPage";
 import JobinPage from "./pages/JobinPage";
+import HaseebPage from "./pages/HaseebPage";
 import RegisterPage from "./pages/RegisterPage";
 import YourLists from "./pages/YourLists";
 
 const DrawerStack = createDrawerNavigator(
   {
-    HomePage: { screen: HomePage },
-    BramPage: { screen: BramPage },
-    JobinPage: { screen: JobinPage },
+    Homepage: { screen: HomePage },
+    "Haseeb's Page": { screen: HaseebPage },
+    "Bram's Page": { screen: BramPage },
+    "Jobin's Page": { screen: JobinPage },
     "Your Lists": { screen: YourLists }
   },
   {
