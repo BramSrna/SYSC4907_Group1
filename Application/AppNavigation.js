@@ -13,11 +13,11 @@ import YourLists from "./pages/YourLists";
 
 const DrawerStack = createDrawerNavigator(
   {
-    Homepage: { screen: HomePage },
-    "Haseeb's Page": { screen: HaseebPage },
-    "Bram's Page": { screen: BramPage },
-    "Jobin's Page": { screen: JobinPage },
-    "Your Lists": { screen: YourLists }
+    GoToHomePage: { screen: HomePage },
+    GoToHaseebPage: { screen: HaseebPage },
+    GoToBramPage: { screen: BramPage },
+    GoToJobinPage: { screen: JobinPage },
+    GoToListPage: { screen: YourLists },
   },
   {
     gesturesEnabled: false
@@ -36,8 +36,8 @@ const DrawerNavigation = createStackNavigator(
 // login stack
 const LoginStack = createStackNavigator(
   {
-    LoginPage: { screen: LoginPage },
-    RegisterPage: { screen: RegisterPage }
+    GoToLoginPage: { screen: LoginPage },
+    GoToRegisterPage: { screen: RegisterPage }
   },
   {
     headerMode: "none",
