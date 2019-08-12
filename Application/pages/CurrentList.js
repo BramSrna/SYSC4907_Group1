@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Text, View, BackHandler } from "react-native";
-import styles from "./pageStyles/HaseebPageStyle";
+import styles from "./pageStyles/CurrentListPageStyle";
 
-class HomePage extends Component {
+class CurrentList extends Component {
   constructor(props) {
     super(props);
   }
@@ -13,14 +13,14 @@ class HomePage extends Component {
       return false;
     });
   }
-
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.whiteText}>HaseebPage</Text>
+        <Text style={styles.whiteText}>{"<-- Yours Lists"}</Text>
+        <Text style={styles.whiteText}>CurrentListPage</Text>
       </View>
     );
   }
 }
 
-export default HomePage;
+export default CurrentList;

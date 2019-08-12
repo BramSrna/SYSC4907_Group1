@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, FlatList, Alert } from "react-native";
+import { Text, View, FlatList, Alert, BackHandler } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
 
 class YourLists extends Component {
@@ -13,10 +13,16 @@ class YourLists extends Component {
 
   componentDidMount() {
     this.setState({ listTitles: ["List One", "List Two", "List Three"] });
+    BackHandler.addEventListener("hardwareBackPress", function() {
+      // Return true if you want to go back, false if want to ignore. This is for Android only.
+      // return true;
+      return false;
+    });
   }
 
   GetItem(item) {
     Alert.alert(item);
+    this.props.navigation.navigate("Current List");
   }
 
   FlatListItemSeparator = () => {
