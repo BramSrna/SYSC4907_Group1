@@ -5,7 +5,7 @@ import {
 } from "react-navigation";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
-import BramPage from "./pages/BramPage";
+import AddItemPage from "./pages/AddItemPage";
 import JobinPage from "./pages/JobinPage";
 import HaseebPage from "./pages/HaseebPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -15,7 +15,7 @@ const DrawerStack = createDrawerNavigator(
   {
     GoToHomePage: { screen: HomePage },
     GoToHaseebPage: { screen: HaseebPage },
-    GoToBramPage: { screen: BramPage },
+    GoToAddItemPage: { screen: AddItemPage },
     GoToJobinPage: { screen: JobinPage },
     GoToListPage: { screen: YourLists }
   },

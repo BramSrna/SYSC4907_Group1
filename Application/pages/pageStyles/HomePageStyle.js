@@ -16,7 +16,7 @@ export default StyleSheet.create({
     width: 250,
     borderRadius: 30,
   },
-  bramPageButton: {
+  addItemPageButton: {
     backgroundColor: "#00b5ec",
   },
   whiteText: {

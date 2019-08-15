@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
-import styles from "../pages/pageStyles/BramPageStyle";
+import styles from "./pageStyles/AddItemPageStyle";
 
-class BramPage extends Component {
+class AddItemPage extends Component {
   constructor(props) {
     super(props);
   }
@@ -10,10 +10,10 @@ class BramPage extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.whiteText}>BramPage</Text>
+        <Text style={styles.whiteText}>AddItemPage</Text>
       </View>
     );
   }
 }
 
-export default BramPage;
+export default AddItemPage;

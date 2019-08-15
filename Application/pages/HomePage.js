@@ -4,7 +4,7 @@ import { Text,
          TouchableHighlight} from "react-native";
 import styles from "../pages/pageStyles/HomePageStyle";
 
-const BRAM_PAGE = "BramPage"
+const ADD_ITEM_PAGE = "AddItemPage"
 
 class HomePage extends Component {
   constructor(props) {
@@ -12,8 +12,8 @@ class HomePage extends Component {
   }
 
   buttonListener = buttonId => {
-    if (buttonId == BRAM_PAGE) {
-      this.props.navigation.navigate("GoToBramPage");
+    if (buttonId == ADD_ITEM_PAGE) {
+      this.props.navigation.navigate("GoToAddItemPage");
     }
   };
 
@@ -23,10 +23,10 @@ class HomePage extends Component {
         <Text style={styles.whiteText}>HomePage</Text>
 
         <TouchableHighlight
-          style={[styles.buttonContainer, styles.bramPageButton]}
-          onPress={() => this.buttonListener(BRAM_PAGE)}
+          style={[styles.buttonContainer, styles.addItemPageButton]}
+          onPress={() => this.buttonListener(ADD_ITEM_PAGE)}
         >
-          <Text style={styles.whiteText}>{"Go to Bram's Page"}</Text>
+          <Text style={styles.whiteText}>{"Go To Add Item Page"}</Text>
         </TouchableHighlight>
 
       </View>
