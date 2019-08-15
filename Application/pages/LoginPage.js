@@ -11,16 +11,16 @@ import styles from "../pages/pageStyles/LoginPageStyle";
 const LOGIN = "Login";
 const FORGOT_PASSWORD = "Forgot your password?";
 const REGISTER = "RegisterPage";
-const HOMEPAGE = "Homepage";
+const HOMEPAGE = "HomePage";
 
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;
 
   buttonListener = buttonId => {
     if (buttonId == LOGIN) {
-      this.props.navigation.navigate(HOMEPAGE);
+      this.props.navigation.navigate("GoToHomePage");
     } else if (buttonId == REGISTER) {
-      this.props.navigation.navigate(REGISTER);
+      this.props.navigation.navigate("GoToRegisterPage");
     } else if (buttonId == FORGOT_PASSWORD) {
       Alert.alert("ERROR", "IN DEVELOPMENT");
     }
