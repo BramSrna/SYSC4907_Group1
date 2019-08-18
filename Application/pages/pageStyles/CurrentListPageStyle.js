@@ -20,5 +20,14 @@ export default StyleSheet.create({
     paddingBottom: 15,
     color: "white",
     fontSize: 12
+  },
+  pageTitle: {
+    padding: 30,
+    paddingTop: 50,
+    paddingBottom: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    color: "white",
+    fontSize: 30
   }
 });

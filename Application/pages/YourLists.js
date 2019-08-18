@@ -3,9 +3,8 @@ import { Text, View, FlatList, Alert, BackHandler } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
 
 /**
- *
- * On this page we will need to get all the titles and actual items that the user is a part of. We will need the Cloud API to do this. For now I have hardcoded data to move on but I will need to come back to this once the Cloud is all setup.
- *
+ *  TODO
+ On this page we will need to get all the titles and actual items that the user is a part of. We will need the Cloud API to do this. For now I have hardcoded data to move on but I will need to come back to this once the Cloud is all setup.
  */
 
 class YourLists extends Component {
@@ -47,8 +46,28 @@ class YourLists extends Component {
     this.setState({ listTitles: tempNames });
   }
 
-  GetItem(item) {
-    this.props.navigation.navigate("Current List");
+  GenerateListItemsFromApiData(listName) {
+    var data = this.state.apiData;
+    var tempList = [];
+    for (var list in data) {
+      if (data[list].name == listName) {
+        tempList = data[list].items;
+      }
+    }
+    return tempList;
+  }
+
+  /**
+   * TODO
+   Should we pass in all the API data, so that way if they return to the page we don't have to make another API call.
+   Pro: Less API call --> Faster? Save data?
+   Con: Passing in a lot of useless info to another page --> Slower?
+   */
+  GoToList(item) {
+    this.props.navigation.navigate("Current List", {
+      name: item,
+      list: this.GenerateListItemsFromApiData(item)
+    });
   }
 
   FlatListItemSeparator = () => {
@@ -77,7 +96,7 @@ class YourLists extends Component {
           keyExtractor={index => index.toString()}
           ItemSeparatorComponent={this.FlatListItemSeparator}
           renderItem={({ item }) => (
-            <Text style={styles.item} onPress={this.GetItem.bind(this, item)}>
+            <Text style={styles.item} onPress={this.GoToList.bind(this, item)}>
               {item}
             </Text>
           )}
