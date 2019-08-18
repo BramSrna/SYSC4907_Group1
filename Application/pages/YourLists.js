@@ -2,17 +2,35 @@ import React, { Component } from "react";
 import { Text, View, FlatList, Alert, BackHandler } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
 
+/**
+ *
+ * On this page we will need to get all the titles and actual items that the user is a part of. We will need the Cloud API to do this. For now I have hardcoded data to move on but I will need to come back to this once the Cloud is all setup.
+ *
+ */
+
 class YourLists extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      listTitles: []
+      listTitles: [],
+      apiData: []
     };
   }
 
   componentDidMount() {
-    this.setState({ listTitles: ["List One", "List Two", "List Three"] });
+    // Im guessing this is something similar to what the Firebase query will return
+    this.setState(
+      {
+        apiData: [
+          { name: "List One", items: ["Item1", "Item2"] },
+          { name: "List Two", items: ["Item1", "Item2", "Item3"] }
+        ]
+      },
+      function() {
+        this.GenerateListTitlesFromApiData();
+      }
+    );
     BackHandler.addEventListener("hardwareBackPress", function() {
       // Return true if you want to go back, false if want to ignore. This is for Android only.
       // return true;
@@ -20,8 +38,16 @@ class YourLists extends Component {
     });
   }
 
+  GenerateListTitlesFromApiData() {
+    var data = this.state.apiData;
+    var tempNames = [];
+    for (var list in data) {
+      tempNames.push(data[list].name);
+    }
+    this.setState({ listTitles: tempNames });
+  }
+
   GetItem(item) {
-    Alert.alert(item);
     this.props.navigation.navigate("Current List");
   }
 
