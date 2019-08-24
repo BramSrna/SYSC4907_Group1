@@ -61,7 +61,7 @@ class CurrentList extends Component {
           {"<<--Your Lists"}
         </Text>
         <Text style={styles.pageTitle}>
-          {this.state.listName}: {this.state.listItems.length}
+          {this.state.listName}: {this.state.listItems.length} Items
         </Text>
         <FlatList
           style={styles.flatList}
