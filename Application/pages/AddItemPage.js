@@ -6,10 +6,10 @@ class AddItemPage extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {itemName: "Item Name",
-                  itemDepartment: "Department",
-                  storeName: "Store Name",
-                  aisleNum: "Aisle Number",};
+    this.state = {itemName: "",
+                  itemDepartment: "",
+                  storeName: "",
+                  aisleNum: "",};
   }
 
   buttonListener = buttonId => {
@@ -31,7 +31,8 @@ class AddItemPage extends Component {
             <View style = {{flex: 1}}>
               <TextInput
                 style={styles.textInput}
-                onChangeText={(text) => this.setState({text})}
+                placeholder="Item Name"
+                onChangeText={(itemName) => this.setState({itemName})}
                 value={this.state.itemName}
               />
             </View>
@@ -75,7 +76,8 @@ class AddItemPage extends Component {
             <View style = {{flex: 1}}>
               <TextInput
                 style={styles.textInput}
-                onChangeText={(text) => this.setState({text})}
+                placeholder="Store Name"
+                onChangeText={(storeName) => this.setState({storeName})}
                 value={this.state.storeName}
               />
             </View>
@@ -88,9 +90,10 @@ class AddItemPage extends Component {
 
             <View style = {{flex: 1}}>
               <TextInput
-                style={styles.textInput}
+                style={styles.textInput}                
+                placeholder="Aisle Number"
                 keyboardType = "numeric"
-                onChangeText={(text) => this.setState({text})}
+                onChangeText={(aisleNum) => this.setState({aisleNum})}
                 value={this.state.aisleNum}
               />
             </View>
