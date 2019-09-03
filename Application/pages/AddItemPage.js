@@ -1,6 +1,19 @@
 import React, { Component } from "react";
-import { Text, View, TextInput, Picker, Button, Image, TouchableHighlight } from "react-native";
+import { Text,
+         View,
+         TextInput,
+         Picker,
+         Button,
+         Image,
+         TouchableHighlight } from "react-native";
 import styles from "./pageStyles/AddItemPageStyle";
+import {db} from "../config";
+
+let addItem = item => {
+  db.ref("/items").push({
+    name: item
+  });
+};
 
 class AddItemPage extends Component {
   constructor(props) {
@@ -12,7 +25,9 @@ class AddItemPage extends Component {
                   aisleNum: "",};
   }
 
-  buttonListener = buttonId => {
+  handleRegister = () => {
+    addItem(this.state.name);
+    AlertIOS.alert("Item saved successfully");
   };
 
   render() {
@@ -103,7 +118,7 @@ class AddItemPage extends Component {
         <View style={styles.botContainer}>
           <TouchableHighlight
             style={[styles.buttonContainer, styles.submitButton]}
-            onPress={() => this.buttonListener()}
+            onPress={this.handleRegister}
           >
             <Text style={styles.whiteText}>{"Register Item"}</Text>
           </TouchableHighlight>
