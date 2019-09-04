@@ -5,13 +5,17 @@ import { Text,
          Picker,
          Button,
          Image,
-         TouchableHighlight } from "react-native";
+         TouchableHighlight,
+         Alert } from "react-native";
 import styles from "./pageStyles/AddItemPageStyle";
 import {db} from "../config";
 
-let addItem = item => {
+let addItem = (itemName, itemDepartment, storeName, aisleNum) => {
   db.ref("/items").push({
-    name: item
+    name: itemName,
+    department: itemDepartment,
+    store: storeName,
+    aisleNum: aisleNum
   });
 };
 
@@ -20,14 +24,17 @@ class AddItemPage extends Component {
     super(props);
 
     this.state = {itemName: "",
-                  itemDepartment: "",
+                  itemDepartment: "BAKERY",
                   storeName: "",
                   aisleNum: "",};
   }
 
   handleRegister = () => {
-    addItem(this.state.name);
-    AlertIOS.alert("Item saved successfully");
+    addItem(this.state.itemName,
+            this.state.itemDepartment,
+            this.state.storeName,
+            this.state.aisleNum);
+    Alert.alert("Item saved successfully");
   };
 
   render() {
@@ -60,10 +67,9 @@ class AddItemPage extends Component {
             
             <View style = {{flex: 1}}>
               <Picker
-                selectedValue={this.state.language}
+                selectedValue={this.state.itemDepartment}
                 style={styles.picker}
-                onValueChange={(itemValue, itemIndex) =>
-                  this.setState({language: itemValue})
+                onValueChange={(itemDepartment) => this.setState({itemDepartment})
                 }>
                 <Picker.Item label="Bakery" value="BAKERY" />
                 <Picker.Item label="Beer" value="BEER" />
