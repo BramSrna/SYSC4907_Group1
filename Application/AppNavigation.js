@@ -5,7 +5,7 @@ import {
 } from "react-navigation";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
-import BramPage from "./pages/BramPage";
+import AddItemPage from "./pages/AddItemPage";
 import JobinPage from "./pages/JobinPage";
 import HaseebPage from "./pages/HaseebPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -13,11 +13,11 @@ import YourLists from "./pages/YourLists";
 
 const DrawerStack = createDrawerNavigator(
   {
-    Homepage: { screen: HomePage },
-    "Haseeb's Page": { screen: HaseebPage },
-    "Bram's Page": { screen: BramPage },
-    "Jobin's Page": { screen: JobinPage },
-    "Your Lists": { screen: YourLists }
+    GoToHomePage: { screen: HomePage },
+    GoToHaseebPage: { screen: HaseebPage },
+    GoToAddItemPage: { screen: AddItemPage },
+    GoToJobinPage: { screen: JobinPage },
+    GoToListPage: { screen: YourLists }
   },
   {
     gesturesEnabled: false
@@ -36,8 +36,8 @@ const DrawerNavigation = createStackNavigator(
 // login stack
 const LoginStack = createStackNavigator(
   {
-    LoginPage: { screen: LoginPage },
-    RegisterPage: { screen: RegisterPage }
+    GoToLoginPage: { screen: LoginPage },
+    GoToRegisterPage: { screen: RegisterPage }
   },
   {
     headerMode: "none",
