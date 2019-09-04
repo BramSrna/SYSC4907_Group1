@@ -33,23 +33,8 @@ export default StyleSheet.create({
     color: 'white',
     fontSize: 20,
   },
-  whiteText: {
-    color: 'white',
-  },
   blackText: {
     color: 'black',
-  },
-  buttonContainer: {
-    height: 45,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
-    width: 250,
-    borderRadius: 30,
-  },
-  submitButton: {
-    backgroundColor: "#00b5ec",
   },
   textInput: {
     height: 40, 

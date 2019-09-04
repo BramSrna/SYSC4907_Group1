@@ -8,6 +8,7 @@ import {
   Alert
 } from "react-native";
 import styles from "../pages/pageStyles/LoginPageStyle";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 const LOGIN = "Login";
 const FORGOT_PASSWORD = "Forgot your password?";
 const REGISTER = "RegisterPage";
@@ -41,7 +42,7 @@ export default class LoginPage extends Component {
   render() {
     if (!this.userAlreadyLoggedIn) {
       return (
-        <View style={styles.container}>
+        <View style={globalStyles.defaultContainer}>
           <View style={styles.inputContainer}>
             <Image
               style={styles.inputIcon}
@@ -75,24 +76,24 @@ export default class LoginPage extends Component {
           </View>
 
           <TouchableHighlight
-            style={[styles.buttonContainer, styles.loginButton]}
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
             onPress={() => this.buttonListener(LOGIN)}
           >
-            <Text style={styles.whiteText}>{LOGIN}</Text>
+            <Text style={globalStyles.whiteText}>{LOGIN}</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
-            style={styles.buttonContainer}
+            style={globalStyles.defaultButtonContainer}
             onPress={() => this.buttonListener(FORGOT_PASSWORD)}
           >
-            <Text style={styles.whiteText}>{FORGOT_PASSWORD}</Text>
+            <Text style={globalStyles.whiteText}>{FORGOT_PASSWORD}</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
-            style={styles.buttonContainer}
+            style={globalStyles.defaultButtonContainer}
             onPress={() => this.buttonListener(REGISTER)}
           >
-            <Text style={styles.whiteText}>Register</Text>
+            <Text style={globalStyles.whiteText}>Register</Text>
           </TouchableHighlight>
         </View>
       );

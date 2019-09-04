@@ -11,6 +11,7 @@ import { Text,
          KeyboardAvoidingView } from "react-native";
 import { Header } from "react-navigation"
 import styles from "./pageStyles/AddItemPageStyle";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 import {db} from "../config";
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
@@ -56,7 +57,7 @@ class AddItemPage extends Component {
           behavior = {keyboardAvoidingViewBehavior}>
           <View style={styles.rowSorter}>
             <View style = {{flex: 1}}>
-              <Text style={styles.whiteText}>Item Name: </Text>
+              <Text style={globalStyles.whiteText}>Item Name: </Text>
             </View>
 
             <View style = {{flex: 1}}>
@@ -71,7 +72,7 @@ class AddItemPage extends Component {
 
           <View style={styles.rowSorter}>
             <View style = {{flex: 1}}>
-              <Text style={styles.whiteText}>Item Department: </Text>
+              <Text style={globalStyles.whiteText}>Item Department: </Text>
             </View>
             
             <View style = {{flex: 1}}>
@@ -100,7 +101,7 @@ class AddItemPage extends Component {
 
           <View style={styles.rowSorter}>
             <View style = {{flex: 1}}>
-              <Text style={styles.whiteText}>Store Name: </Text>
+              <Text style={globalStyles.whiteText}>Store Name: </Text>
             </View>
 
             <View style = {{flex: 1}}>
@@ -115,7 +116,7 @@ class AddItemPage extends Component {
 
           <View style={styles.rowSorter}>
             <View style = {{flex: 1}}>
-              <Text style={styles.whiteText}>Aisle Number: </Text>
+              <Text style={globalStyles.whiteText}>Aisle Number: </Text>
             </View>
 
             <View style = {{flex: 1}}>
@@ -132,10 +133,10 @@ class AddItemPage extends Component {
 
         <View style={styles.botContainer}>
           <TouchableHighlight
-            style={[styles.buttonContainer, styles.submitButton]}
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
             onPress={this.handleRegister}
           >
-            <Text style={styles.whiteText}>{"Register Item"}</Text>
+            <Text style={globalStyles.whiteText}>{"Register Item"}</Text>
           </TouchableHighlight>
         </View>
       </View>
