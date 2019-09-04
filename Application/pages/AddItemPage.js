@@ -6,9 +6,15 @@ import { Text,
          Button,
          Image,
          TouchableHighlight,
-         Alert } from "react-native";
+         Alert,
+         Platform,
+         KeyboardAvoidingView } from "react-native";
+import { Header } from "react-navigation"
 import styles from "./pageStyles/AddItemPageStyle";
 import {db} from "../config";
+
+const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
+const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
 let addItem = (itemName, itemDepartment, storeName, aisleNum) => {
   db.ref("/items").push({
@@ -44,7 +50,10 @@ class AddItemPage extends Component {
           <Text style={styles.whiteHeaderText}>Add Item:</Text>
         </View>
 
-        <View style={styles.midContainer}>
+        <KeyboardAvoidingView
+          style={styles.midContainer}
+          keyboardVerticalOffset = {keyboardVerticalOffset}
+          behavior = {keyboardAvoidingViewBehavior}>
           <View style={styles.rowSorter}>
             <View style = {{flex: 1}}>
               <Text style={styles.whiteText}>Item Name: </Text>
@@ -115,11 +124,11 @@ class AddItemPage extends Component {
                 placeholder="Aisle Number"
                 keyboardType = "numeric"
                 onChangeText={(aisleNum) => this.setState({aisleNum})}
-                value={this.state.aisleNum}
+                value={this.state.aisleNum}                
               />
             </View>
           </View>
-        </View>
+        </KeyboardAvoidingView>
 
         <View style={styles.botContainer}>
           <TouchableHighlight
