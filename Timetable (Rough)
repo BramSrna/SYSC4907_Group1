@@ -51,3 +51,4 @@ Some extra features that we came up with that could be added include:
   - API to help integrate with external/third-party apps
   - Average price of item --> Estimate total price of list
   - Add items to database by taking pictures of the item
+  - Scan items barcodes to add to list and database
