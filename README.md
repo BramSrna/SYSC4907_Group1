@@ -1,6 +1,6 @@
-# 4thYearProjectTemp
+# SYSC 4907 - Group 1
 
-COMMENT THE FUCK OUTTA THIS
+# Crowd-source grocery store layouts for dynamically sorted shopping list
 
 To run application:
 
