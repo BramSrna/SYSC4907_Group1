@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import styles from "./pageStyles/RegisterPageStyle";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 
 class RegisterPage extends Component {
   constructor(props) {
@@ -8,8 +9,8 @@ class RegisterPage extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.whiteText}>RegisterPage</Text>
+      <View style={globalStyles.defaultContainer}>
+        <Text style={globalStyles.whiteText}>RegisterPage</Text>
       </View>
     );
   }

@@ -36,3 +36,19 @@ Phase 3 (June 10th)
   Integrating cloud
 Phase 4 (June 10th)
   Adding machine learning
+  
+  
+Some of the fundamental requirements that were brought up during our discussions include:
+  - Create user accounts
+  - Create grocery list that can be shared between users --> List should rearrange based on layout of store
+  - Use map API to determine grocery store user is going to
+  - Machine learning algorithm to determine/train where specific food items may be from specific store
+  - Allow ‘higher privilege’ users to add info to help train machine learning and improve list accuracy --> Drag and drop like GUI to show where item was found, allow them to add items with tags to improve machine learning if the item is not already in our database
+ 
+
+Some extra features that we came up with that could be added include:
+  - Scan recipe to create a list
+  - API to help integrate with external/third-party apps
+  - Average price of item --> Estimate total price of list
+  - Add items to database by taking pictures of the item
+  - Scan items barcodes to add to list and database

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
 import styles from "../pages/pageStyles/JobinPageStyle";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 
 class JobinPage extends Component {
   constructor(props) {
@@ -9,8 +10,8 @@ class JobinPage extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.whiteText}>JobinPage</Text>
+      <View style={globalStyles.defaultContainer}>
+        <Text style={globalStyles.whiteText}>JobinPage</Text>
       </View>
     );
   }
