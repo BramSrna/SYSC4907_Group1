@@ -19,7 +19,7 @@ export default class LoginPage extends Component {
 
   buttonListener = buttonId => {
     if (buttonId == LOGIN) {
-      this.props.navigation.navigate("GoToHomePage");
+      this.props.navigation.navigate("Homepage");
     } else if (buttonId == REGISTER) {
       this.props.navigation.navigate("GoToRegisterPage");
     } else if (buttonId == FORGOT_PASSWORD) {

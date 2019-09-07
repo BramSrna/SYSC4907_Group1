@@ -2,10 +2,9 @@ import React, { Component } from "react";
 import { Text,
          View,
          TouchableHighlight, BackHandler} from "react-native";
-import styles from "../pages/pageStyles/HomePageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 
-const ADD_ITEM_PAGE = "AddItemPage"
+const ADD_ITEM_PAGE = "Add an Item"
 
 class HomePage extends Component {
   constructor(props) {
@@ -21,7 +20,7 @@ class HomePage extends Component {
   }
   buttonListener = buttonId => {
     if (buttonId == ADD_ITEM_PAGE) {
-      this.props.navigation.navigate("GoToAddItemPage");
+      this.props.navigation.navigate(ADD_ITEM_PAGE);
     }
   };
 

@@ -12,19 +12,24 @@ import RegisterPage from "./pages/RegisterPage";
 import YourLists from "./pages/YourLists";
 import CurrentList from "./pages/CurrentList";
 
-const DrawerStack = createDrawerNavigator({
-  Homepage: { screen: HomePage },
-  "Haseeb's Page": { screen: HaseebPage },
-  "Bram's Page": { screen: BramPage },
-  "Jobin's Page": { screen: JobinPage },
-  "Your Lists": { screen: YourLists },
-  "Current List": {
-    screen: CurrentList,
-    navigationOptions: {
+const DrawerStack = createDrawerNavigator(
+  {
+    Homepage: { screen: HomePage },
+    "Haseeb's Page": { screen: HaseebPage },
+    "Add an Item": { screen: AddItemPage },
+    "Jobin's Page": { screen: JobinPage },
+    "Your Lists": { screen: YourLists },
+    "Current List": {
+      screen: CurrentList,
+      navigationOptions: {
       drawerLabel: () => null
+      }
     }
+  },
+  {
+    gesturesEnabled: false
   }
-});
+);
 
 const DrawerNavigation = createStackNavigator(
   {
@@ -53,13 +58,7 @@ const LoginStack = createStackNavigator(
 const PrimaryNav = createStackNavigator(
   {
     loginStack: { screen: LoginStack },
-    drawerStack: {
-      screen: DrawerNavigation,
-      navigationOptions: {
-        // Do not let swiping back go to back page (Login Page)
-        gesturesEnabled: false
-      }
-    }
+    drawerStack: { screen: DrawerNavigation }
   },
   {
     headerMode: "none",
