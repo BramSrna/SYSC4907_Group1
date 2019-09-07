@@ -12,7 +12,6 @@ class HomePage extends Component {
     super(props);
   }
 
-<<<<<<< HEAD
   componentWillMount() {
     BackHandler.addEventListener("hardwareBackPress", function() {
       // Return true if you want to go back, false if want to ignore. This is for Android only.
@@ -20,13 +19,11 @@ class HomePage extends Component {
       return false;
     });
   }
-=======
   buttonListener = buttonId => {
     if (buttonId == ADD_ITEM_PAGE) {
       this.props.navigation.navigate("GoToAddItemPage");
     }
   };
->>>>>>> master
 
   render() {
     return (

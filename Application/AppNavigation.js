@@ -12,7 +12,6 @@ import RegisterPage from "./pages/RegisterPage";
 import YourLists from "./pages/YourLists";
 import CurrentList from "./pages/CurrentList";
 
-<<<<<<< HEAD
 const DrawerStack = createDrawerNavigator({
   Homepage: { screen: HomePage },
   "Haseeb's Page": { screen: HaseebPage },
@@ -24,18 +23,6 @@ const DrawerStack = createDrawerNavigator({
     navigationOptions: {
       drawerLabel: () => null
     }
-=======
-const DrawerStack = createDrawerNavigator(
-  {
-    GoToHomePage: { screen: HomePage },
-    GoToHaseebPage: { screen: HaseebPage },
-    GoToAddItemPage: { screen: AddItemPage },
-    GoToJobinPage: { screen: JobinPage },
-    GoToListPage: { screen: YourLists }
-  },
-  {
-    gesturesEnabled: false
->>>>>>> master
   }
 });
 
