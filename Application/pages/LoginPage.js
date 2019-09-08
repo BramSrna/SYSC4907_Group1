@@ -55,8 +55,7 @@ export default class LoginPage extends Component {
   }
 
   async authenticateUser(email, password){
-    await Firebase.auth().signInWithEmailAndPassword(email, password).then(async function(){
-      console.log("Reached 1");      
+    await Firebase.auth().signInWithEmailAndPassword(email, password).then(async function(){     
     }).catch(function(error) {
       var errorCode = error.code;
       var errorMessage = error.message;
