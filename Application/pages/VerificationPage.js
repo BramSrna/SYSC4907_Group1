@@ -31,9 +31,9 @@ export default class VerificationPage extends Component {
     }
   };
 
-  checkEmailVerification(){
+  async checkEmailVerification(){
     firebaseUser = new FirebaseUser();
-    return firebaseUser.isUserEmailVerified();
+    return await firebaseUser.isUserEmailVerified();
   }
 
   render() {

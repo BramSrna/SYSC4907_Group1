@@ -19,7 +19,7 @@ export default class FirebaseUser{
         await this.auth.createUserWithEmailAndPassword(email, password).then(async function(user){
             if(user != null) {
                 await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
-                    alert.log("Verification Email Send..");
+                    Alert.alert("Verification Email Send..", "Confirm your email by opening the link that was send to the provided email.");
                     await Firebase.auth().currentUser.updateProfile({
                         displayName: displayName
                     }).catch(function(error){
@@ -31,6 +31,7 @@ export default class FirebaseUser{
                 }).catch(function(error){
                     var errorCode = error.code;
                     var errorMessage = error.message;
+                    Alert.alert(errorCode, errorMessage);
                     console.log(errorCode+" "+errorMessage);
                     return false;
                 });
@@ -53,10 +54,11 @@ export default class FirebaseUser{
     async requestVerificationEmail(){
         if(Firebase.auth().currentUser != null) {
             await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
-                Alert.alert("New Verification Email Send.", "Check your email for the new email.");
+                Alert.alert("New Verification Email Send.", "Check your email for the new verification email.");
             }).catch(function(error){
                 var errorCode = error.code;
                 var errorMessage = error.message;
+                Alert.alert(errorCode, errorMessage);
                 console.log(errorCode+" "+errorMessage);
                 return false;
             });
@@ -66,7 +68,8 @@ export default class FirebaseUser{
         return true;
     }
 
-    isUserEmailVerified(){
+    async isUserEmailVerified(){
+        this.reloadUserInfo();
         return this.emailVerified;
     }
 
@@ -76,5 +79,16 @@ export default class FirebaseUser{
 
     getCurrentUser(){
         return this.user;
+    }
+
+    async reloadUserInfo(){
+        this.user = await Firebase.auth().currentUser.reload();
+        if(this.user != null) {
+            this.name = this.user.displayName;
+            this.email = this.user.email;
+            this.photoUrl = this.user.photoURL;
+            this.emailVerified = this.user.emailVerified;
+            this.uid = this.user.uid;
+        }
     }
 }
