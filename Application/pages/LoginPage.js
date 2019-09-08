@@ -11,6 +11,7 @@ import {
 import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import FirebaseUser from "../components/FirebaseUser";
 const LOGIN = "Login";
 const FORGOT_PASSWORD = "Forgot your password?";
 const REGISTER = "RegisterPage";
@@ -21,6 +22,7 @@ export default class LoginPage extends Component {
   state = {
     email:"",
     password:"",
+    authenticating: false
   }
 
   buttonListener = buttonId => {
@@ -33,19 +35,34 @@ export default class LoginPage extends Component {
     }
   };
 
-  onPressLoginIn(){
+  async onPressLoginIn(){
     if(this.checkInputs()){
-      if(this.authenticateUser(this.state.email, this.state.password)){
-        this.props.navigation.navigate("GoToHomePage");
+      this.setState({authenticating: true});
+      if(await this.authenticateUser(this.state.email, this.state.password)){
+        var user = Firebase.auth().currentUser;
+        if(user != null){
+          if(!user.emailVerified){
+            this.props.navigation.navigate("GoToVerificationPage");
+            this.setState({authenticating: false});
+          }
+          else{
+            this.props.navigation.navigate("GoToHomePage");
+            this.setState({authenticating: false});
+          }
+        }
       }
     }
   }
 
-  authenticateUser(email, password){
-    Firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+  async authenticateUser(email, password){
+    await Firebase.auth().signInWithEmailAndPassword(email, password).then(async function(){
+      console.log("Reached 1");      
+    }).catch(function(error) {
       var errorCode = error.code;
       var errorMessage = error.message;
+      Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
       console.log(errorCode+" "+errorMessage);
+      this.setState({authenticating: false});
       return false;
     });
     return true;

@@ -13,10 +13,10 @@ import YourLists from "./pages/YourLists";
 
 const DrawerStack = createDrawerNavigator(
   {
+    GoToVerificationPage: { screen: VerificationPage },
     GoToHomePage: { screen: HomePage },
     GoToHaseebPage: { screen: HaseebPage },
-    GoToAddItemPage: { screen: AddItemPage },
-    GoToVerificationPage: { screen: VerificationPage },
+    GoToAddItemPage: { screen: AddItemPage },    
     GoToListPage: { screen: YourLists }
   },
   {

@@ -1,4 +1,5 @@
 import Firebase from "firebase";
+import {Alert} from "react-native";
 
 export default class FirebaseUser{
     constructor(){
@@ -18,7 +19,7 @@ export default class FirebaseUser{
         await this.auth.createUserWithEmailAndPassword(email, password).then(async function(user){
             if(user != null) {
                 await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
-                    console.log("Verification Email send..");
+                    alert.log("Verification Email Send..");
                     await Firebase.auth().currentUser.updateProfile({
                         displayName: displayName
                     }).catch(function(error){
@@ -49,5 +50,31 @@ export default class FirebaseUser{
         return true;
     }
 
+    async requestVerificationEmail(){
+        if(Firebase.auth().currentUser != null) {
+            await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
+                Alert.alert("New Verification Email Send.", "Check your email for the new email.");
+            }).catch(function(error){
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                console.log(errorCode+" "+errorMessage);
+                return false;
+            });
+        } else{
+            return false;
+        }
+        return true;
+    }
 
+    isUserEmailVerified(){
+        return this.emailVerified;
+    }
+
+    getDisplayName(){
+        return this.displayName;
+    }
+
+    getCurrentUser(){
+        return this.user;
+    }
 }

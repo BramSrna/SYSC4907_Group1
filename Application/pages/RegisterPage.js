@@ -34,11 +34,13 @@ export default class RegisterPage extends Component {
   };
 
   async updateRegisterInfo(){
+    this.setState({registering: true});
     if(this.checkInputs()){
       var displayName = this.state.firstname + " " + this.state.lastname;
       firebaseUser = new FirebaseUser();
       if(await firebaseUser.register(this.state.email, this.state.password, displayName)){
         this.props.navigation.navigate("GoToVerificationPage");
+        this.setState({registering: false});
       }
     }
   }

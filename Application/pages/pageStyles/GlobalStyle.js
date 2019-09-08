@@ -21,5 +21,11 @@ export default StyleSheet.create({
   },
   whiteText: {
     color: 'white'
+  },
+  whiteTextPadding: {
+    color: 'white',
+    paddingLeft: 20,
+    paddingRight: 20,
+    textAlign: 'center'
   }
 });
