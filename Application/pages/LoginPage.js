@@ -5,8 +5,10 @@ import {
   TextInput,
   TouchableHighlight,
   Image,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
+import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 const LOGIN = "Login";
@@ -16,10 +18,14 @@ const HOMEPAGE = "HomePage";
 
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;
+  state = {
+    email:"",
+    password:"",
+  }
 
   buttonListener = buttonId => {
     if (buttonId == LOGIN) {
-      this.props.navigation.navigate("GoToHomePage");
+      this.onPressLoginIn();
     } else if (buttonId == REGISTER) {
       this.props.navigation.navigate("GoToRegisterPage");
     } else if (buttonId == FORGOT_PASSWORD) {
@@ -27,9 +33,38 @@ export default class LoginPage extends Component {
     }
   };
 
-  userIsCurrentlyLoggedIn() {
+  onPressLoginIn(){
+    if(this.checkInputs()){
+      if(this.authenticateUser(this.state.email, this.state.password)){
+        this.props.navigation.navigate("GoToHomePage");
+      }
+    }
+  }
+
+  authenticateUser(email, password){
+    Firebase.auth().signInWithEmailAndPassword(email, password).catch(function(error) {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode+" "+errorMessage);
+      return false;
+    });
+    return true;
+  }
+
+  checkInputs(){
+    if(!this.state.email=="" && !this.state.password==""){
+      return true;
+    }
     return false;
-    // return true;
+  }
+
+  userIsCurrentlyLoggedIn() {
+    Firebase.auth().onAuthStateChanged(function(user){
+      if(user){
+        return true;
+      }
+    });
+    return false;
   }
 
   componentWillMount() {
@@ -39,7 +74,15 @@ export default class LoginPage extends Component {
     }
   }
 
-  render() {
+  renderCurrentState(){
+    if(this.state.authenticating){
+      return(
+        <View>
+          <ActivityIndicator size="large"/>
+        </View>
+      )
+    }
+    
     if (!this.userAlreadyLoggedIn) {
       return (
         <View style={globalStyles.defaultContainer}>
@@ -52,10 +95,13 @@ export default class LoginPage extends Component {
             />
             <TextInput
               style={styles.inputs}
-              placeholder="Email"
+              placeholder="Enter your email..."
+              label="Email"
               keyboardType="email-address"
+              autoCapitalize = "none"
               underlineColorAndroid="transparent"
               onChangeText={email => this.setState({ email })}
+              value={this.state.email}
             />
           </View>
 
@@ -68,10 +114,12 @@ export default class LoginPage extends Component {
             />
             <TextInput
               style={styles.inputs}
-              placeholder="Password"
+              placeholder="Enter your password..."
+              label="Password"
               secureTextEntry={true}
               underlineColorAndroid="transparent"
               onChangeText={password => this.setState({ password })}
+              value={this.state.password}
             />
           </View>
 
@@ -98,6 +146,13 @@ export default class LoginPage extends Component {
         </View>
       );
     }
-    return null;
+  }
+
+  render() {
+    return(
+      <View style={globalStyles.defaultContainer}>
+        {this.renderCurrentState()}
+      </View>
+    );
   }
 }

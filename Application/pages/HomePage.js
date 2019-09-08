@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavigationActions } from 'react-navigation'
 import { Text,
          View,
          TouchableHighlight} from "react-native";

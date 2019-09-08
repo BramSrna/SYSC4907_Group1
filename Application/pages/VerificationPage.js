@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Text, View } from "react-native";
-import styles from "../pages/pageStyles/JobinPageStyle";
-import globalStyles from "../pages/pageStyles/GlobalStyle";
+import styles from "./pageStyles/VerificationPageStyle";
+import globalStyles from "./pageStyles/GlobalStyle";
 
-class JobinPage extends Component {
+class VerificationPage extends Component {
   constructor(props) {
     super(props);
   }
@@ -17,4 +17,4 @@ class JobinPage extends Component {
   }
 }
 
-export default JobinPage;
+export default VerificationPage;
