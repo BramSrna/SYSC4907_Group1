@@ -37,17 +37,14 @@ export default class LoginPage extends Component {
 
   async onPressLoginIn(){
     if(this.checkInputs()){
-      this.setState({authenticating: true});
       if(await this.authenticateUser(this.state.email, this.state.password)){
         var user = Firebase.auth().currentUser;
         if(user != null){
           if(!user.emailVerified){
             this.props.navigation.navigate("GoToVerificationPage");
-            this.setState({authenticating: false});
           }
           else{
             this.props.navigation.navigate("GoToHomePage");
-            this.setState({authenticating: false});
           }
         }
       }
@@ -61,12 +58,11 @@ export default class LoginPage extends Component {
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
       console.log(errorCode+" "+errorMessage);
-      this.setState({authenticating: false});
       return false;
     });
     return true;
   }
-
+  
   checkInputs(){
     if(!this.state.email=="" && !this.state.password==""){
       return true;
