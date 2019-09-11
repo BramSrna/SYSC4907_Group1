@@ -20,8 +20,8 @@ const HOMEPAGE = "HomePage";
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;
   state = {
-    email:"",
-    password:"",
+    email: "",
+    password: "",
     authenticating: false
   }
 
@@ -35,44 +35,49 @@ export default class LoginPage extends Component {
     }
   };
 
-  async onPressLoginIn(){
-    if(this.checkInputs()){
-      if(await this.authenticateUser(this.state.email, this.state.password)){
-        var user = Firebase.auth().currentUser;
-        if(user != null){
-          if(!user.emailVerified){
+  onPressLoginIn() {
+    if (this.checkInputs()) {
+      this.setState({authenticating: true});
+      if(this.authenticateUser(this.state.email, this.state.password)){
+        user = new FirebaseUser();
+        if (user != null && user.email == this.state.email) {
+          if (!user.emailVerified) {
             this.props.navigation.navigate("GoToVerificationPage");
           }
-          else{
+          else {
             this.props.navigation.navigate("GoToHomePage");
           }
         }
       }
+      this.setState({authenticating: false});
     }
   }
 
-  async authenticateUser(email, password){
-    await Firebase.auth().signInWithEmailAndPassword(email, password).then(async function(){     
-    }).catch(function(error) {
+  authenticateUser(email, password) {
+    Firebase.auth().signInWithEmailAndPassword(email, password).then(async function (object) {
+      if (object.user.email === email) {
+        return true;
+      }
+    }).catch(function (error) {
       var errorCode = error.code;
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
-      console.log(errorCode+" "+errorMessage);
+      console.log(errorCode + " " + errorMessage);
       return false;
     });
     return true;
   }
-  
-  checkInputs(){
-    if(!this.state.email=="" && !this.state.password==""){
+
+  checkInputs() {
+    if (!this.state.email == "" && !this.state.password == "") {
       return true;
     }
     return false;
   }
 
   userIsCurrentlyLoggedIn() {
-    Firebase.auth().onAuthStateChanged(function(user){
-      if(user){
+    Firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
         return true;
       }
     });
@@ -86,15 +91,15 @@ export default class LoginPage extends Component {
     }
   }
 
-  renderCurrentState(){
-    if(this.state.authenticating){
-      return(
+  renderCurrentState() {
+    if (this.state.authenticating) {
+      return (
         <View>
-          <ActivityIndicator size="large"/>
+          <ActivityIndicator size="large" />
         </View>
       )
     }
-    
+
     if (!this.userAlreadyLoggedIn) {
       return (
         <View style={globalStyles.defaultContainer}>
@@ -110,7 +115,7 @@ export default class LoginPage extends Component {
               placeholder="Enter your email..."
               label="Email"
               keyboardType="email-address"
-              autoCapitalize = "none"
+              autoCapitalize="none"
               underlineColorAndroid="transparent"
               onChangeText={email => this.setState({ email })}
               value={this.state.email}
@@ -161,7 +166,7 @@ export default class LoginPage extends Component {
   }
 
   render() {
-    return(
+    return (
       <View style={globalStyles.defaultContainer}>
         {this.renderCurrentState()}
       </View>
