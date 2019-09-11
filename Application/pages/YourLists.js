@@ -15,6 +15,7 @@ class YourLists extends Component {
 
    componentDidMount() {
       var listIds = [];
+      var that = this;
       var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
       db.database()
          .ref("/users/" + uid + "/lists")
@@ -40,28 +41,28 @@ class YourLists extends Component {
                            for (var item in ssv.items) {
                               listItems.push(ssv.items[item]);
                            }
-                           var curApiData = this.state.apiData;
+                           var curApiData = that.state.apiData;
                            curApiData.push({
                               name: ssv.name,
                               items: listItems
                            });
-                           this.setState(
+                           that.setState(
                               {
                                  apiData: curApiData
                               },
                               function() {
-                                 this.GenerateListTitlesFromApiData();
+                                 that.GenerateListTitlesFromApiData();
                               }
                            );
                         } else {
                            console.log("ERROR: List does not exist.");
                            Alert.alert("ERROR: List does not exist.");
-                           this.setState(
+                           that.setState(
                               {
                                  apiData: []
                               },
                               function() {
-                                 this.GenerateListTitlesFromApiData();
+                                 that.GenerateListTitlesFromApiData();
                               }
                            );
                            bool = true;
@@ -70,12 +71,12 @@ class YourLists extends Component {
                   if (bool) break;
                }
             } else {
-               this.setState(
+               that.setState(
                   {
                      apiData: []
                   },
                   function() {
-                     this.GenerateListTitlesFromApiData();
+                     that.GenerateListTitlesFromApiData();
                   }
                );
             }
