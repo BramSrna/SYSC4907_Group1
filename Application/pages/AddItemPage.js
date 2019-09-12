@@ -76,8 +76,8 @@ class AddItemPage extends Component {
                         style={styles.textInput}
                         placeholder="Item Name"
                         onChangeText={itemName => this.setState({ itemName })}
+                        value={this.state.itemName}
                      />
-                     value={this.state.itemName}
                   </View>
                </View>
 
