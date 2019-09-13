@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Text, View, FlatList, Alert, BackHandler } from "react-native";
+import { Text, Button, View, FlatList, Alert, BackHandler } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
 import { db } from "../config";
+import Swipeout from "react-native-swipeout";
 
 class YourLists extends Component {
    constructor(props) {
@@ -11,6 +12,12 @@ class YourLists extends Component {
          listTitles: [],
          apiData: []
       };
+
+      this.listSwipeOptions = [
+         {
+            text: "Button"
+         }
+      ];
    }
 
    componentDidMount() {
@@ -19,8 +26,7 @@ class YourLists extends Component {
       var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
       db.database()
          .ref("/users/" + uid + "/lists")
-         .once("value")
-         .then(function(snapshot) {
+         .on(/*ce*/ "value", function(snapshot) {
             var ssv = snapshot.val();
             if (ssv) {
                for (var createdKey in ssv.created) {
@@ -33,8 +39,7 @@ class YourLists extends Component {
                   var bool = false;
                   db.database()
                      .ref("/lists/" + listIds[idKey])
-                     .once("value")
-                     .then(function(snapshot) {
+                     .on(/*ce*/ "value", function(snapshot) {
                         var ssv = snapshot.val();
                         if (ssv) {
                            var listItems = [];
@@ -109,12 +114,6 @@ class YourLists extends Component {
       return tempList;
    }
 
-   /**
-   * TODO
-   Should we pass in all the API data, so that way if they return to the page we don't have to make another API call.
-   Pro: Less API call --> Faster? Save data?
-   Con: Passing in a lot of useless info to another page --> Slower?
-   */
    GoToList(item) {
       this.props.navigation.navigate("Current List", {
          name: item,
@@ -140,6 +139,11 @@ class YourLists extends Component {
             <Text style={styles.pageTitle}>
                Your Lists: {this.state.listTitles.length}
             </Text>
+            <Button
+               style={styles.addButton}
+               title=" + "
+               onPress={() => Alert.alert("New list pressed")}
+            />
             <FlatList
                style={styles.flatList}
                data={this.state.listTitles}
@@ -148,12 +152,22 @@ class YourLists extends Component {
                keyExtractor={index => index.toString()}
                ItemSeparatorComponent={this.FlatListItemSeparator}
                renderItem={({ item }) => (
-                  <Text
-                     style={styles.item}
-                     onPress={this.GoToList.bind(this, item)}
-                  >
-                     {item}
-                  </Text>
+                  // <Text
+                  //    style={styles.item}
+                  //    onPress={this.GoToList.bind(this, item)}
+                  // >
+                  //    {item}
+                  // </Text>
+                  <Swipeout right={this.listSwipeOptions}>
+                     <View>
+                        <Text
+                           style={styles.item}
+                           onPress={this.GoToList.bind(this, item)}
+                        >
+                           {item}
+                        </Text>
+                     </View>
+                  </Swipeout>
                )}
             />
          </View>

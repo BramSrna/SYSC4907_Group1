@@ -57,6 +57,7 @@ class CurrentList extends Component {
    render() {
       return (
          <View style={styles.ListContainer}>
+            {/* Take out once stack if fixed */}
             <Text
                style={styles.backButton}
                onPress={this.GoBackToYourLists.bind(this)}
