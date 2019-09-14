@@ -1,5 +1,13 @@
 import React, { Component } from "react";
-import { Text, Button, View, FlatList, Alert, BackHandler } from "react-native";
+import {
+   TouchableOpacity,
+   Text,
+   Button,
+   View,
+   FlatList,
+   Alert,
+   BackHandler
+} from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
 import { db } from "../config";
 import Swipeout from "react-native-swipeout";
@@ -15,6 +23,7 @@ class YourLists extends Component {
 
       this.listSwipeOptions = [
          {
+            backgroundColor: "red",
             text: "Button"
          }
       ];
@@ -152,21 +161,14 @@ class YourLists extends Component {
                keyExtractor={index => index.toString()}
                ItemSeparatorComponent={this.FlatListItemSeparator}
                renderItem={({ item }) => (
-                  // <Text
-                  //    style={styles.item}
-                  //    onPress={this.GoToList.bind(this, item)}
-                  // >
-                  //    {item}
-                  // </Text>
-                  <Swipeout right={this.listSwipeOptions}>
-                     <View>
-                        <Text
-                           style={styles.item}
-                           onPress={this.GoToList.bind(this, item)}
-                        >
-                           {item}
-                        </Text>
-                     </View>
+                  <Swipeout
+                     right={this.listSwipeOptions}
+                     backgroundColor="#000000"
+                     underlayColor="white"
+                  >
+                     <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
+                        <Text style={styles.item}>{item}</Text>
+                     </TouchableOpacity>
                   </Swipeout>
                )}
             />
