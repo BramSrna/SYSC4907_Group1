@@ -11,6 +11,17 @@ import HaseebPage from "./pages/HaseebPage";
 import RegisterPage from "./pages/RegisterPage";
 import YourLists from "./pages/YourLists";
 
+const LoginStack = createStackNavigator(
+  {
+    Login: {screen: LoginPage},
+    Registration: {screen:RegisterPage},
+    Verification: {screen: VerificationPage},
+  },
+  {
+    headerMode: "none"
+  }
+);
+
 const DrawerStack = createDrawerNavigator(
   {
     GoToVerificationPage: { screen: VerificationPage },
@@ -30,20 +41,6 @@ const DrawerNavigation = createStackNavigator(
   },
   {
     headerMode: "none"
-  }
-);
-
-// login stack
-const LoginStack = createStackNavigator(
-  {
-    GoToLoginPage: { screen: LoginPage },
-    GoToRegisterPage: { screen: RegisterPage }
-  },
-  {
-    headerMode: "none",
-    navigationOptions: {
-      headerVisible: false
-    }
   }
 );
 

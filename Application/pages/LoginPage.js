@@ -36,29 +36,27 @@ export default class LoginPage extends Component {
   };
 
   onPressLoginIn() {
-    if (this.checkInputs()) {
-      this.setState({authenticating: true});
-      if(this.authenticateUser(this.state.email, this.state.password)){
-        user = new FirebaseUser();
-        if (user != null && user.email == this.state.email) {
-          if (!user.emailVerified) {
-            this.props.navigation.navigate("GoToVerificationPage");
-          }
-          else {
-            this.props.navigation.navigate("GoToHomePage");
-          }
+    if(!this.state.email || !this.state.password){
+      Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
+      return console.log("Email and password required!");
+    }
+    this.setState({ authenticating: true });
+
+    if (this.authenticateUser(this.state.email, this.state.password)) {
+      user = new FirebaseUser();
+      if (user != null && user.email == this.state.email) {
+        if (!user.emailVerified) {
+          this.props.navigation.navigate("GoToVerificationPage");
+        }
+        else {
+          this.props.navigation.navigate("GoToHomePage");
         }
       }
-      this.setState({authenticating: false});
     }
   }
 
   authenticateUser(email, password) {
-    Firebase.auth().signInWithEmailAndPassword(email, password).then(async function (object) {
-      if (object.user.email === email) {
-        return true;
-      }
-    }).catch(function (error) {
+    Firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
       var errorCode = error.code;
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
@@ -68,10 +66,14 @@ export default class LoginPage extends Component {
     return true;
   }
 
-  checkInputs() {
-    if (!this.state.email == "" && !this.state.password == "") {
-      return true;
-    }
+  signUserOutIfLoggedIn() {
+    if (Firebase.auth().onAuthStateChanged(async function (user) {
+      if (user) {
+        await Firebase.auth().signOut().then(function () {
+          return true;
+        });
+      }
+    }));
     return false;
   }
 
