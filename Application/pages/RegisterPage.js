@@ -9,7 +9,7 @@ import {
   Alert,
   ActivityIndicator
 } from "react-native";
-import Firebase from "firebase";
+import * as Firebase from "firebase";
 import styles from "./pageStyles/RegisterPageStyle";
 import FirebaseUser from "../components/FirebaseUser"
 
@@ -19,43 +19,49 @@ const LOGIN = "Already Registered/Login";
 export default class RegisterPage extends Component {
   userAlreadyLoggedIn = false;
   state = {
-    firstname:"",
-    lastname:"",
-    email:"",
-    password:"",
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     registering: false
   }
   buttonListener = buttonId => {
     if (buttonId === REGISTER) {
       this.updateRegisterInfo();
     } else if (buttonId === LOGIN) {
-      this.props.navigation.navigate("GoToLoginPage");
+      this.props.navigation.navigate("Login");
     }
   };
 
-  async updateRegisterInfo(){
-    this.setState({registering: true});
-    if(this.checkInputs()){
+  async updateRegisterInfo() {
+    if (this.checkInputs()) {
+      this.setState({ registering: true });
       var displayName = this.state.firstname + " " + this.state.lastname;
       firebaseUser = new FirebaseUser();
-      if(await firebaseUser.register(this.state.email, this.state.password, displayName)){
-        this.props.navigation.navigate("GoToVerificationPage");
-        this.setState({registering: false});
+      if (await firebaseUser.register(this.state.email, this.state.password, displayName)) {
+        this.props.navigation.navigate("Verification");
+        this.setState({ registering: false });
+      }
+    } else {
+      Alert.alert("Invalid Inputs", "Please Confirm the inputs and try again.");
+    }
+  }
+
+  checkInputs() {
+    if (!this.state.email || !this.state.password
+      || !this.state.firstname || !this.state.lastname) {
+      return false;
+    } else {
+      if (this.state.password == this.state.confirmPassword) {
+        return true;
       }
     }
   }
 
-  checkInputs(){
-    if(!this.state.email=="" && !this.state.password==""
-    && !this.state.firstname=="" && !this.state.lastname==""){
-      return true;
-    }
-    return false;
-  }
-
   userIsCurrentlyLoggedIn() {
-    Firebase.auth().onAuthStateChanged(function(user){
-      if(user){
+    Firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
         return true;
       }
     });
@@ -70,12 +76,12 @@ export default class RegisterPage extends Component {
     }
   }
 
-  renderCurrentState(){
-    if(this.state.registering){
-      return(
-      <View style={styles.container}>
-        <ActivityIndicator size="large"/>
-      </View>
+  renderCurrentState() {
+    if (this.state.registering) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" />
+        </View>
       );
     }
 
@@ -128,7 +134,7 @@ export default class RegisterPage extends Component {
               placeholder="Email"
               label="Email"
               keyboardType="email-address"
-              autoCapitalize = "none"
+              autoCapitalize="none"
               underlineColorAndroid="transparent"
               onChangeText={email => this.setState({ email })}
             />
@@ -151,6 +157,23 @@ export default class RegisterPage extends Component {
             />
           </View>
 
+          <View style={styles.inputContainer}>
+            <Image
+              style={styles.inputIcon}
+              source={{
+                uri: "https://png.icons8.com/key-2/ultraviolet/50/3498db"
+              }}
+            />
+            <TextInput
+              style={styles.inputs}
+              placeholder="Confirm Password"
+              label="Confirm Password"
+              secureTextEntry={true}
+              underlineColorAndroid="transparent"
+              onChangeText={confirmPassword => this.setState({ confirmPassword })}
+            />
+          </View>
+
           <TouchableHighlight
             style={[styles.buttonContainer, styles.loginButton]}
             onPress={() => this.buttonListener(REGISTER)}
@@ -166,11 +189,11 @@ export default class RegisterPage extends Component {
           </TouchableHighlight>
         </View>
       );
+    }
   }
-}
 
   render() {
-    return(
+    return (
       <View style={styles.container}>
         {this.renderCurrentState()}
       </View>

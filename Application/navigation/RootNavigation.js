@@ -1,14 +1,16 @@
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
+import {createStackNavigator, createAppContainer} from 'react-navigation';
+
+import LoginPage from "../pages/LoginPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import VerificationPage from "../pages/VerificationPage";
+import RegisterPage from "../pages/RegisterPage";
 import MainDrawerNavigator from './MainDrawerNavigator';
 
-import LoginPage from "./pages/LoginPage";
-import VerificationPage from "./pages/VerificationPage";
-import RegisterPage from "./pages/RegisterPage";
-
-const RootStackNavigator = StackNavigator(
+const RootStackNavigator = createStackNavigator(
   {
     Login: {screen: LoginPage},
+    ForgotPassword: {screen: ForgotPasswordPage},
     Registration: {screen:RegisterPage},
     Verification: {screen: VerificationPage},
 
@@ -19,8 +21,6 @@ const RootStackNavigator = StackNavigator(
   }
 );
 
-export default class RootNavigation extends React.Component {
-  render() {
-    return <RootStackNavigator />;
-  }
-}
+const App = createAppContainer(RootStackNavigator);
+
+export default App;

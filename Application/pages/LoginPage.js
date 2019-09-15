@@ -29,9 +29,9 @@ export default class LoginPage extends Component {
     if (buttonId == LOGIN) {
       this.onPressLoginIn();
     } else if (buttonId == REGISTER) {
-      this.props.navigation.navigate("GoToRegisterPage");
+      this.props.navigation.navigate("Registration");
     } else if (buttonId == FORGOT_PASSWORD) {
-      Alert.alert("ERROR", "IN DEVELOPMENT");
+      this.props.navigation.navigate("ForgotPassword");
     }
   };
 
@@ -53,28 +53,20 @@ export default class LoginPage extends Component {
         }
       }
     }
+    this.setState({ authenticating: false });
+
   }
 
-  authenticateUser(email, password) {
-    Firebase.auth().signInWithEmailAndPassword(email, password).catch(function (error) {
+  authenticateUser = (email, password) => {
+    Firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+      return true;
+    }, (error) => {
       var errorCode = error.code;
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
       console.log(errorCode + " " + errorMessage);
       return false;
     });
-    return true;
-  }
-
-  signUserOutIfLoggedIn() {
-    if (Firebase.auth().onAuthStateChanged(async function (user) {
-      if (user) {
-        await Firebase.auth().signOut().then(function () {
-          return true;
-        });
-      }
-    }));
-    return false;
   }
 
   userIsCurrentlyLoggedIn() {

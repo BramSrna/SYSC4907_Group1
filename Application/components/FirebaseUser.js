@@ -16,19 +16,21 @@ export default class FirebaseUser{
 
     async register(email, password, displayName){
         this.auth = Firebase.auth();
-        await this.auth.createUserWithEmailAndPassword(email, password).then(async function(user){
-            if(user != null) {
-                await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
+        await this.auth.createUserWithEmailAndPassword(email, password).then(() => {
+            if(Firebase.auth().currentUser) {
+                Firebase.auth().currentUser.sendEmailVerification().then(() => {
                     Alert.alert("Verification Email Send..", "Confirm your email by opening the link that was send to the provided email.");
-                    await Firebase.auth().currentUser.updateProfile({
+                    Firebase.auth().currentUser.updateProfile({
                         displayName: displayName
-                    }).catch(function(error){
+                    }).then(() => {
+                        return true;
+                    }, (error) => {
                         var errorCode = error.code;
                         var errorMessage = error.message;
                         console.log(errorCode+" "+errorMessage);
                         return false;
                     })
-                }).catch(function(error){
+                }, (error) => {
                     var errorCode = error.code;
                     var errorMessage = error.message;
                     Alert.alert(errorCode, errorMessage);
@@ -38,7 +40,7 @@ export default class FirebaseUser{
             } else{
                 return false;
             }
-        }).catch(function(error) {
+        }, (error) => {
             var errorCode = error.code;
             var errorMessage = error.message;
             if (errorCode == "auth/weak-password"){
