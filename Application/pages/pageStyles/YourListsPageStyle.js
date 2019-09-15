@@ -7,12 +7,6 @@ export default StyleSheet.create({
       flex: 1,
       backgroundColor: "black"
    },
-   item: {
-      padding: 10,
-      fontSize: 18,
-      height: 40,
-      color: "white"
-   },
    flatList: {
       paddingTop: 30
    },
