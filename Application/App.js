@@ -30,7 +30,7 @@ export default class App extends Component {
   }
 
   render() {
-    if(!this.state.isLoadingComplete && !this.state.isAuthProcessReady && !this.props.skipLoadingScreen){
+    if((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen){
       return(
         <AppLoading
           startAsync={this._loadResourcesAsync}

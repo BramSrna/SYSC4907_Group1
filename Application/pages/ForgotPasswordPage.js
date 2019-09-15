@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import {Text, View, TextInput, TouchableHighlight, Image} from "react-native";
+import { Text, View, TextInput, TouchableHighlight, Image, Alert } from "react-native";
 import styles from "./pageStyles/GlobalStyle"
-import * as Firebase from "firebase";
+import * as firebase from "firebase";
 
 export default class ForgotPasswordPage extends Component {
     constructor(props) {
@@ -12,7 +12,14 @@ export default class ForgotPasswordPage extends Component {
     }
 
     resetPassword = () => {
-
+        firebase.auth().sendPasswordResetEmail(this.state.email).then(() => {
+            Alert.alert("Password Reset Link Sent", "Please check your email for the password reset link.");
+        }, (error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            Alert.alert(errorCode, errorMessage);
+            console.log(errorCode + " " + errorMessage);
+        });
     }
 
     onBackToLoginPress = () => {
