@@ -7,7 +7,7 @@ import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { AppLoading } from 'expo';
 
 export default class App extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       isLoadingComplete: false,
@@ -15,23 +15,23 @@ export default class App extends Component {
       isAuthenticated: false
     };
 
-    if(!firebase.apps.length){ // Check to see if Firebase app is already initialized on Android
-       app = firebase.initializeApp(FirebaseConfig.firebaseConfig);
+    if (!firebase.apps.length) { // Check to see if Firebase app is already initialized on Android
+      app = firebase.initializeApp(FirebaseConfig.firebaseConfig);
     }
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged); // See if the user is authenticated
   }
 
   onAuthStateChanged = (user) => {
-    this.setState({isAuthProcessReady: true});
-    this.setState({isAuthenticated: !!user}); // (Bang Bang) !! returns the true value of the obj
+    this.setState({ isAuthProcessReady: true });
+    this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
   }
 
-  componentWillMount(){
+  componentWillMount() {
   }
 
   render() {
-    if((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen){
-      return(
+    if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
+      return (
         <AppLoading
           startAsync={this._loadResourcesAsync}
           onError={this._handleLoadingError}
@@ -41,12 +41,30 @@ export default class App extends Component {
     }
     return (
       <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-          {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
-        </View>
-      );
+        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+        {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
+      </View>
+    );
   }
+
+  _loadResourcesAsync = async () => {
+    return Promise.all([
+      Asset.loadAsync([
+        // Add all necessary assets here
+        require('./assets/icon.png'),
+        require('./assets/splash.png'),
+      ]),
+    ]);
+  };
+
+  _handleLoadingError = error => {
+    console.warn(error);
+  };
+
+  _handleFinishLoading = () => {
+    this.setState({ isLoadingComplete: true });
+  };
 }
 
 const styles = StyleSheet.create({
