@@ -23,27 +23,6 @@ class YourLists extends Component {
          apiData: [],
          isDialogVisible: false
       };
-
-      this.listSwipeOptions = [
-         {
-            component: (
-               <View
-                  style={{
-                     flex: 1,
-                     alignItems: "center",
-                     justifyContent: "center",
-                     flexDirection: "column"
-                  }}
-               >
-                  <Image source={require("../images/delete_list_button.png")} />
-               </View>
-            ),
-            backgroundColor: "red",
-            onPress: () => {
-               Alert.alert("Delete list button was clicked");
-            }
-         }
-      ];
    }
 
    componentDidMount() {
@@ -95,6 +74,7 @@ class YourLists extends Component {
             this.GenerateListTitlesFromApiData();
          }
       );
+      // TODO Get all list data
       // var listIds = [];
       // var that = this;
       // var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
@@ -211,13 +191,34 @@ class YourLists extends Component {
       this.setState({ isDialogVisible: false });
    };
 
-   handleDelete = () => {
-      // The user has pressed the "Delete" button, so here you can do your own logic.
-      // ...Your logic
+   handleCreate = () => {
+      // TODO Add the list to the list table and associate it to the user
       this.setState({ isDialogVisible: false });
    };
 
    render() {
+      const swipeButtons = [
+         {
+            component: (
+               <View
+                  style={{
+                     flex: 1,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     flexDirection: "column"
+                  }}
+               >
+                  <Image source={require("../images/delete_list_button.png")} />
+               </View>
+            ),
+            backgroundColor: "red",
+            onPress: () => {
+               Alert.alert(
+                  this.state.activeRow + "Delete list button was clicked"
+               );
+            }
+         }
+      ];
       return (
          <View style={styles.ListContainer}>
             <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
@@ -227,7 +228,7 @@ class YourLists extends Component {
                </Dialog.Description>
                <Dialog.Input></Dialog.Input>
                <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-               <Dialog.Button label="Delete" onPress={this.handleDelete} />
+               <Dialog.Button label="Create" onPress={this.handleCreate} />
             </Dialog.Container>
             <Text style={styles.pageTitle}>
                Your Lists: {this.state.listTitles.length}
@@ -246,7 +247,7 @@ class YourLists extends Component {
                ItemSeparatorComponent={this.FlatListItemSeparator}
                renderItem={({ item }) => (
                   <Swipeout
-                     right={this.listSwipeOptions}
+                     right={swipeButtons}
                      backgroundColor="#000000"
                      underlayColor="white"
                   >
