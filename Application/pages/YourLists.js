@@ -27,7 +27,7 @@ class YourLists extends Component {
 
    componentDidMount() {
       // Instead of constantly making api data calls just use this hardcoded data for development purposes
-      this.setState(
+      /*this.setState(
          {
             apiData: [
                {
@@ -73,73 +73,75 @@ class YourLists extends Component {
          function() {
             this.GenerateListTitlesFromApiData();
          }
-      );
+      );*/
       // TODO Get all list data
-      // var listIds = [];
-      // var that = this;
-      // var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
-      // db.database()
-      //    .ref("/users/" + uid + "/lists")
-      //    .on(/*ce*/ "value", function(snapshot) {
-      //       var ssv = snapshot.val();
-      //       if (ssv) {
-      //          for (var createdKey in ssv.created) {
-      //             listIds.push(ssv.created[createdKey]);
-      //          }
-      //          for (var sharedWithKey in ssv.shared_with) {
-      //             listIds.push(ssv.shared_with[sharedWithKey]);
-      //          }
-      //          for (var idKey in listIds) {
-      //             var bool = false;
-      //             db.database()
-      //                .ref("/lists/" + listIds[idKey])
-      //                .on(/*ce*/ "value", function(snapshot) {
-      //                   var ssv = snapshot.val();
-      //                   if (ssv) {
-      //                      var listItems = [];
-      //                      for (var item in ssv.items) {
-      //                         listItems.push(ssv.items[item]);
-      //                      }
-      //                      var curApiData = that.state.apiData;
-      //                      curApiData.push({
-      //                         name: ssv.name,
-      //                         items: listItems
-      //                      });
-      //                      that.setState(
-      //                         {
-      //                            apiData: curApiData
-      //                         },
-      //                         function() {
-      //                            that.GenerateListTitlesFromApiData();
-      //                         }
-      //                      );
-      //                   } else {
-      //                      console.log("ERROR: List does not exist.");
-      //                      Alert.alert("ERROR: List does not exist.");
-      //                      that.setState(
-      //                         {
-      //                            apiData: []
-      //                         },
-      //                         function() {
-      //                            that.GenerateListTitlesFromApiData();
-      //                         }
-      //                      );
-      //                      bool = true;
-      //                   }
-      //                });
-      //             if (bool) break;
-      //          }
-      //       } else {
-      //          that.setState(
-      //             {
-      //                apiData: []
-      //             },
-      //             function() {
-      //                that.GenerateListTitlesFromApiData();
-      //             }
-      //          );
-      //       }
-      //    });
+      var listIds = [];
+      var that = this;
+      var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
+      db.database()
+         .ref("/users/" + uid + "/lists")
+         .on(/*ce*/ "value", function(snapshot) {
+            var ssv = snapshot.val();
+            if (ssv) {
+               for (var createdKey in ssv.created) {
+                  listIds.push(ssv.created[createdKey]);
+               }
+               for (var sharedWithKey in ssv.shared_with) {
+                  listIds.push(ssv.shared_with[sharedWithKey]);
+               }
+               for (var idKey in listIds) {
+                  var bool = false;
+                  var currentListId = listIds[idKey];
+                  db.database()
+                     .ref("/lists/" + listIds[idKey])
+                     .on(/*ce*/ "value", function(snapshot) {
+                        var ssv = snapshot.val();
+                        if (ssv) {
+                           var listItems = [];
+                           for (var item in ssv.items) {
+                              listItems.push(ssv.items[item]);
+                           }
+                           var curApiData = that.state.apiData;
+                           curApiData.push({
+                              key: currentListId,
+                              name: ssv.name,
+                              items: listItems
+                           });
+                           that.setState(
+                              {
+                                 apiData: curApiData
+                              },
+                              function() {
+                                 that.GenerateListTitlesFromApiData();
+                              }
+                           );
+                        } else {
+                           console.log("ERROR: List does not exist.");
+                           Alert.alert("ERROR: List does not exist.");
+                           that.setState(
+                              {
+                                 apiData: []
+                              },
+                              function() {
+                                 that.GenerateListTitlesFromApiData();
+                              }
+                           );
+                           bool = true;
+                        }
+                     });
+                  if (bool) break;
+               }
+            } else {
+               that.setState(
+                  {
+                     apiData: []
+                  },
+                  function() {
+                     that.GenerateListTitlesFromApiData();
+                  }
+               );
+            }
+         });
 
       BackHandler.addEventListener("hardwareBackPress", function() {
          // Return true if you want to go back, false if want to ignore. This is for Android only.
@@ -196,6 +198,12 @@ class YourLists extends Component {
       this.setState({ isDialogVisible: false });
    };
 
+   handleSwipeOpen(rowId, direction) {
+      if (typeof direction !== "undefined") {
+         this.setState({ activeRow: rowId });
+      }
+   }
+
    render() {
       const swipeButtons = [
          {
@@ -214,7 +222,10 @@ class YourLists extends Component {
             backgroundColor: "red",
             onPress: () => {
                Alert.alert(
-                  this.state.activeRow + "Delete list button was clicked"
+                  "Delete list button was clicked for list: " +
+                     this.state.apiData[this.state.activeRow].name +
+                     " with ID: " +
+                     this.state.apiData[this.state.activeRow].key
                );
             }
          }
@@ -242,14 +253,21 @@ class YourLists extends Component {
                style={styles.flatList}
                data={this.state.listTitles}
                width="100%"
-               extraData={this.state.arrayHolder}
+               extraData={this.state.activeRow}
                keyExtractor={index => index.toString()}
                ItemSeparatorComponent={this.FlatListItemSeparator}
-               renderItem={({ item }) => (
+               renderItem={({ item, index }) => (
                   <Swipeout
                      right={swipeButtons}
                      backgroundColor="#000000"
                      underlayColor="white"
+                     rowID={index}
+                     sectionId={1}
+                     autoClose={true}
+                     onOpen={(secId, rowId, direction) =>
+                        this.handleSwipeOpen(rowId, direction)
+                     }
+                     close={this.state.activeRow !== index}
                   >
                      <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
                         <Text style={styles.item}>{item}</Text>

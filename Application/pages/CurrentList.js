@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import { Text, View, FlatList, BackHandler } from "react-native";
+import { Text, Image, View, FlatList, BackHandler } from "react-native";
 import styles from "./pageStyles/CurrentListPageStyle";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Swipeout from "react-native-swipeout";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -54,7 +56,51 @@ class CurrentList extends Component {
       );
    };
 
+   GenerateListItem(item) {
+      if (item.purchased) {
+         return <Text style={styles.purchasedItem}>{item.name}</Text>;
+      } else {
+         return <Text style={styles.notPurchasedItem}>{item.name}</Text>;
+      }
+   }
+
+   handleSwipeOpen(rowId, direction) {
+      if (typeof direction !== "undefined") {
+         this.setState({ activeRow: rowId });
+         console.log(
+            "Active Row: " + rowId + " " + this.state.listItems[rowId].name
+         );
+      }
+   }
+
+   HandleOnHoldItem(item) {}
+
    render() {
+      const swipeButtons = [
+         {
+            component: (
+               <View
+                  style={{
+                     flex: 1,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     flexDirection: "column"
+                  }}
+               >
+                  <Image source={require("../images/delete_list_button.png")} />
+               </View>
+            ),
+            backgroundColor: "red",
+            onPress: () => {
+               Alert.alert(
+                  "Delete item button was clicked for item: " +
+                     this.state.listItems[this.state.activeRow].name +
+                     " with ID: " +
+                     this.state.listItems[this.state.activeRow].key
+               );
+            }
+         }
+      ];
       return (
          <View style={styles.ListContainer}>
             {/* Take out once stack if fixed */}
@@ -71,11 +117,26 @@ class CurrentList extends Component {
                style={styles.flatList}
                data={this.state.listItems}
                width="100%"
-               extraData={this.state.arrayHolder}
+               extraData={this.state.activeRow}
                keyExtractor={index => index.name}
                ItemSeparatorComponent={this.FlatListItemSeparator}
-               renderItem={({ item }) => (
-                  <Text style={styles.item}>{item.name}</Text>
+               renderItem={({ item, index }) => (
+                  <Swipeout
+                     right={swipeButtons}
+                     backgroundColor="#000000"
+                     underlayColor="white"
+                     rowID={index}
+                     sectionId={1}
+                     autoClose={true}
+                     onOpen={(secId, rowId, direction) =>
+                        this.handleSwipeOpen(rowId, direction)
+                     }
+                     close={this.state.activeRow !== index}
+                  >
+                     <TouchableOpacity>
+                        {this.GenerateListItem(item)}
+                     </TouchableOpacity>
+                  </Swipeout>
                )}
             />
          </View>
