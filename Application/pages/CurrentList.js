@@ -3,6 +3,7 @@ import { Text, Image, View, FlatList, BackHandler } from "react-native";
 import styles from "./pageStyles/CurrentListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
+import DoubleClick from "react-native-double-tap";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -67,13 +68,15 @@ class CurrentList extends Component {
    handleSwipeOpen(rowId, direction) {
       if (typeof direction !== "undefined") {
          this.setState({ activeRow: rowId });
-         console.log(
-            "Active Row: " + rowId + " " + this.state.listItems[rowId].name
-         );
       }
    }
 
-   HandleOnHoldItem(item) {}
+   HandleDoubleTapItem(indexPosition) {
+      var currentList = this.state.listItems;
+      var currentItemBool = currentList[indexPosition].purchased;
+      currentList[indexPosition].purchased = !currentItemBool;
+      this.setState({ listItems: currentList });
+   }
 
    render() {
       const swipeButtons = [
@@ -117,7 +120,7 @@ class CurrentList extends Component {
                style={styles.flatList}
                data={this.state.listItems}
                width="100%"
-               extraData={this.state.activeRow}
+               extraData={this.state}
                keyExtractor={index => index.name}
                ItemSeparatorComponent={this.FlatListItemSeparator}
                renderItem={({ item, index }) => (
@@ -133,9 +136,17 @@ class CurrentList extends Component {
                      }
                      close={this.state.activeRow !== index}
                   >
-                     <TouchableOpacity>
-                        {this.GenerateListItem(item)}
-                     </TouchableOpacity>
+                     <DoubleClick
+                        doubleTap={() => {
+                           console.log("Double tap called on index: " + index);
+                           this.HandleDoubleTapItem(index);
+                        }}
+                        delay={500}
+                     >
+                        <TouchableOpacity>
+                           {this.GenerateListItem(item)}
+                        </TouchableOpacity>
+                     </DoubleClick>
                   </Swipeout>
                )}
             />

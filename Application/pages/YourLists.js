@@ -27,7 +27,7 @@ class YourLists extends Component {
 
    componentDidMount() {
       // Instead of constantly making api data calls just use this hardcoded data for development purposes
-      /*this.setState(
+      this.setState(
          {
             apiData: [
                {
@@ -73,75 +73,75 @@ class YourLists extends Component {
          function() {
             this.GenerateListTitlesFromApiData();
          }
-      );*/
-      // TODO Get all list data
-      var listIds = [];
-      var that = this;
-      var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
-      db.database()
-         .ref("/users/" + uid + "/lists")
-         .on(/*ce*/ "value", function(snapshot) {
-            var ssv = snapshot.val();
-            if (ssv) {
-               for (var createdKey in ssv.created) {
-                  listIds.push(ssv.created[createdKey]);
-               }
-               for (var sharedWithKey in ssv.shared_with) {
-                  listIds.push(ssv.shared_with[sharedWithKey]);
-               }
-               for (var idKey in listIds) {
-                  var bool = false;
-                  var currentListId = listIds[idKey];
-                  db.database()
-                     .ref("/lists/" + listIds[idKey])
-                     .on(/*ce*/ "value", function(snapshot) {
-                        var ssv = snapshot.val();
-                        if (ssv) {
-                           var listItems = [];
-                           for (var item in ssv.items) {
-                              listItems.push(ssv.items[item]);
-                           }
-                           var curApiData = that.state.apiData;
-                           curApiData.push({
-                              key: currentListId,
-                              name: ssv.name,
-                              items: listItems
-                           });
-                           that.setState(
-                              {
-                                 apiData: curApiData
-                              },
-                              function() {
-                                 that.GenerateListTitlesFromApiData();
-                              }
-                           );
-                        } else {
-                           console.log("ERROR: List does not exist.");
-                           Alert.alert("ERROR: List does not exist.");
-                           that.setState(
-                              {
-                                 apiData: []
-                              },
-                              function() {
-                                 that.GenerateListTitlesFromApiData();
-                              }
-                           );
-                           bool = true;
-                        }
-                     });
-                  if (bool) break;
-               }
-            } else {
-               that.setState(
-                  {
-                     apiData: []
-                  },
-                  function() {
-                     that.GenerateListTitlesFromApiData();
-                  }
-               );
-            }
-         });
+      );
+      // // TODO Get all list data
+      // var listIds = [];
+      // var that = this;
+      // var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
+      // db.database()
+      //    .ref("/users/" + uid + "/lists")
+      //    .on(/*ce*/ "value", function(snapshot) {
+      //       var ssv = snapshot.val();
+      //       if (ssv) {
+      //          for (var createdKey in ssv.created) {
+      //             listIds.push(ssv.created[createdKey]);
+      //          }
+      //          for (var sharedWithKey in ssv.shared_with) {
+      //             listIds.push(ssv.shared_with[sharedWithKey]);
+      //          }
+      //          for (var idKey in listIds) {
+      //             var bool = false;
+      //             var currentListId = listIds[idKey];
+      //             db.database()
+      //                .ref("/lists/" + listIds[idKey])
+      //                .on(/*ce*/ "value", function(snapshot) {
+      //                   var ssv = snapshot.val();
+      //                   if (ssv) {
+      //                      var listItems = [];
+      //                      for (var item in ssv.items) {
+      //                         listItems.push(ssv.items[item]);
+      //                      }
+      //                      var curApiData = that.state.apiData;
+      //                      curApiData.push({
+      //                         key: currentListId,
+      //                         name: ssv.name,
+      //                         items: listItems
+      //                      });
+      //                      that.setState(
+      //                         {
+      //                            apiData: curApiData
+      //                         },
+      //                         function() {
+      //                            that.GenerateListTitlesFromApiData();
+      //                         }
+      //                      );
+      //                   } else {
+      //                      console.log("ERROR: List does not exist.");
+      //                      Alert.alert("ERROR: List does not exist.");
+      //                      that.setState(
+      //                         {
+      //                            apiData: []
+      //                         },
+      //                         function() {
+      //                            that.GenerateListTitlesFromApiData();
+      //                         }
+      //                      );
+      //                      bool = true;
+      //                   }
+      //                });
+      //             if (bool) break;
+      //          }
+      //       } else {
+      //          that.setState(
+      //             {
+      //                apiData: []
+      //             },
+      //             function() {
+      //                that.GenerateListTitlesFromApiData();
+      //             }
+      //          );
+      //       }
+      //    });
 
       BackHandler.addEventListener("hardwareBackPress", function() {
          // Return true if you want to go back, false if want to ignore. This is for Android only.
