@@ -4,6 +4,7 @@ import FirebaseConfig from './components/FirebaseConfig';
 import * as firebase from 'firebase';
 import RootNavigation from './navigation/RootNavigation';
 import MainDrawerNavigator from './navigation/MainDrawerNavigator';
+import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
 
 export default class App extends Component {
@@ -24,9 +25,6 @@ export default class App extends Component {
   onAuthStateChanged = (user) => {
     this.setState({ isAuthProcessReady: true });
     this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
-  }
-
-  componentWillMount() {
   }
 
   render() {

@@ -100,9 +100,7 @@ export default class LoginPage extends Component {
           <View style={styles.inputContainer}>
             <Image
               style={styles.inputIcon}
-              source={{
-                uri: "https://png.icons8.com/message/ultraviolet/50/3498db"
-              }}
+              source={require("../assets/icons/icons8-mail-account-64.png")}
             />
             <TextInput
               style={styles.inputs}
@@ -119,9 +117,7 @@ export default class LoginPage extends Component {
           <View style={styles.inputContainer}>
             <Image
               style={styles.inputIcon}
-              source={{
-                uri: "https://png.icons8.com/key-2/ultraviolet/50/3498db"
-              }}
+              source={require("../assets/icons/icons8-key-64.png")}
             />
             <TextInput
               style={styles.inputs}

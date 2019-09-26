@@ -32,9 +32,7 @@ export default class ForgotPasswordPage extends Component {
                 <View style={styles.defaultInputContainer}>
                     <Image
                         style={styles.defaultInputIcon}
-                        source={{
-                            uri: "https://png.icons8.com/message/ultraviolet/50/3498db"
-                        }}
+                        source={require("../assets/icons/icons8-mail-account-64.png")}
                     />
                     <TextInput
                         style={styles.defaultInputs}
