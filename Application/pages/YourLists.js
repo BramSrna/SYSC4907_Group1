@@ -17,7 +17,8 @@ import Dialog from "react-native-dialog";
 class YourLists extends Component {
    constructor(props) {
       super(props);
-
+      this.HASEEB = "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
+      this.newListName = "";
       this.state = {
          listTitles: [],
          apiData: [],
@@ -25,9 +26,84 @@ class YourLists extends Component {
       };
    }
 
+   GenerateNeededData() {
+      // Get all data
+      var listIds = [];
+      var that = this;
+      var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
+      db.database()
+         .ref("/users/" + uid + "/lists")
+         .on("value", function(snapshot) {
+            listIds = [];
+            var ssv = snapshot.val();
+            if (ssv) {
+               for (var createdKey in ssv.created) {
+                  listIds.push(ssv.created[createdKey]);
+               }
+               for (var sharedWithKey in ssv.shared_with) {
+                  listIds.push(ssv.shared_with[sharedWithKey]);
+               }
+
+               var curApiData = [];
+               var listIdLength = listIds.length;
+               var counter = 1;
+               for (var idKey in listIds) {
+                  var currentListId = listIds[idKey];
+                  db.database()
+                     .ref("/lists/" + listIds[idKey])
+                     .once("value", function(snapshot) {
+                        var ssv = snapshot.val();
+                        if (ssv) {
+                           var listItems = [];
+                           for (var item in ssv.items) {
+                              listItems.push(ssv.items[item]);
+                           }
+                           curApiData.push({
+                              key: currentListId,
+                              name: ssv.name,
+                              items: listItems
+                           });
+                           if (counter == listIdLength) {
+                              that.setState(
+                                 {
+                                    apiData: curApiData
+                                 },
+                                 function() {
+                                    that.GenerateListTitlesFromApiData();
+                                 }
+                              );
+                           }
+                           counter++;
+                        } else {
+                           that.setState(
+                              {
+                                 apiData: curApiData
+                              },
+                              function() {
+                                 that.GenerateListTitlesFromApiData();
+                              }
+                           );
+                           console.log("ERROR: List does not exist.");
+                           Alert.alert("ERROR: List does not exist.");
+                        }
+                     });
+               }
+            } else {
+               that.setState(
+                  {
+                     apiData: []
+                  },
+                  function() {
+                     that.GenerateListTitlesFromApiData();
+                  }
+               );
+            }
+         });
+   }
+
    componentDidMount() {
       // Instead of constantly making api data calls just use this hardcoded data for development purposes
-      this.setState(
+      /* this.setState(
          {
             apiData: [
                {
@@ -73,76 +149,8 @@ class YourLists extends Component {
          function() {
             this.GenerateListTitlesFromApiData();
          }
-      );
-      // // TODO Get all list data
-      // var listIds = [];
-      // var that = this;
-      // var uid = /*db.auth().currentUser.uid*/ "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
-      // db.database()
-      //    .ref("/users/" + uid + "/lists")
-      //    .on(/*ce*/ "value", function(snapshot) {
-      //       var ssv = snapshot.val();
-      //       if (ssv) {
-      //          for (var createdKey in ssv.created) {
-      //             listIds.push(ssv.created[createdKey]);
-      //          }
-      //          for (var sharedWithKey in ssv.shared_with) {
-      //             listIds.push(ssv.shared_with[sharedWithKey]);
-      //          }
-      //          for (var idKey in listIds) {
-      //             var bool = false;
-      //             var currentListId = listIds[idKey];
-      //             db.database()
-      //                .ref("/lists/" + listIds[idKey])
-      //                .on(/*ce*/ "value", function(snapshot) {
-      //                   var ssv = snapshot.val();
-      //                   if (ssv) {
-      //                      var listItems = [];
-      //                      for (var item in ssv.items) {
-      //                         listItems.push(ssv.items[item]);
-      //                      }
-      //                      var curApiData = that.state.apiData;
-      //                      curApiData.push({
-      //                         key: currentListId,
-      //                         name: ssv.name,
-      //                         items: listItems
-      //                      });
-      //                      that.setState(
-      //                         {
-      //                            apiData: curApiData
-      //                         },
-      //                         function() {
-      //                            that.GenerateListTitlesFromApiData();
-      //                         }
-      //                      );
-      //                   } else {
-      //                      console.log("ERROR: List does not exist.");
-      //                      Alert.alert("ERROR: List does not exist.");
-      //                      that.setState(
-      //                         {
-      //                            apiData: []
-      //                         },
-      //                         function() {
-      //                            that.GenerateListTitlesFromApiData();
-      //                         }
-      //                      );
-      //                      bool = true;
-      //                   }
-      //                });
-      //             if (bool) break;
-      //          }
-      //       } else {
-      //          that.setState(
-      //             {
-      //                apiData: []
-      //             },
-      //             function() {
-      //                that.GenerateListTitlesFromApiData();
-      //             }
-      //          );
-      //       }
-      //    });
-
+      );*/
+      this.GenerateNeededData();
       BackHandler.addEventListener("hardwareBackPress", function() {
          // Return true if you want to go back, false if want to ignore. This is for Android only.
          // return true;
@@ -188,13 +196,32 @@ class YourLists extends Component {
          />
       );
    };
-
+   adaNameRef;
    handleCancel = () => {
+      this.newListName = "";
       this.setState({ isDialogVisible: false });
    };
 
    handleCreate = () => {
-      // TODO Add the list to the list table and associate it to the user
+      var push = db
+         .database()
+         .ref("/lists")
+         .push({
+            name: this.newListName,
+            items: []
+         });
+      var key = push.key;
+      db.database()
+         .ref("/users/" + this.HASEEB + "/lists")
+         .once("value", function(snapshot) {
+            if (snapshot.val()) {
+               var createdLists = snapshot.val().created;
+               createdLists.push(key);
+               snapshot.ref.update({ created: createdLists });
+            }
+         });
+
+      this.newListName = "";
       this.setState({ isDialogVisible: false });
    };
 
@@ -202,6 +229,10 @@ class YourLists extends Component {
       if (typeof direction !== "undefined") {
          this.setState({ activeRow: rowId });
       }
+   }
+
+   setNewListName(name) {
+      this.newListName = name;
    }
 
    render() {
@@ -237,7 +268,9 @@ class YourLists extends Component {
                <Dialog.Description>
                   Enter the name of the new list you would like to create:
                </Dialog.Description>
-               <Dialog.Input></Dialog.Input>
+               <Dialog.Input
+                  onChangeText={name => this.setNewListName(name)}
+               ></Dialog.Input>
                <Dialog.Button label="Cancel" onPress={this.handleCancel} />
                <Dialog.Button label="Create" onPress={this.handleCreate} />
             </Dialog.Container>
