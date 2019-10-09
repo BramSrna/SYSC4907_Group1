@@ -5083,6 +5083,13 @@ react-navigation-drawer@~1.4.0:
   dependencies:
     react-native-tab-view "^1.2.0"
 
+react-navigation-stack@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/react-navigation-stack/-/react-navigation-stack-1.7.3.tgz#2dce28bdc80bbd2bf09755a6aa7200055a907504"
+  integrity sha512-wOt7T5NkIFInnFw+cxkUHUbNrXbPqascScia6azMWSdHhx+gvz3uW4Ubyw+2NULHcoshU53boUuQ8lUmUrJdhg==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-navigation-stack@~1.5.0:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/react-navigation-stack/-/react-navigation-stack-1.5.1.tgz#8a8c0cd0b8498225f4e8e564f06043849961bede"
