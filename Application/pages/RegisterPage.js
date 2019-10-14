@@ -3,7 +3,6 @@ import {
   Text,
   View,
   TextInput,
-  Button,
   TouchableHighlight,
   Image,
   Alert,
@@ -15,6 +14,9 @@ import FirebaseUser from "../components/FirebaseUser"
 
 const REGISTER = "Register";
 const LOGIN = "Already Registered/Login";
+
+const LOGINPAGE = "Login";
+const VERIFICATIONPAGE = "Verification";
 
 export default class RegisterPage extends Component {
   userAlreadyLoggedIn = false;
@@ -30,17 +32,17 @@ export default class RegisterPage extends Component {
     if (buttonId === REGISTER) {
       this.updateRegisterInfo();
     } else if (buttonId === LOGIN) {
-      this.props.navigation.navigate("Login");
+      this.props.navigation.navigate(LOGINPAGE);
     }
   };
 
-  async updateRegisterInfo() {
+  updateRegisterInfo() {
     if (this.checkInputs()) {
       this.setState({ registering: true });
       var displayName = this.state.firstname + " " + this.state.lastname;
       firebaseUser = new FirebaseUser();
-      if (await firebaseUser.register(this.state.email, this.state.password, displayName)) {
-        this.props.navigation.navigate("Verification");
+      if (firebaseUser.register(this.state.email, this.state.password, displayName)) {
+        this.props.navigation.navigate(VERIFICATIONPAGE);
         this.setState({ registering: false });
       }
     } else {
@@ -59,21 +61,8 @@ export default class RegisterPage extends Component {
     }
   }
 
-  userIsCurrentlyLoggedIn() {
-    Firebase.auth().onAuthStateChanged(function (user) {
-      if (user) {
-        return true;
-      }
-    });
-    return false;
-  }
-
   componentWillMount() {
     this.setState({ firstname: "", lastname: "", email: "", password: "" });
-    this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
-    if (this.userAlreadyLoggedIn) {
-      this.props.navigation.navigate("HomePage");
-    }
   }
 
   renderCurrentState() {

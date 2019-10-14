@@ -3,8 +3,11 @@ import { Text, View, TouchableHighlight } from "react-native";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import firebase from 'firebase';
 
-const ADD_ITEM_PAGE = "AddItemPage"
+const ADD_ITEM = "Go To Add Item Page"
 const SIGN_OUT = "Sign Out"
+
+const ADDITEMPAGE = "AddItemPage";
+
 
 class HomePage extends Component {
   constructor(props) {
@@ -13,8 +16,8 @@ class HomePage extends Component {
 
 
   buttonListener = buttonId => {
-    if (buttonId == ADD_ITEM_PAGE) {
-      this.props.navigation.navigate("GoToAddItemPage");
+    if (buttonId == ADD_ITEM) {
+      this.props.navigation.navigate(ADDITEMPAGE);
     } else if (buttonId == SIGN_OUT) {
       firebase.auth().signOut();
     }
@@ -27,9 +30,9 @@ class HomePage extends Component {
 
         <TouchableHighlight
           style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-          onPress={() => this.buttonListener(ADD_ITEM_PAGE)}
+          onPress={() => this.buttonListener(ADD_ITEM)}
         >
-          <Text style={globalStyles.whiteText}>{"Go To Add Item Page"}</Text>
+          <Text style={globalStyles.whiteText}>{ADD_ITEM}</Text>
         </TouchableHighlight>
 
         <TouchableHighlight

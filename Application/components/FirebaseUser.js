@@ -14,9 +14,9 @@ export default class FirebaseUser{
         }
     }
 
-    async register(email, password, displayName){
+    register(email, password, displayName){
         this.auth = Firebase.auth();
-        await this.auth.createUserWithEmailAndPassword(email, password).then(() => {
+        return this.auth.createUserWithEmailAndPassword(email, password).then(() => {
             if(Firebase.auth().currentUser) {
                 Firebase.auth().currentUser.sendEmailVerification().then(() => {
                     Alert.alert("Verification Email Send..", "Confirm your email by opening the link that was send to the provided email.");
@@ -50,7 +50,6 @@ export default class FirebaseUser{
             }
             return false;
         });
-        return true;
     }
 
     async requestVerificationEmail(){
@@ -70,7 +69,7 @@ export default class FirebaseUser{
         return true;
     }
 
-    async isUserEmailVerified(){
+    isUserEmailVerified(){
         this.reloadUserInfo();
         return this.emailVerified;
     }
@@ -83,8 +82,8 @@ export default class FirebaseUser{
         return this.user;
     }
 
-    async reloadUserInfo(){
-        this.user = await Firebase.auth().currentUser.reload();
+    reloadUserInfo(){
+        this.user = Firebase.auth().currentUser.reload();
         if(this.user != null) {
             this.name = this.user.displayName;
             this.email = this.user.email;
