@@ -18,7 +18,7 @@ class MapCreatorPage extends Component {
 
         this.currDepartments = [
             {
-                depName: "TEMP",
+                depName: Object.keys(departments)[0],
             },
         ]
 
@@ -51,7 +51,7 @@ class MapCreatorPage extends Component {
     }
 
     addDepartment = () => {
-        this.currDepartments.push({name : "TEMP"});
+        this.currDepartments.push({depName : Object.keys(departments)[0]});
 
         this.setState({ arrayHolder: [...this.currDepartments]})
     }
@@ -108,6 +108,7 @@ class MapCreatorPage extends Component {
         return (
             <View style={styles.rowSorter}>
                 <View style = {styles.bufferView}></View>
+
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.upButtonPressed(index)}>
@@ -117,7 +118,9 @@ class MapCreatorPage extends Component {
                         source={require("../assets/icons/up_button.png")}
                     />
                 </TouchableHighlight>
+
                 <View style = {styles.bufferView}></View>
+
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.delButtonPressed(index)}>
@@ -127,7 +130,9 @@ class MapCreatorPage extends Component {
                         source={require("../assets/icons/delete_button.png")}
                     />
                 </TouchableHighlight>
+
                 <View style = {styles.bufferView}></View>
+
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.downButtonPressed(index)}>
@@ -137,7 +142,9 @@ class MapCreatorPage extends Component {
                         source={require("../assets/icons/down_button.png")}
                     />
                 </TouchableHighlight>
+
                 <View style = {styles.bufferView}></View>
+
                 <View style = {{flex : 5}}>                
                     <Picker
                         selectedValue={this.currDepartments[index]["depName"]}
@@ -148,6 +155,7 @@ class MapCreatorPage extends Component {
                         })}
                     </Picker>
                 </View>
+
                 <View style = {{flex : 1, backgroundColor : "white"}}/>
 
             </View>

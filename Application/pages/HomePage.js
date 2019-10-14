@@ -12,12 +12,11 @@ class HomePage extends Component {
     super(props);
   }
 
-
   buttonListener = buttonId => {
     if (buttonId == ADD_ITEM_PAGE) {
-      this.props.navigation.navigate("GoToAddItemPage");
+      this.props.navigation.navigate("AddItemPage");
     } else if (buttonId == MAP_CREATOR_PAGE) {
-      this.props.navigation.navigate("GoToMapCreatorPage");
+      this.props.navigation.navigate("MapCreatorPage");
     } else if (buttonId == SIGN_OUT) {
       firebase.auth().signOut();
     }
