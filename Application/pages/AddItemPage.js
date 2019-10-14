@@ -15,6 +15,7 @@ import { Header } from "react-navigation"
 import styles from "./pageStyles/AddItemPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
+import {departments} from "../DepartmentList";
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
@@ -83,22 +84,10 @@ class AddItemPage extends Component {
               <Picker
                 selectedValue={this.state.itemDepartment}
                 style={styles.picker}
-                onValueChange={(itemDepartment) => this.setState({ itemDepartment })
-                }>
-                <Picker.Item label="Bakery" value="BAKERY" />
-                <Picker.Item label="Beer" value="BEER" />
-                <Picker.Item label="Bulk" value="BULK" />
-                <Picker.Item label="Cheese" value="CHEESE" />
-                <Picker.Item label="Coffee And Tea" value="COFFEE_AND_TEA" />
-                <Picker.Item label="Flowers and Floral Arrangements" value="FLOWERS_AND_FLORAL_ARRANGEMENTS" />
-                <Picker.Item label="Grocery" value="GROCERY" />
-                <Picker.Item label="Meat and Poultry" value="MEAT_AND_POULTRY" />
-                <Picker.Item label="Prepared Foods" value="PREPARED_FOODS" />
-                <Picker.Item label="Produce" value="PRODUCE" />
-                <Picker.Item label="Seafood" value="SEAFOOD" />
-                <Picker.Item label="Wine" value="WINE" />
-                <Picker.Item label="Whole Body" value="WHOLE_BODY" />
-                <Picker.Item label="Pets" value="PETS" />
+                onValueChange={(itemDepartment) => this.setState({itemDepartment})}>
+                {Object.keys(departments).map((key) => {
+                  return (<Picker.Item label={departments[key]["displayName"]} value={key} key={key}/>)
+                })}
               </Picker>
             </View>
           </View>
