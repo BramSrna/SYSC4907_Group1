@@ -10,7 +10,7 @@ import {
    Image
 } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
-import { db } from "../config";
+import * as firebase from "firebase";
 import Swipeout from "react-native-swipeout";
 import Dialog from "react-native-dialog";
 
@@ -30,8 +30,8 @@ class YourLists extends Component {
       // Get all data
       var listIds = [];
       var that = this;
-      var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
-      db.database()
+      var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+      firebase.database()
          .ref("/users/" + uid + "/lists")
          .on("value", function(snapshot) {
             listIds = [];
@@ -40,8 +40,8 @@ class YourLists extends Component {
                for (var createdKey in ssv.created) {
                   listIds.push(ssv.created[createdKey]);
                }
-               for (var sharedWithKey in ssv.shared_with) {
-                  listIds.push(ssv.shared_with[sharedWithKey]);
+               for (var sharedWithKey in ssv.shared) {
+                  listIds.push(ssv.shared[sharedWithKey]);
                }
 
                var curApiData = [];
@@ -49,7 +49,7 @@ class YourLists extends Component {
                var counter = 1;
                for (var idKey in listIds) {
                   var currentListId = listIds[idKey];
-                  db.database()
+                  firebase.database()
                      .ref("/lists/" + listIds[idKey])
                      .once("value", function(snapshot) {
                         var ssv = snapshot.val();
@@ -179,7 +179,7 @@ class YourLists extends Component {
    }
 
    GoToList(item) {
-      this.props.navigation.navigate("Current List", {
+      this.props.navigation.navigate("CurrentListPage", {
          name: item,
          list: this.GenerateListItemsFromApiData(item)
       });
@@ -203,7 +203,7 @@ class YourLists extends Component {
    };
 
    handleCreate = () => {
-      var push = db
+      var push = firebase
          .database()
          .ref("/lists")
          .push({
@@ -211,8 +211,8 @@ class YourLists extends Component {
             items: []
          });
       var key = push.key;
-      var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
-      db.database()
+      var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+      firebase.database()
          .ref("/users/" + uid + "/lists")
          .once("value", function(snapshot) {
             if (snapshot.val()) {
@@ -259,8 +259,8 @@ class YourLists extends Component {
                      " with ID: " +
                      this.state.apiData[this.state.activeRow].key
                );
-               var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
-               db.database()
+               var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+               firebase.database()
                   .ref("/users/" + uid + "/lists")
                   .once("value", function(snapshot) {
                      var creatorBool = false;
@@ -277,7 +277,7 @@ class YourLists extends Component {
                            }
                         }
                         snapshot.ref.update({ created: createdLists });
-                        var sharedLists = snapshot.val().shared_with;
+                        var sharedLists = snapshot.val().shared;
                         for (var a = 0; a < sharedLists.length; a++) {
                            if (
                               sharedLists[a] ===
@@ -288,17 +288,17 @@ class YourLists extends Component {
                               break;
                            }
                         }
-                        snapshot.ref.update({ shared_with: sharedLists });
+                        snapshot.ref.update({ shared: sharedLists });
                      }
 
                      if (creatorBool) {
-                        db.database()
+                        firebase.database()
                            .ref("/users/")
                            .once("value", function(snapshot) {
                               if (snapshot.val()) {
                                  for (var uid in snapshot.val()) {
                                     var sharedWithLists = snapshot.val().uid
-                                       .lists.shared_with;
+                                       .lists.shared;
                                     for (
                                        var a = 0;
                                        a < sharedWithLists.length;
@@ -313,7 +313,7 @@ class YourLists extends Component {
                                           sharedWithLists.splice(a, 1);
                                           a--;
                                           snapshot.ref.update({
-                                             shared_with: sharedWithLists
+                                             shared: sharedWithLists
                                           });
 
                                           break;
@@ -324,7 +324,7 @@ class YourLists extends Component {
                            });
                      }
                   });
-               db.database()
+               firebase.database()
                   .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
                   .remove();
             }

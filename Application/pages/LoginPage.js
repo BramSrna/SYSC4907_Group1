@@ -5,10 +5,13 @@ import {
   TextInput,
   TouchableHighlight,
   Image,
-  Alert
+  Alert,
+  ActivityIndicator
 } from "react-native";
+import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import FirebaseUser from "../components/FirebaseUser";
 const LOGIN = "Login";
 const FORGOT_PASSWORD = "Forgot your password?";
 const REGISTER = "RegisterPage";
@@ -16,20 +19,63 @@ const HOMEPAGE = "HomePage";
 
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;
+  state = {
+    email: "",
+    password: "",
+    authenticating: false
+  }
 
   buttonListener = buttonId => {
     if (buttonId == LOGIN) {
-      this.props.navigation.navigate("Homepage");
+      this.onPressLoginIn();
     } else if (buttonId == REGISTER) {
-      this.props.navigation.navigate("GoToRegisterPage");
+      this.props.navigation.navigate("Registration");
     } else if (buttonId == FORGOT_PASSWORD) {
-      Alert.alert("ERROR", "IN DEVELOPMENT");
+      this.props.navigation.navigate("ForgotPassword");
     }
   };
 
+  onPressLoginIn() {
+    if(!this.state.email || !this.state.password){
+      Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
+      return console.log("Email and password required!");
+    }
+    this.setState({ authenticating: true });
+
+    if (this.authenticateUser(this.state.email, this.state.password)) {
+      user = new FirebaseUser();
+      if (user != null && user.email == this.state.email) {
+        if (!user.emailVerified) {
+          this.props.navigation.navigate("GoToVerificationPage");
+        }
+        else {
+          this.props.navigation.navigate("GoToHomePage");
+        }
+      }
+    }
+    this.setState({ authenticating: false });
+
+  }
+
+  authenticateUser = (email, password) => {
+    Firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+      return true;
+    }, (error) => {
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
+      console.log(errorCode + " " + errorMessage);
+      return false;
+    });
+  }
+
   userIsCurrentlyLoggedIn() {
+    Firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        return true;
+      }
+    });
     return false;
-    // return true;
   }
 
   componentWillMount() {
@@ -39,39 +85,48 @@ export default class LoginPage extends Component {
     }
   }
 
-  render() {
+  renderCurrentState() {
+    if (this.state.authenticating) {
+      return (
+        <View>
+          <ActivityIndicator size="large" />
+        </View>
+      )
+    }
+
     if (!this.userAlreadyLoggedIn) {
       return (
         <View style={globalStyles.defaultContainer}>
           <View style={styles.inputContainer}>
             <Image
               style={styles.inputIcon}
-              source={{
-                uri: "https://png.icons8.com/message/ultraviolet/50/3498db"
-              }}
+              source={require("../assets/icons/icons8-mail-account-64.png")}
             />
             <TextInput
               style={styles.inputs}
-              placeholder="Email"
+              placeholder="Enter your email..."
+              label="Email"
               keyboardType="email-address"
+              autoCapitalize="none"
               underlineColorAndroid="transparent"
               onChangeText={email => this.setState({ email })}
+              value={this.state.email}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Image
               style={styles.inputIcon}
-              source={{
-                uri: "https://png.icons8.com/key-2/ultraviolet/50/3498db"
-              }}
+              source={require("../assets/icons/icons8-key-64.png")}
             />
             <TextInput
               style={styles.inputs}
-              placeholder="Password"
+              placeholder="Enter your password..."
+              label="Password"
               secureTextEntry={true}
               underlineColorAndroid="transparent"
               onChangeText={password => this.setState({ password })}
+              value={this.state.password}
             />
           </View>
 
@@ -98,6 +153,13 @@ export default class LoginPage extends Component {
         </View>
       );
     }
-    return null;
+  }
+
+  render() {
+    return (
+      <View style={globalStyles.defaultContainer}>
+        {this.renderCurrentState()}
+      </View>
+    );
   }
 }

@@ -16,10 +16,37 @@ export default StyleSheet.create({
     width: 250,
     borderRadius: 30,
   },
+  defaultInputContainer: {
+    borderBottomColor: '#F5FCFF',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    width: 250,
+    height: 45,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  defaultInputs: {
+    height: 45,
+    marginLeft: 16,
+    flex: 1,
+  },
+  defaultInputIcon: {
+    width: 30,
+    height: 30,
+    marginLeft: 15,
+    justifyContent: 'center',
+  },
   defaultButton: {
     backgroundColor: "#00b5ec",
   },
   whiteText: {
     color: 'white'
+  },
+  whiteTextPadding: {
+    color: 'white',
+    paddingLeft: 20,
+    paddingRight: 20,
+    textAlign: 'center'
   }
 });

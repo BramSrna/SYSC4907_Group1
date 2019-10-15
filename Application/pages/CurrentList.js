@@ -20,7 +20,7 @@ class CurrentList extends Component {
    }
 
    GoBackToYourLists() {
-      this.props.navigation.navigate("Your Lists");
+      this.props.navigation.navigate("YourListsPage");
    }
 
    componentDidMount() {
