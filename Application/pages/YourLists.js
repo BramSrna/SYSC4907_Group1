@@ -211,8 +211,9 @@ class YourLists extends Component {
             items: []
          });
       var key = push.key;
+      var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
       db.database()
-         .ref("/users/" + this.HASEEB + "/lists")
+         .ref("/users/" + uid + "/lists")
          .once("value", function(snapshot) {
             if (snapshot.val()) {
                var createdLists = snapshot.val().created;
@@ -258,6 +259,74 @@ class YourLists extends Component {
                      " with ID: " +
                      this.state.apiData[this.state.activeRow].key
                );
+               var uid = /*db.auth().currentUser.uid*/ this.HASEEB;
+               db.database()
+                  .ref("/users/" + uid + "/lists")
+                  .once("value", function(snapshot) {
+                     var creatorBool = false;
+                     if (snapshot.val()) {
+                        var createdLists = snapshot.val().created;
+                        for (var a = 0; a < createdLists.length; a++) {
+                           if (
+                              createdLists[a] ===
+                              this.state.apiData[this.state.activeRow].key
+                           ) {
+                              createdLists.splice(a, 1);
+                              a--;
+                              creatorBool = true;
+                           }
+                        }
+                        snapshot.ref.update({ created: createdLists });
+                        var sharedLists = snapshot.val().shared_with;
+                        for (var a = 0; a < sharedLists.length; a++) {
+                           if (
+                              sharedLists[a] ===
+                              this.state.apiData[this.state.activeRow].key
+                           ) {
+                              sharedLists.splice(a, 1);
+                              a--;
+                              break;
+                           }
+                        }
+                        snapshot.ref.update({ shared_with: sharedLists });
+                     }
+
+                     if (creatorBool) {
+                        db.database()
+                           .ref("/users/")
+                           .once("value", function(snapshot) {
+                              if (snapshot.val()) {
+                                 for (var uid in snapshot.val()) {
+                                    var sharedWithLists = snapshot.val().uid
+                                       .lists.shared_with;
+                                    for (
+                                       var a = 0;
+                                       a < sharedWithLists.length;
+                                       a++
+                                    ) {
+                                       if (
+                                          sharedWithLists[a] ===
+                                          this.state.apiData[
+                                             this.state.activeRow
+                                          ].key
+                                       ) {
+                                          sharedWithLists.splice(a, 1);
+                                          a--;
+                                          snapshot.ref.update({
+                                             shared_with: sharedWithLists
+                                          });
+
+                                          break;
+                                       }
+                                    }
+                                 }
+                              }
+                           });
+                     }
+                  });
+               db.database()
+                  .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
+                  .remove();
             }
          }
       ];
