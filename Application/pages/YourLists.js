@@ -31,17 +31,18 @@ class YourLists extends Component {
       var listIds = [];
       var that = this;
       var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
-      firebase.database()
+      firebase
+         .database()
          .ref("/users/" + uid + "/lists")
          .on("value", function(snapshot) {
             listIds = [];
             var ssv = snapshot.val();
             if (ssv) {
-               for (var createdKey in ssv.created) {
-                  listIds.push(ssv.created[createdKey]);
+               for (var created in ssv.created) {
+                  listIds.push(created);
                }
-               for (var sharedWithKey in ssv.shared) {
-                  listIds.push(ssv.shared[sharedWithKey]);
+               for (var shared in ssv.shared) {
+                  listIds.push(shared);
                }
 
                var curApiData = [];
@@ -49,7 +50,8 @@ class YourLists extends Component {
                var counter = 1;
                for (var idKey in listIds) {
                   var currentListId = listIds[idKey];
-                  firebase.database()
+                  firebase
+                     .database()
                      .ref("/lists/" + listIds[idKey])
                      .once("value", function(snapshot) {
                         var ssv = snapshot.val();
@@ -212,7 +214,8 @@ class YourLists extends Component {
          });
       var key = push.key;
       var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
-      firebase.database()
+      firebase
+         .database()
          .ref("/users/" + uid + "/lists")
          .once("value", function(snapshot) {
             if (snapshot.val()) {
@@ -260,7 +263,8 @@ class YourLists extends Component {
                      this.state.apiData[this.state.activeRow].key
                );
                var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
-               firebase.database()
+               firebase
+                  .database()
                   .ref("/users/" + uid + "/lists")
                   .once("value", function(snapshot) {
                      var creatorBool = false;
@@ -292,7 +296,8 @@ class YourLists extends Component {
                      }
 
                      if (creatorBool) {
-                        firebase.database()
+                        firebase
+                           .database()
                            .ref("/users/")
                            .once("value", function(snapshot) {
                               if (snapshot.val()) {
@@ -324,7 +329,8 @@ class YourLists extends Component {
                            });
                      }
                   });
-               firebase.database()
+               firebase
+                  .database()
                   .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
                   .remove();
             }
