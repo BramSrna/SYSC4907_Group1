@@ -36,7 +36,7 @@ export default class LoginPage extends Component {
   };
 
   onPressLoginIn() {
-    if(!this.state.email || !this.state.password){
+    if (!this.state.email || !this.state.password) {
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
       return console.log("Email and password required!");
     }

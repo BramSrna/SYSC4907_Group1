@@ -2,11 +2,9 @@ import React, { Component } from "react";
 import {
    TouchableOpacity,
    Text,
-   Button,
    View,
    FlatList,
    Alert,
-   BackHandler,
    Image
 } from "react-native";
 import styles from "./pageStyles/YourListsPageStyle";
@@ -17,7 +15,6 @@ import Dialog from "react-native-dialog";
 class YourLists extends Component {
    constructor(props) {
       super(props);
-      this.HASEEB = "Tbn0C7WvyRSoQZ9KQNjFPjIfmGJ2";
       this.newListName = "";
       this.state = {
          listTitles: [],
@@ -30,11 +27,11 @@ class YourLists extends Component {
       // Get all data
       var listIds = [];
       var that = this;
-      var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+      var uid = firebase.auth().currentUser.uid;
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .on("value", function(snapshot) {
+         .on("value", function (snapshot) {
             listIds = [];
             var ssv = snapshot.val();
             if (ssv) {
@@ -52,25 +49,20 @@ class YourLists extends Component {
                   var currentListId = listIds[idKey];
                   firebase
                      .database()
-                     .ref("/lists/" + listIds[idKey])
-                     .once("value", function(snapshot) {
+                     .ref("/lists/" + currentListId)
+                     .once("value", function (snapshot) {
                         var ssv = snapshot.val();
                         if (ssv) {
-                           var listItems = [];
-                           for (var item in ssv.items) {
-                              listItems.push(ssv.items[item]);
-                           }
                            curApiData.push({
-                              key: currentListId,
+                              key: snapshot.key,
                               name: ssv.name,
-                              items: listItems
                            });
                            if (counter == listIdLength) {
                               that.setState(
                                  {
                                     apiData: curApiData
                                  },
-                                 function() {
+                                 function () {
                                     that.GenerateListTitlesFromApiData();
                                  }
                               );
@@ -81,7 +73,7 @@ class YourLists extends Component {
                               {
                                  apiData: curApiData
                               },
-                              function() {
+                              function () {
                                  that.GenerateListTitlesFromApiData();
                               }
                            );
@@ -95,7 +87,7 @@ class YourLists extends Component {
                   {
                      apiData: []
                   },
-                  function() {
+                  function () {
                      that.GenerateListTitlesFromApiData();
                   }
                );
@@ -104,60 +96,7 @@ class YourLists extends Component {
    }
 
    componentDidMount() {
-      // Instead of constantly making api data calls just use this hardcoded data for development purposes
-      /* this.setState(
-         {
-            apiData: [
-               {
-                  items: [
-                     {
-                        name: "Gum",
-                        purchased: true
-                     },
-                     {
-                        name: "Candy",
-                        purchased: true
-                     },
-                     {
-                        name: "Bread",
-                        purchased: true
-                     },
-                     {
-                        name: "Pop",
-                        purchased: false
-                     },
-                     {
-                        name: "Eggs",
-                        purchased: true
-                     }
-                  ],
-                  name: "Walmart List"
-               },
-               {
-                  items: [
-                     {
-                        name: "Milk",
-                        purchased: false
-                     },
-                     {
-                        name: "Cereal",
-                        purchased: true
-                     }
-                  ],
-                  name: "Shoppa Drugggz M4rt"
-               }
-            ]
-         },
-         function() {
-            this.GenerateListTitlesFromApiData();
-         }
-      );*/
       this.GenerateNeededData();
-      BackHandler.addEventListener("hardwareBackPress", function() {
-         // Return true if you want to go back, false if want to ignore. This is for Android only.
-         // return true;
-         return false;
-      });
    }
 
    GenerateListTitlesFromApiData() {
@@ -169,21 +108,19 @@ class YourLists extends Component {
       this.setState({ listTitles: tempNames });
    }
 
-   GenerateListItemsFromApiData(listName) {
+   GetListID(listName) {
       var data = this.state.apiData;
-      var tempList = [];
       for (var list in data) {
          if (data[list].name == listName) {
-            tempList = data[list].items;
+            return data[list].key;
          }
       }
-      return tempList;
    }
 
-   GoToList(item) {
+   GoToList(listName) {
       this.props.navigation.navigate("CurrentListPage", {
-         name: item,
-         list: this.GenerateListItemsFromApiData(item)
+         name: listName,
+         listID: this.GetListID(listName)
       });
    }
 
@@ -198,13 +135,13 @@ class YourLists extends Component {
          />
       );
    };
-   adaNameRef;
    handleCancel = () => {
       this.newListName = "";
       this.setState({ isDialogVisible: false });
    };
 
    handleCreate = () => {
+      // Add the list to the lists table
       var push = firebase
          .database()
          .ref("/lists")
@@ -213,12 +150,13 @@ class YourLists extends Component {
             items: []
          });
       var key = push.key;
-      var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+      var uid = firebase.auth().currentUser.uid;
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .once("value", function(snapshot) {
+         .once("value", function (snapshot) {
             if (snapshot.val()) {
+               // Add the new list to the users created section
                var createdLists = snapshot.val().created;
                createdLists.push(key);
                snapshot.ref.update({ created: createdLists });
@@ -256,83 +194,96 @@ class YourLists extends Component {
             ),
             backgroundColor: "red",
             onPress: () => {
-               Alert.alert(
-                  "Delete list button was clicked for list: " +
-                     this.state.apiData[this.state.activeRow].name +
-                     " with ID: " +
-                     this.state.apiData[this.state.activeRow].key
-               );
-               var uid = /*firebase.auth().currentUser.uid*/ this.HASEEB;
+               var uid = firebase.auth().currentUser.uid;
                firebase
                   .database()
                   .ref("/users/" + uid + "/lists")
-                  .once("value", function(snapshot) {
-                     var creatorBool = false;
+                  .once("value", function (snapshot) {
                      if (snapshot.val()) {
+                        // Remove from the user created section if exists
                         var createdLists = snapshot.val().created;
-                        for (var a = 0; a < createdLists.length; a++) {
+                        var indexPosition = 0;
+                        for (var list in createdLists) {
                            if (
-                              createdLists[a] ===
+                              list ===
                               this.state.apiData[this.state.activeRow].key
                            ) {
-                              createdLists.splice(a, 1);
-                              a--;
-                              creatorBool = true;
-                           }
-                        }
-                        snapshot.ref.update({ created: createdLists });
-                        var sharedLists = snapshot.val().shared;
-                        for (var a = 0; a < sharedLists.length; a++) {
-                           if (
-                              sharedLists[a] ===
-                              this.state.apiData[this.state.activeRow].key
-                           ) {
-                              sharedLists.splice(a, 1);
-                              a--;
+                              createdLists.splice(indexPosition, 1);
                               break;
                            }
+                           indexPosition++;
+                        }
+                        snapshot.ref.update({ created: createdLists });
+
+                        // Remove from the user shared section if exists
+                        var sharedLists = snapshot.val().shared;
+                        indexPosition = 0;
+                        for (list in sharedLists) {
+                           if (
+                              list ===
+                              this.state.apiData[this.state.activeRow].key
+                           ) {
+                              sharedLists.splice(indexPosition, 1);
+                              break;
+                           }
+                           indexPosition++;
                         }
                         snapshot.ref.update({ shared: sharedLists });
                      }
 
-                     if (creatorBool) {
-                        firebase
-                           .database()
-                           .ref("/users/")
-                           .once("value", function(snapshot) {
-                              if (snapshot.val()) {
-                                 for (var uid in snapshot.val()) {
-                                    var sharedWithLists = snapshot.val().uid
+                     // Remove from the lists table if it is in no users created or shared section
+                     firebase
+                        .database()
+                        .ref("/users/")
+                        .once("value", function (snapshot) {
+                           var listStillExists = false;
+                           if (snapshot.val()) {
+                              for (var uid in snapshot.val()) {
+                                 var sharedWithLists = snapshot.val().uid
+                                    .lists.shared;
+                                 for (
+                                    var list in sharedWithLists
+                                 ) {
+                                    if (
+                                       list ===
+                                       this.state.apiData[
+                                          this.state.activeRow
+                                       ].key
+                                    ) {
+                                       listStillExists = true;
+                                       break;
+                                    }
+                                 }
+
+                                 if (!listStillExists) {
+                                    var createdLists = snapshot.val().uid
                                        .lists.shared;
                                     for (
-                                       var a = 0;
-                                       a < sharedWithLists.length;
-                                       a++
+                                       list in createdLists
                                     ) {
                                        if (
-                                          sharedWithLists[a] ===
+                                          list ===
                                           this.state.apiData[
                                              this.state.activeRow
                                           ].key
                                        ) {
-                                          sharedWithLists.splice(a, 1);
-                                          a--;
-                                          snapshot.ref.update({
-                                             shared: sharedWithLists
-                                          });
-
+                                          listStillExists = true;
                                           break;
                                        }
                                     }
                                  }
+
+                                 if (!listStillExists) {
+                                    firebase
+                                       .database()
+                                       .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
+                                       .remove();
+                                 }
                               }
-                           });
-                     }
+                           }
+                        });
                   });
-               firebase
-                  .database()
-                  .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
-                  .remove();
+
             }
          }
       ];

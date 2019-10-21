@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Text, Image, View, FlatList, BackHandler } from "react-native";
+import { Text, Image, View, FlatList, Alert } from "react-native";
 import styles from "./pageStyles/CurrentListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
+import * as firebase from "firebase";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -31,18 +32,30 @@ class CurrentList extends Component {
             this.SetNameAndCurrentItems();
          }
       );
-      BackHandler.addEventListener("hardwareBackPress", function() {
-         // Return true if you want to go back, false if want to ignore. This is for Android only.
-         // return true;
-         return false;
-      });
    }
 
    SetNameAndCurrentItems() {
       this.setState({
-         listName: this.props.navigation.getParam("name", ""),
-         listItems: this.props.navigation.getParam("list", [])
+         listName: this.props.navigation.getParam("name", "(Invalid Name)"),
+         listItems: []
       });
+      var that = this;
+      firebase
+         .database()
+         .ref("/lists/" + this.props.navigation.getParam("listID", ""))
+         .on("value", function (snapshot) {
+            var ssv = snapshot.val();
+            if (ssv.items) {
+               for (var item in ssv.items) {
+                  // console.log(ssv.items[item]);
+                  var currentItems = that.state.listItems;
+                  currentItems.push(ssv.items[item]);
+                  that.setState({ listItems: currentItems });
+               }
+            }
+
+         });
+
    }
 
    FlatListItemSeparator = () => {
@@ -97,9 +110,9 @@ class CurrentList extends Component {
             onPress: () => {
                Alert.alert(
                   "Delete item button was clicked for item: " +
-                     this.state.listItems[this.state.activeRow].name +
-                     " with ID: " +
-                     this.state.listItems[this.state.activeRow].key
+                  this.state.listItems[this.state.activeRow].name +
+                  " with ID: " +
+                  this.state.listItems[this.state.activeRow].key
                );
             }
          }
@@ -138,7 +151,6 @@ class CurrentList extends Component {
                   >
                      <DoubleClick
                         doubleTap={() => {
-                           console.log("Double tap called on index: " + index);
                            this.HandleDoubleTapItem(index);
                         }}
                         delay={500}
