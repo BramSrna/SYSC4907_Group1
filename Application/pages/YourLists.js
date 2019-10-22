@@ -147,21 +147,15 @@ class YourLists extends Component {
          .ref("/lists")
          .push({
             name: this.newListName,
-            items: []
+            items: {},
+            user_count: 1
          });
       var key = push.key;
       var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists")
-         .once("value", function (snapshot) {
-            if (snapshot.val()) {
-               // Add the new list to the users created section
-               var createdLists = snapshot.val().created;
-               createdLists.push(key);
-               snapshot.ref.update({ created: createdLists });
-            }
-         });
+      firebase.database().ref("/users/" + uid + "/lists/created").child(key).set(0).then((data) => {
+      }).catch((error) => {
+         alert("Failed to create list: " + error);
+      })
 
       this.newListName = "";
       this.setState({ isDialogVisible: false });
@@ -195,6 +189,7 @@ class YourLists extends Component {
             backgroundColor: "red",
             onPress: () => {
                var uid = firebase.auth().currentUser.uid;
+               var listId = this.state.apiData[this.state.activeRow].key;
                firebase
                   .database()
                   .ref("/users/" + uid + "/lists")
@@ -202,86 +197,61 @@ class YourLists extends Component {
                      if (snapshot.val()) {
                         // Remove from the user created section if exists
                         var createdLists = snapshot.val().created;
-                        var indexPosition = 0;
-                        for (var list in createdLists) {
+                        for (var cList in createdLists) {
                            if (
-                              list ===
-                              this.state.apiData[this.state.activeRow].key
+                              cList ===
+                              listId
                            ) {
-                              createdLists.splice(indexPosition, 1);
-                              break;
-                           }
-                           indexPosition++;
-                        }
-                        snapshot.ref.update({ created: createdLists });
-
-                        // Remove from the user shared section if exists
-                        var sharedLists = snapshot.val().shared;
-                        indexPosition = 0;
-                        for (list in sharedLists) {
-                           if (
-                              list ===
-                              this.state.apiData[this.state.activeRow].key
-                           ) {
-                              sharedLists.splice(indexPosition, 1);
-                              break;
-                           }
-                           indexPosition++;
-                        }
-                        snapshot.ref.update({ shared: sharedLists });
-                     }
-
-                     // Remove from the lists table if it is in no users created or shared section
-                     firebase
-                        .database()
-                        .ref("/users/")
-                        .once("value", function (snapshot) {
-                           var listStillExists = false;
-                           if (snapshot.val()) {
-                              for (var uid in snapshot.val()) {
-                                 var sharedWithLists = snapshot.val().uid
-                                    .lists.shared;
-                                 for (
-                                    var list in sharedWithLists
-                                 ) {
-                                    if (
-                                       list ===
-                                       this.state.apiData[
-                                          this.state.activeRow
-                                       ].key
-                                    ) {
-                                       listStillExists = true;
-                                       break;
-                                    }
-                                 }
-
-                                 if (!listStillExists) {
-                                    var createdLists = snapshot.val().uid
-                                       .lists.shared;
-                                    for (
-                                       list in createdLists
-                                    ) {
-                                       if (
-                                          list ===
-                                          this.state.apiData[
-                                             this.state.activeRow
-                                          ].key
-                                       ) {
-                                          listStillExists = true;
-                                          break;
+                              firebase.database().ref("/users/" + uid + "/lists/created/").child(cList).remove();
+                              firebase
+                                 .database()
+                                 .ref("/lists/" + cList)
+                                 .once("value", function (snapshot) {
+                                    if (snapshot.val()) {
+                                       if (snapshot.val().user_count == 1) {
+                                          firebase.database().ref("/lists/").child(cList).remove();
+                                       } else {
+                                          var newCount = snapshot.val().user_count - 1;
+                                          firebase.database().ref("/lists/" + cList).update({
+                                             user_count: newCount
+                                          });
                                        }
                                     }
-                                 }
-
-                                 if (!listStillExists) {
-                                    firebase
-                                       .database()
-                                       .ref("/lists/" + this.state.apiData[this.state.activeRow].key)
-                                       .remove();
-                                 }
-                              }
+                                 });
+                              break;
                            }
-                        });
+                        }
+
+                        // Remove from the user shared section if exists, but only if not removed earlier
+                        var sharedLists = snapshot.val().shared;
+                        for (sList in sharedLists) {
+                           if (
+                              sList ===
+                              listId
+                           ) {
+                              firebase.database().ref("/users/" + uid + "/lists/shared/").child(sList).remove();
+                              firebase
+                                 .database()
+                                 .ref("/lists/" + sList)
+                                 .once("value", function (snapshot) {
+                                    if (snapshot.val()) {
+                                       if (snapshot.val().user_count == 1) {
+
+                                          firebase.database().ref("/lists/").child(sList).remove();
+                                       } else {
+                                          var newCount = snapshot.val().user_count - 1;
+                                          firebase.database().ref("/lists/" + cList).update({
+                                             user_count: newCount
+                                          });
+                                       }
+                                    }
+                                 });
+                              break;
+                           }
+
+                        }
+                     }
+
                   });
 
             }
