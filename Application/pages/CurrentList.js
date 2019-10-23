@@ -4,7 +4,7 @@ import styles from "./pageStyles/CurrentListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
-import * as firebase from "firebase";
+import lf from "./ListFunctions";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -36,26 +36,9 @@ class CurrentList extends Component {
 
    SetNameAndCurrentItems() {
       this.setState({
-         listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-         listItems: []
+         listName: this.props.navigation.getParam("name", "(Invalid Name)")
       });
-      var that = this;
-      firebase
-         .database()
-         .ref("/lists/" + this.props.navigation.getParam("listID", ""))
-         .on("value", function (snapshot) {
-            var ssv = snapshot.val();
-            if (ssv.items) {
-               for (var item in ssv.items) {
-                  // console.log(ssv.items[item]);
-                  var currentItems = that.state.listItems;
-                  currentItems.push(ssv.items[item]);
-                  that.setState({ listItems: currentItems });
-               }
-            }
-
-         });
-
+      lf.GetItemsInAList(this, this.props.navigation.getParam("listID", ""))
    }
 
    FlatListItemSeparator = () => {
