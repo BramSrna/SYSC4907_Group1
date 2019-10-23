@@ -17,6 +17,7 @@ export default StyleSheet.create({
     },
     mainContainer: {
         flex: 1,
+        backgroundColor: "white",
     },
     item: {
       backgroundColor: '#f9c2ff',
@@ -26,7 +27,7 @@ export default StyleSheet.create({
     },
     textInput: {
         height: 40, 
-        borderColor: "gray", 
+        borderColor: "black", 
         borderWidth: 1,
         justifyContent: "flex-end",
         color: "black",
@@ -42,7 +43,7 @@ export default StyleSheet.create({
     },
     picker: {
       height: 40, 
-      borderColor: "gray", 
+      borderColor: "black", 
       borderWidth: 1,
       justifyContent: "flex-end",
       color: "black",
