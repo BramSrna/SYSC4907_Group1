@@ -107,8 +107,6 @@ class MapCreatorPage extends Component {
         // Images taken from https://material.io/resources/icons/?icon=cancel&style=baseline
         return (
             <View style={styles.rowSorter}>
-                <View style = {styles.bufferView}></View>
-
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.upButtonPressed(index)}>
@@ -157,7 +155,6 @@ class MapCreatorPage extends Component {
                 </View>
 
                 <View style = {{flex : 1, backgroundColor : "white"}}/>
-
             </View>
         )
     }
@@ -166,14 +163,16 @@ class MapCreatorPage extends Component {
         return (
         <View style={styles.mainContainer}>
             <View style={styles.topContainer}>
-                <Text style={styles.blackHeaderText}>Map Creator:</Text>
+                <View style={styles.headerContainer}>
+                    <Text style={styles.blackHeaderText}>Map Creator:</Text>
+                </View>
 
                 <View style={styles.rowSorter}>
-                    <View style = {styles.mainContainer}>
+                    <View style = {styles.textContainer}>
                         <Text style={globalStyles.blackText}>Store Name: </Text>
                     </View>
 
-                    <View style = {styles.mainContainer}>
+                    <View style = {styles.pickerContainer}>
                         <TextInput
                             style={styles.textInput}
                             placeholder="Store Name"
@@ -181,6 +180,7 @@ class MapCreatorPage extends Component {
                             value={this.state.storeName}
                         />
                     </View>
+
                 </View>
             </View>
 
@@ -194,20 +194,24 @@ class MapCreatorPage extends Component {
 
             <View style={styles.botContainer}>
                 <View style={styles.rowSorter}>
-                    <TouchableHighlight
-                        style={[styles.buttonContainer, styles.button]}
-                        onPress={this.addDepartment}
-                    >
-                        <Text style={globalStyles.whiteText}>{"Add Department"}</Text>
-                    </TouchableHighlight>
+                    <View style={styles.outerButtonContainer}>
+                        <TouchableHighlight
+                            style={[styles.buttonContainer, styles.button]}
+                            onPress={this.addDepartment}
+                        >
+                            <Text style={globalStyles.whiteText}>{"Add Department"}</Text>
+                        </TouchableHighlight>
+                    </View>
 
-                    <TouchableHighlight
-                        style={[styles.buttonContainer, styles.button]}
-                        onPress={this.handleSaveMap}
-                    >
+                    <View style={styles.outerButtonContainer}>
+                        <TouchableHighlight
+                            style={[styles.buttonContainer, styles.button]}
+                            onPress={this.handleSaveMap}
+                        >
 
-                        <Text style={globalStyles.whiteText}>{"Save Map"}</Text>
-                    </TouchableHighlight>
+                            <Text style={globalStyles.whiteText}>{"Save Map"}</Text>
+                        </TouchableHighlight>
+                    </View>
                 </View>
             </View>
         </View>
