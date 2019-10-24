@@ -12,6 +12,8 @@ import FirebaseUser from "../components/FirebaseUser";
 const VERIFY = "Verify";
 const RESEND = "Resend confirmation link";
 
+const HOMEPAGE = "Home";
+
 export default class VerificationPage extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +22,7 @@ export default class VerificationPage extends Component {
   buttonListener = buttonId => {
     if (buttonId === VERIFY) {
       if(this.checkEmailVerification()){
-        this.props.navigation.navigate("GoToHomePage");
+        this.props.navigation.navigate(HOMEPAGE);
       } else{
         Alert.alert("Email Not Verified", "Check email for verification link.");
         console.log("Email Verification Check Failed!");
@@ -31,9 +33,9 @@ export default class VerificationPage extends Component {
     }
   };
 
-  async checkEmailVerification(){
+  checkEmailVerification(){
     firebaseUser = new FirebaseUser();
-    return await firebaseUser.isUserEmailVerified();
+    return firebaseUser.isUserEmailVerified();
   }
 
   render() {
