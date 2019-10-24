@@ -16,6 +16,7 @@ class MapCreatorPage extends Component {
     constructor(props) {
         super(props);
 
+        // Use a list for keeping track of all the departments
         this.currDepartments = [
             {
                 depName: Object.keys(departments)[0],
@@ -23,15 +24,18 @@ class MapCreatorPage extends Component {
         ]
 
         this.state = {
-            arrayHolder: [],
-            storeName: "",
+            arrayHolder: [], // The departments added so far
+            storeName: "", // The name of the store
         };
     }
 
     /*
     componentDidMount
+
     Set mounted to True
+
     @input  None
+
     @return void
     */
     componentDidMount () {
@@ -42,71 +46,165 @@ class MapCreatorPage extends Component {
 
     /*
     componentWillUnmount
+
     Set mounted to False
+    
     @input  None
+
     @return void
     */
     componentWillUnmount () {
         this._mounted = false
     }
 
+    /*
+    addDepartment
+
+    Adds a department to the list of departments and
+    intializes it to the first item in the list.
+    Rerenders the screen + state.
+
+    @input  None
+
+    @return void
+    */
     addDepartment = () => {
+        // Add a department to the list
         this.currDepartments.push({depName : Object.keys(departments)[0]});
 
+        // Rerender the screen
         this.setState({ arrayHolder: [...this.currDepartments]})
     }
 
+    /*
+    handleSaveMap
+
+    Handles the Save Map button being clicked.
+    Copies the current department setting list and
+    pushes it to the database.
+
+    @input  None
+
+    @return void
+    */
     handleSaveMap = () => {
         var deps = []
 
+        // Copy the current list of departments
         for (var i = 0; i < this.currDepartments.length; i++){
             deps.push(this.currDepartments[i]["depName"])
         }
 
-        console.log(deps)
-
+        // Push the list to the database
         firebase.database().ref("/stores").push({
             name: this.state.storeName,
             map: deps
         });
     }
 
+    /*
+    updateDepartment
+
+    Updates the current index in the list, setting
+    it to the given value.
+
+    @input  ind     The index to update
+    @input  newVal  The new value for the index
+
+    @return void
+    */
     updateDepartment(ind, newVal) {
         this.currDepartments[ind]["depName"] = newVal
 
         this.setState({ arrayHolder: [...this.currDepartments]})
     }
 
+    /*
+    upButtonPressed
+
+    Handler for the up button. Swaps the department at
+    the given index with the department above it. If
+    the department is at the top of the list, nothing
+    happens.
+
+    @input  ind     The index to move
+
+    @return void
+    */
     upButtonPressed(ind) {
+        // Check if the index is at the top of the list
         if (ind != 0) {
+            // Swap the element at the index with the one above it
             var aboveItem = this.currDepartments[ind - 1]["depName"]
             this.currDepartments[ind - 1]["depName"] = this.currDepartments[ind]["depName"]
             this.currDepartments[ind]["depName"] = aboveItem
 
+            // Update the state
             this.setState({ arrayHolder: [...this.currDepartments]})
         }
     }
 
+    /*
+    delButtonPressed
+
+    Handler for the delete button. Deletes the button
+    at the given index from the list. Updates the state.
+
+    @input  ind     The index to delete
+
+    @return void
+    */
     delButtonPressed(ind) {
+        // Remove the department from the list
         this.currDepartments.splice(ind, 1)
 
+        // Update the state
         this.setState({ arrayHolder: [...this.currDepartments]})
     }
 
+    /*
+    downButtonPressed
+
+    Handler for the down button. Swaps the department at
+    the given index with the department below it. If
+    the department is at the bottom of the list, nothing
+    happens.
+
+    @input  ind     The index to move
+
+    @return void
+    */
     downButtonPressed(ind) {
+        // Check if the index is at the bottom of the list
         if (ind != this.currDepartments.length - 1) {
+            // Swap the element at the index with the below it
             var belowItem = this.currDepartments[ind + 1]["depName"]
             this.currDepartments[ind + 1]["depName"] = this.currDepartments[ind]["depName"]
             this.currDepartments[ind]["depName"] = belowItem
 
+            // Update the state
             this.setState({ arrayHolder: [...this.currDepartments]})
         }
     }
 
+    /*
+    renderListElem
+
+    Renders the items in the department list. Each
+    item has an up button, delete button, down button,
+    picker for selecting the department, and a blank spot
+    to allow for scrolling.
+
+    @input  index   The index of the element being rendered
+
+    @return void
+    */
     renderListElem(index) {
         // Images taken from https://material.io/resources/icons/?icon=cancel&style=baseline
         return (
+            // Use the row sorter for rendering the item
             <View style={styles.rowSorter}>
+                {/* Render the up button */}
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.upButtonPressed(index)}>
@@ -117,8 +215,10 @@ class MapCreatorPage extends Component {
                     />
                 </TouchableHighlight>
 
+                {/* Place buffers between elements to make it clearer */}
                 <View style = {styles.bufferView}></View>
 
+                {/* Render the delete button */}
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.delButtonPressed(index)}>
@@ -131,6 +231,7 @@ class MapCreatorPage extends Component {
 
                 <View style = {styles.bufferView}></View>
 
+                {/* Render the down button */}
                 <TouchableHighlight
                     style = {[styles.listButton, {backgroundColor : "white"}]}
                     onPress = {() => this.downButtonPressed(index)}>
@@ -143,6 +244,7 @@ class MapCreatorPage extends Component {
 
                 <View style = {styles.bufferView}></View>
 
+                {/* Render the department picker */}
                 <View style = {{flex : 5}}>                
                     <Picker
                         selectedValue={this.currDepartments[index]["depName"]}
@@ -154,6 +256,7 @@ class MapCreatorPage extends Component {
                     </Picker>
                 </View>
 
+                {/* Add a blank area at the end of the row to allow for scrolling */}
                 <View style = {{flex : 1, backgroundColor : "white"}}/>
             </View>
         )

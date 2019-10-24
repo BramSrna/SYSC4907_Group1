@@ -12,7 +12,6 @@ export default StyleSheet.create({
     }, 
     topContainer: {
         flex: 2,
-        //justifyContent: "space-between",
     },
     headerContainer: {
         flex: 1,
@@ -48,12 +47,6 @@ export default StyleSheet.create({
     },
     botContainer: {
         flex: 2,
-    },
-    item: {
-      backgroundColor: '#f9c2ff',
-      padding: 20,
-      marginVertical: 8,
-      marginHorizontal: 16,
     },
     textInput: {
         height: 40, 
