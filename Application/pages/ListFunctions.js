@@ -9,6 +9,32 @@ class ListFunctions {
    }
 
    /**
+    * This function is used to remove an item from a list
+    * @param {*} listId: id of the list the item is in
+    * @param {*} itemId: id of the item of the list
+    */
+   DeleteItemInList(listId, itemId) {
+      firebase.database().ref("/lists/" + listId + "/items/").child(itemId).remove();
+   }
+
+   /**
+    * This function is used to change the purchased boolean in the database 
+    * @param {*} listId: id of the list the item is in
+    * @param {*} itemId: id of the item in the list
+    */
+   UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
+      firebase
+         .database()
+         .ref("/lists/" + listId + "/items/" + itemId)
+         .once("value", function (snapshot) {
+            var currentBool = snapshot.val().purchased;
+            firebase.database().ref("/lists/" + listId + "/items/" + itemId).update({
+               purchased: !currentBool
+            });
+         });
+   }
+
+   /**
     * Get all the items in the current list
     * @param {*} that: this for calling function
     * @param {*} listId: id of the list we are currently viewing
@@ -19,14 +45,17 @@ class ListFunctions {
          .ref("/lists/" + listId)
          .on("value", function (snapshot) {
             var items = [];
+            var ids = [];
             var ssv = snapshot.val();
             if (ssv.items) {
                for (var item in ssv.items) {
                   items.push(ssv.items[item]);
+                  ids.push(item);
                }
             }
             that.setState({
-               listItems: items
+               listItems: items,
+               listItemIds: ids
             });
          });
    }

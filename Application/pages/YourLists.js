@@ -116,7 +116,7 @@ class YourLists extends Component {
                <Dialog.Button label="Create" onPress={this.handleCreate} />
             </Dialog.Container>
             <Text style={styles.pageTitle}>
-               Your Lists: {this.state.listTitles.length}
+               All Lists: {this.state.listTitles.length}
             </Text>
             <TouchableOpacity
                onPress={() => this.setState({ isDialogVisible: true })}

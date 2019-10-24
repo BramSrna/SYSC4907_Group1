@@ -1,21 +1,21 @@
 import React, { Component } from "react";
-import { Text, Image, View, FlatList } from "react-native";
-import styles from "./pageStyles/CurrentListPageStyle";
+import { Text, Image, View, FlatList, Alert } from "react-native";
+import styles from "./pageStyles/AddItemToListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
 import lf from "./ListFunctions";
 
-class CurrentList extends Component {
+class AddItemToList extends Component {
    constructor(props) {
       super(props);
 
       this.state = {
-         listName: "",
-         listId: "",
-         listItems: [],
-         listItemIds: []
+         loading: false,
+         data: [],
+         error: null
       };
+      this.arrayholder = [];
    }
 
    componentWillUnmount() {
@@ -38,10 +38,9 @@ class CurrentList extends Component {
 
    SetNameAndCurrentItems() {
       this.setState({
-         listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-         listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+         listName: this.props.navigation.getParam("name", "(Invalid Name)")
       });
-      lf.GetItemsInAList(this, this.props.navigation.getParam("listID", "(Invalid List ID)"));
+      lf.GetItemsInAList(this, this.props.navigation.getParam("listID", ""))
    }
 
    FlatListItemSeparator = () => {
@@ -71,11 +70,10 @@ class CurrentList extends Component {
    }
 
    HandleDoubleTapItem(indexPosition) {
-      // var currentList = this.state.listItems;
-      lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId, this.state.listItemIds[indexPosition])
-      // var currentItemBool = currentList[indexPosition].purchased;
-      // currentList[indexPosition].purchased = !currentItemBool;
-      // this.setState({ listItems: currentList });
+      var currentList = this.state.listItems;
+      var currentItemBool = currentList[indexPosition].purchased;
+      currentList[indexPosition].purchased = !currentItemBool;
+      this.setState({ listItems: currentList });
    }
 
    render() {
@@ -95,8 +93,12 @@ class CurrentList extends Component {
             ),
             backgroundColor: "red",
             onPress: () => {
-               lf.DeleteItemInList(this.state.listId, this.state.listItemIds[this.state.activeRow])
-
+               Alert.alert(
+                  "Delete item button was clicked for item: " +
+                  this.state.listItems[this.state.activeRow].name +
+                  " with ID: " +
+                  this.state.listItems[this.state.activeRow].key
+               );
             }
          }
       ];
@@ -155,4 +157,4 @@ class CurrentList extends Component {
    }
 }
 
-export default CurrentList;
+export default AddItemToList;
