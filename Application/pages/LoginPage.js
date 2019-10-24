@@ -12,10 +12,15 @@ import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
+
 const LOGIN = "Login";
+const REGISTER = "Register";
 const FORGOT_PASSWORD = "Forgot your password?";
-const REGISTER = "RegisterPage";
-const HOMEPAGE = "HomePage";
+
+const HOMEPAGE = "Home";
+const REGISTERPAGE = "Registration";
+const FORGOTPASSWORDPAGE = "ForgotPassword";
+const VERIFICATIONPAGE = "Verification";
 
 export default class LoginPage extends Component {
   userAlreadyLoggedIn = false;
@@ -29,9 +34,9 @@ export default class LoginPage extends Component {
     if (buttonId == LOGIN) {
       this.onPressLoginIn();
     } else if (buttonId == REGISTER) {
-      this.props.navigation.navigate("Registration");
+      this.props.navigation.navigate(REGISTERPAGE);
     } else if (buttonId == FORGOT_PASSWORD) {
-      this.props.navigation.navigate("ForgotPassword");
+      this.props.navigation.navigate(FORGOTPASSWORDPAGE);
     }
   };
 
@@ -46,10 +51,10 @@ export default class LoginPage extends Component {
       user = new FirebaseUser();
       if (user != null && user.email == this.state.email) {
         if (!user.emailVerified) {
-          this.props.navigation.navigate("GoToVerificationPage");
+          this.props.navigation.navigate(VERIFICATIONPAGE);
         }
         else {
-          this.props.navigation.navigate("GoToHomePage");
+          this.props.navigation.navigate(HOMEPAGE);
         }
       }
     }

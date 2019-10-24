@@ -3,6 +3,8 @@ import { Text, View, TextInput, TouchableHighlight, Image, Alert } from "react-n
 import styles from "./pageStyles/GlobalStyle"
 import * as firebase from "firebase";
 
+const LOGINPAGE = "Login";
+
 export default class ForgotPasswordPage extends Component {
     constructor(props) {
         super(props);
@@ -23,7 +25,7 @@ export default class ForgotPasswordPage extends Component {
     }
 
     onBackToLoginPress = () => {
-        this.props.navigation.navigate("Login");
+        this.props.navigation.navigate(LOGINPAGE);
     }
 
     render() {
