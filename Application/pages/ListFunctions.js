@@ -9,16 +9,6 @@ class ListFunctions {
    }
 
    /**
-    * This function is used to set state for live updates
-    * @param {*} that: this of caller
-    * @param {*} state: state to update
-    */
-   SetState(that, state) {
-      that.setState(state);
-   }
-
-
-   /**
     * Get all the items in the current list
     * @param {*} that: this for calling function
     * @param {*} listId: id of the list we are currently viewing
@@ -35,7 +25,7 @@ class ListFunctions {
                   items.push(ssv.items[item]);
                }
             }
-            this.SetState(that, {
+            that.setState({
                listItems: items
             });
          });
@@ -171,7 +161,7 @@ class ListFunctions {
                            });
                            listTitles.push(ssv.name);
                            if (counter == listIdLength) {
-                              this.SetState(that, {
+                              that.setState({
                                  apiData: curApiData,
                                  listTitles: listTitles
                               });
@@ -180,7 +170,7 @@ class ListFunctions {
                         } else {
                            console.log("ERROR: List does not exist.");
 
-                           this.SetState(that, {
+                           that.setState({
                               apiData: curApiData,
                               listTitles: listTitles
 
@@ -190,7 +180,7 @@ class ListFunctions {
                }
             } else {
                console.log("No API data...")
-               this.SetState(that, {
+               that.setState({
                   apiData: [],
                   listTitles: []
 

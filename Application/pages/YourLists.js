@@ -1,6 +1,4 @@
-import React, {
-   Component
-} from "react";
+import React, { Component } from "react";
 import {
    TouchableOpacity,
    Text,
@@ -12,6 +10,7 @@ import styles from "./pageStyles/YourListsPageStyle";
 import Swipeout from "react-native-swipeout";
 import Dialog from "react-native-dialog";
 import lf from "./ListFunctions";
+
 
 class YourLists extends Component {
    constructor(props) {
@@ -25,7 +24,7 @@ class YourLists extends Component {
    }
 
    GenerateNeededData() {
-      lf.GetListsKeyAndName(this)
+      lf.GetListsKeyAndName(this);
    }
 
    componentDidMount() {
@@ -49,22 +48,19 @@ class YourLists extends Component {
    }
 
    FlatListItemSeparator = () => {
-      return (<
-         View style={
-            {
+      return (
+         <View
+            style={{
                height: 1,
                width: "100%",
                backgroundColor: "#607D8B"
-            }
-         }
-      />
+            }}
+         />
       );
    };
    handleCancel = () => {
       this.newListName = "";
-      this.setState({
-         isDialogVisible: false
-      });
+      this.setState({ isDialogVisible: false });
    };
 
    handleCreate = () => {
@@ -77,9 +73,7 @@ class YourLists extends Component {
 
    handleSwipeOpen(rowId, direction) {
       if (typeof direction !== "undefined") {
-         this.setState({
-            activeRow: rowId
-         });
+         this.setState({ activeRow: rowId });
       }
    }
 
@@ -88,26 +82,26 @@ class YourLists extends Component {
    }
 
    render() {
-      const swipeButtons = [{
-         component: (<View style={
-            {
-               flex: 1,
-               alignItems: "center",
-               justifyContent: "center",
-               flexDirection: "column"
+      const swipeButtons = [
+         {
+            component: (
+               <View
+                  style={{
+                     flex: 1,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     flexDirection: "column"
+                  }}
+               >
+                  <Image source={require("../images/delete_list_button.png")} />
+               </View>
+            ),
+            backgroundColor: "red",
+            onPress: () => {
+               lf.DeleteList(this.state.apiData[this.state.activeRow].key);
             }
-         } >
-            <
-               Image source={
-                  require("../images/delete_list_button.png")
-               }
-            /> </View >
-         ),
-         backgroundColor: "red",
-         onPress: () => {
-            var listId = this.state.apiData[this.state.activeRow].key;
          }
-      }];
+      ];
       return (
          <View style={styles.ListContainer}>
             <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
