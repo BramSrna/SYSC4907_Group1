@@ -68,7 +68,7 @@ class ListFunctions {
             var items = [];
             var ids = [];
             var ssv = snapshot.val();
-            if (ssv.items) {
+            if (ssv && ssv.items) {
                for (var item in ssv.items) {
                   items.push(ssv.items[item]);
                   ids.push(item);
@@ -78,7 +78,6 @@ class ListFunctions {
                listItems: items,
                listItemIds: ids
             });
-            console.log(items)
          });
    }
 
