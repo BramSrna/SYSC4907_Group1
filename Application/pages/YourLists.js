@@ -93,7 +93,7 @@ class YourLists extends Component {
                      flexDirection: "column"
                   }}
                >
-                  <Image source={require("../images/delete_list_button.png")} />
+                  <Image source={require("../assets/icons/delete_list_button.png")} />
                </View>
             ),
             backgroundColor: "red",
@@ -121,7 +121,7 @@ class YourLists extends Component {
             <TouchableOpacity
                onPress={() => this.setState({ isDialogVisible: true })}
             >
-               <Image source={require("../images/new_list_button.png")} />
+               <Image source={require("../assets/icons/new_list_button.png")} />
             </TouchableOpacity>
             <FlatList
                style={styles.flatList}

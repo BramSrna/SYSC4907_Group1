@@ -1,160 +1,165 @@
-import React, { Component } from "react";
-import { Text, Image, View, FlatList, Alert } from "react-native";
-import styles from "./pageStyles/AddItemToListPageStyle";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Swipeout from "react-native-swipeout";
-import DoubleClick from "react-native-double-tap";
-import lf from "./ListFunctions";
+/**
+ *    DONT WORRY ABOUT THIS RN
+ *
+ */
 
-class AddItemToList extends Component {
-   constructor(props) {
-      super(props);
+// import React, { Component } from "react";
+// import { Text, Image, View, FlatList, Alert } from "react-native";
+// import styles from "./pageStyles/AddItemToListPageStyle";
+// import { TouchableOpacity } from "react-native-gesture-handler";
+// import Swipeout from "react-native-swipeout";
+// import DoubleClick from "react-native-double-tap";
+// import lf from "./ListFunctions";
 
-      this.state = {
-         loading: false,
-         data: [],
-         error: null
-      };
-      this.arrayholder = [];
-   }
+// class AddItemToList extends Component {
+//    constructor(props) {
+//       super(props);
 
-   componentWillUnmount() {
-      this.focusListener.remove();
-   }
+//       this.state = {
+//          loading: false,
+//          data: [],
+//          error: null
+//       };
+//       this.arrayholder = [];
+//    }
 
-   GoBackToYourLists() {
-      this.props.navigation.navigate("YourListsPage");
-   }
+//    componentWillUnmount() {
+//       this.focusListener.remove();
+//    }
 
-   componentDidMount() {
-      // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this.SetNameAndCurrentItems();
-         }
-      );
-   }
+//    GoBackToYourLists() {
+//       this.props.navigation.navigate("YourListsPage");
+//    }
 
-   SetNameAndCurrentItems() {
-      this.setState({
-         listName: this.props.navigation.getParam("name", "(Invalid Name)")
-      });
-      lf.GetItemsInAList(this, this.props.navigation.getParam("listID", ""))
-   }
+//    componentDidMount() {
+//       // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
+//       this.focusListener = this.props.navigation.addListener(
+//          "willFocus",
+//          () => {
+//             this.SetNameAndCurrentItems();
+//          }
+//       );
+//    }
 
-   FlatListItemSeparator = () => {
-      return (
-         <View
-            style={{
-               height: 1,
-               width: "100%",
-               backgroundColor: "#607D8B"
-            }}
-         />
-      );
-   };
+//    SetNameAndCurrentItems() {
+//       this.setState({
+//          listName: this.props.navigation.getParam("name", "(Invalid Name)")
+//       });
+//       lf.GetItemsInAList(this, this.props.navigation.getParam("listID", ""))
+//    }
 
-   GenerateListItem(item) {
-      if (item.purchased) {
-         return <Text style={styles.purchasedItem}>{item.name}</Text>;
-      } else {
-         return <Text style={styles.notPurchasedItem}>{item.name}</Text>;
-      }
-   }
+//    FlatListItemSeparator = () => {
+//       return (
+//          <View
+//             style={{
+//                height: 1,
+//                width: "100%",
+//                backgroundColor: "#607D8B"
+//             }}
+//          />
+//       );
+//    };
 
-   handleSwipeOpen(rowId, direction) {
-      if (typeof direction !== "undefined") {
-         this.setState({ activeRow: rowId });
-      }
-   }
+//    GenerateListItem(item) {
+//       if (item.purchased) {
+//          return <Text style={styles.purchasedItem}>{item.name}</Text>;
+//       } else {
+//          return <Text style={styles.notPurchasedItem}>{item.name}</Text>;
+//       }
+//    }
 
-   HandleDoubleTapItem(indexPosition) {
-      var currentList = this.state.listItems;
-      var currentItemBool = currentList[indexPosition].purchased;
-      currentList[indexPosition].purchased = !currentItemBool;
-      this.setState({ listItems: currentList });
-   }
+//    handleSwipeOpen(rowId, direction) {
+//       if (typeof direction !== "undefined") {
+//          this.setState({ activeRow: rowId });
+//       }
+//    }
 
-   render() {
-      const swipeButtons = [
-         {
-            component: (
-               <View
-                  style={{
-                     flex: 1,
-                     alignItems: "center",
-                     justifyContent: "center",
-                     flexDirection: "column"
-                  }}
-               >
-                  <Image source={require("../images/delete_list_button.png")} />
-               </View>
-            ),
-            backgroundColor: "red",
-            onPress: () => {
-               Alert.alert(
-                  "Delete item button was clicked for item: " +
-                  this.state.listItems[this.state.activeRow].name +
-                  " with ID: " +
-                  this.state.listItems[this.state.activeRow].key
-               );
-            }
-         }
-      ];
-      return (
-         <View style={styles.ListContainer}>
-            {/* Take out once stack if fixed */}
-            <Text
-               style={styles.backButton}
-               onPress={this.GoBackToYourLists.bind(this)}
-            >
-               {"<<--Your Lists"}
-            </Text>
-            <Text style={styles.pageTitle}>
-               {this.state.listName}: {this.state.listItems.length} Items
-            </Text>
-            <TouchableOpacity
-               onPress={() => console.log("Button pressed")}
-            >
-               <Image source={require("../images/new_list_button.png")} />
-            </TouchableOpacity>
-            <FlatList
-               style={styles.flatList}
-               data={this.state.listItems}
-               width="100%"
-               extraData={this.state}
-               keyExtractor={index => index.name}
-               ItemSeparatorComponent={this.FlatListItemSeparator}
-               renderItem={({ item, index }) => (
-                  <Swipeout
-                     right={swipeButtons}
-                     backgroundColor="#000000"
-                     underlayColor="white"
-                     rowID={index}
-                     sectionId={1}
-                     autoClose={true}
-                     onOpen={(secId, rowId, direction) =>
-                        this.handleSwipeOpen(rowId, direction)
-                     }
-                     close={this.state.activeRow !== index}
-                  >
-                     <DoubleClick
-                        doubleTap={() => {
-                           this.HandleDoubleTapItem(index);
-                        }}
-                        delay={500}
-                     >
-                        <TouchableOpacity>
-                           {this.GenerateListItem(item)}
-                        </TouchableOpacity>
-                     </DoubleClick>
-                  </Swipeout>
-               )}
-            />
-         </View>
-      );
-   }
-}
+//    HandleDoubleTapItem(indexPosition) {
+//       var currentList = this.state.listItems;
+//       var currentItemBool = currentList[indexPosition].purchased;
+//       currentList[indexPosition].purchased = !currentItemBool;
+//       this.setState({ listItems: currentList });
+//    }
 
-export default AddItemToList;
+//    render() {
+//       const swipeButtons = [
+//          {
+//             component: (
+//                <View
+//                   style={{
+//                      flex: 1,
+//                      alignItems: "center",
+//                      justifyContent: "center",
+//                      flexDirection: "column"
+//                   }}
+//                >
+//                   <Image source={require("../images/delete_list_button.png")} />
+//                </View>
+//             ),
+//             backgroundColor: "red",
+//             onPress: () => {
+//                Alert.alert(
+//                   "Delete item button was clicked for item: " +
+//                   this.state.listItems[this.state.activeRow].name +
+//                   " with ID: " +
+//                   this.state.listItems[this.state.activeRow].key
+//                );
+//             }
+//          }
+//       ];
+//       return (
+//          <View style={styles.ListContainer}>
+//             {/* Take out once stack if fixed */}
+//             <Text
+//                style={styles.backButton}
+//                onPress={this.GoBackToYourLists.bind(this)}
+//             >
+//                {"<<--Your Lists"}
+//             </Text>
+//             <Text style={styles.pageTitle}>
+//                {this.state.listName}: {this.state.listItems.length} Items
+//             </Text>
+//             <TouchableOpacity
+//                onPress={() => console.log("Button pressed")}
+//             >
+//                <Image source={require("../images/new_list_button.png")} />
+//             </TouchableOpacity>
+//             <FlatList
+//                style={styles.flatList}
+//                data={this.state.listItems}
+//                width="100%"
+//                extraData={this.state}
+//                keyExtractor={index => index.name}
+//                ItemSeparatorComponent={this.FlatListItemSeparator}
+//                renderItem={({ item, index }) => (
+//                   <Swipeout
+//                      right={swipeButtons}
+//                      backgroundColor="#000000"
+//                      underlayColor="white"
+//                      rowID={index}
+//                      sectionId={1}
+//                      autoClose={true}
+//                      onOpen={(secId, rowId, direction) =>
+//                         this.handleSwipeOpen(rowId, direction)
+//                      }
+//                      close={this.state.activeRow !== index}
+//                   >
+//                      <DoubleClick
+//                         doubleTap={() => {
+//                            this.HandleDoubleTapItem(index);
+//                         }}
+//                         delay={500}
+//                      >
+//                         <TouchableOpacity>
+//                            {this.GenerateListItem(item)}
+//                         </TouchableOpacity>
+//                      </DoubleClick>
+//                   </Swipeout>
+//                )}
+//             />
+//          </View>
+//       );
+//    }
+// }
+
+// export default AddItemToList;

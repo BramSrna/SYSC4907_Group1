@@ -9,6 +9,27 @@ class ListFunctions {
    }
 
    /**
+    * This function is used to add items to a list.
+    * @param {*} listId: id of the list we are adding items to 
+    * @param {*} name: name of the item 
+    * @param {*} quantity: quantity of the item 
+    * @param {*} size: size of the item 
+    * @param {*} notes: additional notes regarding the item 
+    */
+   AddItemToList(listId, name, quantity, size, notes) {
+      firebase
+         .database()
+         .ref("/lists/" + listId + "/items/")
+         .push({
+            name: name,
+            purchased: false,
+            quantity: quantity,
+            size: size,
+            notes: notes
+         });
+   }
+
+   /**
     * This function is used to remove an item from a list
     * @param {*} listId: id of the list the item is in
     * @param {*} itemId: id of the item of the list
@@ -57,6 +78,7 @@ class ListFunctions {
                listItems: items,
                listItemIds: ids
             });
+            console.log(items)
          });
    }
 

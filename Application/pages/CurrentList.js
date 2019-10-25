@@ -5,6 +5,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
 import lf from "./ListFunctions";
+import Dialog from "react-native-dialog";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -14,7 +15,11 @@ class CurrentList extends Component {
          listName: "",
          listId: "",
          listItems: [],
-         listItemIds: []
+         listItemIds: [],
+
+         itemName: "",
+         isDialogVisible: false
+
       };
    }
 
@@ -34,6 +39,7 @@ class CurrentList extends Component {
             this.SetNameAndCurrentItems();
          }
       );
+
    }
 
    SetNameAndCurrentItems() {
@@ -71,12 +77,29 @@ class CurrentList extends Component {
    }
 
    HandleDoubleTapItem(indexPosition) {
-      // var currentList = this.state.listItems;
       lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId, this.state.listItemIds[indexPosition])
-      // var currentItemBool = currentList[indexPosition].purchased;
-      // currentList[indexPosition].purchased = !currentItemBool;
-      // this.setState({ listItems: currentList });
    }
+
+
+
+   DELETEME1 = () => {
+      this.state.itemName = "";
+      this.setState({ isDialogVisible: false });
+   };
+   DELETEME2 = () => {
+      lf.AddItemToList(this.state.listId, this.state.itemName, 1, "aSize mL", "aNote");
+      this.state.itemName = "";
+      this.setState({
+         isDialogVisible: false
+      });
+   };
+   DELETEME3 = (name) => {
+      this.setState({
+         itemName: name
+      });
+   }
+
+
 
    render() {
       const swipeButtons = [
@@ -90,7 +113,7 @@ class CurrentList extends Component {
                      flexDirection: "column"
                   }}
                >
-                  <Image source={require("../images/delete_list_button.png")} />
+                  <Image source={require("../assets/icons/delete_list_button.png")} />
                </View>
             ),
             backgroundColor: "red",
@@ -102,20 +125,39 @@ class CurrentList extends Component {
       ];
       return (
          <View style={styles.ListContainer}>
-            {/* Take out once stack if fixed */}
+
+
+
+            {/* Take out once stack is fixed */}
             <Text
                style={styles.backButton}
                onPress={this.GoBackToYourLists.bind(this)}
             >
                {"<<--Your Lists"}
             </Text>
+
+            {/* Temporary to quickly add items */}
+            <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
+               <Dialog.Title>Add Item</Dialog.Title>
+               <Dialog.Description>
+                  Enter the name of the items you would like to add to the list:
+               </Dialog.Description>
+               <Dialog.Input
+                  onChangeText={name => this.DELETEME3(name)}
+               ></Dialog.Input>
+               <Dialog.Button label="Cancel" onPress={this.DELETEME1} />
+               <Dialog.Button label="Add" onPress={this.DELETEME2} />
+            </Dialog.Container>
+
+
+
             <Text style={styles.pageTitle}>
                {this.state.listName}: {this.state.listItems.length} Items
             </Text>
             <TouchableOpacity
-               onPress={() => console.log("Button pressed")}
+               onPress={() => this.setState({ isDialogVisible: true })}
             >
-               <Image source={require("../images/new_list_button.png")} />
+               <Image source={require("../assets/icons/new_list_button.png")} />
             </TouchableOpacity>
             <FlatList
                style={styles.flatList}
