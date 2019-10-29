@@ -4,17 +4,15 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() {
-
-   }
+   constructor() {}
 
    /**
     * This function is used to add items to a list.
-    * @param {*} listId: id of the list we are adding items to 
-    * @param {*} name: name of the item 
-    * @param {*} quantity: quantity of the item 
-    * @param {*} size: size of the item 
-    * @param {*} notes: additional notes regarding the item 
+    * @param {*} listId: id of the list we are adding items to
+    * @param {*} name: name of the item
+    * @param {*} quantity: quantity of the item
+    * @param {*} size: size of the item
+    * @param {*} notes: additional notes regarding the item
     */
    AddItemToList(listId, name, quantity, size, notes) {
       firebase
@@ -35,11 +33,15 @@ class ListFunctions {
     * @param {*} itemId: id of the item of the list
     */
    DeleteItemInList(listId, itemId) {
-      firebase.database().ref("/lists/" + listId + "/items/").child(itemId).remove();
+      firebase
+         .database()
+         .ref("/lists/" + listId + "/items/")
+         .child(itemId)
+         .remove();
    }
 
    /**
-    * This function is used to change the purchased boolean in the database 
+    * This function is used to change the purchased boolean in the database
     * @param {*} listId: id of the list the item is in
     * @param {*} itemId: id of the item in the list
     */
@@ -47,11 +49,14 @@ class ListFunctions {
       firebase
          .database()
          .ref("/lists/" + listId + "/items/" + itemId)
-         .once("value", function (snapshot) {
+         .once("value", function(snapshot) {
             var currentBool = snapshot.val().purchased;
-            firebase.database().ref("/lists/" + listId + "/items/" + itemId).update({
-               purchased: !currentBool
-            });
+            firebase
+               .database()
+               .ref("/lists/" + listId + "/items/" + itemId)
+               .update({
+                  purchased: !currentBool
+               });
          });
    }
 
@@ -64,7 +69,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/lists/" + listId)
-         .on("value", function (snapshot) {
+         .on("value", function(snapshot) {
             var items = [];
             var ids = [];
             var ssv = snapshot.val();
@@ -90,28 +95,36 @@ class ListFunctions {
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .once("value", function (snapshot) {
+         .once("value", function(snapshot) {
             if (snapshot.val()) {
                // Remove from the user created section if exists
                var createdLists = snapshot.val().created;
                for (var cList in createdLists) {
-                  if (
-                     cList ===
-                     listId
-                  ) {
-                     firebase.database().ref("/users/" + uid + "/lists/created/").child(cList).remove();
+                  if (cList === listId) {
+                     firebase
+                        .database()
+                        .ref("/users/" + uid + "/lists/created/")
+                        .child(cList)
+                        .remove();
                      firebase
                         .database()
                         .ref("/lists/" + cList)
-                        .once("value", function (snapshot) {
+                        .once("value", function(snapshot) {
                            if (snapshot.val()) {
                               if (snapshot.val().user_count == 1) {
-                                 firebase.database().ref("/lists/").child(cList).remove();
+                                 firebase
+                                    .database()
+                                    .ref("/lists/")
+                                    .child(cList)
+                                    .remove();
                               } else {
                                  var newCount = snapshot.val().user_count - 1;
-                                 firebase.database().ref("/lists/" + cList).update({
-                                    user_count: newCount
-                                 });
+                                 firebase
+                                    .database()
+                                    .ref("/lists/" + cList)
+                                    .update({
+                                       user_count: newCount
+                                    });
                               }
                            }
                         });
@@ -122,24 +135,31 @@ class ListFunctions {
                // Remove from the user shared section if exists
                var sharedLists = snapshot.val().shared;
                for (sList in sharedLists) {
-                  if (
-                     sList ===
-                     listId
-                  ) {
-                     firebase.database().ref("/users/" + uid + "/lists/shared/").child(sList).remove();
+                  if (sList === listId) {
+                     firebase
+                        .database()
+                        .ref("/users/" + uid + "/lists/shared/")
+                        .child(sList)
+                        .remove();
                      firebase
                         .database()
                         .ref("/lists/" + sList)
-                        .once("value", function (snapshot) {
+                        .once("value", function(snapshot) {
                            if (snapshot.val()) {
                               if (snapshot.val().user_count == 1) {
-
-                                 firebase.database().ref("/lists/").child(sList).remove();
+                                 firebase
+                                    .database()
+                                    .ref("/lists/")
+                                    .child(sList)
+                                    .remove();
                               } else {
                                  var newCount = snapshot.val().user_count - 1;
-                                 firebase.database().ref("/lists/" + cList).update({
-                                    user_count: newCount
-                                 });
+                                 firebase
+                                    .database()
+                                    .ref("/lists/" + cList)
+                                    .update({
+                                       user_count: newCount
+                                    });
                               }
                            }
                         });
@@ -152,7 +172,7 @@ class ListFunctions {
 
    /**
     * Create a new list
-    * @param {*} listName: name of the list 
+    * @param {*} listName: name of the list
     */
    CreateNewList(listName) {
       // Add the list to the lists table
@@ -168,9 +188,15 @@ class ListFunctions {
       // Add the list to the user table
       var key = push.key;
       var uid = firebase.auth().currentUser.uid;
-      firebase.database().ref("/users/" + uid + "/lists/created").child(key).set(0).then((data) => {}).catch((error) => {
-         console.log("Failed to create list: " + error);
-      })
+      firebase
+         .database()
+         .ref("/users/" + uid + "/lists/created")
+         .child(key)
+         .set(0)
+         .then(data => {})
+         .catch(error => {
+            console.log("Failed to create list: " + error);
+         });
    }
 
    /**
@@ -182,7 +208,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .on("value", function (snapshot) {
+         .on("value", function(snapshot) {
             listIds = [];
             var ssv = snapshot.val();
             if (ssv) {
@@ -197,17 +223,19 @@ class ListFunctions {
                var listTitles = [];
                var listIdLength = listIds.length;
                var counter = 1;
+               var bool = true;
                for (var idKey in listIds) {
+                  bool = false;
                   var currentListId = listIds[idKey];
                   firebase
                      .database()
                      .ref("/lists/" + currentListId)
-                     .once("value", function (snapshot) {
+                     .once("value", function(snapshot) {
                         var ssv = snapshot.val();
                         if (ssv) {
                            curApiData.push({
                               key: snapshot.key,
-                              name: ssv.name,
+                              name: ssv.name
                            });
                            listTitles.push(ssv.name);
                            if (counter == listIdLength) {
@@ -223,23 +251,25 @@ class ListFunctions {
                            that.setState({
                               apiData: curApiData,
                               listTitles: listTitles
-
                            });
                         }
                      });
                }
+               if (bool) {
+                  that.setState({
+                     apiData: [],
+                     listTitles: []
+                  });
+               }
             } else {
-               console.log("No API data...")
+               console.log("No API data...");
                that.setState({
                   apiData: [],
                   listTitles: []
-
                });
             }
          });
    }
-
-
 }
 
 const lf = new ListFunctions();
