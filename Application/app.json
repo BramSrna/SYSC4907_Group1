@@ -24,8 +24,12 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.Carleton.GroceryList"
     },
-    "description": ""
+    "description": "",
+    "android": {
+      "package": "com.Carleton.GroceryList"
+    }
   }
 }

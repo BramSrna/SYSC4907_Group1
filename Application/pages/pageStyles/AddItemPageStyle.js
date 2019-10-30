@@ -1,4 +1,6 @@
-import { StyleSheet } from 'react-native';
+import {
+  StyleSheet
+} from 'react-native';
 
 export default StyleSheet.create({
   container: {
@@ -37,15 +39,15 @@ export default StyleSheet.create({
     color: 'black',
   },
   textInput: {
-    height: 40, 
-    borderColor: "gray", 
+    height: 40,
+    borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
   },
   picker: {
-    height: 40, 
-    borderColor: "gray", 
+    height: 40,
+    borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
