@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage';
 import AddItemPage from '../pages/AddItemPage'
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'
+import MapCreatorPage from '../pages/MapCreatorPage'
 
 const MainDrawerNavigator = createDrawerNavigator({
     Home: {
@@ -21,6 +22,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: YourLists,
         navigationOptions: {
             drawerLabel: "Your Lists"
+        }
+    },
+    MapCreatorPage: {
+        screen: MapCreatorPage,
+        navigationOptions: {
+            drawerLabel: "Map Creator"
         }
     },
     CurrentListPage: {
