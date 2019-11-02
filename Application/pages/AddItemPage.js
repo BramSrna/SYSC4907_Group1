@@ -12,10 +12,11 @@ import {
   KeyboardAvoidingView
 } from "react-native";
 import { Header } from "react-navigation"
-import styles from "./pageStyles/AddItemPageStyle";
+import {styles, pickerStyle} from "./pageStyles/AddItemPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import {departments} from "../DepartmentList";
+import RNPickerSelect from 'react-native-picker-select';
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
@@ -26,7 +27,7 @@ class AddItemPage extends Component {
 
     this.state = {
       itemName: "",
-      itemDepartment: "BAKERY",
+      itemDepartment: departments[0].value,
       storeName: "",
       aisleNum: "",
     };
@@ -46,7 +47,7 @@ class AddItemPage extends Component {
       this.state.itemDepartment,
       this.state.storeName,
       this.state.aisleNum);
-    Alert.alert("Item saved successfully");
+    Alert.alert("Item saved successfully! Thank You!");
   };
 
   render() {
@@ -81,14 +82,13 @@ class AddItemPage extends Component {
             </View>
 
             <View style={{ flex: 1 }}>
-              <Picker
-                selectedValue={this.state.itemDepartment}
-                style={styles.picker}
-                onValueChange={(itemDepartment) => this.setState({itemDepartment})}>
-                {Object.keys(departments).map((key) => {
-                  return (<Picker.Item label={departments[key]["displayName"]} value={key} key={key}/>)
-                })}
-              </Picker>
+              <RNPickerSelect
+                value={this.state.itemDepartment}
+                items={departments}
+                style={pickerStyle}
+                useNativeAndroidPickerStyle={false}
+                placeholder={{}}
+                onValueChange={(itemDepartment) => this.setState({itemDepartment})}/>
             </View>
           </View>
 

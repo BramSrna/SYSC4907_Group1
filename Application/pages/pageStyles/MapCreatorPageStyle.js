@@ -1,7 +1,7 @@
 import { StyleSheet,
     Dimensions } from 'react-native';
 
-export default StyleSheet.create({   
+export const styles = StyleSheet.create({   
     mainContainer: {
         flex: 1,
         backgroundColor: "white",
@@ -89,3 +89,20 @@ export default StyleSheet.create({
         flex: 1,
     }
 });  
+
+export const pickerStyle = {
+    inputAndroid: {
+        borderColor: "white", 
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "black",
+        paddingRight: 30,
+    },
+    inputIOS: {
+        borderColor: "gray", 
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "white",
+        paddingRight: 30,
+    },
+};

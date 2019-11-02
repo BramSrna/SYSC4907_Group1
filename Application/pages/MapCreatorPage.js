@@ -6,11 +6,12 @@ import { Text,
          Picker,
          Alert,
          Image} from "react-native";
-import styles from "../pages/pageStyles/MapCreatorPageStyle";
+import {styles, pickerStyle} from "../pages/pageStyles/MapCreatorPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import {departments} from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
+import RNPickerSelect from 'react-native-picker-select';
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -19,7 +20,7 @@ class MapCreatorPage extends Component {
         // Use a list for keeping track of all the departments
         this.currDepartments = [
             {
-                depName: Object.keys(departments)[0],
+                depName: departments[0].label,
             },
         ]
 
@@ -70,7 +71,7 @@ class MapCreatorPage extends Component {
     */
     addDepartment = () => {
         // Add a department to the list
-        this.currDepartments.push({depName : Object.keys(departments)[0]});
+        this.currDepartments.push({depName : departments[0].label});
 
         // Rerender the screen
         this.setState({ arrayHolder: [...this.currDepartments]})
@@ -100,6 +101,8 @@ class MapCreatorPage extends Component {
             name: this.state.storeName,
             map: deps
         });
+
+        Alert.alert("Map Saved! Thank you!")
     }
 
     /*
@@ -245,15 +248,13 @@ class MapCreatorPage extends Component {
                 <View style = {styles.bufferView}></View>
 
                 {/* Render the department picker */}
-                <View style = {{flex : 5}}>                
-                    <Picker
-                        selectedValue={this.currDepartments[index]["depName"]}
-                        style={styles.picker}
-                        onValueChange={(itemDepartment) => this.updateDepartment(index, itemDepartment)}>
-                        {Object.keys(departments).map((key) => {
-                            return (<Picker.Item label={departments[key]["displayName"]} value={key} key={key}/>)
-                        })}
-                    </Picker>
+                <View style = {{flex : 5}}>
+                    <RNPickerSelect
+                        value={this.currDepartments[index]["depName"]}
+                        items={departments}
+                        placeholder={{}}
+                        style={pickerStyle}
+                        onValueChange={(val) => this.updateDepartment(index, val)}/>
                 </View>
 
                 {/* Add a blank area at the end of the row to allow for scrolling */}
