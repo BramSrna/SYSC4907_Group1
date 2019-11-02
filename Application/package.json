@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "braces": "^3.0.2",
+    "eslint": "^6.6.0",
     "expo": "^33.0.0",
     "expo-asset": "^6.0.0",
     "firebase": "^6.5.0",
