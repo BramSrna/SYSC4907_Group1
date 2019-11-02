@@ -102,7 +102,7 @@ export const pickerStyle = {
         borderColor: "gray", 
         borderWidth: 1,
         justifyContent: "flex-end",
-        color: "white",
+        color: "black",
         paddingRight: 30,
     },
 }; 
