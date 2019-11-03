@@ -2,7 +2,7 @@ import {
   StyleSheet
 } from 'react-native';
 
-export default StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -45,15 +45,27 @@ export default StyleSheet.create({
     justifyContent: "flex-end",
     color: "white",
   },
-  picker: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-  },
   rowSorter: {
     flexDirection: "row",
     padding: 20,
   }
 });
+
+export const pickerStyle = {
+  inputAndroid: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+    paddingRight: 30,
+  },
+  inputIOS: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+    paddingRight: 30,
+  },
+};

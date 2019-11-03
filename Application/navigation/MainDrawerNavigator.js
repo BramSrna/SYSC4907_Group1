@@ -7,6 +7,7 @@ import HomePage from '../pages/HomePage';
 import AddItemPage from '../pages/AddItemPage'
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'
+import MapCreatorPage from '../pages/MapCreatorPage'
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -14,6 +15,9 @@ const StackNavigator = createStackNavigator({
     },
     AddItemPage: {
         screen: AddItemPage
+    },
+    MapCreatorPage: {
+        screen: MapCreatorPage
     },
     YourListsPage: {
         screen: YourLists
@@ -38,6 +42,12 @@ const MainDrawerNavigator = createDrawerNavigator({
             drawerLabel: "Add Items"
         }
     },
+    MapCreatorPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Map Creator"
+        }
+    },
     YourListsPage: {
         screen: StackNavigator,
         navigationOptions: {
@@ -49,11 +59,14 @@ const MainDrawerNavigator = createDrawerNavigator({
         navigationOptions: {
             drawerLabel: () => null
         }
-    }
-
+    },
 
 }, {
-    gesturesEnabled: false
+    gesturesEnabled: false,
+    contentOptions: {
+        activeBackgroundColor: 'white',
+        activeTintColor: 'black'
+    }
 });
 
 const App = createAppContainer(MainDrawerNavigator);

@@ -50,5 +50,17 @@ export default StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     textAlign: 'center'
-  }
+  },
+  blackText: {
+    color: "black"
+  },
+  pageTitle: {
+    padding: 30,
+    paddingTop: 50,
+    paddingBottom: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    color: "white",
+    fontSize: 30
+  },
 });

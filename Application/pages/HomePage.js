@@ -6,9 +6,11 @@ import Menu from "./Menu"
 
 const ADD_ITEM = "Go To Add Item Page"
 const YOUR_LISTS = "Go To Your Lists Page"
+const MAP_CREATOR = "Go To Map Creator Page"
 const SIGN_OUT = "Sign Out"
 const ADDITEMPAGE = "AddItemPage";
 const YOURLISTSPAGE = "YourListsPage";
+const MAPCREATORPAGE = "MapCreatorPage";
 
 
 class HomePage extends Component {
@@ -20,6 +22,8 @@ class HomePage extends Component {
   buttonListener = buttonId => {
     if (buttonId == ADD_ITEM) {
       this.props.navigation.navigate(ADDITEMPAGE);
+    } else if (buttonId == MAP_CREATOR) {
+      this.props.navigation.navigate(MAPCREATORPAGE);
     } else if (buttonId == SIGN_OUT) {
       firebase.auth().signOut();
     } else if (buttonId == YOUR_LISTS) {
@@ -39,6 +43,13 @@ class HomePage extends Component {
             onPress={() => this.buttonListener(ADD_ITEM)}
           >
             <Text style={globalStyles.whiteText}>{ADD_ITEM}</Text>
+          </TouchableHighlight>
+
+          <TouchableHighlight
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+            onPress={() => this.buttonListener(MAP_CREATOR)}
+          >
+            <Text style={globalStyles.whiteText}>{MAP_CREATOR}</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
