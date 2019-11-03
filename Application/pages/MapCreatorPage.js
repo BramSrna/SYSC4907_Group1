@@ -266,7 +266,7 @@ class MapCreatorPage extends Component {
                 <FlatList
                     data={this.state.arrayHolder}
                     renderItem={({item, index}) => this.renderListElem(index)}
-                    keyExtractor={item => item.id}
+                    keyExtractor={(item, index) => index.toString()}
                 />
             </View>
 
