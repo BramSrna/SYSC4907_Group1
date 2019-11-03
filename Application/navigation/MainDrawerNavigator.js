@@ -8,6 +8,8 @@ import AddItemPage from '../pages/AddItemPage'
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'
 import MapCreatorPage from '../pages/MapCreatorPage'
+import SideMenu from './SideMenu';
+
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -63,10 +65,8 @@ const MainDrawerNavigator = createDrawerNavigator({
 
 }, {
     gesturesEnabled: false,
-    contentOptions: {
-        activeBackgroundColor: 'white',
-        activeTintColor: 'black'
-    }
+    contentComponent: SideMenu,
+    drawerWidth: 250
 });
 
 const App = createAppContainer(MainDrawerNavigator);
