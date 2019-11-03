@@ -157,7 +157,7 @@ class CurrentList extends Component {
             <TouchableOpacity
                onPress={() => this.setState({ isDialogVisible: true })}
             >
-               <Image source={require("../assets/icons/new_list_button.png")} />
+               <Image source={require("../assets/icons/new.png")} />
             </TouchableOpacity>
             <FlatList
                style={styles.flatList}

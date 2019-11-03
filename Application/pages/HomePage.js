@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { Text, View, TouchableHighlight } from "react-native";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import firebase from 'firebase';
+import Menu from "./Menu"
 
 const ADD_ITEM = "Go To Add Item Page"
 const YOUR_LISTS = "Go To Your Lists Page"
 const SIGN_OUT = "Sign Out"
-
 const ADDITEMPAGE = "AddItemPage";
 const YOURLISTSPAGE = "YourListsPage";
 
@@ -29,31 +29,34 @@ class HomePage extends Component {
 
   render() {
     return (
-      <View style={globalStyles.defaultContainer}>
-        <Text style={globalStyles.whiteText}>HomePage</Text>
+      <React.Fragment>
+        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+        <View style={globalStyles.defaultContainer}>
+          <Text style={globalStyles.whiteText}>HomePage</Text>
 
-        <TouchableHighlight
-          style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-          onPress={() => this.buttonListener(ADD_ITEM)}
-        >
-          <Text style={globalStyles.whiteText}>{ADD_ITEM}</Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+            onPress={() => this.buttonListener(ADD_ITEM)}
+          >
+            <Text style={globalStyles.whiteText}>{ADD_ITEM}</Text>
+          </TouchableHighlight>
 
-        <TouchableHighlight
-          style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-          onPress={() => this.buttonListener(YOUR_LISTS)}
-        >
-          <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+            onPress={() => this.buttonListener(YOUR_LISTS)}
+          >
+            <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
+          </TouchableHighlight>
 
-        <TouchableHighlight
-          style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-          onPress={() => this.buttonListener(SIGN_OUT)}
-        >
-          <Text style={globalStyles.whiteText}>{SIGN_OUT}</Text>
-        </TouchableHighlight>
+          <TouchableHighlight
+            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+            onPress={() => this.buttonListener(SIGN_OUT)}
+          >
+            <Text style={globalStyles.whiteText}>{SIGN_OUT}</Text>
+          </TouchableHighlight>
 
-      </View>
+        </View>
+      </React.Fragment>
     );
   }
 }
