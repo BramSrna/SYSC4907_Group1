@@ -41,6 +41,9 @@ class ItemLoc(object):
 		aisleDist = self.aisle.compDistance(secondLoc.getAisle())
 		
 		return((storeDist + departmentDist + aisleDist) / 3)
+
+	def __str__(self):
+		return("STORE: %s, DEPARTMENT: %s, AISLE: %s" % (self.store.getName(), self.department.getName(), self.aisle.getNumber()))
 		
 	"""
 	getStore

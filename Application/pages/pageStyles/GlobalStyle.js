@@ -63,4 +63,7 @@ export default StyleSheet.create({
     color: "white",
     fontSize: 30
   },
+  requiredHighlight: {
+    color: "red",
+  }
 });
