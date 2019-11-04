@@ -1,6 +1,12 @@
 import random
 import yaml
+import json
 import numpy as np
+
+GEN_FILE_PATH = "./"
+FILE_NAME = GEN_FILE_PATH + "GeneratedData"
+YAML_EXTENSION = ".yaml"
+JSON_EXTENSION = ".json"
 
 """
 normSumOne
@@ -73,6 +79,7 @@ The names are of the format $pattern_$integer
 """
 def genNames(pattern, numItems):
     names = []
+
     for i in range(numItems):
         name = pattern + "_" + str(i)
         names.append(name)
@@ -112,13 +119,14 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
     # generate the possible locations that item can
     # be found in
     itemMap = {}
+    tracker = [[dep, 0] for dep in depPool]
     for item in itemPool:
         # Get the possible departments the item can be found in
-        departments = getNItemsFromList(depPool, len(departmentWeights))
+        tracker.sort(key=lambda x: x[1])
 
         # Add the item to each of its departments dictionaries
-        for i in range(len(departments)):
-            department = departments[i]
+        for i in range(len(departmentWeights)):
+            department = tracker[i][0]
 
             # Initialize the dictionary if it has not been
             if department not in itemMap:
@@ -130,12 +138,13 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
             itemMap[department]["ITEMS"].append(item)
             itemMap[department]["PROBABILITIES"].append(departmentWeights[i])
 
+            tracker[i][1] += 1
+
     # Normalize each probability list
     for department in itemMap:        
         itemMap[department]["PROBABILITIES"] = normSumOne(itemMap[department]["PROBABILITIES"])
 
     data = {}
-
     # Initialize the store information using the given information dictionary
     for store in storePool:
         # Determine the size of the store
@@ -193,8 +202,8 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
             # Remove all items and their respective probabilities
             # for each item already in the store
             temp = zip(possibleItems, probabilities)
-            temp = [item for item in temp if item[0] not in itemsInStore]
-            possibleItems, probabilities = list(zip(*(temp)))
+            noDups = [item for item in temp if item[0] not in itemsInStore]
+            possibleItems, probabilities = list(zip(*(noDups)))
 
             # Normalize the probabilities
             probabilities = normSumOne(probabilities)
@@ -214,11 +223,40 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
 
     return(data)
 
-if __name__ == "__main__":
+def genWithDups():
+    sizeItemPool = 80
+    sizeDepPool = 7
+    sizeStorePool = 10
+
+    """
+    ITEMS_PER_AISLE = Range of number of items in each aisle
+    AISLES_PER_DEPARTMENT = Range of number of aisles in each department
+    DEPARTMENTS_PER_STORE = Range of number of departments in each store
+    """
+    storeSizeInfo = {
+        "SMALL" : {
+            "ITEMS_PER_AISLE" : [10, 10],
+            "AISLES_PER_DEPARTMENT" : [1, 1],
+            "DEPARTMENTS_PER_STORE" : [7, 7]
+        }
+    }
+
+    """
+    DEPARTMENT_LOC_WEIGHTS = Weight of each possible department for the items
+    """
+    itemLocInfo = {
+        "DEPARTMENT_LOC_WEIGHTS" : [0.9, 0.1]
+    }
+
+    # Generate the data
+    data = genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo)
+
+    return(data)    
+
+def defaultGen():
     sizeItemPool = 5600
     sizeDepPool = 20
     sizeStorePool = 20
-
     """
     ITEMS_PER_AISLE = Range of number of items in each aisle
     AISLES_PER_DEPARTMENT = Range of number of aisles in each department
@@ -241,17 +279,24 @@ if __name__ == "__main__":
             "DEPARTMENTS_PER_STORE" : [10, 20]
         }
     }
-
     """
     DEPARTMENT_LOC_WEIGHTS = Weight of each possible department for the items
     """
     itemLocInfo = {
         "DEPARTMENT_LOC_WEIGHTS" : [0.9, 0.1]
     }
-
     # Generate the data
     data = genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo)
 
+    return(data)
+
+if __name__ == "__main__":
+    data = genWithDups()
+
     # Write the generated data to a yaml file
-    with open("temp.yaml", "w") as f:
+    with open(FILE_NAME + YAML_EXTENSION, "w") as f:
         yaml.dump(data, f)
+
+    # Write the generated data to a json file
+    with open(FILE_NAME + JSON_EXTENSION, "w") as f:
+        json.dump(data, f)

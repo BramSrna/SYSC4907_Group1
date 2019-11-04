@@ -77,7 +77,7 @@ class AddItemLocationPage extends Component {
     var retVal = this.checkReqFields();
 
     if (retVal == true){
-      firebase.database().ref("/items").push({
+      firebase.database().ref("/itemLocs").push({
         genericName: this.state.genericName,
         specificName: this.state.specificName,
         department: this.state.itemDepartment,
