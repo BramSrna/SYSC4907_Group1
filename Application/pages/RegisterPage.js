@@ -8,7 +8,6 @@ import {
   Alert,
   ActivityIndicator
 } from "react-native";
-import * as Firebase from "firebase";
 import styles from "./pageStyles/RegisterPageStyle";
 import FirebaseUser from "../components/FirebaseUser"
 

@@ -4,19 +4,21 @@ import {
     createStackNavigator
 } from 'react-navigation';
 import HomePage from '../pages/HomePage';
-import AddItemPage from '../pages/AddItemPage'
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'
 import MapCreatorPage from '../pages/MapCreatorPage'
 import SideMenu from './SideMenu';
+import RegisterItemPage from '../pages/RegisterItemPage'
+import CrowdSourcePage from '../pages/CrowdSourcePage';
+import AddItemLocationPage from '../pages/AddItemLocationPage';
 
 
 const StackNavigator = createStackNavigator({
     Home: {
         screen: HomePage
     },
-    AddItemPage: {
-        screen: AddItemPage
+    AddItemLocationPage: {
+        screen: AddItemLocationPage
     },
     MapCreatorPage: {
         screen: MapCreatorPage
@@ -26,6 +28,12 @@ const StackNavigator = createStackNavigator({
     },
     CurrentListPage: {
         screen: CurrentList
+    },
+    CrowdSourcePage: {
+        screen: CrowdSourcePage
+    },
+    RegisterItemPage: {
+        screen: RegisterItemPage
     },
 }, {
     headerMode: "none"
@@ -37,23 +45,30 @@ const MainDrawerNavigator = createDrawerNavigator({
         navigationOptions: {
             drawerLabel: "Home"
         }
-    },
-    AddItemPage: {
+    }, AddItemLocationPage: {
         screen: StackNavigator,
         navigationOptions: {
-            drawerLabel: "Add Items"
+            drawerLabel: "Add Item Location"
         }
-    },
-    MapCreatorPage: {
+    }, MapCreatorPage: {
         screen: StackNavigator,
         navigationOptions: {
-            drawerLabel: "Map Creator"
+            drawerLabel: "Map a Store"
         }
-    },
-    YourListsPage: {
+    }, YourListsPage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Your Lists"
+        }
+    }, CrowdSourcePage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: () => null
+        }
+    }, RegisterItemPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Register an Item"
         }
     },
     CurrentListPage: {
@@ -63,11 +78,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         }
     },
 
-}, {
-    gesturesEnabled: false,
-    contentComponent: SideMenu,
-    drawerWidth: 250
-});
+},
+    {
+        gesturesEnabled: false,
+        contentComponent: SideMenu,
+        drawerWidth: 250
+    });
 
 const App = createAppContainer(MainDrawerNavigator);
 

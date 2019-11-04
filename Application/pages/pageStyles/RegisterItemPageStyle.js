@@ -53,19 +53,21 @@ export const styles = StyleSheet.create({
 
 export const pickerStyle = {
   inputAndroid: {
-    height: 40,
+    height: 30,
     borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
     paddingRight: 30,
+    width: 80
   },
   inputIOS: {
-    height: 40,
+    height: 30,
     borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
     paddingRight: 30,
+    width: 80
   },
 };

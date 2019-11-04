@@ -45,11 +45,14 @@ class SideMenu extends Component {
                             Feedback
             </Text>
                         <View style={styles.navSectionStyle}>
-                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('AddItemPage')}>
-                                Add Item
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('AddItemLocationPage')}>
+                                Add Item Location
               </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('MapCreatorPage')}>
-                                Map Creator
+                                Map a Store
+              </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('RegisterItemPage')}>
+                                Register an Item
               </Text>
                         </View>
                     </View>

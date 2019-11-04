@@ -4,13 +4,13 @@ import globalStyles from "../pages/pageStyles/GlobalStyle";
 import firebase from 'firebase';
 import Menu from "./Menu"
 
-const ADD_ITEM = "Go To Add Item Page"
 const YOUR_LISTS = "Go To Your Lists Page"
-const MAP_CREATOR = "Go To Map Creator Page"
+const CROWD_SOURCE = "Go To Crowd Source Page"
 const SIGN_OUT = "Sign Out"
-const ADDITEMPAGE = "AddItemPage";
-const YOURLISTSPAGE = "YourListsPage";
-const MAPCREATORPAGE = "MapCreatorPage";
+
+const YOUR_LISTS_PAGE = "YourListsPage";
+const CROWD_SOURCE_PAGE = "CrowdSourcePage";
+
 
 
 class HomePage extends Component {
@@ -20,14 +20,12 @@ class HomePage extends Component {
 
 
   buttonListener = buttonId => {
-    if (buttonId == ADD_ITEM) {
-      this.props.navigation.navigate(ADDITEMPAGE);
-    } else if (buttonId == MAP_CREATOR) {
-      this.props.navigation.navigate(MAPCREATORPAGE);
+    if (buttonId == CROWD_SOURCE) {
+      this.props.navigation.navigate(CROWD_SOURCE_PAGE);
     } else if (buttonId == SIGN_OUT) {
       firebase.auth().signOut();
     } else if (buttonId == YOUR_LISTS) {
-      this.props.navigation.navigate(YOURLISTSPAGE);
+      this.props.navigation.navigate(YOUR_LISTS_PAGE);
     }
   };
 
@@ -40,16 +38,9 @@ class HomePage extends Component {
 
           <TouchableHighlight
             style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(ADD_ITEM)}
+            onPress={() => this.buttonListener(CROWD_SOURCE)}
           >
-            <Text style={globalStyles.whiteText}>{ADD_ITEM}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(MAP_CREATOR)}
-          >
-            <Text style={globalStyles.whiteText}>{MAP_CREATOR}</Text>
+            <Text style={globalStyles.whiteText}>{CROWD_SOURCE}</Text>
           </TouchableHighlight>
 
           <TouchableHighlight
