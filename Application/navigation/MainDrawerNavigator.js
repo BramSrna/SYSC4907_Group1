@@ -3,7 +3,6 @@ import {
     createAppContainer
 } from 'react-navigation';
 import HomePage from '../pages/HomePage';
-import RegisterItemPage from '../pages/RegisterItemPage'
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'
 

@@ -223,6 +223,16 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
 
     return(data)
 
+"""
+genWithDups
+
+Uses a store size info library more likely
+to generate stores with duplicate items.
+
+@input  None
+
+@return None
+"""
 def genWithDups():
     sizeItemPool = 80
     sizeDepPool = 7

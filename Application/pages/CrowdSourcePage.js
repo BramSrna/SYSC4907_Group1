@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight } from "react-native";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
-import firebase from 'firebase';
 
+// Text to display on the buttons
 const REGISTER_ITEM = "Go To Register Item Page"
 const ADD_ITEM_LOCATION = "Go To Add Item Location Page"
 const MAP_CREATOR = "Go To Map Creator Page"
 
+// Strings for controlling navigation
 const REGISTER_ITEM_PAGE = "RegisterItemPage";
 const ADD_ITEM_LOCATION_PAGE = "AddItemLocationPage";
 const MAP_CREATOR_PAGE = "MapCreatorPage";
@@ -16,6 +17,17 @@ class CrowdSourcePage extends Component {
     super(props);
   }
 
+  /**
+   * buttonListener
+   * 
+   * The listener for button presses.
+   * Navigates to the new screen corresponding
+   * to the button that was pressed.
+   * 
+   * @param {String}  buttonId  The ID of the button pressed
+   * 
+   * @returns None
+   */
   buttonListener = buttonId => {
     if (buttonId == REGISTER_ITEM) {
       this.props.navigation.navigate(REGISTER_ITEM_PAGE);

@@ -3,14 +3,10 @@ import {
   Text,
   View,
   TextInput,
-  Picker,
-  Button,
-  Image,
   TouchableHighlight,
   Alert,
   Platform,
   KeyboardAvoidingView,
-  ScrollView,
 } from "react-native";
 import { Header } from "react-navigation"
 import {styles, pickerStyle} from "./pageStyles/RegisterItemPageStyle";
@@ -22,6 +18,7 @@ import {units} from "../UnitList";
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
+// The default value for all input fields
 const DEFAULT_GENERIC_NAME = ""
 const DEFAULT_SPECIFIC_NAME = ""
 const DEFAULT_SIZE = ""
@@ -41,9 +38,21 @@ class RegisterItemPage extends Component {
     };
   }
 
+  /**
+   * handleRegister
+   * 
+   * Handler for the register item button.
+   * Saves all of the information to the database.
+   * 
+   * @param None
+   * 
+   * @returns None
+  */
   handleRegister = () => {
+    // Check the required fields
     var retVal = this.checkReqFields();
 
+    // Saves the data if all required fields have values
     if (retVal){
       firebase.database().ref("/items").push({
         genericName: this.state.genericName,
@@ -57,12 +66,29 @@ class RegisterItemPage extends Component {
     }
   };
 
+  /**
+   * checkReqFields
+   * 
+   * Checks that the user has inputted values for
+   * all mandatory fields. Determines if the user
+   * has inputted a value by comparing the default
+   * to the current value to see if they match. If
+   * the current value matches the default value,
+   * then the user has not entered a value.
+   * 
+   * @param None
+   * 
+   * @returns Boolean True if the user has inputted a value for all valid fields
+   *                  False otherwise
+   */
   checkReqFields(){
+    // Check the generic name field
     if (this.state.genericName == DEFAULT_GENERIC_NAME) {
       Alert.alert("Please enter a value for the generic name.");
       return(false);
     }
 
+    // Check the specific name field
     if (this.state.specificName == DEFAULT_SPECIFIC_NAME) {
       Alert.alert("Please enter a value for the specific name.");
       return(false);
@@ -70,7 +96,19 @@ class RegisterItemPage extends Component {
 
     return(true);
   }
-
+  /**
+   * 
+   * renderRequiredText
+   * 
+   * Renders a required text Text fields.
+   * Prints the body of the text field with
+   * the required text marker.
+   * 
+   * @param {String}  bodyText  The text of the Text field
+   * @param {String}  reqText   The text to signify it is required text (Default = (*))
+   * 
+   * @returns None
+   */
   renderRequiredText(bodyText, reqText = "(*)") {
     return(
       <Text style={globalStyles.whiteText}>

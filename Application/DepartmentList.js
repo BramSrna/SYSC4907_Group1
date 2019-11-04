@@ -5,7 +5,7 @@ The keys in the dictionary are the names of
 the departments.
 The items in the dictionary are as follows:
     label: The name of the department to be displayed to users
-    colour: The colour of the department
+    value: The corresponding value saved to the database
 */
 const departmentList = [
     {label: "Bakery", value: "BAKERY"},
