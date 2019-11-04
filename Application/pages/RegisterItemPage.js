@@ -23,7 +23,6 @@ const DEFAULT_GENERIC_NAME = ""
 const DEFAULT_SPECIFIC_NAME = ""
 const DEFAULT_SIZE = ""
 const DEFAULT_SIZE_UNIT = "Please select the size unit..."
-const DEFAULT_QUANTITY = ""
 
 class RegisterItemPage extends Component {
   constructor(props) {
@@ -34,7 +33,6 @@ class RegisterItemPage extends Component {
       specificName: DEFAULT_SPECIFIC_NAME,
       size: DEFAULT_SIZE,
       sizeUnit: DEFAULT_SIZE_UNIT,
-      quantity: DEFAULT_QUANTITY,
     };
   }
 
@@ -59,7 +57,6 @@ class RegisterItemPage extends Component {
         specificName: this.state.specificName,
         size: this.state.size,
         sizeUnit: this.state.sizeUnit,
-        quantity: this.state.quantity,
       });
 
       Alert.alert("Item saved successfully");
@@ -186,22 +183,6 @@ class RegisterItemPage extends Component {
                     useNativeAndroidPickerStyle={false}
                     placeholder={{}}
                     onValueChange={(sizeUnit) => this.setState({ sizeUnit })}/>
-            </View>
-          </View>
-
-          <View style={styles.rowSorter}>
-            <View style={{ flex: 1 }}>
-              <Text style={globalStyles.whiteText}>Quantity: </Text>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Quantity"
-                keyboardType="numeric"
-                onChangeText={(quantity) => this.setState({ quantity })}
-                value={this.state.quantity}
-              />
             </View>
           </View>
         </KeyboardAvoidingView>

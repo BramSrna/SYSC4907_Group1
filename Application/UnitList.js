@@ -8,6 +8,7 @@ The items in the dictionary are as follows:
 const unitList = [
     {label: "Grams", value: "GRAMS"},
     {label: "Litres", value: "LITRES"},
+    {label: "Units", value: "UNITS"},
 ];
 
 export const units = unitList;
