@@ -1,15 +1,17 @@
-import { StyleSheet,
-    Dimensions } from 'react-native';
+import {
+    StyleSheet,
+    Dimensions
+} from 'react-native';
 
-export const styles = StyleSheet.create({   
+export const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: "black",
         borderLeftWidth: Dimensions.get('window').width / 20,
         borderRightWidth: Dimensions.get('window').width / 20,
-        borderColor: "white",
+        borderColor: "black",
         justifyContent: "space-between",
-    }, 
+    },
     topContainer: {
         flex: 2,
     },
@@ -24,47 +26,45 @@ export const styles = StyleSheet.create({
     },
     textContainer: {
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: "black",
         justifyContent: "center",
         alignItems: "center",
     },
     outerButtonContainer: {
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: "black",
         justifyContent: "center",
         alignItems: "center",
     },
     pickerContainer: {
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: "black",
         justifyContent: "center",
         alignItems: "stretch",
     },
     midContainer: {
-        flex: 8,
-        borderWidth: 5,
-        borderColor: "black",
+        flex: 8
     },
     botContainer: {
         flex: 2,
     },
     textInput: {
-        height: 40, 
-        borderColor: "black", 
+        height: 40,
+        borderColor: "white",
         borderWidth: 1,
         justifyContent: "flex-end",
-        color: "black",
+        color: "white",
     },
     blackHeaderText: {
-        color: 'black',
+        color: 'white',
         fontSize: 20,
     },
     picker: {
-      height: 40, 
-      borderColor: "black", 
-      borderWidth: 1,
-      justifyContent: "flex-end",
-      color: "black",
+        height: 40,
+        borderColor: "white",
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "white",
     },
     buttonContainer: {
         height: 45,
@@ -88,21 +88,23 @@ export const styles = StyleSheet.create({
     image: {
         flex: 1,
     }
-});  
+});
 
 export const pickerStyle = {
     inputAndroid: {
-        borderColor: "white", 
+        borderColor: "black",
         borderWidth: 1,
         justifyContent: "flex-end",
         color: "black",
         paddingRight: 30,
+        height: 40
     },
     inputIOS: {
-        borderColor: "gray", 
+        borderColor: "gray",
         borderWidth: 1,
         justifyContent: "flex-end",
-        color: "black",
+        color: "white",
         paddingRight: 30,
+        height: 40
     },
-}; 
+};

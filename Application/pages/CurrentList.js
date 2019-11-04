@@ -115,7 +115,7 @@ class CurrentList extends Component {
                      flexDirection: "column"
                   }}
                >
-                  <Image source={require("../assets/icons/delete_list_button.png")} />
+                  <Image source={require("../assets/icons/delete.png")} />
                </View>
             ),
             backgroundColor: "red",

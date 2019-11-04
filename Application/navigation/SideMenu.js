@@ -27,7 +27,7 @@ class SideMenu extends Component {
                 <ScrollView>
                     <View>
                         <Text style={styles.sectionHeadingStyle}>
-                            Your Profile
+                            Your Data
             </Text>
                         <View style={styles.navSectionStyle}>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
