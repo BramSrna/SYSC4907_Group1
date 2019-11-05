@@ -18,9 +18,6 @@ export default StyleSheet.create({
       color: "white",
       fontSize: 30
    },
-   flatList: {
-      paddingTop: 30
-   },
    item: {
       padding: 10,
       fontSize: 18,
