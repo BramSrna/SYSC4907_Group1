@@ -162,6 +162,21 @@ class AddItemLocationPage extends Component {
           behavior={keyboardAvoidingViewBehavior}>
           <View style={styles.rowSorter}>
             <View style={{ flex: 1 }}>
+              {this.renderRequiredText("Generic Name: ")}
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Generic Name"
+                onChangeText={(genericName) => this.setState({ genericName })}
+                value={this.state.genericName}
+              />
+            </View>
+          </View>
+
+          <View style={styles.rowSorter}>
+            <View style={{ flex: 1 }}>
               <Text style={globalStyles.whiteText}>Specific Name: </Text>
             </View>
 
