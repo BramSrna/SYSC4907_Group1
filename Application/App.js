@@ -6,6 +6,8 @@ import RootNavigation from './navigation/RootNavigation';
 import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
 import { AppLoading } from 'expo';
+import { YellowBox } from 'react-native';
+import _ from 'lodash';
 
 export default class App extends Component {
   constructor(props) {
@@ -14,6 +16,15 @@ export default class App extends Component {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false
+    };
+
+    //Temprory Solution to remove Timer warning on android
+    YellowBox.ignoreWarnings(['Setting a timer']);
+    const _console = _.clone(console);
+    console.warn = message => {
+      if (message.indexOf('Setting a timer') <= -1) {
+        _console.warn(message);
+      }
     };
 
     if (!firebase.apps.length) { // Check to see if Firebase app is already initialized on Android
