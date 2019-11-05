@@ -6,6 +6,8 @@ import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
 import lf from "./ListFunctions";
 import Dialog from "react-native-dialog";
+import Menu from "./Menu"
+
 
 class CurrentList extends Component {
    constructor(props) {
@@ -56,7 +58,7 @@ class CurrentList extends Component {
             style={{
                height: 1,
                width: "100%",
-               backgroundColor: "#607D8B"
+               backgroundColor: "#00b5ec"
             }}
          />
       );
@@ -113,7 +115,7 @@ class CurrentList extends Component {
                      flexDirection: "column"
                   }}
                >
-                  <Image source={require("../assets/icons/delete_list_button.png")} />
+                  <Image source={require("../assets/icons/delete.png")} />
                </View>
             ),
             backgroundColor: "red",
@@ -124,75 +126,70 @@ class CurrentList extends Component {
          }
       ];
       return (
-         <View style={styles.ListContainer}>
+         <React.Fragment>
+            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+            <View style={styles.ListContainer}>
 
 
 
-            {/* Take out once stack is fixed */}
-            <Text
-               style={styles.backButton}
-               onPress={this.GoBackToYourLists.bind(this)}
-            >
-               {"<<--Your Lists"}
-            </Text>
-
-            {/* Temporary to quickly add items */}
-            <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
-               <Dialog.Title>Add Item</Dialog.Title>
-               <Dialog.Description>
-                  Enter the name of the items you would like to add to the list:
+               {/* Temporary to quickly add items */}
+               <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
+                  <Dialog.Title>Add Item</Dialog.Title>
+                  <Dialog.Description>
+                     Enter the name of the items you would like to add to the list:
                </Dialog.Description>
-               <Dialog.Input
-                  onChangeText={name => this.DELETEME3(name)}
-               ></Dialog.Input>
-               <Dialog.Button label="Cancel" onPress={this.DELETEME1} />
-               <Dialog.Button label="Add" onPress={this.DELETEME2} />
-            </Dialog.Container>
+                  <Dialog.Input
+                     onChangeText={name => this.DELETEME3(name)}
+                  ></Dialog.Input>
+                  <Dialog.Button label="Cancel" onPress={this.DELETEME1} />
+                  <Dialog.Button label="Add" onPress={this.DELETEME2} />
+               </Dialog.Container>
 
 
 
-            <Text style={styles.pageTitle}>
-               {this.state.listName}: {this.state.listItems.length} Items
+               <Text style={styles.pageTitle}>
+                  {this.state.listName}: {this.state.listItems.length} Items
             </Text>
-            <TouchableOpacity
-               onPress={() => this.setState({ isDialogVisible: true })}
-            >
-               <Image source={require("../assets/icons/new_list_button.png")} />
-            </TouchableOpacity>
-            <FlatList
-               style={styles.flatList}
-               data={this.state.listItems}
-               width="100%"
-               extraData={this.state}
-               keyExtractor={index => index.name}
-               ItemSeparatorComponent={this.FlatListItemSeparator}
-               renderItem={({ item, index }) => (
-                  <Swipeout
-                     right={swipeButtons}
-                     backgroundColor="#000000"
-                     underlayColor="white"
-                     rowID={index}
-                     sectionId={1}
-                     autoClose={true}
-                     onOpen={(secId, rowId, direction) =>
-                        this.handleSwipeOpen(rowId, direction)
-                     }
-                     close={this.state.activeRow !== index}
-                  >
-                     <DoubleClick
-                        doubleTap={() => {
-                           this.HandleDoubleTapItem(index);
-                        }}
-                        delay={500}
+               <TouchableOpacity
+                  onPress={() => this.setState({ isDialogVisible: true })}
+               >
+                  <Image source={require("../assets/icons/new.png")} />
+               </TouchableOpacity>
+               <FlatList
+                  style={styles.flatList}
+                  data={this.state.listItems}
+                  width="100%"
+                  extraData={this.state}
+                  keyExtractor={index => index.name}
+                  ItemSeparatorComponent={this.FlatListItemSeparator}
+                  renderItem={({ item, index }) => (
+                     <Swipeout
+                        right={swipeButtons}
+                        backgroundColor="#000000"
+                        underlayColor="white"
+                        rowID={index}
+                        sectionId={1}
+                        autoClose={true}
+                        onOpen={(secId, rowId, direction) =>
+                           this.handleSwipeOpen(rowId, direction)
+                        }
+                        close={this.state.activeRow !== index}
                      >
-                        <TouchableOpacity>
-                           {this.GenerateListItem(item)}
-                        </TouchableOpacity>
-                     </DoubleClick>
-                  </Swipeout>
-               )}
-            />
-         </View>
+                        <DoubleClick
+                           doubleTap={() => {
+                              this.HandleDoubleTapItem(index);
+                           }}
+                           delay={500}
+                        >
+                           <TouchableOpacity>
+                              {this.GenerateListItem(item)}
+                           </TouchableOpacity>
+                        </DoubleClick>
+                     </Swipeout>
+                  )}
+               />
+            </View>
+         </React.Fragment>
       );
    }
 }

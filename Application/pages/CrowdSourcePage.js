@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight } from "react-native";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import Menu from "./Menu"
 
 // Text to display on the buttons
 const REGISTER_ITEM = "Go To Register Item Page"
@@ -40,6 +41,8 @@ class CrowdSourcePage extends Component {
 
   render() {
     return (
+      <React.Fragment>
+        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
         <View style={globalStyles.defaultContainer}>
           <Text style={globalStyles.whiteText}>Crowd Sourcing Options</Text>
 
@@ -61,10 +64,11 @@ class CrowdSourcePage extends Component {
             style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
             onPress={() => this.buttonListener(MAP_CREATOR)}
           >
-          <Text style={globalStyles.whiteText}>{MAP_CREATOR}</Text>
-        </TouchableHighlight>
+            <Text style={globalStyles.whiteText}>{MAP_CREATOR}</Text>
+          </TouchableHighlight>
 
         </View>
+      </React.Fragment>
     );
   }
 }

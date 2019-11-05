@@ -1,17 +1,19 @@
 import React, { Component } from "react";
-import { Text,
-         View,
-         TouchableHighlight,
-         TextInput,
-         Picker,
-         Alert,
-         Image} from "react-native";
-import {styles, pickerStyle} from "../pages/pageStyles/MapCreatorPageStyle";
+import {
+    Text,
+    View,
+    TouchableHighlight,
+    TextInput,
+    Alert,
+    Image
+} from "react-native";
+import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
-import {departments} from "../DepartmentList"
+import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
+import Menu from "./Menu"
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -36,7 +38,7 @@ class MapCreatorPage extends Component {
     @input  None
     @return void
     */
-    componentDidMount () {
+    componentDidMount() {
         this._mounted = true
 
         this.setState({ arrayHolder: [...this.currDepartments] })
@@ -49,7 +51,7 @@ class MapCreatorPage extends Component {
     @input  None
     @return void
     */
-    componentWillUnmount () {
+    componentWillUnmount() {
         this._mounted = false
     }
 
@@ -63,10 +65,10 @@ class MapCreatorPage extends Component {
     */
     addDepartment = () => {
         // Add a department to the list
-        this.currDepartments.push({depName : departments[0].label});
+        this.currDepartments.push({ depName: departments[0].label });
 
         // Rerender the screen
-        this.setState({ arrayHolder: [...this.currDepartments]})
+        this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
     /*
@@ -81,7 +83,7 @@ class MapCreatorPage extends Component {
         var deps = []
 
         // Copy the current list of departments
-        for (var i = 0; i < this.currDepartments.length; i++){
+        for (var i = 0; i < this.currDepartments.length; i++) {
             deps.push(this.currDepartments[i]["depName"])
         }
 
@@ -105,7 +107,7 @@ class MapCreatorPage extends Component {
     updateDepartment(ind, newVal) {
         this.currDepartments[ind]["depName"] = newVal
 
-        this.setState({ arrayHolder: [...this.currDepartments]})
+        this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
     /*
@@ -126,7 +128,7 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind]["depName"] = aboveItem
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments]})
+            this.setState({ arrayHolder: [...this.currDepartments] })
         }
     }
 
@@ -142,7 +144,7 @@ class MapCreatorPage extends Component {
         this.currDepartments.splice(ind, 1)
 
         // Update the state
-        this.setState({ arrayHolder: [...this.currDepartments]})
+        this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
     /*
@@ -163,7 +165,7 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind]["depName"] = belowItem
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments]})
+            this.setState({ arrayHolder: [...this.currDepartments] })
         }
     }
 
@@ -183,8 +185,8 @@ class MapCreatorPage extends Component {
             <View style={styles.rowSorter}>
                 {/* Render the up button */}
                 <TouchableHighlight
-                    style = {[styles.listButton, {backgroundColor : "white"}]}
-                    onPress = {() => this.upButtonPressed(index)}>
+                    style={[styles.listButton, { backgroundColor: "black" }]}
+                    onPress={() => this.upButtonPressed(index)}>
                     <Image
                         style={styles.image}
                         resizeMode="contain"
@@ -193,12 +195,12 @@ class MapCreatorPage extends Component {
                 </TouchableHighlight>
 
                 {/* Place buffers between elements to make it clearer */}
-                <View style = {styles.bufferView}></View>
+                <View style={styles.bufferView}></View>
 
                 {/* Render the delete button */}
                 <TouchableHighlight
-                    style = {[styles.listButton, {backgroundColor : "white"}]}
-                    onPress = {() => this.delButtonPressed(index)}>
+                    style={[styles.listButton, { backgroundColor: "black" }]}
+                    onPress={() => this.delButtonPressed(index)}>
                     <Image
                         style={styles.image}
                         resizeMode="contain"
@@ -206,12 +208,12 @@ class MapCreatorPage extends Component {
                     />
                 </TouchableHighlight>
 
-                <View style = {styles.bufferView}></View>
+                <View style={styles.bufferView}></View>
 
                 {/* Render the down button */}
                 <TouchableHighlight
-                    style = {[styles.listButton, {backgroundColor : "white"}]}
-                    onPress = {() => this.downButtonPressed(index)}>
+                    style={[styles.listButton, { backgroundColor: "black" }]}
+                    onPress={() => this.downButtonPressed(index)}>
                     <Image
                         style={styles.image}
                         resizeMode="contain"
@@ -219,80 +221,84 @@ class MapCreatorPage extends Component {
                     />
                 </TouchableHighlight>
 
-                <View style = {styles.bufferView}></View>
+                <View style={styles.bufferView}></View>
 
                 {/* Render the department picker */}
-                <View style = {{flex : 5}}>
+                <View style={{ flex: 5 }}>
                     <RNPickerSelect
                         value={this.currDepartments[index]["depName"]}
                         items={departments}
                         placeholder={{}}
                         style={pickerStyle}
-                        onValueChange={(val) => this.updateDepartment(index, val)}/>
+                        onValueChange={(val) => this.updateDepartment(index, val)} />
                 </View>
 
                 {/* Add a blank area at the end of the row to allow for scrolling */}
-                <View style = {{flex : 1, backgroundColor : "white"}}/>
+                {/* <View style={{ flex: 1, backgroundColor: "white" }} /> */}
             </View>
         )
     }
 
     render() {
         return (
-        <View style={styles.mainContainer}>
-            <View style={styles.topContainer}>
-                <View style={styles.headerContainer}>
-                    <Text style={styles.blackHeaderText}>Map Creator:</Text>
-                </View>
 
-                <View style={styles.rowSorter}>
-                    <View style = {styles.textContainer}>
-                        <Text style={globalStyles.blackText}>Store Name: </Text>
+            <React.Fragment>
+                <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+                <View style={styles.mainContainer}>
+                    <View style={styles.topContainer}>
+                        <View style={styles.headerContainer}>
+                            <Text style={styles.blackHeaderText}>Map Creator</Text>
+                        </View>
+
+                        <View style={styles.rowSorter}>
+                            <View style={styles.textContainer}>
+                                <Text style={globalStyles.whiteText}>Store Name: </Text>
+                            </View>
+
+                            <View style={styles.pickerContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder="Store Name"
+                                    onChangeText={(storeName) => this.setState({ storeName })}
+                                    value={this.state.storeName}
+                                />
+                            </View>
+
+                        </View>
                     </View>
 
-                    <View style = {styles.pickerContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            placeholder="Store Name"
-                            onChangeText={(storeName) => this.setState({storeName})}
-                            value={this.state.storeName}
+                    <View style={styles.midContainer}>
+                        <FlatList
+                            data={this.state.arrayHolder}
+                            renderItem={({ item, index }) => this.renderListElem(index)}
+                            keyExtractor={(item, index) => index.toString()}
                         />
                     </View>
 
-                </View>
-            </View>
+                    <View style={styles.botContainer}>
+                        <View style={styles.rowSorter}>
+                            <View style={styles.outerButtonContainer}>
+                                <TouchableHighlight
+                                    style={[styles.buttonContainer, styles.button]}
+                                    onPress={this.addDepartment}
+                                >
+                                    <Text style={globalStyles.whiteText}>{"Add Department"}</Text>
+                                </TouchableHighlight>
+                            </View>
 
-            <View style={styles.midContainer}>
-                <FlatList
-                    data={this.state.arrayHolder}
-                    renderItem={({item, index}) => this.renderListElem(index)}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
+                            <View style={styles.outerButtonContainer}>
+                                <TouchableHighlight
+                                    style={[styles.buttonContainer, styles.button]}
+                                    onPress={this.handleSaveMap}
+                                >
 
-            <View style={styles.botContainer}>
-                <View style={styles.rowSorter}>
-                    <View style={styles.outerButtonContainer}>
-                        <TouchableHighlight
-                            style={[styles.buttonContainer, styles.button]}
-                            onPress={this.addDepartment}
-                        >
-                            <Text style={globalStyles.whiteText}>{"Add Department"}</Text>
-                        </TouchableHighlight>
-                    </View>
-
-                    <View style={styles.outerButtonContainer}>
-                        <TouchableHighlight
-                            style={[styles.buttonContainer, styles.button]}
-                            onPress={this.handleSaveMap}
-                        >
-
-                            <Text style={globalStyles.whiteText}>{"Save Map"}</Text>
-                        </TouchableHighlight>
+                                    <Text style={globalStyles.whiteText}>{"Save Map"}</Text>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
                     </View>
                 </View>
-            </View>
-        </View>
+            </React.Fragment>
         );
     }
 }

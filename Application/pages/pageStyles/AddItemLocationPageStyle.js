@@ -1,4 +1,6 @@
-import { StyleSheet } from 'react-native';
+import {
+  StyleSheet
+} from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
@@ -40,15 +42,15 @@ export const styles = StyleSheet.create({
     color: 'black',
   },
   textInput: {
-    height: 40, 
-    borderColor: "gray", 
+    height: 40,
+    borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
   },
   picker: {
-    height: 40, 
-    borderColor: "gray", 
+    height: 40,
+    borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
@@ -57,22 +59,23 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
   },
-}); 
+});
 
 export const pickerStyle = {
   inputAndroid: {
     height: 40,
-    borderColor: "gray", 
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-    paddingRight: 30,
-  }, 
-  inputIOS: {
-    borderColor: "gray", 
+    borderColor: "gray",
     borderWidth: 1,
     justifyContent: "flex-end",
     color: "white",
     paddingRight: 30,
   },
-}; 
+  inputIOS: {
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+    height: 40,
+    paddingRight: 30,
+  },
+};

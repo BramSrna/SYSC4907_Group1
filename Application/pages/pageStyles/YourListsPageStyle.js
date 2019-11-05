@@ -14,13 +14,9 @@ export default StyleSheet.create({
    },
    pageTitle: {
       padding: 30,
-      paddingTop: 50,
       paddingBottom: 15,
       color: "white",
       fontSize: 30
-   },
-   flatList: {
-      paddingTop: 30
    },
    item: {
       padding: 10,

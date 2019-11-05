@@ -9,11 +9,12 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { Header } from "react-navigation"
-import {styles, pickerStyle} from "./pageStyles/RegisterItemPageStyle";
+import { styles, pickerStyle } from "./pageStyles/RegisterItemPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
-import {units} from "../UnitList";
+import { units } from "../UnitList";
+import Menu from "./Menu"
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
@@ -51,7 +52,7 @@ class RegisterItemPage extends Component {
     var retVal = this.checkReqFields();
 
     // Saves the data if all required fields have values
-    if (retVal){
+    if (retVal) {
       firebase.database().ref("/items").push({
         genericName: this.state.genericName,
         specificName: this.state.specificName,
@@ -78,20 +79,20 @@ class RegisterItemPage extends Component {
    * @returns Boolean True if the user has inputted a value for all valid fields
    *                  False otherwise
    */
-  checkReqFields(){
+  checkReqFields() {
     // Check the generic name field
     if (this.state.genericName == DEFAULT_GENERIC_NAME) {
       Alert.alert("Please enter a value for the generic name.");
-      return(false);
+      return (false);
     }
 
     // Check the specific name field
     if (this.state.specificName == DEFAULT_SPECIFIC_NAME) {
       Alert.alert("Please enter a value for the specific name.");
-      return(false);
+      return (false);
     }
 
-    return(true);
+    return (true);
   }
   /**
    * 
@@ -107,7 +108,7 @@ class RegisterItemPage extends Component {
    * @returns None
    */
   renderRequiredText(bodyText, reqText = "(*)") {
-    return(
+    return (
       <Text style={globalStyles.whiteText}>
         {bodyText}
         <Text style={globalStyles.requiredHighlight}>
@@ -119,83 +120,86 @@ class RegisterItemPage extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.topContainer}>
-          <Text style={styles.whiteHeaderText}>Register Item:</Text>
+      <React.Fragment>
+        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+        <View style={styles.container}>
+          <View style={styles.topContainer}>
+            <Text style={styles.whiteHeaderText}>Register Item</Text>
+          </View>
+
+          <KeyboardAvoidingView
+            style={styles.midContainer}
+            keyboardVerticalOffset={keyboardVerticalOffset}
+            behavior={keyboardAvoidingViewBehavior}>
+            <View style={styles.rowSorter}>
+              <View style={{ flex: 1 }}>
+                {this.renderRequiredText("Generic Name: ")}
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Generic Name Ex. Ketchup"
+                  onChangeText={(genericName) => this.setState({ genericName })}
+                  value={this.state.genericName}
+                />
+              </View>
+            </View>
+
+            <View style={styles.rowSorter}>
+              <View style={{ flex: 1 }}>
+                {this.renderRequiredText("Specific Name: ")}
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Specific Name"
+                  onChangeText={(specificName) => this.setState({ specificName })}
+                  value={this.state.specificName}
+                />
+              </View>
+            </View>
+
+            <View style={styles.rowSorter}>
+              <View style={{ flex: 1 }}>
+                <Text style={globalStyles.whiteText}>Size: </Text>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Size"
+                  keyboardType="numeric"
+                  onChangeText={(size) => this.setState({ size })}
+                  value={this.state.size}
+                />
+              </View>
+
+              <View style={{ flex: 0.1 }} />
+
+              <View style={{ flex: 1 }}>
+                <RNPickerSelect
+                  value={this.state.sizeUnit}
+                  items={units}
+                  style={pickerStyle}
+                  useNativeAndroidPickerStyle={false}
+                  placeholder={{}}
+                  onValueChange={(sizeUnit) => this.setState({ sizeUnit })} />
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+
+          <View style={styles.botContainer}>
+            <TouchableHighlight
+              style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+              onPress={this.handleRegister}
+            >
+              <Text style={globalStyles.whiteText}>{"Register Item"}</Text>
+            </TouchableHighlight>
+          </View>
         </View>
-
-        <KeyboardAvoidingView
-          style={styles.midContainer}
-          keyboardVerticalOffset={keyboardVerticalOffset}
-          behavior={keyboardAvoidingViewBehavior}>
-          <View style={styles.rowSorter}>
-            <View style={{ flex: 1 }}>
-              {this.renderRequiredText("Generic Name: ")}
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Generic Name Ex. Ketchup"
-                onChangeText={(genericName) => this.setState({ genericName })}
-                value={this.state.genericName}
-              />
-            </View>
-          </View>
-
-          <View style={styles.rowSorter}>
-            <View style={{ flex: 1 }}>
-              {this.renderRequiredText("Specific Name: ")}
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Specific Name"
-                onChangeText={(specificName) => this.setState({ specificName })}
-                value={this.state.specificName}
-              />
-            </View>
-          </View>
-
-          <View style={styles.rowSorter}>
-            <View style={{ flex: 1 }}>
-              <Text style={globalStyles.whiteText}>Size: </Text>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Size"
-                keyboardType="numeric"
-                onChangeText={(size) => this.setState({ size })}
-                value={this.state.size}
-              />
-            </View>
-
-            <View style={{flex: 0.1}}/>
-
-            <View style={{ flex: 1 }}>
-              <RNPickerSelect
-                    value={this.state.sizeUnit}
-                    items={units}
-                    style={pickerStyle}
-                    useNativeAndroidPickerStyle={false}
-                    placeholder={{}}
-                    onValueChange={(sizeUnit) => this.setState({ sizeUnit })}/>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-
-        <View style={styles.botContainer}>
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={this.handleRegister}
-          >
-            <Text style={globalStyles.whiteText}>{"Register Item"}</Text>
-          </TouchableHighlight>
-        </View>
-      </View>
+      </React.Fragment>
     );
   }
 }
