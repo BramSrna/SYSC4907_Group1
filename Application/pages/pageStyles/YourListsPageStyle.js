@@ -21,7 +21,7 @@ export default StyleSheet.create({
    item: {
       padding: 10,
       fontSize: 18,
-      height: 40,
+      // height: 40,
       color: "white"
    },
    addButton: {

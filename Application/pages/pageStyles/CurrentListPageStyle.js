@@ -12,13 +12,11 @@ export default StyleSheet.create({
    notPurchasedItem: {
       padding: 10,
       fontSize: 18,
-      height: 40,
       color: "white"
    },
    purchasedItem: {
       padding: 10,
       fontSize: 18,
-      height: 40,
       color: "red",
       textDecorationLine: "line-through"
    },
