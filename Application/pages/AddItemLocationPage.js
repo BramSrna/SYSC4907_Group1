@@ -16,6 +16,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { departments } from "../DepartmentList";
 import Menu from "./Menu"
 
+
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
@@ -156,13 +157,28 @@ class AddItemLocationPage extends Component {
         <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
         <View style={styles.container}>
           <View style={styles.topContainer}>
-            <Text style={styles.whiteHeaderText}>Add Item Location</Text>
+            <Text style={styles.whiteHeaderText}>Add Item Location:</Text>
           </View>
 
           <KeyboardAvoidingView
             style={styles.midContainer}
             keyboardVerticalOffset={keyboardVerticalOffset}
             behavior={keyboardAvoidingViewBehavior}>
+            <View style={styles.rowSorter}>
+              <View style={{ flex: 1 }}>
+                {this.renderRequiredText("Generic Name: ")}
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Generic Name"
+                  onChangeText={(genericName) => this.setState({ genericName })}
+                  value={this.state.genericName}
+                />
+              </View>
+            </View>
+
             <View style={styles.rowSorter}>
               <View style={{ flex: 1 }}>
                 <Text style={globalStyles.whiteText}>Specific Name: </Text>
