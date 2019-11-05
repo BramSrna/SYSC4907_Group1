@@ -36,6 +36,8 @@ const StackNavigator = createStackNavigator({
         screen: RegisterItemPage
     },
 }, {
+    //TODO
+    initialRouteName: "YourListsPage",
     headerMode: "none"
 });
 
@@ -45,27 +47,32 @@ const MainDrawerNavigator = createDrawerNavigator({
         navigationOptions: {
             drawerLabel: "Home"
         }
-    }, AddItemLocationPage: {
+    },
+    AddItemLocationPage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Add Item Location"
         }
-    }, MapCreatorPage: {
+    },
+    MapCreatorPage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Map a Store"
         }
-    }, YourListsPage: {
+    },
+    YourListsPage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Your Lists"
         }
-    }, CrowdSourcePage: {
+    },
+    CrowdSourcePage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: () => null
         }
-    }, RegisterItemPage: {
+    },
+    RegisterItemPage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Register an Item"
@@ -78,12 +85,11 @@ const MainDrawerNavigator = createDrawerNavigator({
         }
     },
 
-},
-    {
-        gesturesEnabled: false,
-        contentComponent: SideMenu,
-        drawerWidth: 250
-    });
+}, {
+    gesturesEnabled: false,
+    contentComponent: SideMenu,
+    drawerWidth: 250
+});
 
 const App = createAppContainer(MainDrawerNavigator);
 

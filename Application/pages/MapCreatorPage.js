@@ -247,7 +247,7 @@ class MapCreatorPage extends Component {
                 <View style={styles.mainContainer}>
                     <View style={styles.topContainer}>
                         <View style={styles.headerContainer}>
-                            <Text style={styles.blackHeaderText}>Map Creator:</Text>
+                            <Text style={styles.blackHeaderText}>Map Creator</Text>
                         </View>
 
                         <View style={styles.rowSorter}>

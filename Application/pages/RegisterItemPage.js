@@ -124,7 +124,7 @@ class RegisterItemPage extends Component {
         <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
         <View style={styles.container}>
           <View style={styles.topContainer}>
-            <Text style={styles.whiteHeaderText}>Register Item:</Text>
+            <Text style={styles.whiteHeaderText}>Register Item</Text>
           </View>
 
           <KeyboardAvoidingView

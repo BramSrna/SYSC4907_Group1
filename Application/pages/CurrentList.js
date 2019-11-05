@@ -58,7 +58,7 @@ class CurrentList extends Component {
             style={{
                height: 1,
                width: "100%",
-               backgroundColor: "#607D8B"
+               backgroundColor: "#00b5ec"
             }}
          />
       );
