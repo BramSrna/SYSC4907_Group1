@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import FirebaseConfig from './components/FirebaseConfig';
 import * as firebase from 'firebase';
 import RootNavigation from './navigation/RootNavigation';
 import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
-import { AppLoading } from 'expo';
+import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
 import _ from 'lodash';
 
@@ -38,14 +38,25 @@ export default class App extends Component {
     this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
   }
 
+  componentDidMount() {
+    SplashScreen.preventAutoHide();
+  }
+
   render() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
       return (
-        <AppLoading
-          startAsync={this._loadResourcesAsync}
-          onError={this._handleLoadingError}
-          onFinish={this._handleFinishLoading}
-        />
+        <View style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <Image style={{
+            height: '100%',
+            aspectRatio: .5,
+          }}
+            source={require('./assets/splash.gif')}
+            onLoad={this._loadResourcesAsync}
+          />
+        </View>
       );
     }
     return (
@@ -58,13 +69,13 @@ export default class App extends Component {
   }
 
   _loadResourcesAsync = async () => {
-    return Promise.all([
+    await Promise.all([
       Asset.loadAsync([
         // Add all necessary assets here
-        require('./assets/icon.png'),
-        require('./assets/splash.png'),
       ]),
     ]);
+    SplashScreen.hide();
+    this.setState({ isLoadingComplete: true });
   };
 
   _handleLoadingError = error => {
