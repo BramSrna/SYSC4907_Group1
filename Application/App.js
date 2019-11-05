@@ -58,12 +58,12 @@ export default class App extends Component {
   }
 
   _loadResourcesAsync = async () => {
-    SplashScreen.hide();
     await Promise.all([
       Asset.loadAsync([
         // Add all necessary assets here
       ]),
     ]);
+    SplashScreen.hide();
     this.setState({ isLoadingComplete: true });
   };
 
