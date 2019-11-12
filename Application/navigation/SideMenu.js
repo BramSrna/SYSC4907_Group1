@@ -30,9 +30,12 @@ class SideMenu extends Component {
                             Your Data
             </Text>
                         <View style={styles.navSectionStyle}>
-                            {/* <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
                                 Home
-              </Text> */}
+              </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourContacts')}>
+                                Contacts
+              </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourListsPage')}>
                                 Your Lists
               </Text>
