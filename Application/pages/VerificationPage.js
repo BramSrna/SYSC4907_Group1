@@ -11,9 +11,7 @@ import FirebaseUser from "../components/FirebaseUser";
 
 const VERIFY = "Verify";
 const RESEND = "Resend confirmation link";
-
-const HOMEPAGE = "YourListsPage";
-// TODO const HOMEPAGE = "Home";
+const HOMEPAGE = "Home";
 
 export default class VerificationPage extends Component {
   constructor(props) {

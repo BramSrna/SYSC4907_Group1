@@ -36,8 +36,7 @@ const StackNavigator = createStackNavigator({
         screen: RegisterItemPage
     },
 }, {
-    //TODO
-    initialRouteName: "YourListsPage",
+    initialRouteName: "Home",
     headerMode: "none"
 });
 

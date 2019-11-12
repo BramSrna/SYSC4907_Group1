@@ -16,9 +16,7 @@ import FirebaseUser from "../components/FirebaseUser";
 const LOGIN = "Login";
 const REGISTER = "Register";
 const FORGOT_PASSWORD = "Forgot your password?";
-
-const HOMEPAGE = "YourListsPage";
-// TODO const HOMEPAGE = "Home";
+const HOMEPAGE = "Home";
 const REGISTERPAGE = "Registration";
 const FORGOTPASSWORDPAGE = "ForgotPassword";
 const VERIFICATIONPAGE = "Verification";
