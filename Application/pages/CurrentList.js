@@ -4,7 +4,7 @@ import styles from "./pageStyles/CurrentListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
-import lf from "./ListFunctions";
+import lf from "./Functions/ListFunctions";
 import Dialog from "react-native-dialog";
 import Menu from "./Menu"
 

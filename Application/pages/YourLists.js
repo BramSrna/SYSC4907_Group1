@@ -9,7 +9,7 @@ import {
 import styles from "./pageStyles/YourListsPageStyle";
 import Swipeout from "react-native-swipeout";
 import Dialog from "react-native-dialog";
-import lf from "./ListFunctions";
+import lf from "./Functions/ListFunctions";
 import Menu from "./Menu"
 
 
