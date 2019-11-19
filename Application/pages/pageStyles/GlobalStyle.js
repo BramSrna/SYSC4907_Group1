@@ -64,5 +64,5 @@ export default StyleSheet.create({
   },
   requiredHighlight: {
     color: "red",
-  }
+  },
 });

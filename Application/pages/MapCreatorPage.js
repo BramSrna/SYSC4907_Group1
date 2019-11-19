@@ -243,7 +243,7 @@ class MapCreatorPage extends Component {
 
     renderMenuAction = () => (
         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
-      );
+    );
 
     render() {
         return (
@@ -251,6 +251,7 @@ class MapCreatorPage extends Component {
             <React.Fragment>
                 <TopNavigation
                     title={PAGE_TITLE}
+                    alignment="center"
                     leftControl={this.renderMenuAction()}
                 />
                 <View style={styles.mainContainer}>

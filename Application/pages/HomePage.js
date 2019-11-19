@@ -32,29 +32,33 @@ class HomePage extends Component {
 
   render() {
     return (
-      <Layout style={globalStyles.defaultContainer}>
+      <React.Fragment>
         <TopNavigation
           title={PAGE_TITLE}
+          alignment='center'
           leftControl={this.renderMenuAction()}
         />
-        <View style={globalStyles.defaultContainer}>
-          <Text style={globalStyles.whiteText}>HomePage</Text>
+        <Layout style={globalStyles.defaultContainer}>
+          <View style={globalStyles.defaultContainer}>
+            <Text style={globalStyles.whiteText}>HomePage</Text>
 
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(CROWD_SOURCE)}
-          >
-            <Text style={globalStyles.whiteText}>{CROWD_SOURCE}</Text>
-          </TouchableHighlight>
+            <TouchableHighlight
+              style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+              onPress={() => this.buttonListener(CROWD_SOURCE)}
+            >
+              <Text style={globalStyles.whiteText}>{CROWD_SOURCE}</Text>
+            </TouchableHighlight>
 
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(YOUR_LISTS)}
-          >
-            <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
-          </TouchableHighlight>
-        </View>
-      </Layout>
+            <TouchableHighlight
+              style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
+              onPress={() => this.buttonListener(YOUR_LISTS)}
+            >
+              <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
+            </TouchableHighlight>
+          </View>
+        </Layout>
+      </React.Fragment>
+
     );
   }
 }

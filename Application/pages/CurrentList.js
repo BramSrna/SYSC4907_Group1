@@ -134,6 +134,7 @@ class CurrentList extends Component {
          <React.Fragment>
             <TopNavigation
                title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
+               alignment="center"
                leftControl={this.renderMenuAction()}
             />
             <View style={styles.ListContainer}>

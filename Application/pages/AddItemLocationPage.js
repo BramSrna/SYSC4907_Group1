@@ -162,6 +162,7 @@ class AddItemLocationPage extends Component {
       <React.Fragment>
         <TopNavigation
           title={PAGE_TITLE}
+          alignment="center"
           leftControl={this.renderMenuAction()}
         />
         <View style={styles.container}>
