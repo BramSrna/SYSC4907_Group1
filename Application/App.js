@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { mapping, light, dark } from '@eva-design/eva';
+import { Image, Platform, StatusBar, StyleSheet, SafeAreaView } from 'react-native';
+import { mapping, light} from '@eva-design/eva';
+import { dark } from './assets/Themes.js';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
@@ -74,7 +75,7 @@ export default class App extends Component {
       <Layout style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
-        {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
+        {(this.state.isAuthenticated) ? <MainDrawerNavigator toggleTheme={this.toggleTheme()}/> : <RootNavigation />}
       </Layout>
     );
   }
@@ -84,7 +85,9 @@ export default class App extends Component {
       <React.Fragment>
         <IconRegistry icons={EvaIconsPack} />
         <ApplicationProvider mapping={mapping} theme={themes[this.state.theme]}>
-          {this.renderCurrentState()}
+          <SafeAreaView style={[styles.container, {backgroundColor: this.state.theme == 'light' ? light["background-basic-color-1"] : dark["background-basic-color-1"]}]}>
+            {this.renderCurrentState()}
+          </SafeAreaView>
         </ApplicationProvider>
       </React.Fragment>
     );
@@ -112,7 +115,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0,
+
   },
   statusBarUnderlay: {
     height: 24,

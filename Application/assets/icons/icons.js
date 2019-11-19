@@ -20,3 +20,11 @@ export const PasswordIcon = (style) => (
 export const MenuOutline = (style) => (
     <Icon {...style} name='menu-outline' />
 );
+
+export const MoonOutline = (style) => (
+    <Icon {...style} name='moon-outline' />
+);
+
+export const Moon = (style) => (
+    <Icon {...style} name='moon' />
+);
