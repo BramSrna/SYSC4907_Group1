@@ -1,24 +1,14 @@
 export default {
-    rowContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        paddingVertical: 4,
-        paddingHorizontal: 4,
-      },
       columnContainer: {
+        flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center',
-        flexWrap: 'wrap',
+        alignItems: 'stretch',
         paddingVertical: 4,
         paddingHorizontal: 4,
       },
     container: {
-        paddingTop: 35,
         flex: 1,
-        backgroundColor: 'black',
-        color: 'white',
     },
     fillContainer: {
         flex: 1,
@@ -38,7 +28,9 @@ export default {
         fontSize: 20
     },
     footerContainer: {
-        padding: 20,
-        backgroundColor: 'black',
-    }
+    },
+    toggle:{
+        padding: 10,
+        alignSelf: 'flex-start',
+    },
 };

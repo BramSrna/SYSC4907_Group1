@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import styles from './SideMenuStyle';
 import { NavigationActions } from 'react-navigation';
 import { ScrollView, View } from 'react-native';
-import globalStyles from "../pages/pageStyles/GlobalStyle";
-import { Layout, Text, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, Text, Toggle } from 'react-native-ui-kitten';
 import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";
@@ -17,10 +16,18 @@ const REGISTER_AN_ITEM = "Register an Item";
 const SIGNOUT = "Sign Out";
 
 class SideMenu extends Component {
-
     constructor(props) {
         super(props)
+        this.state = {
+            darkMode: false,
+        };
     }
+
+    onDarkModeToggle = (darkMode) => {
+        this.setState({ darkMode });
+        this.props.toggleTheme();
+    };
+
     navigateToScreen = (route) => () => {
         if (route == 'Logout') {
             firebase.auth().signOut();
@@ -34,8 +41,8 @@ class SideMenu extends Component {
 
     render() {
         return (
-            <Layout style={styles.rowContainer}>
-                <ScrollView>
+            <Layout style={styles.columnContainer}>
+                <ScrollView style={styles.container}>
                     <Layout style={styles.columnContainer}>
                         <Text style={styles.sectionHeadingStyle}>
                             {YOUR_DATA}
@@ -67,7 +74,15 @@ class SideMenu extends Component {
                     </Layout>
                 </ScrollView>
                 <Layout style={styles.footerContainer}>
-                    <Text onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
+                    <Toggle style={styles.toggle}
+                        checked={this.state.darkMode}
+                        text='Dark Mode'
+                        size='small'
+                        onChange={this.onDarkModeToggle}
+                    />
+                    <Layout>
+                        <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
+                    </Layout>
                 </Layout>
             </Layout>
         );

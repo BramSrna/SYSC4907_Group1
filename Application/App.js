@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { mapping, light as lightTheme, dark as darkTheme } from '@eva-design/eva';
+import { mapping, light, dark } from '@eva-design/eva';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
@@ -12,13 +12,16 @@ import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
 import _ from 'lodash';
 
+const themes = { light, dark };
+
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
-      isAuthenticated: false
+      isAuthenticated: false,
+      theme: 'dark',
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -44,6 +47,11 @@ export default class App extends Component {
   componentDidMount() {
     SplashScreen.preventAutoHide();
   }
+
+  toggleTheme = () => {
+    const nextTheme = this.state.theme === 'light' ? 'dark' : 'light';
+    this.setState({ theme: nextTheme });
+  };
 
   renderCurrentState() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
@@ -75,7 +83,7 @@ export default class App extends Component {
     return (
       <React.Fragment>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={darkTheme}>
+        <ApplicationProvider mapping={mapping} theme={themes[this.state.theme]}>
           {this.renderCurrentState()}
         </ApplicationProvider>
       </React.Fragment>
