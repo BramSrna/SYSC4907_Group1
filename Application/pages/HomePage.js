@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight } from "react-native";
-import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, TopNavigation, TopNavigationAction, OverflowMenu } from 'react-native-ui-kitten';
 import globalStyles from "../pages/pageStyles/GlobalStyle";
-import firebase from 'firebase';
-import { MenuOutline } from "../assets/icons/icons.js";
+import { MenuOutline, Moon, MoonOutline } from "../assets/icons/icons.js";
 
 const PAGE_TITLE = "Home";
 
@@ -18,6 +17,10 @@ class HomePage extends Component {
     super(props);
   }
 
+  menuData = [
+    { title: 'Dark Mode', icon: InfoIcon },
+  ];
+
   buttonListener = buttonId => {
     if (buttonId == CROWD_SOURCE) {
       this.props.navigation.navigate(CROWD_SOURCE_PAGE);
@@ -26,9 +29,31 @@ class HomePage extends Component {
     }
   };
 
-  renderMenuAction = () => (
+  renderLeftMenuAction = () => (
     <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
   );
+
+  renderRightMenuAction = () => (
+    <OverflowMenu
+      visible={this.state.menuVisible}
+      data={this.menuData}
+      placement='bottom end'
+      onSelect={this.onMenuItemSelect}
+      onBackdropPress={this.onMenuActionPress}>
+      <TopNavigationAction
+        icon={MenuIcon}
+        onPress={this.onMenuActionPress}
+      />
+    </OverflowMenu>
+  );
+
+  onMenuItemSelect = (index) => {
+    if(index = 1){
+      
+    }
+
+    this.setState({ menuVisible: false });
+  };
 
   render() {
     return (
@@ -36,7 +61,8 @@ class HomePage extends Component {
         <TopNavigation
           title={PAGE_TITLE}
           alignment='center'
-          leftControl={this.renderMenuAction()}
+          leftControl={this.renderLeftMenuAction()}
+          rightControls={this.renderRightMenuAction()}
         />
         <Layout style={globalStyles.defaultContainer}>
           <View style={globalStyles.defaultContainer}>
