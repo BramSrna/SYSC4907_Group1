@@ -6,12 +6,15 @@ import {
    FlatList,
    Image
 } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import styles from "./pageStyles/YourListsPageStyle";
 import Swipeout from "react-native-swipeout";
 import Dialog from "react-native-dialog";
 import lf from "./ListFunctions";
-import Menu from "./Menu"
 
+const PAGE_TITLE = "Your Lists";
 
 class YourLists extends Component {
    constructor(props) {
@@ -82,6 +85,10 @@ class YourLists extends Component {
       this.newListName = name;
    }
 
+   renderMenuAction = () => (
+      <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+   );
+
    render() {
       const swipeButtons = [
          {
@@ -105,7 +112,10 @@ class YourLists extends Component {
       ];
       return (
          <React.Fragment>
-            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+            <TopNavigation
+               title={PAGE_TITLE}
+               leftControl={this.renderMenuAction()}
+            />
             <View style={styles.ListContainer}>
                <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
                   <Dialog.Title>New List</Dialog.Title>

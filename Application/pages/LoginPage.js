@@ -1,17 +1,11 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  TouchableHighlight,
-  Image,
-  Alert,
-  ActivityIndicator
-} from "react-native";
+import { KeyboardAvoidingView, Image, Alert, ActivityIndicator } from "react-native";
+import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
 import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
+import { EmailIcon, PasswordIcon } from "../assets/icons/icons.js";
 
 const LOGIN = "Login";
 const REGISTER = "Register";
@@ -26,6 +20,7 @@ export default class LoginPage extends Component {
   state = {
     email: "",
     password: "",
+    secureTextEntry: true,
     authenticating: false
   }
 
@@ -89,81 +84,89 @@ export default class LoginPage extends Component {
     }
   }
 
+  renderPasswordEyeIcon = (style) => {
+    const iconName = this.state.secureTextEntry ? 'eye-off' : 'eye';
+    return (
+      <Icon {...style} name={iconName} />
+    );
+  };
+
+  onPasswordEyeIconPress = () => {
+    const secureTextEntry = !this.state.secureTextEntry;
+    this.setState({ secureTextEntry });
+  };
+
   renderCurrentState() {
     if (this.state.authenticating) {
       return (
-        <View>
+        <Layout style={styles.columnContainer}>
           <ActivityIndicator size="large" />
-        </View>
+        </Layout>
       )
     }
 
     if (!this.userAlreadyLoggedIn) {
       return (
-        <View style={globalStyles.defaultContainer}>
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-mail-account-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
+        <Layout style={styles.columnContainer}>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
               placeholder="Enter your email..."
-              label="Email"
               keyboardType="email-address"
               autoCapitalize="none"
-              underlineColorAndroid="transparent"
+              autoCompleteType="email"
+              captionIcon={this.emailIcon}
               onChangeText={email => this.setState({ email })}
-              value={this.state.email}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-key-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
+              value={this.state.email} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
               placeholder="Enter your password..."
-              label="Password"
-              secureTextEntry={true}
-              underlineColorAndroid="transparent"
+              autoCapitalize="none"
+              autoCompleteType="password"
+              captionIcon={this.passwordIcon}
+              icon={this.renderPasswordEyeIcon}
+              secureTextEntry={this.state.secureTextEntry}
+              onIconPress={this.onPasswordEyeIconPress}
               onChangeText={password => this.setState({ password })}
-              value={this.state.password}
-            />
-          </View>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(LOGIN)}
-          >
-            <Text style={globalStyles.whiteText}>{LOGIN}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={globalStyles.defaultButtonContainer}
-            onPress={() => this.buttonListener(FORGOT_PASSWORD)}
-          >
-            <Text style={globalStyles.whiteText}>{FORGOT_PASSWORD}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={globalStyles.defaultButtonContainer}
-            onPress={() => this.buttonListener(REGISTER)}
-          >
-            <Text style={globalStyles.whiteText}>Register</Text>
-          </TouchableHighlight>
-        </View>
+              value={this.state.password} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
+              onPress={() => this.buttonListener(LOGIN)}>
+              {LOGIN}
+            </Button>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
+              appearance='ghost'
+              onPress={() => this.buttonListener(FORGOT_PASSWORD)}>
+              {FORGOT_PASSWORD}
+            </Button>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
+              appearance='ghost'
+              onPress={() => this.buttonListener(REGISTER)}>
+              {REGISTER}
+            </Button>
+          </Layout>
+        </Layout>
       );
     }
   }
 
   render() {
     return (
-      <View style={globalStyles.defaultContainer}>
-        {this.renderCurrentState()}
-      </View>
+      <Layout style={globalStyles.defaultContainer}>
+        <KeyboardAvoidingView behavior="padding">
+          {this.renderCurrentState()}
+        </KeyboardAvoidingView>
+      </Layout>
     );
   }
 }

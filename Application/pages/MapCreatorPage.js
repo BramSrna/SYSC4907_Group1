@@ -7,13 +7,15 @@ import {
     Alert,
     Image
 } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
-import Menu from "./Menu"
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -239,11 +241,18 @@ class MapCreatorPage extends Component {
         )
     }
 
+    renderMenuAction = () => (
+        <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+      );
+
     render() {
         return (
 
             <React.Fragment>
-                <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+                <TopNavigation
+                    title={PAGE_TITLE}
+                    leftControl={this.renderMenuAction()}
+                />
                 <View style={styles.mainContainer}>
                     <View style={styles.topContainer}>
                         <View style={styles.headerContainer}>

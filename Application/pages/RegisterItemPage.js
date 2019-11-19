@@ -8,16 +8,20 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import { Header } from "react-navigation"
 import { styles, pickerStyle } from "./pageStyles/RegisterItemPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
 import { units } from "../UnitList";
-import Menu from "./Menu"
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
+
+const PAGE_TITLE = "Register Item";
 
 // The default value for all input fields
 const DEFAULT_GENERIC_NAME = ""
@@ -118,10 +122,17 @@ class RegisterItemPage extends Component {
     );
   }
 
+  renderMenuAction = () => (
+    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+  );
+
   render() {
     return (
       <React.Fragment>
-        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+        <TopNavigation
+          title={PAGE_TITLE}
+          leftControl={this.renderMenuAction()}
+        />
         <View style={styles.container}>
           <View style={styles.topContainer}>
             <Text style={styles.whiteHeaderText}>Register Item</Text>

@@ -1,12 +1,16 @@
 import React, { Component } from "react";
 import { Text, View, TouchableHighlight } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import globalStyles from "../pages/pageStyles/GlobalStyle";
-import Menu from "./Menu"
+
+const PAGE_TITLE = "Croud-Source";
 
 // Text to display on the buttons
-const REGISTER_ITEM = "Go To Register Item Page"
-const ADD_ITEM_LOCATION = "Go To Add Item Location Page"
-const MAP_CREATOR = "Go To Map Creator Page"
+const REGISTER_ITEM = "Go To Register Item Page";
+const ADD_ITEM_LOCATION = "Go To Add Item Location Page";
+const MAP_CREATOR = "Go To Map Creator Page";
 
 // Strings for controlling navigation
 const REGISTER_ITEM_PAGE = "RegisterItemPage";
@@ -39,10 +43,17 @@ class CrowdSourcePage extends Component {
     }
   };
 
+  renderMenuAction = () => (
+    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+  );
+
   render() {
     return (
       <React.Fragment>
-        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+        <TopNavigation
+          title={PAGE_TITLE}
+          leftControl={this.renderMenuAction()}
+        />
         <View style={globalStyles.defaultContainer}>
           <Text style={globalStyles.whiteText}>Crowd Sourcing Options</Text>
 

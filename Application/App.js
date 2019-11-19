@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { mapping, light as lightTheme, dark as darkTheme } from '@eva-design/eva';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
 import * as firebase from 'firebase';
 import RootNavigation from './navigation/RootNavigation';
@@ -42,10 +45,10 @@ export default class App extends Component {
     SplashScreen.preventAutoHide();
   }
 
-  render() {
+  renderCurrentState() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
       return (
-        <View style={{
+        <Layout style={{
           justifyContent: 'center',
           alignItems: 'center',
         }}>
@@ -56,15 +59,26 @@ export default class App extends Component {
             source={require('./assets/splash.gif')}
             onLoad={this._loadResourcesAsync}
           />
-        </View>
+        </Layout>
       );
     }
     return (
-      <View style={styles.container}>
+      <Layout style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+        {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
-      </View>
+      </Layout>
+    );
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <IconRegistry icons={EvaIconsPack} />
+        <ApplicationProvider mapping={mapping} theme={darkTheme}>
+          {this.renderCurrentState()}
+        </ApplicationProvider>
+      </React.Fragment>
     );
   }
 
@@ -90,7 +104,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight : 0,
   },
   statusBarUnderlay: {
     height: 24,

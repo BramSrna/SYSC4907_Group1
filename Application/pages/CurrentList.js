@@ -1,13 +1,16 @@
 import React, { Component } from "react";
 import { Text, Image, View, FlatList } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import styles from "./pageStyles/CurrentListPageStyle";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
 import lf from "./ListFunctions";
 import Dialog from "react-native-dialog";
-import Menu from "./Menu"
 
+const PAGE_TITLE = "Current List";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -101,7 +104,9 @@ class CurrentList extends Component {
       });
    }
 
-
+   renderMenuAction = () => (
+      <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+   );
 
    render() {
       const swipeButtons = [
@@ -127,7 +132,10 @@ class CurrentList extends Component {
       ];
       return (
          <React.Fragment>
-            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+            <TopNavigation
+               title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
+               leftControl={this.renderMenuAction()}
+            />
             <View style={styles.ListContainer}>
 
 

@@ -8,15 +8,17 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
+import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
+
 import { Header } from "react-navigation"
 import { styles, pickerStyle } from "./pageStyles/AddItemLocationPageStyle";
 import globalStyles from "./pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
 import { departments } from "../DepartmentList";
-import Menu from "./Menu"
 
-
+const PAGE_TITLE = "Add Item Location";
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
 const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
@@ -151,10 +153,17 @@ class AddItemLocationPage extends Component {
     );
   }
 
+  renderMenuAction = () => (
+    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+  );
+
   render() {
     return (
       <React.Fragment>
-        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+        <TopNavigation
+          title={PAGE_TITLE}
+          leftControl={this.renderMenuAction()}
+        />
         <View style={styles.container}>
           <View style={styles.topContainer}>
             <Text style={styles.whiteHeaderText}>Add Item Location:</Text>
