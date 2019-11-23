@@ -156,14 +156,14 @@ class AddItemLocationPage extends Component {
       <React.Fragment>
         <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
         <View style={styles.container}>
-          <View style={styles.topContainer}>
-            <Text style={styles.whiteHeaderText}>Add Item Location:</Text>
-          </View>
 
           <KeyboardAvoidingView
             style={styles.midContainer}
             keyboardVerticalOffset={keyboardVerticalOffset}
             behavior={keyboardAvoidingViewBehavior}>
+            <View style={styles.topContainer}>
+              <Text style={styles.whiteHeaderText}>Add Item Location:</Text>
+            </View>
             <View style={styles.rowSorter}>
               <View style={{ flex: 1 }}>
                 {this.renderRequiredText("Generic Name: ")}
@@ -205,7 +205,7 @@ class AddItemLocationPage extends Component {
                   items={departments}
                   style={pickerStyle}
                   useNativeAndroidPickerStyle={false}
-                  placeholder={{}}
+                  placeholder={{ label: "Select...", value: "" }}
                   onValueChange={(itemDepartment) => this.setState({ itemDepartment })} />
               </View>
             </View>

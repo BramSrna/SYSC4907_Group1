@@ -12,6 +12,7 @@ import RegisterItemPage from '../pages/RegisterItemPage'
 import CrowdSourcePage from '../pages/CrowdSourcePage';
 import AddItemLocationPage from '../pages/AddItemLocationPage';
 import YourContacts from '../pages/YourContacts';
+import NewContact from '../pages/NewContact';
 
 
 const StackNavigator = createStackNavigator({
@@ -38,6 +39,9 @@ const StackNavigator = createStackNavigator({
     },
     YourContacts: {
         screen: YourContacts
+    },
+    NewContact: {
+        screen: NewContact
     }
 }, {
     initialRouteName: "Home",
@@ -91,6 +95,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Contacts"
+        }
+    },
+    NewContact: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: () => null
         }
     }
 

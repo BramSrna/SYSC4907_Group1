@@ -82,6 +82,16 @@ class YourLists extends Component {
       this.newListName = name;
    }
 
+   GetListKeyFromActiveRow() {
+      var curListTitle = this.state.listTitles[this.state.activeRow];
+      for (var data in this.state.apiData) {
+         if (this.state.apiData[data].name == curListTitle) {
+            return this.state.apiData[data].key;
+         }
+      }
+      return null;
+   }
+
    render() {
       const swipeButtons = [
          {
@@ -99,7 +109,7 @@ class YourLists extends Component {
             ),
             backgroundColor: "red",
             onPress: () => {
-               lf.DeleteList(this.state.apiData[this.state.activeRow].key);
+               lf.DeleteList(this.GetListKeyFromActiveRow());
             }
          }
       ];

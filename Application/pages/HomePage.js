@@ -18,6 +18,25 @@ class HomePage extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    // Make sure user information added to the database
+    var currentUser = firebase.auth().currentUser;
+    var emailId = currentUser.email.toString();
+    emailId = emailId.replace(/\./g, ",");
+    firebase
+      .database()
+      .ref("/userInfo/" + emailId)
+      .once("value", function (snapshot) {
+        if (!snapshot.val()) {
+          firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
+            console.log(snapshot);
+          });
+        }
+      });
+
+
+  }
+
 
   buttonListener = buttonId => {
     if (buttonId == CROWD_SOURCE) {

@@ -4,7 +4,7 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
 
    /**
     * This function is used to add items to a list.
@@ -193,7 +193,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => { })
+         .then(data => {})
          .catch(error => {
             console.log("Failed to create list: " + error);
          });
@@ -238,6 +238,7 @@ class ListFunctions {
                               name: ssv.name
                            });
                            listTitles.push(ssv.name);
+                           listTitles.sort((a, b) => a.localeCompare(b))
                            if (counter == listIdLength) {
                               that.setState({
                                  apiData: curApiData,

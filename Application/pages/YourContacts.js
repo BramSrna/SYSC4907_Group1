@@ -4,18 +4,18 @@ import {
    View,
    SectionList,
    StyleSheet,
-   Alert
+   Alert,
+   TouchableOpacity,
+   Image
 } from "react-native";
 // import styles from "./pageStyles/YourContactsPageStyle";
 import cf from "./Functions/ContactFunctions";
 import Menu from "./Menu"
 
-
-
 class YourContacts extends Component {
    constructor(props) {
       super(props);
-      this.state = { sections: [] };
+      this.state = { sections: [], groups: [] };
    }
 
    componentDidMount() {
@@ -39,8 +39,15 @@ class YourContacts extends Component {
       return (
          <React.Fragment>
             <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
+            <Text style={styles.pageTitle}>
+               All Contacts:
+            </Text>
+            <TouchableOpacity
+               onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })}
+            >
+               <Image source={require("../assets/icons/new.png")} />
+            </TouchableOpacity>
             <View>
-
                <SectionList style={styles.test}
                   ItemSeparatorComponent={this.FlatListItemSeparator}
                   sections={this.state.sections}
