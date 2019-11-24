@@ -7,6 +7,26 @@ import * as firebase from "firebase";
 class ContactFunctions {
    constructor() { }
 
+   TestNotification = (message) => {
+      let response = fetch('https://exp.host/--/api/v2/push/send', {
+         method: 'POST',
+         headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            to: 'ExponentPushToken[a-3hi7MEfJMYJiN8hM_D05]',
+            sound: 'default',
+            title: 'aTitle',
+            body: 'aBody'
+         })
+      });
+
+
+
+   }
+
+
    AddNewGroup(that, groupName, listOfGroups) {
       for (group in listOfGroups) {
          if (listOfGroups[group].label == groupName) {
@@ -14,9 +34,8 @@ class ContactFunctions {
          } else {
             var obj = { label: groupName, value: groupName };
             listOfGroups.push(obj);
-            that.newGroupName = "";
             that.setState({
-               isDialogVisible: false, group: obj, allGroups: listOfGroups
+               isDialogVisible: false, group: groupName, allGroups: listOfGroups
             });
          }
       }
@@ -29,6 +48,7 @@ class ContactFunctions {
                Alert.alert("The email you entered does not have an account with us!")
             } else {
                var uid = firebase.auth().currentUser.uid
+               var currentUserEmail = firebase.auth().currentUser.email.toString()
                firebase
                   .database()
                   .ref("/contacts/" + uid)
@@ -39,22 +59,48 @@ class ContactFunctions {
                            if (ssv[contact].email == email) {
                               if (ssv[contact].status == "sent") {
                                  Alert.alert("You have already sent a contact request to this person!")
+                                 return
                               } else if (ssv[contact].status == "contact") {
                                  Alert.alert("This person is already a contact of yours!")
+                                 return
                               } else if (ssv[contact].status == "pending") {
                                  Alert.alert("You have a contact request from this person pending!")
+                                 return
                               }
                            }
                         }
-                        // Send the contact request
-                        var push = firebase
+                        // Place contact request in your sent
+                        firebase
                            .database()
-                           .ref("/lists")
+                           .ref("/contacts/" + uid)
                            .push({
-                              name: listName,
-                              items: {},
-                              user_count: 1
+                              name: that.state.name,
+                              group: that.state.group,
+                              email: that.state.email,
+                              status: "sent"
                            });
+
+                        // Place contact request in other persons pending
+                        var userInfoKey = that.state.email.replace(/\./g, ",");
+                        firebase
+                           .database()
+                           .ref("/userInfo/" + userInfoKey)
+                           .once("value", function (snapshot) {
+                              if (snapshot.val().uid) {
+                                 firebase
+                                    .database()
+                                    .ref("/contacts/" + snapshot.val().uid)
+                                    .push({
+                                       name: "",
+                                       group: "",
+                                       email: currentUserEmail,
+                                       status: "pending"
+                                    });
+                              } else {
+                                 console.log("The app was not configured properly.")
+                              }
+                           });
+
                      } else {
                         console.log("User has no contacts")
                      }
@@ -77,17 +123,18 @@ class ContactFunctions {
             var groups = [];
             var groupNames = [];
             var groupedList = {};
+            var pendingList = {};
             var sections = [];
             snapshot.forEach(function (child) {
                if (child.val().status == "sent") { }
                else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
-                     groupedList["Pending"].push(child.val())
+                     pendingList["Pending"].push(child.val())
                   } else {
                      groups.push({ label: "Pending", value: "Pending" })
                      groupNames.push("Pending")
-                     groupedList["Pending"] = [];
-                     groupedList["Pending"].push(child.val())
+                     pendingList["Pending"] = [];
+                     pendingList["Pending"].push(child.val())
 
                   }
                } else {
@@ -107,6 +154,14 @@ class ContactFunctions {
                   }
                }
             });
+
+            for (var group in pendingList) {
+               var temp = [];
+               for (var person in pendingList[group]) {
+                  temp.push(pendingList[group][person]);
+               }
+               sections.push({ title: group, data: temp });
+            }
 
             for (var group in groupedList) {
                var temp = [];

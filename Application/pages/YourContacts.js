@@ -35,6 +35,10 @@ class YourContacts extends Component {
       );
    };
 
+   Temp() {
+      cf.TestNotification("Test")
+   }
+
    render() {
       return (
          <React.Fragment>
@@ -43,7 +47,7 @@ class YourContacts extends Component {
                All Contacts:
             </Text>
             <TouchableOpacity
-               onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })}
+               onPress={() => /*this.props.navigation.navigate("NewContact", { groups: this.state.groups })*/this.Temp()}
             >
                <Image source={require("../assets/icons/new.png")} />
             </TouchableOpacity>

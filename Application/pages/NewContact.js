@@ -36,8 +36,6 @@ class NewContact extends Component {
          isDialogVisible: false,
          allGroups: []
       };
-      this.newGroupName = "";
-      this.handleChangeGroup = this.handleChangeGroup.bind(this);
    }
 
    componentDidMount() {
@@ -51,12 +49,11 @@ class NewContact extends Component {
    }
 
    handleCancel = () => {
-      this.newGroupName = "";
-      this.setState({ isDialogVisible: false });
+      this.setState({ isDialogVisible: false, group: DEFAULT_GROUP });
    };
 
    handleCreate = () => {
-      cf.AddNewGroup(this, this.newGroupName, this.state.allGroups)
+      cf.AddNewGroup(this, this.state.group, this.state.allGroups)
    };
 
 
@@ -66,10 +63,6 @@ class NewContact extends Component {
       cf.SendContactRequest(this.state.email, this)
 
    };
-
-   setNewGroupName(name) {
-      this.newGroupName = name;
-   }
 
    renderRequiredText(bodyText, reqText = "(*)") {
       return (
@@ -99,7 +92,7 @@ class NewContact extends Component {
                         Enter the name of the new group you would like to create:
                </Dialog.Description>
                      <Dialog.Input
-                        onChangeText={name => this.setNewGroupName(name)}
+                        onChangeText={group => this.setState({ group })}
                      ></Dialog.Input>
                      <Dialog.Button label="Cancel" onPress={this.handleCancel} />
                      <Dialog.Button label="Create" onPress={this.handleCreate} />

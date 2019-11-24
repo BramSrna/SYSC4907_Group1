@@ -3,6 +3,9 @@ import { Text, View, TouchableHighlight } from "react-native";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import firebase from 'firebase';
 import Menu from "./Menu"
+import { Notifications } from 'expo'
+import * as Permissions from 'expo-permissions'
+
 
 const YOUR_LISTS = "Go To Your Lists Page"
 const CROWD_SOURCE = "Go To Crowd Source Page"
@@ -18,7 +21,7 @@ class HomePage extends Component {
     super(props);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
@@ -27,13 +30,40 @@ class HomePage extends Component {
       .database()
       .ref("/userInfo/" + emailId)
       .once("value", function (snapshot) {
-        if (!snapshot.val()) {
+        if (!snapshot.val().uid) {
           firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
-            console.log(snapshot);
+            // console.log(snapshot);
           });
         }
       });
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
 
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+
+    // Get the token that uniquely identifies this device
+    let token = await Notifications.getExpoPushTokenAsync();
+
+    try {
+      firebase.database().ref('/userInfo/' + emailId + '/notificationToken').set(token)
+
+    } catch (error) {
+      console.log(error)
+    }
 
   }
 
