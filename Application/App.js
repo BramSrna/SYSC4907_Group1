@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, SafeAreaView } from 'react-native';
+import { Image, Platform, StatusBar, StyleSheet, SafeAreaView, } from 'react-native';
 import { mapping, } from '@eva-design/eva';
 import { dark, light } from './assets/Themes.js';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
@@ -18,11 +18,12 @@ const themes = { light, dark };
 export default class App extends Component {
   constructor(props) {
     super(props);
+    global.theme = dark;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: light,
+      theme: global.theme,
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -49,6 +50,10 @@ export default class App extends Component {
     SplashScreen.preventAutoHide();
   }
 
+  componentWillUnmount() {
+    this.eventListener.remove();
+  }
+
   renderCurrentState() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
       return (
@@ -68,7 +73,7 @@ export default class App extends Component {
     }
     return (
       <Layout style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'ios' && <StatusBar barStyle={this.state.theme === light ? 'dark-content' : 'light-content'} />}
         {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
