@@ -2,7 +2,6 @@ import React from 'react';
 import { Image } from 'react-native';
 import { Icon } from 'react-native-ui-kitten';
 
-
 export const EmailIcon = (style) => (
     <Image
         style={style}
@@ -27,4 +26,8 @@ export const MoonOutline = (style) => (
 
 export const Moon = (style) => (
     <Icon {...style} name='moon' />
+);
+
+export const MenuIcon = (style) => (
+    <Icon {...style} name='more-vertical-outline' />
 );

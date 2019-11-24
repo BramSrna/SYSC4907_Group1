@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from './SideMenuStyle';
 import { NavigationActions } from 'react-navigation';
-import { ScrollView, View } from 'react-native';
-import { Layout, Text, Toggle } from 'react-native-ui-kitten';
+import { ScrollView, } from 'react-native';
+import { Layout, Text, } from 'react-native-ui-kitten';
 import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";
@@ -74,12 +74,6 @@ class SideMenu extends Component {
                     </Layout>
                 </ScrollView>
                 <Layout style={styles.footerContainer}>
-                    <Toggle style={styles.toggle}
-                        checked={this.state.darkMode}
-                        text='Dark Mode'
-                        size='small'
-                        onChange={this.onDarkModeToggle}
-                    />
                     <Layout>
                         <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
                     </Layout>

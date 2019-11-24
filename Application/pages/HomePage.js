@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import { Text, View, TouchableHighlight } from "react-native";
+import { StyleSheet } from 'react-native';
 import { Layout, TopNavigation, TopNavigationAction, OverflowMenu } from 'react-native-ui-kitten';
-import globalStyles from "../pages/pageStyles/GlobalStyle";
-import { MenuOutline, Moon, MoonOutline } from "../assets/icons/icons.js";
+import { MenuOutline, Moon, MoonOutline, MenuIcon } from "../assets/icons/icons.js";
+import { ScrollView } from "react-native-gesture-handler";
+import HomeSquareContainer from "../components/HomeSquareContainer.js";
 
 const PAGE_TITLE = "Home";
 
@@ -15,10 +16,13 @@ const CROWD_SOURCE_PAGE = "CrowdSourcePage";
 class HomePage extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      menuVisible: false,
+    };
   }
 
   menuData = [
-    { title: 'Dark Mode', icon: InfoIcon },
+    { title: 'Dark Mode', icon: MoonOutline },
   ];
 
   buttonListener = buttonId => {
@@ -47,9 +51,14 @@ class HomePage extends Component {
     </OverflowMenu>
   );
 
+  onMenuActionPress = () => {
+    const menuVisible = !this.state.menuVisible;
+    this.setState({ menuVisible });
+  };
+
   onMenuItemSelect = (index) => {
-    if(index = 1){
-      
+    if (index = 1) {
+      // do stuff
     }
 
     this.setState({ menuVisible: false });
@@ -64,29 +73,32 @@ class HomePage extends Component {
           leftControl={this.renderLeftMenuAction()}
           rightControls={this.renderRightMenuAction()}
         />
-        <Layout style={globalStyles.defaultContainer}>
-          <View style={globalStyles.defaultContainer}>
-            <Text style={globalStyles.whiteText}>HomePage</Text>
-
-            <TouchableHighlight
-              style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-              onPress={() => this.buttonListener(CROWD_SOURCE)}
-            >
-              <Text style={globalStyles.whiteText}>{CROWD_SOURCE}</Text>
-            </TouchableHighlight>
-
-            <TouchableHighlight
-              style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-              onPress={() => this.buttonListener(YOUR_LISTS)}
-            >
-              <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
-            </TouchableHighlight>
-          </View>
-        </Layout>
+        <ScrollView style={styles.scrollContainer}>
+          <Layout style={styles.container}>
+            <HomeSquareContainer name='Your Lists' icon='list-outline'/>
+            <HomeSquareContainer name='Your Contacts' icon='people-outline'/>
+            <HomeSquareContainer name='Find Stores' icon='map-outline'/>
+            <HomeSquareContainer name='Search Recipes' icon='search-outline'/>
+            <HomeSquareContainer name='Your Recommendations' icon='bulb-outline' sizeVal={2} />
+            <HomeSquareContainer name='Shared With You' icon='share-outline' sizeVal={2} />
+          </Layout>
+        </ScrollView>
       </React.Fragment>
 
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex:1,
+    height: '100%',
+    flexDirection:'row',
+    flexWrap:'wrap',
+  },
+  scrollContainer: {
+    flex:1,
+  },
+});
 
 export default HomePage;

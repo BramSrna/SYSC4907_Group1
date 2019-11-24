@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Image, Platform, StatusBar, StyleSheet, SafeAreaView } from 'react-native';
-import { mapping, light} from '@eva-design/eva';
-import { dark } from './assets/Themes.js';
+import { mapping, } from '@eva-design/eva';
+import { dark, light } from './assets/Themes.js';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
@@ -22,7 +22,7 @@ export default class App extends Component {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: 'dark',
+      theme: light,
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -49,11 +49,6 @@ export default class App extends Component {
     SplashScreen.preventAutoHide();
   }
 
-  toggleTheme = () => {
-    const nextTheme = this.state.theme === 'light' ? 'dark' : 'light';
-    this.setState({ theme: nextTheme });
-  };
-
   renderCurrentState() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
       return (
@@ -75,7 +70,7 @@ export default class App extends Component {
       <Layout style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
-        {(this.state.isAuthenticated) ? <MainDrawerNavigator toggleTheme={this.toggleTheme()}/> : <RootNavigation />}
+        {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
     );
   }
@@ -84,8 +79,8 @@ export default class App extends Component {
     return (
       <React.Fragment>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={themes[this.state.theme]}>
-          <SafeAreaView style={[styles.container, {backgroundColor: this.state.theme == 'light' ? light["background-basic-color-1"] : dark["background-basic-color-1"]}]}>
+        <ApplicationProvider mapping={mapping} theme={this.state.theme}>
+          <SafeAreaView style={[styles.container, { backgroundColor: this.state.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
             {this.renderCurrentState()}
           </SafeAreaView>
         </ApplicationProvider>
@@ -115,10 +110,8 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
   },
   statusBarUnderlay: {
     height: 24,
-    backgroundColor: 'rgba(0,0,0,0.2)',
   },
 });
