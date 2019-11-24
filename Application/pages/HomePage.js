@@ -58,7 +58,7 @@ class HomePage extends Component {
 
   onMenuItemSelect = (index) => {
     if (index = 1) {
-      // do stuff
+      // TODO: add toggle theme function
     }
 
     this.setState({ menuVisible: false });

@@ -4,8 +4,6 @@ export default {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'stretch',
-        paddingVertical: 4,
-        paddingHorizontal: 4,
       },
     container: {
         flex: 1,

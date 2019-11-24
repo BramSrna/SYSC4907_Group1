@@ -41,13 +41,15 @@ class SideMenu extends Component {
 
     render() {
         return (
-            <Layout style={styles.columnContainer}>
+            <Layout style={styles.columnContainer} level='2'>
                 <ScrollView style={styles.container}>
                     <Layout style={styles.columnContainer}>
-                        <Text style={styles.sectionHeadingStyle}>
-                            {YOUR_DATA}
-                        </Text>
-                        <Layout style={styles.navSectionStyle}>
+                        <Layout level='4'>
+                            <Text style={styles.sectionHeadingStyle}>
+                                {YOUR_DATA}
+                            </Text>
+                        </Layout>
+                        <Layout style={styles.navSectionStyle} level='3'>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
                                 {HOME}
                             </Text>
@@ -57,10 +59,12 @@ class SideMenu extends Component {
                         </Layout>
                     </Layout>
                     <Layout style={styles.columnContainer}>
-                        <Text style={styles.sectionHeadingStyle}>
-                            {FEEDBACK}
-                        </Text>
-                        <Layout style={styles.navSectionStyle}>
+                        <Layout level='4'>
+                            <Text style={styles.sectionHeadingStyle}>
+                                {FEEDBACK}
+                            </Text>
+                        </Layout>
+                        <Layout style={styles.navSectionStyle} level='3'>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('AddItemLocationPage')}>
                                 {ADD_ITEM_LOCATION}
                             </Text>
@@ -74,7 +78,7 @@ class SideMenu extends Component {
                     </Layout>
                 </ScrollView>
                 <Layout style={styles.footerContainer}>
-                    <Layout>
+                    <Layout level='3'>
                         <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
                     </Layout>
                 </Layout>
