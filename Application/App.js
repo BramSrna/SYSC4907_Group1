@@ -72,7 +72,7 @@ export default class App extends Component {
       );
     }
     return (
-      <Layout style={styles.container}>
+      <Layout style={[styles.container, { backgroundColor: this.state.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
         {Platform.OS === 'ios' && <StatusBar barStyle={this.state.theme === light ? 'dark-content' : 'light-content'} />}
         {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}

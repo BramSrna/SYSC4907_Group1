@@ -14,7 +14,7 @@ const CROWD_SOURCE = "Go To Crowd Source Page";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
 
-const MARGIN_RATIO = 30;
+const MARGIN_RATIO = 30; // higher number = smaller margin
 
 class HomePage extends Component {
   constructor(props) {
