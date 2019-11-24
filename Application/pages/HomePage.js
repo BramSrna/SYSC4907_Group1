@@ -7,13 +7,8 @@ import { ScrollView } from "react-native-gesture-handler";
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
 
 const PAGE_TITLE = "Home";
-
-const YOUR_LISTS = "Go To Your Lists Page";
-const CROWD_SOURCE = "Go To Crowd Source Page";
-
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
-
 const MARGIN_RATIO = 30; // higher number = smaller margin
 
 class HomePage extends Component {
@@ -35,7 +30,7 @@ class HomePage extends Component {
   }
 
   menuData = [
-    { title: 'Dark Mode', icon: MoonOutline },
+    { title: global.theme == light ? 'Dark Mode' : 'Light Mode', icon: global.theme == light ? Moon : MoonOutline },
   ];
 
   calcMarginValue = (deviceWidth, tpr) => {
@@ -47,14 +42,6 @@ class HomePage extends Component {
     marginValue = deviceWidth / (tpr * MARGIN_RATIO);
     sizeValue = (deviceWidth - marginValue * (tpr * 2)) / tpr;
     return sizeValue;
-  };
-
-  buttonListener = buttonId => {
-    if (buttonId == CROWD_SOURCE) {
-      this.props.navigation.navigate(CROWD_SOURCE_PAGE);
-    } else if (buttonId == YOUR_LISTS) {
-      this.props.navigation.navigate(YOUR_LISTS_PAGE);
-    }
   };
 
   renderLeftMenuAction = () => (
@@ -81,7 +68,7 @@ class HomePage extends Component {
   };
 
   onMenuItemSelect = (index) => {
-    if (index = 0) {
+    if (index = 1) {
       global.theme = global.theme == light ? dark : light;
     }
     this.setState({ menuVisible: false });
