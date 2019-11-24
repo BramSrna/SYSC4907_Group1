@@ -23,7 +23,6 @@ export default {
     sectionHeadingStyle: {
         paddingVertical: 10,
         paddingHorizontal: 10,
-        color: 'white',
         fontWeight: 'bold',
         fontSize: 20
     },

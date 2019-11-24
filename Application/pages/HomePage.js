@@ -75,16 +75,16 @@ class HomePage extends Component {
         />
         <ScrollView style={styles.scrollContainer}>
           <Layout style={styles.container}>
-            <HomeSquareContainer name='Your Lists' icon='list-outline'/>
+            <HomeSquareContainer name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)}/>
             <HomeSquareContainer name='Your Contacts' icon='people-outline'/>
             <HomeSquareContainer name='Find Stores' icon='map-outline'/>
             <HomeSquareContainer name='Search Recipes' icon='search-outline'/>
             <HomeSquareContainer name='Your Recommendations' icon='bulb-outline' sizeVal={2} />
-            <HomeSquareContainer name='Shared With You' icon='share-outline' sizeVal={2} />
+            <HomeSquareContainer name='Shared With You' icon='share-outline' />
+            <HomeSquareContainer name='Crowd-Source' icon='loader-outline' onPress={() => this.props.navigation.navigate(CROWD_SOURCE_PAGE)}/>
           </Layout>
         </ScrollView>
       </React.Fragment>
-
     );
   }
 }
