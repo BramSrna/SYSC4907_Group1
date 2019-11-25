@@ -39,6 +39,7 @@ class YourContacts extends Component {
       cf.TestNotification("Test")
    }
 
+
    render() {
       return (
          <React.Fragment>
@@ -58,18 +59,41 @@ class YourContacts extends Component {
                   renderSectionHeader={({ section }) => (
                      <Text style={styles.SectionHeaderStyle}> {section.title} </Text>
                   )}
-                  renderItem={({ item }) => (
-                     // Single Comes here which will be repeatative for the FlatListItems
-                     <Text
-                        style={styles.SectionListItemStyle}
-                        //Item Separator View
-                        onPress={this.GetSectionListItem.bind(
-                           this,
-                           ' Name: ' + item.name
-                        )}>
-                        {item.name}
-                     </Text>
-                  )}
+                  renderItem={({ item }) => {
+                     if (item.status == "contact") {
+                        return <React.Fragment><Text
+                           style={styles.SectionListItemStyle}
+                           //Item Separator View
+                           onPress={this.GetSectionListItem.bind(
+                              this,
+                              ' Name: ' + item.name
+                           )}>
+                           {item.name}
+                        </Text></React.Fragment>
+                     } else if (item.status == "pending") {
+                        return <React.Fragment><View style={{ flexDirection: 'row', backgroundColor: '#F5F5F5' }}>
+                           <Text
+                              style={styles.SectionListItemStyle}
+                              //Item Separator View
+                              onPress={this.GetSectionListItem.bind(
+                                 this,
+                                 ' Email: ' + item.email
+                              )}>
+                              {item.email}
+                           </Text>
+                           <TouchableOpacity style={styles.acceptDeny}
+                              onPress={() => Alert.alert("Accpet")}
+                           >
+                              <Image source={require("../assets/icons/accept.png")} />
+                           </TouchableOpacity>
+                           <TouchableOpacity style={styles.acceptDeny}
+                              onPress={() => Alert.alert("Cancel")}
+                           >
+                              <Image source={require("../assets/icons/cancel.png")} />
+                           </TouchableOpacity></View></React.Fragment>
+                     }
+
+                  }}
                   keyExtractor={(item, index) => index}
                />
             </View>
@@ -96,5 +120,10 @@ const styles = StyleSheet.create({
       color: '#000',
       backgroundColor: '#F5F5F5',
    },
+   acceptDeny: {
+      padding: 15,
+      backgroundColor: '#F5F5F5',
+
+   }
 });
 export default YourContacts;
