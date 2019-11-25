@@ -31,3 +31,11 @@ export const Moon = (style) => (
 export const MenuIcon = (style) => (
     <Icon {...style} name='more-vertical-outline' />
 );
+
+export const Trash2Icon = (style) => (
+    <Icon {...style} name='trash-2-outline' />
+);
+
+export const FolderRemoveIcon = (style) => (
+    <Icon {...style} name='folder-remove-outline' />
+);

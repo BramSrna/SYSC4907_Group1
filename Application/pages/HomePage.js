@@ -5,6 +5,7 @@ import { MenuOutline, Moon, MoonOutline, MenuIcon } from "../assets/icons/icons.
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
+import {theme} from '../global.js';
 
 const PAGE_TITLE = "Home";
 const YOUR_LISTS_PAGE = "YourListsPage";
@@ -30,7 +31,7 @@ class HomePage extends Component {
   }
 
   menuData = [
-    { title: global.theme == light ? 'Dark Mode' : 'Light Mode', icon: global.theme == light ? Moon : MoonOutline },
+    { title: theme == light ? 'Dark Mode' : 'Light Mode', icon: theme == light ? Moon : MoonOutline },
   ];
 
   calcMarginValue = (deviceWidth, tpr) => {
@@ -69,7 +70,7 @@ class HomePage extends Component {
 
   onMenuItemSelect = (index) => {
     if (index = 1) {
-      global.theme = global.theme == light ? dark : light;
+      theme = theme == light ? dark : light;
     }
     this.setState({ menuVisible: false });
   };
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"]
+    backgroundColor: theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"]
   },
 });
 

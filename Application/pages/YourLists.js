@@ -13,6 +13,7 @@ import styles from "./pageStyles/YourListsPageStyle";
 import Swipeout from "react-native-swipeout";
 import Dialog from "react-native-dialog";
 import lf from "./ListFunctions";
+import ListItemContainer from '../components/ListItemContainer.js';
 
 const PAGE_TITLE = "Your Lists";
 
@@ -93,18 +94,19 @@ class YourLists extends Component {
       const swipeButtons = [
          {
             component: (
-               <View
+               <Layout
                   style={{
                      flex: 1,
                      alignItems: "center",
                      justifyContent: "center",
-                     flexDirection: "column"
+                     backgroundColor: "red",
+                     flexDirection: "column",
+                     backgroundColor: "red",
                   }}
                >
-                  <Image source={require("../assets/icons/delete.png")} />
-               </View>
+                  <Icon name='trash-2-outline' width={30} height={30} />
+               </Layout>
             ),
-            backgroundColor: "red",
             onPress: () => {
                lf.DeleteList(this.state.apiData[this.state.activeRow].key);
             }
@@ -117,8 +119,8 @@ class YourLists extends Component {
                alignment='center'
                leftControl={this.renderMenuAction()}
             />
-            <View style={styles.ListContainer}>
-               <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
+            <Layout style={styles.ListContainer}>
+               {/* <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
                   <Dialog.Title>New List</Dialog.Title>
                   <Dialog.Description>
                      Enter the name of the new list you would like to create:
@@ -128,42 +130,42 @@ class YourLists extends Component {
                   ></Dialog.Input>
                   <Dialog.Button label="Cancel" onPress={this.handleCancel} />
                   <Dialog.Button label="Create" onPress={this.handleCreate} />
-               </Dialog.Container>
-               <Text style={styles.pageTitle}>
+               </Dialog.Container> */}
+               {/* <Text style={styles.pageTitle}>
                   All Lists: {this.state.listTitles.length}
                </Text>
                <TouchableOpacity
                   onPress={() => this.setState({ isDialogVisible: true })}
                >
                   <Image source={require("../assets/icons/new.png")} />
-               </TouchableOpacity>
+               </TouchableOpacity> */}
                <FlatList
+                  contentContainerStyle={{ paddingBottom: 34 }}
                   style={styles.flatList}
                   data={this.state.listTitles}
                   width="100%"
                   extraData={this.state.activeRow}
                   keyExtractor={index => index.toString()}
-                  ItemSeparatorComponent={this.FlatListItemSeparator}
                   renderItem={({ item, index }) => (
-                     <Swipeout
-                        right={swipeButtons}
-                        backgroundColor="#000000"
-                        underlayColor="white"
-                        rowID={index}
-                        sectionId={1}
-                        autoClose={true}
-                        onOpen={(secId, rowId, direction) =>
-                           this.handleSwipeOpen(rowId, direction)
-                        }
-                        close={this.state.activeRow !== index}
-                     >
-                        <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
-                           <Text style={styles.item}>{item}</Text>
-                        </TouchableOpacity>
-                     </Swipeout>
+                     <ListItemContainer name={item} onPress={this.GoToList.bind(this, item)} />
+                     // <Swipeout
+                     //    right={swipeButtons}
+                     //    backgroundColor="#000000"
+                     //    rowID={index}
+                     //    sectionId={1}
+                     //    autoClose={true}
+                     //    onOpen={(secId, rowId, direction) =>
+                     //       this.handleSwipeOpen(rowId, direction)
+                     //    }
+                     //    close={this.state.activeRow !== index}
+                     // >
+                     //    <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
+                     //       <Text style={styles.item}>{item}</Text>
+                     //    </TouchableOpacity>
+                     // </Swipeout>
                   )}
                />
-            </View>
+            </Layout>
          </React.Fragment>
       );
    }
