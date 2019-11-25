@@ -5,7 +5,6 @@ import { MenuOutline, Moon, MoonOutline, MenuIcon } from "../assets/icons/icons.
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
-import {theme} from '../global.js';
 
 const PAGE_TITLE = "Home";
 const YOUR_LISTS_PAGE = "YourListsPage";
@@ -31,7 +30,7 @@ class HomePage extends Component {
   }
 
   menuData = [
-    { title: theme == light ? 'Dark Mode' : 'Light Mode', icon: theme == light ? Moon : MoonOutline },
+    { title: global.theme == light ? 'Dark Mode' : 'Light Mode', icon: global.theme == light ? Moon : MoonOutline },
   ];
 
   calcMarginValue = (deviceWidth, tpr) => {
@@ -51,6 +50,7 @@ class HomePage extends Component {
 
   renderRightMenuAction = () => (
     <OverflowMenu
+      style={styles.overflowMenu}
       visible={this.state.menuVisible}
       data={this.menuData}
       placement='bottom end'
@@ -70,12 +70,13 @@ class HomePage extends Component {
 
   onMenuItemSelect = (index) => {
     if (index = 1) {
-      theme = theme == light ? dark : light;
+      this.setState({ theme: global.theme == light ? dark : light });
     }
     this.setState({ menuVisible: false });
   };
 
   render() {
+    global.theme = global.theme;
     aspectRatio = this.state.height / this.state.width;
     gridShape = aspectRatio > 1.6 ? 2 : 4;
     marginValue = this.calcMarginValue(this.state.width, gridShape);
@@ -88,7 +89,7 @@ class HomePage extends Component {
           leftControl={this.renderLeftMenuAction()}
           rightControls={this.renderRightMenuAction()}
         />
-        <ScrollView style={styles.scrollContainer}>
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme === light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' />
@@ -113,7 +114,13 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    backgroundColor: theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"]
+  },
+  overflowMenu: {
+    padding: 4,
+    shadowColor: 'black',
+    shadowOpacity: .5,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
   },
 });
 

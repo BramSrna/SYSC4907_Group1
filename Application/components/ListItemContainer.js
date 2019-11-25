@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         margin: 4,
         shadowColor: 'black',
         shadowOpacity: .20,
-        shadowOffset: { width: 0, height: 4, },
+        shadowOffset: { width: 0, height: 0, },
         elevation: 4,
     },
     listItemContainer: {
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
         padding:4,
         shadowColor: 'black',
         shadowOpacity: .5,
-        shadowOffset: { width: 8, height: 8},
+        shadowOffset: { width: 0, height: 0},
         elevation: 8,
     },
 });

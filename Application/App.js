@@ -11,7 +11,6 @@ import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
 import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
-import {theme} from './global.js';
 import _ from 'lodash';
 
 const themes = { light, dark };
@@ -19,11 +18,12 @@ const themes = { light, dark };
 export default class App extends Component {
   constructor(props) {
     super(props);
+    global.theme = light;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: theme,
+      theme: global.theme,
     };
 
     //Temprory Solution to remove Timer warning on android

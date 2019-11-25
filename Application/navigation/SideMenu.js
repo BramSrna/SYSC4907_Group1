@@ -18,15 +18,7 @@ const SIGNOUT = "Sign Out";
 class SideMenu extends Component {
     constructor(props) {
         super(props)
-        this.state = {
-            darkMode: false,
-        };
     }
-
-    onDarkModeToggle = (darkMode) => {
-        this.setState({ darkMode });
-        this.props.toggleTheme();
-    };
 
     navigateToScreen = (route) => () => {
         if (route == 'Logout') {
