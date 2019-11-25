@@ -60,6 +60,10 @@ class YourLists extends Component {
       this.newListName = name;
    }
 
+   deleteListWithID(id){
+      lf.DeleteList(id);
+   }
+
    renderModalElement = () => {
       return (
          <Layout
@@ -170,7 +174,7 @@ class YourLists extends Component {
                   extraData={this.state.activeRow}
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
-                     <ListItemContainer name={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={() => { lf.DeleteList() }} />
+                     <ListItemContainer name={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                      // <Swipeout
                      //    right={swipeButtons}
                      //    backgroundColor="#000000"

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, } from 'react-native';
 import { Layout, ListItem, Text, Icon, OverflowMenu, Button, TopNavigationAction } from 'react-native-ui-kitten';
-import { Trash2Icon, FolderRemoveIcon } from "../assets/icons/icons.js";
+import { ShareIcon } from "../assets/icons/icons.js";
 
 /**
  * ListItemContainer - A simple list item container designed to be used within lists
@@ -24,7 +24,7 @@ export default class ListItemContainer extends Component {
     }
 
     menuData = [
-        { title: 'Delete', icon: Trash2Icon },
+        { title: 'Share', icon: ShareIcon },
     ];
 
     onMenuActionPress = () => {
@@ -33,20 +33,20 @@ export default class ListItemContainer extends Component {
     };
 
     onSelectMenuItem =() => {
-        this.props.onDelete(this.props.listID);
+        this.onMenuActionPress;
     };
 
     render() {
-        const { name = 'Lorem Ipsum', icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevel = '2', sizeValue = 200, marginValue = 8 } = this.props;
+        const { name = 'Lorem Ipsum', icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '2'} = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
         return (
-            <Layout style={styles.outerContainer} level='2'>
-                <Layout style={styles.listItemContainer} level='2'>
+            <Layout style={styles.outerContainer} level={backgroundLevelOuter}>
+                <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
                     <ListItem style={styles.listItemContainer} title={name} onPress={this.props.onPress} />
                 </Layout>
-                <Layout style={styles.optionButtonContainer} level='2'>
+                <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
                     <OverflowMenu
                         style={styles.overflowMenu}
                         visible={this.state.menuVisible}
