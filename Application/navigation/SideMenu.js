@@ -36,7 +36,7 @@ class SideMenu extends Component {
             <Layout style={styles.columnContainer} level='2'>
                 <ScrollView style={styles.container}>
                     <Layout style={styles.columnContainer}>
-                        <Layout level='4'>
+                        <Layout style={styles.headingContainer} level='4'>
                             <Text style={styles.sectionHeadingStyle}>
                                 {YOUR_DATA}
                             </Text>
@@ -51,7 +51,7 @@ class SideMenu extends Component {
                         </Layout>
                     </Layout>
                     <Layout style={styles.columnContainer}>
-                        <Layout level='4'>
+                        <Layout style={styles.headingContainer} level='4'>
                             <Text style={styles.sectionHeadingStyle}>
                                 {FEEDBACK}
                             </Text>
@@ -69,7 +69,7 @@ class SideMenu extends Component {
                         </Layout>
                     </Layout>
                 </ScrollView>
-                <Layout style={styles.footerContainer}>
+                <Layout style={styles.footerContainer} level='3'>
                     <Layout level='3'>
                         <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
                     </Layout>

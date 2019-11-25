@@ -1,12 +1,15 @@
 export default {
-      columnContainer: {
+    columnContainer: {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'stretch',
-      },
+    },
     container: {
         flex: 1,
+    },
+    headingContainer: {
+        padding: 4,
     },
     fillContainer: {
         flex: 1,
@@ -25,8 +28,9 @@ export default {
         fontSize: 20
     },
     footerContainer: {
+        paddingVertical: 4,
     },
-    toggle:{
+    toggle: {
         padding: 10,
         alignSelf: 'flex-start',
     },
