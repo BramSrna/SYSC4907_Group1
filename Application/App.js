@@ -18,7 +18,7 @@ const themes = { light, dark };
 export default class App extends Component {
   constructor(props) {
     super(props);
-    global.theme = dark;
+    global.theme = light;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,

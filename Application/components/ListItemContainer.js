@@ -37,14 +37,14 @@ export default class ListItemContainer extends Component {
     };
 
     render() {
-        const { name = 'Lorem Ipsum', icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '2'} = this.props;
+        const { name = 'Lorem Ipsum', detail="", icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '2'} = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
         return (
             <Layout style={styles.outerContainer} level={backgroundLevelOuter}>
                 <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
-                    <ListItem style={styles.listItemContainer} title={name} onPress={this.props.onPress} />
+                    <ListItem style={styles.listItemContainer} title={name} description={detail} onPress={this.props.onPress} />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
                     <OverflowMenu

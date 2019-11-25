@@ -174,7 +174,7 @@ class YourLists extends Component {
                   extraData={this.state.activeRow}
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
-                     <ListItemContainer name={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
+                     <ListItemContainer name={item} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                      // <Swipeout
                      //    right={swipeButtons}
                      //    backgroundColor="#000000"
