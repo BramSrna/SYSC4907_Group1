@@ -1,10 +1,11 @@
 import * as firebase from "firebase";
+import { dark, light } from '../assets/Themes.js';
 
 /**
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() {}
+   constructor() { }
 
    /**
     * This function is used to add items to a list.
@@ -49,7 +50,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/lists/" + listId + "/items/" + itemId)
-         .once("value", function(snapshot) {
+         .once("value", function (snapshot) {
             var currentBool = snapshot.val().purchased;
             firebase
                .database()
@@ -69,7 +70,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/lists/" + listId)
-         .on("value", function(snapshot) {
+         .on("value", function (snapshot) {
             var items = [];
             var ids = [];
             var ssv = snapshot.val();
@@ -95,7 +96,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .once("value", function(snapshot) {
+         .once("value", function (snapshot) {
             if (snapshot.val()) {
                // Remove from the user created section if exists
                var createdLists = snapshot.val().created;
@@ -109,7 +110,7 @@ class ListFunctions {
                      firebase
                         .database()
                         .ref("/lists/" + cList)
-                        .once("value", function(snapshot) {
+                        .once("value", function (snapshot) {
                            if (snapshot.val()) {
                               if (snapshot.val().user_count == 1) {
                                  firebase
@@ -144,7 +145,7 @@ class ListFunctions {
                      firebase
                         .database()
                         .ref("/lists/" + sList)
-                        .once("value", function(snapshot) {
+                        .once("value", function (snapshot) {
                            if (snapshot.val()) {
                               if (snapshot.val().user_count == 1) {
                                  firebase
@@ -193,7 +194,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => {})
+         .then(data => { })
          .catch(error => {
             console.log("Failed to create list: " + error);
          });
@@ -208,7 +209,7 @@ class ListFunctions {
       firebase
          .database()
          .ref("/users/" + uid + "/lists")
-         .on("value", function(snapshot) {
+         .on("value", function (snapshot) {
             listIds = [];
             var ssv = snapshot.val();
             if (ssv) {
@@ -230,7 +231,7 @@ class ListFunctions {
                   firebase
                      .database()
                      .ref("/lists/" + currentListId)
-                     .once("value", function(snapshot) {
+                     .once("value", function (snapshot) {
                         var ssv = snapshot.val();
                         if (ssv) {
                            curApiData.push({
@@ -269,6 +270,40 @@ class ListFunctions {
                });
             }
          });
+   }
+
+   /**
+    * Get the current theme of the user
+    * @param {*} that: this for caller
+    */
+   GetTheme(that) {
+      var uid = firebase.auth().currentUser.uid;
+
+      firebase
+         .database()
+         .ref("/users/" + uid + "/preferences/theme")
+         .on("value", function (snapshot) {
+            var ssv = snapshot.val();
+            that.setState({
+               theme: ssv == 'light' ? light : dark,
+            });
+         });
+   }
+
+   /**
+    * Toggle the current theme of the user
+    * @param {*} that: this for caller
+    */
+   ToggleTheme() {
+      var uid = firebase.auth().currentUser.uid;
+      var ssv;
+      firebase
+         .database()
+         .ref("/users/" + uid + "/preferences/theme")
+         .once("value", function (snapshot) {
+            ssv = snapshot.val();
+         });
+      return firebase.database().ref("/users/" + uid + "/preferences/theme").set(ssv == 'light' ? 'dark' : 'light');
    }
 }
 

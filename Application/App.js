@@ -11,6 +11,7 @@ import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
 import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
+import lf from './pages/ListFunctions.js';
 import _ from 'lodash';
 
 const themes = { light, dark };
@@ -18,12 +19,11 @@ const themes = { light, dark };
 export default class App extends Component {
   constructor(props) {
     super(props);
-    global.theme = light;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: global.theme,
+      theme: light,
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -44,6 +44,8 @@ export default class App extends Component {
   onAuthStateChanged = (user) => {
     this.setState({ isAuthProcessReady: true });
     this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
+
+    lf.GetTheme(this);
   }
 
   componentDidMount() {
