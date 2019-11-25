@@ -12,8 +12,6 @@ const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
 const MARGIN_RATIO = 30; // higher number = smaller margin
 
-var currTheme = light;
-
 class HomePage extends Component {
   constructor(props) {
     super(props);
@@ -21,10 +19,8 @@ class HomePage extends Component {
       width: Dimensions.get("window").width,
       height: Dimensions.get("window").height,
       menuVisible: false,
-      theme: light,
     };
     this.onLayout = this.onLayout.bind(this);
-    lf.GetTheme(this);
   }
 
   onLayout(e) {
@@ -35,7 +31,7 @@ class HomePage extends Component {
   }
 
   menuData = [
-    { title: currTheme == light ? 'Dark Mode' : 'Light Mode', icon: currTheme == light ? Moon : MoonOutline },
+    { title: global.theme == light ? 'Dark Mode' : 'Light Mode', icon: global.theme == light ? Moon : MoonOutline },
   ];
 
   calcMarginValue = (deviceWidth, tpr) => {
@@ -81,7 +77,6 @@ class HomePage extends Component {
   };
 
   render() {
-    currTheme =this.state.theme;
     aspectRatio = this.state.height / this.state.width;
     gridShape = aspectRatio > 1.6 ? 2 : 4;
     marginValue = this.calcMarginValue(this.state.width, gridShape);
@@ -94,7 +89,7 @@ class HomePage extends Component {
           leftControl={this.renderLeftMenuAction()}
           rightControls={this.renderRightMenuAction()}
         />
-        <ScrollView style={[styles.scrollContainer, { backgroundColor: this.state.theme === light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' />

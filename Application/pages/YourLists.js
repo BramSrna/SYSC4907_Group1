@@ -60,7 +60,7 @@ class YourLists extends Component {
       this.newListName = name;
    }
 
-   deleteListWithID(id){
+   deleteListWithID = (id) => {
       lf.DeleteList(id);
    }
 
@@ -90,27 +90,26 @@ class YourLists extends Component {
    };
 
    render() {
-      // const swipeButtons = [
-      //    {
-      //       component: (
-      //          <Layout
-      //             style={{
-      //                flex: 1,
-      //                alignItems: "center",
-      //                justifyContent: "center",
-      //                backgroundColor: "red",
-      //                flexDirection: "column",
-      //                backgroundColor: "red",
-      //             }}
-      //          >
-      //             <Icon name='trash-2-outline' width={30} height={30} />
-      //          </Layout>
-      //       ),
-      //       onPress: () => {
-      //          lf.DeleteList(this.state.apiData[this.state.activeRow].key);
-      //       }
-      //    }
-      // ];
+      const swipeButtons = [
+         {
+            component: (
+               <Layout
+                  style={{
+                     flex: 1,
+                     alignItems: "center",
+                     justifyContent: "center",
+                     backgroundColor: "red",
+                     flexDirection: "column",
+                  }}
+               >
+                  <Icon name='trash-2-outline' width={30} height={30} />
+               </Layout>
+            ),
+            onPress: () => {
+               lf.DeleteList(this.state.apiData[this.state.activeRow].key);
+            }
+         }
+      ];
 
       const AddIcon = (style) => (
          <Icon {...style} name='plus-outline' />
@@ -146,28 +145,8 @@ class YourLists extends Component {
                      {this.renderModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
-
-               {/* <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
-                  <Dialog.Title>New List</Dialog.Title>
-                  <Dialog.Description>
-                     Enter the name of the new list you would like to create:
-               </Dialog.Description>
-                  <Dialog.Input
-                     onChangeText={name => this.setNewListName(name)}
-                  ></Dialog.Input>
-                  <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-                  <Dialog.Button label="Create" onPress={this.handleCreate} />
-               </Dialog.Container> */}
-               {/* <Text style={styles.pageTitle}>
-                  All Lists: {this.state.listTitles.length}
-               </Text>
-               <TouchableOpacity
-                  onPress={() => this.setState({ isDialogVisible: true })}
-               >
-                  <Image source={require("../assets/icons/new.png")} />
-               </TouchableOpacity> */}
                <FlatList
-                  contentContainerStyle={{ paddingBottom: 34 }}
+                  contentContainerStyle={{ paddingBottom: 34 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}
                   data={this.state.listTitles}
                   width="100%"
@@ -175,21 +154,6 @@ class YourLists extends Component {
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
                      <ListItemContainer name={item} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
-                     // <Swipeout
-                     //    right={swipeButtons}
-                     //    backgroundColor="#000000"
-                     //    rowID={index}
-                     //    sectionId={1}
-                     //    autoClose={true}
-                     //    onOpen={(secId, rowId, direction) =>
-                     //       this.handleSwipeOpen(rowId, direction)
-                     //    }
-                     //    close={this.state.activeRow !== index}
-                     // >
-                     //    <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
-                     //       <Text style={styles.item}>{item}</Text>
-                     //    </TouchableOpacity>
-                     // </Swipeout>
                   )}
                />
             </Layout>
@@ -236,7 +200,7 @@ const styles = StyleSheet.create({
       padding: 16,
    },
    modal: {
-
+      paddingBottom: 300, // TODO: Make this dynamic...
    },
    input: {
       flexDirection: 'row',

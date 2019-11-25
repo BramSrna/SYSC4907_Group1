@@ -1,5 +1,4 @@
 import * as firebase from "firebase";
-import { dark, light } from '../assets/Themes.js';
 
 /**
  * This class contains all the functions that the UI uses to manipulate the database.
@@ -278,16 +277,17 @@ class ListFunctions {
     */
    GetTheme(that) {
       var uid = firebase.auth().currentUser.uid;
-
-      firebase
-         .database()
-         .ref("/users/" + uid + "/preferences/theme")
-         .on("value", function (snapshot) {
-            var ssv = snapshot.val();
-            that.setState({
-               theme: ssv == 'light' ? light : dark,
+      if (uid) {
+         firebase
+            .database()
+            .ref("/users/" + uid + "/preferences/theme")
+            .on("value", function (snapshot) {
+               var ssv = snapshot.val();
+               that.setState({
+                  theme: ssv == 'light' ? 'light' : 'dark',
+               });
             });
-         });
+      }
    }
 
    /**
@@ -297,13 +297,15 @@ class ListFunctions {
    ToggleTheme() {
       var uid = firebase.auth().currentUser.uid;
       var ssv;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/preferences/theme")
-         .once("value", function (snapshot) {
-            ssv = snapshot.val();
-         });
-      return firebase.database().ref("/users/" + uid + "/preferences/theme").set(ssv == 'light' ? 'dark' : 'light');
+      if (uid) {
+         firebase
+            .database()
+            .ref("/users/" + uid + "/preferences/theme")
+            .once("value", function (snapshot) {
+               ssv = snapshot.val();
+            });
+         return firebase.database().ref("/users/" + uid + "/preferences/theme").set(ssv == 'light' ? 'dark' : 'light');
+      } else null;
    }
 }
 

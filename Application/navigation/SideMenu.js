@@ -22,12 +22,21 @@ class SideMenu extends Component {
 
     navigateToScreen = (route) => () => {
         if (route == 'Logout') {
-            firebase.auth().signOut();
+            this.signOutUser();
         } else {
             const navigateAction = NavigationActions.navigate({
                 routeName: route
             });
             this.props.navigation.dispatch(navigateAction);
+        }
+    }
+
+    signOutUser = async () => {
+        try {
+            await firebase.auth().signOut();
+            navigate('Auth');
+        } catch (e) {
+            console.log(e);
         }
     }
 

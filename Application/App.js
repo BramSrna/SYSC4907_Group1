@@ -19,11 +19,12 @@ const themes = { light, dark };
 export default class App extends Component {
   constructor(props) {
     super(props);
+    global.theme = light;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: light,
+      theme: 'light',
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -45,7 +46,9 @@ export default class App extends Component {
     this.setState({ isAuthProcessReady: true });
     this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
 
-    lf.GetTheme(this);
+    if (this.state.isAuthenticated) {
+      lf.GetTheme(this);
+    }
   }
 
   componentDidMount() {
@@ -75,7 +78,7 @@ export default class App extends Component {
     }
     return (
       <Layout style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle={this.state.theme === light ? 'dark-content' : 'light-content'} />}
+        {Platform.OS === 'ios' && <StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />}
         {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
@@ -83,11 +86,12 @@ export default class App extends Component {
   }
 
   render() {
+    global.theme = this.state.theme == 'light' ? light : dark;
     return (
       <React.Fragment>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={mapping} theme={this.state.theme}>
-          <SafeAreaView style={[styles.container, { backgroundColor: this.state.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+        <ApplicationProvider mapping={mapping} theme={global.theme}>
+          <SafeAreaView style={[styles.container, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
             {this.renderCurrentState()}
           </SafeAreaView>
         </ApplicationProvider>

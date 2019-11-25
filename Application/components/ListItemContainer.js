@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, } from 'react-native';
+import { StyleSheet, ToastAndroid } from 'react-native';
 import { Layout, ListItem, Text, Icon, OverflowMenu, Button, TopNavigationAction } from 'react-native-ui-kitten';
-import { ShareIcon } from "../assets/icons/icons.js";
+import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
 /**
  * ListItemContainer - A simple list item container designed to be used within lists
@@ -25,6 +25,7 @@ export default class ListItemContainer extends Component {
 
     menuData = [
         { title: 'Share', icon: ShareIcon },
+        { title: 'Delete', icon: Trash2Icon },
     ];
 
     onMenuActionPress = () => {
@@ -32,19 +33,28 @@ export default class ListItemContainer extends Component {
         this.setState({ menuVisible });
     };
 
-    onSelectMenuItem =() => {
-        this.onMenuActionPress;
+    onSelectMenuItem = (index) => {
+        this.setState({ menuVisible: false });
+        if (index == 0) {
+            // TODO: Share functionality
+        }
+        else if (index == 1) {
+            // Delete
+            this.props.onDelete(this.props.listID);
+            // ToastAndroid.show("Delete list:"+this.props.listID+" attempted", ToastAndroid.SHORT);
+            console.log("Delete list:"+this.props.listID+" attempted");
+        }
     };
 
     render() {
-        const { name = 'Lorem Ipsum', detail="", icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '2'} = this.props;
+        const { name = 'Lorem Ipsum', detail = "", icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '3' } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
         return (
             <Layout style={styles.outerContainer} level={backgroundLevelOuter}>
                 <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
-                    <ListItem style={styles.listItemContainer} title={name} description={detail} onPress={this.props.onPress} />
+                    <ListItem style={styles.listItemContainer} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={this.props.onPress} />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
                     <OverflowMenu
@@ -91,7 +101,7 @@ const styles = StyleSheet.create({
         padding: 4,
         shadowColor: 'black',
         shadowOpacity: .5,
-        shadowOffset: { width: 0, height: 0 },
+        shadowOffset: { width: 4, height: 4 },
         elevation: 8,
     },
 });
