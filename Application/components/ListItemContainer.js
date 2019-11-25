@@ -32,22 +32,19 @@ export default class ListItemContainer extends Component {
         this.setState({ menuVisible });
     };
 
-    onMenuItemSelect = (index) => {
-        if (index = 1) {
-
-        }
-        this.setState({ menuVisible: false });
+    onSelectMenuItem =() => {
+        this.props.onDelete(this.props.listID);
     };
 
     render() {
-        const { name = 'Lorem Ipsum', icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevel = '2', onPress = () => { }, sizeValue = 200, marginValue = 8 } = this.props;
+        const { name = 'Lorem Ipsum', icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevel = '2', sizeValue = 200, marginValue = 8 } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
         return (
             <Layout style={styles.outerContainer} level='2'>
                 <Layout style={styles.listItemContainer} level='2'>
-                    <ListItem style={styles.listItemContainer} title={name} onPress={onPress} />
+                    <ListItem style={styles.listItemContainer} title={name} onPress={this.props.onPress} />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level='2'>
                     <OverflowMenu
@@ -55,7 +52,7 @@ export default class ListItemContainer extends Component {
                         visible={this.state.menuVisible}
                         data={this.menuData}
                         placement='left'
-                        onSelect={this.onMenuItemSelect}
+                        onSelect={this.onSelectMenuItem}
                         onBackdropPress={this.onMenuActionPress}>
                         <Button
                             appearance='ghost'
@@ -85,16 +82,16 @@ const styles = StyleSheet.create({
     listItemContainer: {
         flex: 1,
         borderRadius: 10,
-        padding:4,
+        padding: 4,
     },
     optionButtonContainer: {
         borderRadius: 10,
     },
     overflowMenu: {
-        padding:4,
+        padding: 4,
         shadowColor: 'black',
         shadowOpacity: .5,
-        shadowOffset: { width: 0, height: 0},
+        shadowOffset: { width: 0, height: 0 },
         elevation: 8,
     },
 });
