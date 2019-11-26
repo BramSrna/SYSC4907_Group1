@@ -51,3 +51,7 @@ export const AddIcon = (style) => (
 export const SunIcon = (style) => (
     <Icon {...style} name='sun-outline' />
 );
+
+export const UploadIcon = (style) => (
+    <Icon {...style} name='upload-outline' />
+);

@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import { Text, View, TouchableHighlight } from "react-native";
+import { Text, View, TouchableHighlight, StyleSheet, Dimensions,} from "react-native";
 import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
-
+import { ScrollView } from "react-native-gesture-handler";
+import { dark, light } from '../assets/Themes.js';
+import HomeSquareContainer from "../components/HomeSquareContainer.js";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 
 const PAGE_TITLE = "Croud-Source";
+const MARGIN_RATIO = 30; // higher number = smaller margin
 
 // Text to display on the buttons
 const REGISTER_ITEM = "Go To Register Item Page";
@@ -20,7 +23,48 @@ const MAP_CREATOR_PAGE = "MapCreatorPage";
 class CrowdSourcePage extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").height,
+    };
+    this.onLayout = this.onLayout.bind(this);
   }
+
+  /**
+   * Updates the width and height state varibles if the screen is rotated.
+   * @param {*} e this
+   */
+  onLayout(e) {
+    this.setState({
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
+    });
+  }
+
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the margin size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Margin Size
+   */
+  calcMarginValue = (deviceWidth, tpr) => {
+    marginValue = deviceWidth / (tpr * MARGIN_RATIO);
+    return marginValue;
+  };
+
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the container size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Container size
+   */
+  calcSizeValue = (deviceWidth, tpr) => {
+    marginValue = deviceWidth / (tpr * MARGIN_RATIO);
+    sizeValue = (deviceWidth - marginValue * (tpr * 2)) / tpr;
+    return sizeValue;
+  };
 
   /**
    * buttonListener
@@ -48,40 +92,39 @@ class CrowdSourcePage extends Component {
   );
 
   render() {
+    aspectRatio = this.state.height / this.state.width;
+    gridShape = aspectRatio > 1.6 ? 2 : 4;
+    marginValue = this.calcMarginValue(this.state.width, gridShape);
+    sizeValue = this.calcSizeValue(this.state.width, gridShape);
     return (
       <React.Fragment>
         <TopNavigation
           title={PAGE_TITLE}
+          alignment='center'
           leftControl={this.renderMenuAction()}
         />
-        <View style={globalStyles.defaultContainer}>
-          <Text style={globalStyles.whiteText}>Crowd Sourcing Options</Text>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(REGISTER_ITEM)}
-          >
-            <Text style={globalStyles.whiteText}>{REGISTER_ITEM}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(ADD_ITEM_LOCATION)}
-          >
-            <Text style={globalStyles.whiteText}>{ADD_ITEM_LOCATION}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(MAP_CREATOR)}
-          >
-            <Text style={globalStyles.whiteText}>{MAP_CREATOR}</Text>
-          </TouchableHighlight>
-
-        </View>
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+          <Layout style={styles.container} onLayout={this.onLayout} >
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Register Item' icon='pricetags-outline' onPress={() => this.props.navigation.navigate(REGISTER_ITEM_PAGE)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Add Item Location' icon='pin-outline' onPress={() => this.props.navigation.navigate(ADD_ITEM_LOCATION)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Map Creator' icon='map-outline' shape={2} onPress={() => this.props.navigation.navigate(MAP_CREATOR)} />
+          </Layout>
+        </ScrollView>
       </React.Fragment>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+});
 
 export default CrowdSourcePage;

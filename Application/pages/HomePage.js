@@ -23,6 +23,10 @@ class HomePage extends Component {
     this.onLayout = this.onLayout.bind(this);
   }
 
+  /**
+   * Updates the width and height state varibles if the screen is rotated.
+   * @param {*} e this
+   */
   onLayout(e) {
     this.setState({
       width: Dimensions.get('window').width,
@@ -30,20 +34,34 @@ class HomePage extends Component {
     });
   }
 
-  menuData = [
-    { title: 'Toggle Theme', icon: SunIcon },
-  ];
-
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the margin size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Margin Size
+   */
   calcMarginValue = (deviceWidth, tpr) => {
     marginValue = deviceWidth / (tpr * MARGIN_RATIO);
     return marginValue;
   };
 
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the container size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Container size
+   */
   calcSizeValue = (deviceWidth, tpr) => {
     marginValue = deviceWidth / (tpr * MARGIN_RATIO);
     sizeValue = (deviceWidth - marginValue * (tpr * 2)) / tpr;
     return sizeValue;
   };
+
+  menuData = [
+    { title: 'Toggle Theme', icon: SunIcon },
+  ];
 
   renderLeftMenuAction = () => (
     <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
