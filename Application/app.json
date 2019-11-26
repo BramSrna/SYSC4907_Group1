@@ -30,9 +30,11 @@
     "description": "",
     "android": {
       "package": "com.Carleton.GroceryList"
+    },
+    "notification": {
+      "iosDisplayInForeground": true
     }
-  },
-  "notification": {
-    "iosDisplayInForeground": true
   }
+
+
 }

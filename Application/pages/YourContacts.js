@@ -48,7 +48,7 @@ class YourContacts extends Component {
                All Contacts:
             </Text>
             <TouchableOpacity
-               onPress={() => /*this.props.navigation.navigate("NewContact", { groups: this.state.groups })*/this.Temp()}
+               onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })/*this.Temp()*/}
             >
                <Image source={require("../assets/icons/new.png")} />
             </TouchableOpacity>
@@ -82,7 +82,7 @@ class YourContacts extends Component {
                               {item.email}
                            </Text>
                            <TouchableOpacity style={styles.acceptDeny}
-                              onPress={() => Alert.alert("Accpet")}
+                              onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups, email: item.email })}
                            >
                               <Image source={require("../assets/icons/accept.png")} />
                            </TouchableOpacity>

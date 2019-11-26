@@ -30,7 +30,7 @@ class HomePage extends Component {
       .database()
       .ref("/userInfo/" + emailId)
       .once("value", function (snapshot) {
-        if (!snapshot.val().uid) {
+        if (!snapshot.val()) {
           firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
             // console.log(snapshot);
           });

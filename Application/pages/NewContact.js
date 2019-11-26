@@ -34,12 +34,21 @@ class NewContact extends Component {
          group: DEFAULT_GROUP,
          email: DEFAULT_EMAIL,
          isDialogVisible: false,
-         allGroups: []
+         allGroups: [],
+         lockEmail: true,
+         fromPending: false
       };
    }
 
    componentDidMount() {
       this.setState({ allGroups: this.props.navigation.getParam("groups", []) });
+      this.setState({ email: this.props.navigation.getParam("email", DEFAULT_EMAIL) });
+      var bool = true;
+      if (this.props.navigation.getParam("email", DEFAULT_EMAIL) != DEFAULT_EMAIL) {
+         bool = false;
+      }
+      this.setState({ lockEmail: bool });
+      this.setState({ fromPending: !bool });
    }
 
    handleChangeGroup(val) {
@@ -53,6 +62,7 @@ class NewContact extends Component {
    };
 
    handleCreate = () => {
+
       cf.AddNewGroup(this, this.state.group, this.state.allGroups)
    };
 
@@ -60,7 +70,13 @@ class NewContact extends Component {
 
    handleAdd = () => {
       //Try adding the contact
-      cf.SendContactRequest(this.state.email, this)
+      if (this.state.fromPending) {
+         cf.AcceptContactRequest(this.state.email, this.state.name, this.state.group)
+
+      } else {
+         cf.SendContactRequest(this.state.email, this.state.name, this.state.group)
+
+      }
 
    };
 
@@ -87,7 +103,7 @@ class NewContact extends Component {
                   keyboardVerticalOffset={keyboardVerticalOffset}
                   behavior={keyboardAvoidingViewBehavior}>
                   <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
-                     <Dialog.Title>New List</Dialog.Title>
+                     <Dialog.Title>New Group</Dialog.Title>
                      <Dialog.Description>
                         Enter the name of the new group you would like to create:
                </Dialog.Description>
@@ -148,6 +164,7 @@ class NewContact extends Component {
                            placeholder="Email"
                            onChangeText={(email) => this.setState({ email })}
                            value={this.state.email}
+                           editable={this.state.lockEmail}
                         />
                      </View>
                   </View>

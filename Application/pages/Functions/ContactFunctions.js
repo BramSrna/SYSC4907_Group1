@@ -1,4 +1,4 @@
-import { Alert } from "react-native";
+import { Alert, SnapshotViewIOSComponent } from "react-native";
 import * as firebase from "firebase";
 
 /**
@@ -26,22 +26,66 @@ class ContactFunctions {
 
    }
 
+   AcceptContactRequest(contactEmail, contactName, contactGroup) {
+      var currentUser = firebase.auth().currentUser
+      firebase
+         .database()
+         .ref("/contacts/" + currentUser.uid)
+         .once("value", function (snapshot) {
+            var ssv = snapshot.val();
+            if (ssv) {
+               for (var contact in ssv) {
+                  if (ssv[contact].email == contactEmail) {
+                     var update = snapshot.ref.child(contact);
+                     update.ref.update({ "status": "contact", "name": contactName, "group": contactGroup });
+
+                     var userInfoKey = contactEmail.replace(/\./g, ",");
+                     firebase
+                        .database()
+                        .ref("/userInfo/" + userInfoKey)
+                        .once("value", function (snapshot) {
+                           if (snapshot.val()) {
+                              firebase
+                                 .database()
+                                 .ref("/contacts/" + snapshot.val().uid)
+                                 .once("value", function (snapshot) {
+                                    var ssv = snapshot.val();
+                                    if (ssv) {
+                                       for (var contact in ssv) {
+                                          if (ssv[contact].email == currentUser.email) {
+                                             var update = snapshot.ref.child(contact);
+                                             update.ref.update({ "status": "contact" });
+
+                                          }
+                                       }
+                                    }
+                                 })
+                           } else {
+                              console.log("The app was not configured properly.")
+                           }
+                        });
+
+                  }
+               }
+            }
+         })
+   }
 
    AddNewGroup(that, groupName, listOfGroups) {
       for (group in listOfGroups) {
          if (listOfGroups[group].label == groupName) {
             Alert.alert("That group already exists!")
-         } else {
-            var obj = { label: groupName, value: groupName };
-            listOfGroups.push(obj);
-            that.setState({
-               isDialogVisible: false, group: groupName, allGroups: listOfGroups
-            });
+            return;
          }
       }
+      var obj = { label: groupName, value: groupName };
+      listOfGroups.push(obj);
+      that.setState({
+         isDialogVisible: false, group: groupName, allGroups: listOfGroups
+      });
    }
 
-   SendContactRequest(email, that) {
+   SendContactRequest(email, name, group) {
       firebase.auth().fetchSignInMethodsForEmail(email)
          .then(function (signInMethods) {
             if (signInMethods.length == 0) {
@@ -59,29 +103,29 @@ class ContactFunctions {
                            if (ssv[contact].email == email) {
                               if (ssv[contact].status == "sent") {
                                  Alert.alert("You have already sent a contact request to this person!")
-                                 return
                               } else if (ssv[contact].status == "contact") {
                                  Alert.alert("This person is already a contact of yours!")
-                                 return
                               } else if (ssv[contact].status == "pending") {
                                  Alert.alert("You have a contact request from this person pending!")
-                                 return
                               }
                            }
                         }
+
+
+                     } else {
                         // Place contact request in your sent
                         firebase
                            .database()
                            .ref("/contacts/" + uid)
                            .push({
-                              name: that.state.name,
-                              group: that.state.group,
-                              email: that.state.email,
+                              name: name,
+                              group: group,
+                              email: email,
                               status: "sent"
                            });
 
                         // Place contact request in other persons pending
-                        var userInfoKey = that.state.email.replace(/\./g, ",");
+                        var userInfoKey = email.replace(/\./g, ",");
                         firebase
                            .database()
                            .ref("/userInfo/" + userInfoKey)
@@ -100,9 +144,6 @@ class ContactFunctions {
                                  console.log("The app was not configured properly.")
                               }
                            });
-
-                     } else {
-                        console.log("User has no contacts")
                      }
                   });
             }
