@@ -5,15 +5,16 @@ import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
 /**
  * ListItemContainer - A simple list item container designed to be used within lists
- * @property {string} name - Text to be displayed (default: 'Lorem Ipsum')
- * @property {string} icon - Icon name (currently only supports names from Eva Icons Pack: https://akveo.github.io/eva-icons/#/) (default: 'list-outline')
- * @property {integer} shape - 1 for Square, 2 for Rectangle (default: 1)
- * @property {string} iconFill - Color to fill the icon (default: #8F9BB3)
- * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '2') (see https://akveo.github.io/react-native-ui-kitten/docs/components/layout/api#layout for more details)
- * @property {GestureResponderEvent} onPress - onPress()
- * @property {integer} sizeValue - Sets the size of the container (default: 200)
- * @property {integer} marginValue - Sets the margin of the container (default: 8)
- * 
+ * @property {string} title - Text to be displayed (default: 'Lorem Ipsum')
+ * @property {string} description - Text to be displayed below the name (default: 'Lorem Ipsum')
+ * @property {string} iconFill - Color to fill the icon on the right of the container (default: #8F9BB3)
+ * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '3') (see https://akveo.github.io/react-native-ui-kitten/docs/components/layout/api#layout for more details)
+ * @property {function} onPress - onPress()
+ * @property {function} onDelete - onDelete()
+ * @property {boolean} fromItemView - Determines if this component is being created from YourLists page or CurrentList page (default: false)
+ * @property {boolean} purchased - Determines if this component will display the purchased icon(checkmark-circle-outline) or the default icon(radio-button-off-outline) (default: false) 
+ * @property {*} listID - The listID that this component refers to.
+ * @property {*} itemID - The itemID that this component refers to.
  */
 export default class ListItemContainer extends Component {
     constructor(props) {
@@ -69,7 +70,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { name = 'Lorem Ipsum', detail = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevelOuter = '3', onPress = () => { } } = this.props;
+        const { title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
@@ -80,11 +81,11 @@ export default class ListItemContainer extends Component {
             <Icon name='radio-button-off-outline' fill='orange' />
         );
         return (
-            <Layout style={styles.outerContainer} level={backgroundLevelOuter} >
-                <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
-                    <ListItem style={styles.listItemContainer} disabled={fromItemView} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+            <Layout style={styles.outerContainer} level={backgroundLevel} >
+                <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                    <ListItem style={styles.listItemContainer} disabled={fromItemView} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
                 </Layout>
-                <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
+                <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
                     <OverflowMenu
                         style={styles.overflowMenu}
                         visible={this.state.menuVisible}

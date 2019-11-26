@@ -54,9 +54,9 @@ class CurrentList extends Component {
 
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return <ListItemContainer name={item.name} fromItemView={true} purchased={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       } else {
-         return <ListItemContainer name={item.name} fromItemView={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       }
    }
 
