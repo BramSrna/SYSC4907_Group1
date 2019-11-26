@@ -65,8 +65,7 @@ class HomePage extends Component {
   );
 
   onMenuActionPress = () => {
-    const menuVisible = !this.state.menuVisible;
-    this.setState({ menuVisible });
+    this.setState({ menuVisible: !this.state.menuVisible });
   };
 
   onMenuItemSelect = (index) => {

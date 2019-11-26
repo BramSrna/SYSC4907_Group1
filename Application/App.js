@@ -79,7 +79,7 @@ export default class App extends Component {
     return (
       <Layout style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />}
-        {Platform.OS === 'android' && <Layout style={styles.statusBarUnderlay} />}
+        {Platform.OS === 'android' && <Layout style={{ marginTop: StatusBar.currentHeight }} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
     );
@@ -121,8 +121,5 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  statusBarUnderlay: {
-    height: 24,
   },
 });
