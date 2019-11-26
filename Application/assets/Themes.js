@@ -9,5 +9,5 @@ import { light as lightTheme, dark as darkTheme} from '@eva-design/eva';
   export const light = {
     ...lightTheme,
   
-    //"background-basic-color-1": "#121212",
+    "background-basic-color-1": "#FFFFFF",
   };
