@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-   Text,
    View,
    SectionList,
    StyleSheet,
@@ -10,7 +9,8 @@ import {
 } from "react-native";
 // import styles from "./pageStyles/YourContactsPageStyle";
 import cf from "./Functions/ContactFunctions";
-import Menu from "./Menu"
+import { Layout, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 
 class YourContacts extends Component {
    constructor(props) {
@@ -39,20 +39,27 @@ class YourContacts extends Component {
       cf.TestNotification("Test")
    }
 
-
    render() {
+      const AddAction = (props) => (
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })} />
+      );
+
+      const renderRightControls = () => [
+         <AddAction />
+      ];
+
+      const renderMenuAction = () => (
+         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+      );
       return (
          <React.Fragment>
-            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
-            <Text style={styles.pageTitle}>
-               All Contacts:
-            </Text>
-            <TouchableOpacity
-               onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })/*this.Temp()*/}
-            >
-               <Image source={require("../assets/icons/new.png")} />
-            </TouchableOpacity>
-            <View>
+            <TopNavigation
+               title="Your Contacts"
+               alignment='center'
+               leftControl={renderMenuAction()}
+               rightControls={renderRightControls()}
+            />
+            <Layout>
                <SectionList style={styles.test}
                   ItemSeparatorComponent={this.FlatListItemSeparator}
                   sections={this.state.sections}
@@ -96,7 +103,7 @@ class YourContacts extends Component {
                   }}
                   keyExtractor={(item, index) => index}
                />
-            </View>
+            </Layout>
          </React.Fragment >
       );
    }

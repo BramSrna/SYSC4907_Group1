@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-   Text,
    View,
    TextInput,
    TouchableHighlight,
@@ -12,9 +11,11 @@ import { Header } from "react-navigation"
 import { styles, pickerStyle } from "./pageStyles/NewContactPageStyle";
 import globalStyles from "./pageStyles/GlobalStyle";
 import RNPickerSelect from 'react-native-picker-select';
-import Menu from "./Menu"
 import Dialog from "react-native-dialog";
 import cf from "./Functions/ContactFunctions";
+import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+
 
 
 const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
@@ -91,32 +92,47 @@ class NewContact extends Component {
       );
    }
 
+   renderModalElement = () => {
+      return (
+         <Layout
+            level='3'
+            style={styles.modalContainer}>
+            <Text category='h6' >Create New List</Text>
+            <Input
+               style={styles.input}
+               placeholder='List Name...'
+               onChangeText={group => this.setState({ group })}
+               autoFocus={this.state.modalVisible ? true : false}
+            />
+            <Layout style={styles.buttonContainer}>
+               <Button style={styles.modalButton} onPress={() => { this.handleCreate() }}>Create</Button>
+               <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+            </Layout>
+         </Layout>
+      );
+   };
+
    render() {
+      const renderMenuAction = () => (
+         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+      );
       return (
          <React.Fragment>
-            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
-            <View style={styles.container}>
-
-
-               <KeyboardAvoidingView
-                  style={styles.midContainer}
-                  keyboardVerticalOffset={keyboardVerticalOffset}
-                  behavior={keyboardAvoidingViewBehavior}>
-                  <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
-                     <Dialog.Title>New Group</Dialog.Title>
-                     <Dialog.Description>
-                        Enter the name of the new group you would like to create:
-               </Dialog.Description>
-                     <Dialog.Input
-                        onChangeText={group => this.setState({ group })}
-                     ></Dialog.Input>
-                     <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-                     <Dialog.Button label="Create" onPress={this.handleCreate} />
-                  </Dialog.Container>
-                  <View style={styles.topContainer}>
-                     <Text style={styles.whiteHeaderText}>New Contact</Text>
-                  </View>
-                  <View style={styles.rowSorter}>
+            <TopNavigation
+               title="New Contact"
+               alignment='center'
+               leftControl={renderMenuAction()}
+            />
+            <Layout>
+               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
+                  <Modal style={styles.modal}
+                     allowBackdrop={true}
+                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+                     onBackdropPress={this.setModalVisible}
+                     visible={this.state.modalVisible}>
+                     {this.renderModalElement()}
+                  </Modal>
+                  {/* <View style={styles.rowSorter}>
                      <View style={{ flex: 1 }}>
                         {this.renderRequiredText("Name: ")}
                      </View>
@@ -177,8 +193,9 @@ class NewContact extends Component {
                   >
                      <Text style={globalStyles.whiteText}>{"Add Contact"}</Text>
                   </TouchableHighlight>
-               </View>
-            </View>
+               </View> */}
+               </KeyboardAvoidingView>
+            </Layout>
          </React.Fragment>
       );
    }

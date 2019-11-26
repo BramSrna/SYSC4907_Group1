@@ -4,7 +4,7 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() {}
+   constructor() { }
 
    /**
     * This function is used to add items to a list.
@@ -193,7 +193,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => {})
+         .then(data => { })
          .catch(error => {
             console.log("Failed to create list: " + error);
          });
@@ -270,6 +270,43 @@ class ListFunctions {
                });
             }
          });
+   }
+
+   /**
+    * Get the current theme of the user
+    * @param {*} that: this for caller
+    */
+   GetTheme(that) {
+      var uid = firebase.auth().currentUser.uid;
+      if (uid) {
+         firebase
+            .database()
+            .ref("/users/" + uid + "/preferences/theme")
+            .on("value", function (snapshot) {
+               var ssv = snapshot.val();
+               that.setState({
+                  theme: ssv == 'light' ? 'light' : 'dark',
+               });
+            });
+      }
+   }
+
+   /**
+    * Toggle the current theme of the user
+    * @param {*} that: this for caller
+    */
+   ToggleTheme() {
+      var uid = firebase.auth().currentUser.uid;
+      var ssv;
+      if (uid) {
+         firebase
+            .database()
+            .ref("/users/" + uid + "/preferences/theme")
+            .once("value", function (snapshot) {
+               ssv = snapshot.val();
+            });
+         return firebase.database().ref("/users/" + uid + "/preferences/theme").set(ssv == 'light' ? 'dark' : 'light');
+      } else null;
    }
 }
 

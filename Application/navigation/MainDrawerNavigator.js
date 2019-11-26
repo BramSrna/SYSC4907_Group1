@@ -1,8 +1,4 @@
-import {
-    createDrawerNavigator,
-    createAppContainer,
-    createStackNavigator
-} from 'react-navigation';
+import { createDrawerNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
 import HomePage from '../pages/HomePage';
 import YourLists from '../pages/YourLists'
 import CurrentList from '../pages/CurrentList'

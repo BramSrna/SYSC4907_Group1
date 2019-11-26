@@ -1,26 +1,37 @@
 export default {
-    container: {
-        paddingTop: 35,
+    columnContainer: {
         flex: 1,
-        backgroundColor: 'black',
-        color: 'white',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'stretch',
+    },
+    container: {
+        flex: 1,
+    },
+    headingContainer: {
+        padding: 4,
+    },
+    fillContainer: {
+        flex: 1,
+        width: '100%',
     },
     navItemStyle: {
         padding: 10,
         paddingHorizontal: 30
     },
     navSectionStyle: {
-        backgroundColor: 'white'
     },
     sectionHeadingStyle: {
         paddingVertical: 10,
         paddingHorizontal: 10,
-        color: 'white',
         fontWeight: 'bold',
         fontSize: 20
     },
     footerContainer: {
-        padding: 20,
-        backgroundColor: 'white',
-    }
+        paddingVertical: 4,
+    },
+    toggle: {
+        padding: 10,
+        alignSelf: 'flex-start',
+    },
 };
