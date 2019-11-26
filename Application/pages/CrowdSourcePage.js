@@ -1,19 +1,13 @@
 import React, { Component } from "react";
-import { Text, View, TouchableHighlight, StyleSheet, Dimensions,} from "react-native";
-import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { StyleSheet, Dimensions, } from "react-native";
+import { Layout, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
-import globalStyles from "../pages/pageStyles/GlobalStyle";
 
 const PAGE_TITLE = "Croud-Source";
 const MARGIN_RATIO = 30; // higher number = smaller margin
-
-// Text to display on the buttons
-const REGISTER_ITEM = "Go To Register Item Page";
-const ADD_ITEM_LOCATION = "Go To Add Item Location Page";
-const MAP_CREATOR = "Go To Map Creator Page";
 
 // Strings for controlling navigation
 const REGISTER_ITEM_PAGE = "RegisterItemPage";
