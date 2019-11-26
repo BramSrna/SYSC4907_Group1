@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Dimensions } from 'react-native';
 import { Layout, TopNavigation, TopNavigationAction, OverflowMenu, } from 'react-native-ui-kitten';
-import { MenuOutline, Moon, MoonOutline, MenuIcon } from "../assets/icons/icons.js";
+import { MenuOutline, SunIcon, MenuIcon } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
@@ -31,7 +31,7 @@ class HomePage extends Component {
   }
 
   menuData = [
-    { title: global.theme == light ? 'Dark Mode' : 'Light Mode', icon: global.theme == light ? Moon : MoonOutline },
+    { title: 'Toggle Theme', icon: SunIcon },
   ];
 
   calcMarginValue = (deviceWidth, tpr) => {

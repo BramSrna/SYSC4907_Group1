@@ -17,6 +17,8 @@ import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
 
+const PAGE_TITLE="Map Creator";
+
 class MapCreatorPage extends Component {
     constructor(props) {
         super(props);

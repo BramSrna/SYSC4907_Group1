@@ -46,4 +46,8 @@ export const ShareIcon = (style) => (
 
 export const AddIcon = (style) => (
     <Icon {...style} name='plus-outline' />
- );
+);
+
+export const SunIcon = (style) => (
+    <Icon {...style} name='sun-outline' />
+);
