@@ -1,18 +1,11 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  TouchableHighlight,
-  Alert,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
+import { Text, View, TextInput, TouchableHighlight, Alert, Platform, KeyboardAvoidingView, StyleSheet} from "react-native";
 import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
+import { ScrollView } from "react-native-gesture-handler";
+import { dark, light } from '../assets/Themes.js';
 
 import { Header } from "react-navigation"
-import { styles, pickerStyle } from "./pageStyles/RegisterItemPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
@@ -134,6 +127,11 @@ class RegisterItemPage extends Component {
           alignment="center"
           leftControl={this.renderMenuAction()}
         />
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+          <Layout>
+
+          </Layout>
+        </ScrollView>
         <View style={styles.container}>
           <View style={styles.topContainer}>
             <Text style={styles.whiteHeaderText}>Register Item</Text>
@@ -215,5 +213,92 @@ class RegisterItemPage extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  overflowMenu: {
+    padding: 4,
+    shadowColor: 'black',
+    shadowOpacity: .5,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
+  },
+
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    color: "black",
+  },
+  topContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    color: "black",
+  },
+  midContainer: {
+    flex: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    color: "black",
+  },
+  botContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'black',
+    color: "black",
+  },
+  whiteHeaderText: {
+    color: 'white',
+    fontSize: 20,
+  },
+  blackText: {
+    color: 'black',
+  },
+  textInput: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+  },
+  rowSorter: {
+    flexDirection: "row",
+    padding: 20,
+  }
+});
+
+export const pickerStyle = {
+  inputAndroid: {
+    height: 30,
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+    paddingRight: 30,
+    width: 80
+  },
+  inputIOS: {
+    height: 30,
+    borderColor: "gray",
+    borderWidth: 1,
+    justifyContent: "flex-end",
+    color: "white",
+    paddingRight: 30,
+    width: 80
+  },
+};
 
 export default RegisterItemPage;
