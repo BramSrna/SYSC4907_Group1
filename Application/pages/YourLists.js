@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { View, FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
 import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
-import { MenuOutline } from "../assets/icons/icons.js";
+import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
 
@@ -50,12 +50,6 @@ class YourLists extends Component {
       });
    };
 
-   handleSwipeOpen(rowId, direction) {
-      if (typeof direction !== "undefined") {
-         this.setState({ activeRow: rowId });
-      }
-   }
-
    setNewListName(name) {
       this.newListName = name;
    }
@@ -72,8 +66,7 @@ class YourLists extends Component {
             <Text category='h6' >Create New List</Text>
             <Input
                style={styles.input}
-               placeholder='List Name'
-               value={this.state.primaryValue}
+               placeholder='List Name...'
                onChangeText={name => this.setNewListName(name)}
                autoFocus={this.state.modalVisible ? true : false}
             />
@@ -90,31 +83,6 @@ class YourLists extends Component {
    };
 
    render() {
-      const swipeButtons = [
-         {
-            component: (
-               <Layout
-                  style={{
-                     flex: 1,
-                     alignItems: "center",
-                     justifyContent: "center",
-                     backgroundColor: "red",
-                     flexDirection: "column",
-                  }}
-               >
-                  <Icon name='trash-2-outline' width={30} height={30} />
-               </Layout>
-            ),
-            onPress: () => {
-               lf.DeleteList(this.state.apiData[this.state.activeRow].key);
-            }
-         }
-      ];
-
-      const AddIcon = (style) => (
-         <Icon {...style} name='plus-outline' />
-      );
-
       const AddAction = (props) => (
          <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
       );
@@ -136,21 +104,20 @@ class YourLists extends Component {
                rightControls={renderRightControls()}
             />
             <Layout style={styles.ListContainer}>
-               <KeyboardAvoidingView style={styles.container} contentContainerStyle={styles.container} behavior="position" enabled>
+               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
-                     backdropStyle={{ backgroundColor: 'black', opacity: 0.5 }}
+                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
                      onBackdropPress={this.setModalVisible}
                      visible={this.state.modalVisible}>
                      {this.renderModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
                <FlatList
-                  contentContainerStyle={{ paddingBottom: 34 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                  contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}
                   data={this.state.listTitles}
                   width="100%"
-                  extraData={this.state.activeRow}
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
                      <ListItemContainer name={item} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
@@ -172,7 +139,8 @@ const styles = StyleSheet.create({
       flex: 1,
    },
    flatList: {
-      paddingTop: 30
+      paddingTop: 8,
+      paddingHorizontal: 4,
    },
    pageTitle: {
       padding: 30,

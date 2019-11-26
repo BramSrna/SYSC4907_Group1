@@ -42,19 +42,25 @@ export default class ListItemContainer extends Component {
             // Delete
             this.props.onDelete(this.props.listID);
             // ToastAndroid.show("Delete list:"+this.props.listID+" attempted", ToastAndroid.SHORT);
-            console.log("Delete list:"+this.props.listID+" attempted");
+            console.log("Delete list:" + this.props.listID + " attempted");
         }
     };
 
     render() {
-        const { name = 'Lorem Ipsum', detail = "", icon = 'list-outline', shape = 1, iconFill = '#8F9BB3', backgroundLevelOuter = '3' } = this.props;
+        const { name = 'Lorem Ipsum', detail = '', listItem=false, icon = 'list-outline', purchased = false, iconFill = '#8F9BB3', backgroundLevelOuter = '3', onPress = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
+        CheckmarkCircleIcon = () => (
+            <Icon name='checkmark-circle-outline' fill='green' />
+        );
+        RadioButtonOffIcon = () => (
+            <Icon name='radio-button-off-outline' fill='orange' />
+        );
         return (
-            <Layout style={styles.outerContainer} level={backgroundLevelOuter}>
+            <Layout style={styles.outerContainer} level={backgroundLevelOuter} >
                 <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
-                    <ListItem style={styles.listItemContainer} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={this.props.onPress} />
+                    <ListItem style={styles.listItemContainer} disabled={listItem} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={onPress} />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
                     <OverflowMenu

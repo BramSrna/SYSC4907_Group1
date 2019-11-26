@@ -43,3 +43,7 @@ export const FolderRemoveIcon = (style) => (
 export const ShareIcon = (style) => (
     <Icon {...style} name='share-outline' />
 );
+
+export const AddIcon = (style) => (
+    <Icon {...style} name='plus-outline' />
+ );
