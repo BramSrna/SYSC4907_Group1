@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ToastAndroid } from 'react-native';
+import { StyleSheet, } from 'react-native';
 import { Layout, ListItem, Text, Icon, OverflowMenu, Button, TopNavigationAction } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
@@ -21,10 +21,23 @@ export default class ListItemContainer extends Component {
         this.state = {
             menuVisible: false,
         };
+        this._isMounted = false;
     }
 
-    menuData = [
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    listViewMenuData = [
         { title: 'Share', icon: ShareIcon },
+        { title: 'Delete', icon: Trash2Icon },
+    ];
+
+    itemViewMenuData = [
         { title: 'Delete', icon: Trash2Icon },
     ];
 
@@ -34,20 +47,29 @@ export default class ListItemContainer extends Component {
     };
 
     onSelectMenuItem = (index) => {
-        this.setState({ menuVisible: false });
-        if (index == 0) {
-            // TODO: Share functionality
-        }
-        else if (index == 1) {
-            // Delete
-            this.props.onDelete(this.props.listID);
-            // ToastAndroid.show("Delete list:"+this.props.listID+" attempted", ToastAndroid.SHORT);
-            console.log("Delete list:" + this.props.listID + " attempted");
-        }
+        this.setState({ menuVisible: false }, () => { this.preformMenuAction(index) });
     };
 
+    preformMenuAction = (index) => {
+        if (this.props.fromItemView) {
+            if (index == 0) {
+                this.props.onDelete(this.props.listID, this.props.itemID);
+                // console.log("Delete item:" + this.props.itemID + " from List:" + this.props.listID);
+            }
+        } else {
+            if (index == 0) {
+                // TODO: Share functionality
+            }
+            else if (index == 1) {
+                // Delete
+                this.props.onDelete(this.props.listID);
+                // console.log("Delete list:" + this.props.listID + " attempted");
+            }
+        }
+    }
+
     render() {
-        const { name = 'Lorem Ipsum', detail = '', listItem=false, icon = 'list-outline', purchased = false, iconFill = '#8F9BB3', backgroundLevelOuter = '3', onPress = () => { } } = this.props;
+        const { name = 'Lorem Ipsum', detail = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevelOuter = '3', onPress = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
@@ -60,13 +82,13 @@ export default class ListItemContainer extends Component {
         return (
             <Layout style={styles.outerContainer} level={backgroundLevelOuter} >
                 <Layout style={styles.listItemContainer} level={backgroundLevelOuter}>
-                    <ListItem style={styles.listItemContainer} disabled={listItem} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                    <ListItem style={styles.listItemContainer} disabled={fromItemView} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={name} description={detail} titleStyle={{ fontSize: 16 }} onPress={onPress} />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevelOuter}>
                     <OverflowMenu
                         style={styles.overflowMenu}
                         visible={this.state.menuVisible}
-                        data={this.menuData}
+                        data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
                         placement='left'
                         onSelect={this.onSelectMenuItem}
                         onBackdropPress={this.onMenuActionPress}>

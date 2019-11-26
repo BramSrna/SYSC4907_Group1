@@ -42,7 +42,6 @@ class CurrentList extends Component {
             this.SetNameAndCurrentItems();
          }
       );
-
    }
 
    SetNameAndCurrentItems() {
@@ -53,11 +52,11 @@ class CurrentList extends Component {
       lf.GetItemsInAList(this, this.props.navigation.getParam("listID", "(Invalid List ID)"));
    }
 
-   GenerateListItem(item) {
+   GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return <ListItemContainer name={item.name} listItem={true} purchased={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} />;
+         return <ListItemContainer name={item.name} fromItemView={true} purchased={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       } else {
-         return <ListItemContainer name={item.name} listItem={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} />;
+         return <ListItemContainer name={item.name} fromItemView={true} detail={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       }
    }
 
@@ -90,6 +89,10 @@ class CurrentList extends Component {
       });
    }
 
+   deleteItem = (listID, itemID) => {
+      lf.DeleteItemInList(listID, itemID);
+   }
+
    renderModalElement = () => {
       return (
          <Layout
@@ -115,28 +118,6 @@ class CurrentList extends Component {
    };
 
    render() {
-      // const swipeButtons = [
-      //    {
-      //       component: (
-      //          <View
-      //             style={{
-      //                flex: 1,
-      //                alignItems: "center",
-      //                justifyContent: "center",
-      //                flexDirection: "column"
-      //             }}
-      //          >
-      //             <Image source={require("../assets/icons/delete.png")} />
-      //          </View>
-      //       ),
-      //       backgroundColor: "red",
-      //       onPress: () => {
-      //          lf.DeleteItemInList(this.state.listId, this.state.listItemIds[this.state.activeRow])
-
-      //       }
-      //    }
-      // ];
-
       const AddAction = (props) => (
          <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
       );
@@ -180,23 +161,8 @@ class CurrentList extends Component {
                   renderItem={({ item, index }) => (
                      <DoubleClick
                         doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >
-                        {this.GenerateListItem(item)}
+                        {this.GenerateListItem(item, index)}
                      </DoubleClick>
-
-                     // <Swipeout
-                     //    right={swipeButtons}
-                     //    backgroundColor="#000000"
-                     //    underlayColor="white"
-                     //    rowID={index}
-                     //    sectionId={1}
-                     //    autoClose={true}
-                     //    onOpen={(secId, rowId, direction) =>
-                     //       this.handleSwipeOpen(rowId, direction)
-                     //    }
-                     //    close={this.state.activeRow !== index}
-                     // >
-
-                     // </Swipeout>
                   )}
                />
             </Layout>
