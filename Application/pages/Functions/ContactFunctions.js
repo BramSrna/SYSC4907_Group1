@@ -7,7 +7,7 @@ import * as firebase from "firebase";
 class ContactFunctions {
    constructor() { }
 
-   TestNotification = (message) => {
+   TestNotification = (token, title, body) => {
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -15,10 +15,10 @@ class ContactFunctions {
             'Content-Type': 'application/json'
          },
          body: JSON.stringify({
-            to: 'ExponentPushToken[a-3hi7MEfJMYJiN8hM_D05]',
+            to: token,
             sound: 'default',
-            title: 'aTitle',
-            body: 'aBody'
+            title: title,
+            body: body
          })
       });
 

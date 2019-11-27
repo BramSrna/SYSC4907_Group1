@@ -36,12 +36,12 @@ class YourContacts extends Component {
    };
 
    Temp() {
-      cf.TestNotification("Test")
+      cf.TestNotification("ExponentPushToken[a-3hi7MEfJMYJiN8hM_D05]", "Haseeb", "Is the Best")
    }
 
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })} />
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => /*this.props.navigation.navigate("NewContact", { groups: this.state.groups })*/ this.Temp()} />
       );
 
       const renderRightControls = () => [

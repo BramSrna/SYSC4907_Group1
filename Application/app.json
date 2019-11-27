@@ -32,6 +32,7 @@
       "package": "com.Carleton.GroceryList"
     },
     "notification": {
+      "icon": "./assets/notif.png",
       "iosDisplayInForeground": true
     }
   }
