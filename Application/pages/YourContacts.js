@@ -94,7 +94,7 @@ class YourContacts extends Component {
                               <Image source={require("../assets/icons/accept.png")} />
                            </TouchableOpacity>
                            <TouchableOpacity style={styles.acceptDeny}
-                              onPress={() => Alert.alert("Cancel")}
+                              onPress={() => cf.RejectContactRequest(item.email)}
                            >
                               <Image source={require("../assets/icons/cancel.png")} />
                            </TouchableOpacity></View></React.Fragment>

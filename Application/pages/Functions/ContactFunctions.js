@@ -26,6 +26,59 @@ class ContactFunctions {
 
    }
 
+   RejectContactRequest(requestEmail) {
+      var currentUser = firebase.auth().currentUser
+      firebase
+         .database()
+         .ref("/contacts/" + currentUser.uid)
+         .once("value", function (snapshot) {
+            if (snapshot.val()) {
+               var ssv = snapshot.val()
+               for (var contact in ssv) {
+                  if (ssv[contact].email == requestEmail) {
+                     firebase
+                        .database()
+                        .ref("/contacts/" + currentUser.uid)
+                        .child(contact)
+                        .remove();
+
+                     var userInfoKey = requestEmail.replace(/\./g, ",");
+                     firebase
+                        .database()
+                        .ref("/userInfo/" + userInfoKey)
+                        .once("value", function (snapshot) {
+                           if (snapshot.val()) {
+                              var requestuid = snapshot.val().uid
+                              firebase
+                                 .database()
+                                 .ref("/contacts/" + requestuid)
+                                 .once("value", function (snapshot) {
+                                    if (snapshot.val()) {
+                                       for (var contact in snapshot.val()) {
+
+                                          if (snapshot.val()[contact].email == currentUser.email) {
+
+                                             firebase
+                                                .database()
+                                                .ref("/contacts/" + requestuid)
+                                                .child(contact)
+                                                .remove();
+                                          }
+                                       }
+                                    }
+
+
+                                 })
+                           } else {
+                              console.log("User not logged in properly.")
+                           }
+                        })
+                  }
+               }
+            }
+         });
+   }
+
    AcceptContactRequest(contactEmail, contactName, contactGroup) {
       var currentUser = firebase.auth().currentUser
       firebase
