@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, View, Alert } from 'react-native';
 import { Layout, ListItem, Text, Icon, OverflowMenu, Button, TopNavigationAction } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
@@ -59,7 +59,7 @@ export default class ListItemContainer extends Component {
             }
         } else {
             if (index == 0) {
-                // TODO: Share functionality
+                Alert.alert("Share the list " + this.props.listID)
             }
             else if (index == 1) {
                 // Delete
@@ -70,7 +70,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
+        const { contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
@@ -80,6 +80,57 @@ export default class ListItemContainer extends Component {
         RadioButtonOffIcon = () => (
             <Icon name='radio-button-off-outline' fill='orange' />
         );
+        if (contact) {
+            if (pending) {
+                return (
+                    <Layout style={styles.outerContainer} level={backgroundLevel} >
+                        <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                            <ListItem style={styles.listItemContainer} disabled={fromItemView} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                        </Layout>
+                        <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
+                            <OverflowMenu
+                                style={styles.overflowMenu}
+                                visible={this.state.menuVisible}
+                                data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
+                                placement='left'
+                                onSelect={this.onSelectMenuItem}
+                                onBackdropPress={this.onMenuActionPress}>
+                                <View style={styles.pending}>
+                                    <TouchableOpacity style={styles.acceptDeny}
+                                        onPress={() => this.props.acceptFunction()}>
+                                        <Image source={require("../assets/icons/accept.png")} /></TouchableOpacity>
+                                    <TouchableOpacity style={styles.acceptDeny}
+                                        onPress={() => this.props.rejectFunction()}>
+                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></View>
+                            </OverflowMenu>
+                        </Layout>
+                    </Layout >
+                );
+            } else {
+                return (
+                    <Layout style={styles.outerContainer} level={backgroundLevel} >
+                        <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                            <ListItem style={styles.listItemContainer} disabled={fromItemView} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                        </Layout>
+                        <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
+                            <OverflowMenu
+                                style={styles.overflowMenu}
+                                visible={this.state.menuVisible}
+                                data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
+                                placement='left'
+                                onSelect={this.onSelectMenuItem}
+                                onBackdropPress={this.onMenuActionPress}>
+                                <Button
+                                    appearance='ghost'
+                                    icon={MenuIcon}
+                                    onPress={this.onMenuActionPress}
+                                />
+                            </OverflowMenu>
+                        </Layout>
+                    </Layout>
+                );
+            }
+        }
         return (
             <Layout style={styles.outerContainer} level={backgroundLevel} >
                 <Layout style={styles.listItemContainer} level={backgroundLevel}>
@@ -132,5 +183,10 @@ const styles = StyleSheet.create({
         shadowOpacity: .5,
         shadowOffset: { width: 4, height: 4 },
         elevation: 8,
-    },
+    }, acceptDeny: {
+        padding: 15,
+    }
+    , pending: {
+        flexDirection: 'row'
+    }
 });

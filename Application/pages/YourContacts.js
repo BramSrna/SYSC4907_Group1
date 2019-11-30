@@ -11,6 +11,7 @@ import {
 import cf from "./Functions/ContactFunctions";
 import { Layout, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import ListItemContainer from '../components/ListItemContainer.js';
 
 class YourContacts extends Component {
    constructor(props) {
@@ -35,13 +36,9 @@ class YourContacts extends Component {
       );
    };
 
-   Temp() {
-      cf.TestNotification("ExponentPushToken[a-3hi7MEfJMYJiN8hM_D05]", "Haseeb", "Is the Best")
-   }
-
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={() => /*this.props.navigation.navigate("NewContact", { groups: this.state.groups })*/ this.Temp()} />
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })} />
       );
 
       const renderRightControls = () => [
@@ -68,36 +65,9 @@ class YourContacts extends Component {
                   )}
                   renderItem={({ item }) => {
                      if (item.status == "contact") {
-                        return <React.Fragment><Text
-                           style={styles.SectionListItemStyle}
-                           //Item Separator View
-                           onPress={this.GetSectionListItem.bind(
-                              this,
-                              ' Name: ' + item.name
-                           )}>
-                           {item.name}
-                        </Text></React.Fragment>
+                        return <ListItemContainer contact={true} title={item.name} fromItemView={true} onDelete={() => cf.DeleteContact(item.email)} />;
                      } else if (item.status == "pending") {
-                        return <React.Fragment><View style={{ flexDirection: 'row', backgroundColor: '#F5F5F5' }}>
-                           <Text
-                              style={styles.SectionListItemStyle}
-                              //Item Separator View
-                              onPress={this.GetSectionListItem.bind(
-                                 this,
-                                 ' Email: ' + item.email
-                              )}>
-                              {item.email}
-                           </Text>
-                           <TouchableOpacity style={styles.acceptDeny}
-                              onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups, email: item.email })}
-                           >
-                              <Image source={require("../assets/icons/accept.png")} />
-                           </TouchableOpacity>
-                           <TouchableOpacity style={styles.acceptDeny}
-                              onPress={() => cf.RejectContactRequest(item.email)}
-                           >
-                              <Image source={require("../assets/icons/cancel.png")} />
-                           </TouchableOpacity></View></React.Fragment>
+                        return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groups, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
                      }
 
                   }}
