@@ -60,27 +60,6 @@ class CrowdSourcePage extends Component {
     return sizeValue;
   };
 
-  /**
-   * buttonListener
-   * 
-   * The listener for button presses.
-   * Navigates to the new screen corresponding
-   * to the button that was pressed.
-   * 
-   * @param {String}  buttonId  The ID of the button pressed
-   * 
-   * @returns None
-   */
-  buttonListener = buttonId => {
-    if (buttonId == REGISTER_ITEM) {
-      this.props.navigation.navigate(REGISTER_ITEM_PAGE);
-    } else if (buttonId == MAP_CREATOR) {
-      this.props.navigation.navigate(MAP_CREATOR_PAGE);
-    } else if (buttonId == ADD_ITEM_LOCATION) {
-      this.props.navigation.navigate(ADD_ITEM_LOCATION_PAGE);
-    }
-  };
-
   renderMenuAction = () => (
     <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
   );
@@ -100,8 +79,8 @@ class CrowdSourcePage extends Component {
         <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Register Item' icon='pricetags-outline' onPress={() => this.props.navigation.navigate(REGISTER_ITEM_PAGE)} />
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Add Item Location' icon='pin-outline' onPress={() => this.props.navigation.navigate(ADD_ITEM_LOCATION)} />
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Map Creator' icon='map-outline' shape={2} onPress={() => this.props.navigation.navigate(MAP_CREATOR)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Add Item Location' icon='pin-outline' onPress={() => this.props.navigation.navigate(ADD_ITEM_LOCATION_PAGE)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Map Creator' icon='map-outline' shape={2} onPress={() => this.props.navigation.navigate(MAP_CREATOR_PAGE)} />
           </Layout>
         </ScrollView>
       </React.Fragment>
