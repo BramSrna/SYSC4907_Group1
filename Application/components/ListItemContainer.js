@@ -59,7 +59,8 @@ export default class ListItemContainer extends Component {
             }
         } else {
             if (index == 0) {
-                Alert.alert("Share the list " + this.props.listID)
+                // Alert.alert("Share the list " + this.props.listID)
+                this.props.navigate()
             }
             else if (index == 1) {
                 // Delete
@@ -70,7 +71,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
+        const { share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
@@ -107,28 +108,39 @@ export default class ListItemContainer extends Component {
                     </Layout >
                 );
             } else {
-                return (
-                    <Layout style={styles.outerContainer} level={backgroundLevel} >
-                        <Layout style={styles.listItemContainer} level={backgroundLevel}>
-                            <ListItem style={styles.listItemContainer} disabled={fromItemView} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                if (share) {
+                    return (
+                        <Layout style={styles.outerContainer} level={backgroundLevel} >
+                            <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                                <ListItem icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} style={styles.listItemContainer} disabled={fromItemView} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                            </Layout>
                         </Layout>
-                        <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
-                            <OverflowMenu
-                                style={styles.overflowMenu}
-                                visible={this.state.menuVisible}
-                                data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
-                                placement='left'
-                                onSelect={this.onSelectMenuItem}
-                                onBackdropPress={this.onMenuActionPress}>
-                                <Button
-                                    appearance='ghost'
-                                    icon={MenuIcon}
-                                    onPress={this.onMenuActionPress}
-                                />
-                            </OverflowMenu>
+                    );
+
+                } else {
+                    return (
+                        <Layout style={styles.outerContainer} level={backgroundLevel} >
+                            <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                                <ListItem style={styles.listItemContainer} disabled={fromItemView} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                            </Layout>
+                            <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
+                                <OverflowMenu
+                                    style={styles.overflowMenu}
+                                    visible={this.state.menuVisible}
+                                    data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
+                                    placement='left'
+                                    onSelect={this.onSelectMenuItem}
+                                    onBackdropPress={this.onMenuActionPress}>
+                                    <Button
+                                        appearance='ghost'
+                                        icon={MenuIcon}
+                                        onPress={this.onMenuActionPress}
+                                    />
+                                </OverflowMenu>
+                            </Layout>
                         </Layout>
-                    </Layout>
-                );
+                    );
+                }
             }
         }
         return (

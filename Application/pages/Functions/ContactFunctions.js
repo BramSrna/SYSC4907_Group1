@@ -25,6 +25,14 @@ class ContactFunctions {
       });
    }
 
+   ShareList(props, listID, usersToShareWith, callback) {
+      Alert.alert("List " + listID + " will be shared with: " + usersToShareWith.toString());
+      // Share the list and increment the user count
+      if (true) {
+         callback(props)
+      }
+   }
+
    DeleteContact(email) {
       var currentUser = firebase.auth().currentUser
       firebase
@@ -292,6 +300,8 @@ class ContactFunctions {
             var groupedList = {};
             var pendingList = {};
             var sections = [];
+            var groupsWithoutPending = [];
+            var sectionsWithoutPending = [];
             snapshot.forEach(function (child) {
                if (child.val().status == "sent") {} else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
@@ -315,6 +325,10 @@ class ContactFunctions {
                         groupedList[child.val().group].push(child.val())
                      } else {
                         groups.push({
+                           label: child.val().group,
+                           value: child.val().group
+                        })
+                        groupsWithoutPending.push({
                            label: child.val().group,
                            value: child.val().group
                         })
@@ -347,14 +361,24 @@ class ContactFunctions {
                   title: group,
                   data: temp
                });
+               sectionsWithoutPending.push({
+                  title: group,
+                  data: temp
+               });
             }
             sections.push({
                title: "All Contacts",
                data: allContacts
             });
+            sectionsWithoutPending.push({
+               title: "All Contacts",
+               data: allContacts
+            });
             that.setState({
                sections: sections,
-               groups: groups
+               groups: groups,
+               sectionsWoPending: sectionsWithoutPending,
+               groupsWoPending: groupsWithoutPending
             });
 
          });
