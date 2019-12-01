@@ -7,9 +7,9 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ContactFunctions {
-   constructor() {}
+   constructor() { }
 
-   sendNotification = (token, title, body) => {
+   sendNotification = (token, title, body, data) => {
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -20,7 +20,8 @@ class ContactFunctions {
             to: token,
             sound: 'default',
             title: title,
-            body: body
+            body: body,
+            data: data
          })
       });
    }
@@ -180,7 +181,7 @@ class ContactFunctions {
                                        }
                                     }
                                  })
-                              sendNotification(token, 'Grocery Shopping List New Contact', name + ' has accepted your contact request!');
+                              sendNotification(token, 'Grocery Shopping List New Contact', name + ' has accepted your contact request!', { "page": "YourContacts" });
 
                            } else {
                               console.log("The app was not configured properly.")
@@ -273,7 +274,7 @@ class ContactFunctions {
                                  console.log("The app was not configured properly.")
                               }
                            });
-                        sendNotification(token, 'Grocery Shopping List Contact Request', 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!');
+                        sendNotification(token, 'Grocery Shopping List Contact Request', 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!', { "page": "YourContacts" });
                         Alert.alert("Your contact will appear once the other person accepts it.")
 
                      }
@@ -303,7 +304,7 @@ class ContactFunctions {
             var groupsWithoutPending = [];
             var sectionsWithoutPending = [];
             snapshot.forEach(function (child) {
-               if (child.val().status == "sent") {} else if (child.val().status == "pending") {
+               if (child.val().status == "sent") { } else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
                      pendingList["Pending"].push(child.val())
                   } else {

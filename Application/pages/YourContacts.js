@@ -146,7 +146,7 @@ class YourContacts extends Component {
                <Layout>
                   <Button
                      title="SHARE"
-                     color="#f194ff"
+                     color="#13FF00"
                      onPress={() => cf.ShareList(this.props, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
                      })}

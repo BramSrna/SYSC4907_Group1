@@ -66,12 +66,16 @@ class HomePage extends Component {
 
     try {
       firebase.database().ref('/userInfo/' + emailId + '/notificationToken').set(token)
-
+      this._notificationSubscription = Notifications.addListener(this._handleNotification);
     } catch (error) {
       console.log(error)
     }
 
   }
+
+  _handleNotification = (notification) => {
+    this.props.navigation.navigate(notification.data.page)
+  };
 
   /**
    * Updates the width and height state varibles if the screen is rotated.
