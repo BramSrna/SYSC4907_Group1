@@ -1,18 +1,12 @@
 import React, { Component } from "react";
-import { Text, View, TextInput, TouchableHighlight, Alert, Platform, KeyboardAvoidingView, StyleSheet } from "react-native";
-import { Layout, Button, Input, Select, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
-
-import { Header } from "react-navigation"
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
-import RNPickerSelect from 'react-native-picker-select';
 import { units } from "../UnitList";
-
-const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
-const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
 const PAGE_TITLE = "Register Item";
 

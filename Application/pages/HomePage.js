@@ -77,7 +77,7 @@ class HomePage extends Component {
       onBackdropPress={this.onMenuActionPress}>
       <TopNavigationAction
         icon={MenuIcon}
-        onPress={this.onMenuActionPress}
+        onPress={() => this.onMenuActionPress()}
       />
     </OverflowMenu>
   );
