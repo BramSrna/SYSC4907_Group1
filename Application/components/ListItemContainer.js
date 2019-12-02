@@ -70,7 +70,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { } } = this.props;
+        const { title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
