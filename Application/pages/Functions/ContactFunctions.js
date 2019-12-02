@@ -27,6 +27,7 @@ class ContactFunctions {
    }
 
    ShareList(props, listID, usersToShareWith, callback) {
+      // Update user count in lists and add to users shared list
       Alert.alert("List " + listID + " will be shared with: " + usersToShareWith.toString());
       // Share the list and increment the user count
       if (true) {
@@ -196,14 +197,15 @@ class ContactFunctions {
 
    AddNewGroup(that, groupName, listOfGroups) {
       for (group in listOfGroups) {
-         if (listOfGroups[group].label == groupName) {
+         if (listOfGroups[group].text == groupName) {
             Alert.alert("That group already exists!")
             return;
          }
       }
       var obj = {
          label: groupName,
-         value: groupName
+         value: groupName,
+         text: groupName
       };
       listOfGroups.push(obj);
       that.setState({
@@ -310,7 +312,8 @@ class ContactFunctions {
                   } else {
                      groups.push({
                         label: "Pending",
-                        value: "Pending"
+                        value: "Pending",
+                        text: "Pending"
                      })
                      groupNames.push("Pending")
                      pendingList["Pending"] = [];
@@ -327,10 +330,12 @@ class ContactFunctions {
                      } else {
                         groups.push({
                            label: child.val().group,
+                           text: child.val().group,
                            value: child.val().group
                         })
                         groupsWithoutPending.push({
                            label: child.val().group,
+                           text: child.val().group,
                            value: child.val().group
                         })
                         groupNames.push(child.val().group)

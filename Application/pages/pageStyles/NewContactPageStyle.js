@@ -10,72 +10,62 @@ export const styles = StyleSheet.create({
     backgroundColor: 'black',
     color: "black",
   },
-  topContainer: {
+  modal: {
+    paddingBottom: 300, // TODO: Make this dynamic...
+  },
+  formOuterContainer: {
+    margin: 8,
+    padding: 8,
+    borderRadius: 10,
+  },
+  formInnerContainer: {
     flex: 1,
-    justifyContent: 'center',
+    padding: 8,
     alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
-  },
-  midContainer: {
-    flex: 4,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
+    borderRadius: 10,
   },
-  botContainer: {
+  inputRow: {
+    paddingVertical: 4,
+  },
+  selectBox: {
+    width: '100%',
+  },
+  modalContainer: {
     flex: 1,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
+    padding: 16,
   },
-  scrollView: {
-    backgroundColor: "black",
+  input: {
+    flexDirection: 'row',
+    borderRadius: 30,
+    width: 250,
+    margin: 4,
   },
-  whiteHeaderText: {
-    color: 'white',
-    fontSize: 20,
+  buttonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 250,
+    borderRadius: 30,
   },
-  blackText: {
-    color: 'black',
+  modalButton: {
+    flex: 1,
+    margin: 4,
+    borderRadius: 30,
   },
-  textInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
+  button: {
+    flex: 1,
+    marginTop: 8,
+    width: '100%',
   },
-  picker: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
+  scrollContainer: {
+    flex: 1,
   },
-  rowSorter: {
-    flexDirection: "row",
-    padding: 20,
+  avoidingView: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
 });
-
-export const pickerStyle = {
-  inputAndroid: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-    paddingRight: 30,
-  },
-  inputIOS: {
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-    height: 40,
-    paddingRight: 30,
-  },
-};

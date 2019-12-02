@@ -98,7 +98,7 @@ class YourContacts extends Component {
 
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groups })} />
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending })} />
       );
 
       const renderRightControls = () => [
@@ -134,7 +134,7 @@ class YourContacts extends Component {
                         if (item.status == "contact") {
                            return <ListItemContainer contact={true} title={item.name} fromItemView={true} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.GetSectionListItem(item + " , but need to implement edit") }} />;
                         } else if (item.status == "pending") {
-                           return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groups, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
+                           return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
                         }
                      }
 

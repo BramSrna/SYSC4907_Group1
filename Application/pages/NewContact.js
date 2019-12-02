@@ -8,18 +8,17 @@ import {
    KeyboardAvoidingView, TouchableOpacity, Image
 } from "react-native";
 import { Header } from "react-navigation"
-import { styles, pickerStyle } from "./pageStyles/NewContactPageStyle";
+import { styles } from "./pageStyles/NewContactPageStyle";
 import globalStyles from "./pageStyles/GlobalStyle";
 import RNPickerSelect from 'react-native-picker-select';
 import Dialog from "react-native-dialog";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Button, Text, Input, Modal, Select, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import { dark, light } from '../assets/Themes.js';
+import { ScrollView } from "react-native-gesture-handler";
 
 
-
-const keyboardVerticalOffset = Platform.OS === 'ios' ? (Header.HEIGHT + 64) : (Header.HEIGHT + 0)
-const keyboardAvoidingViewBehavior = Platform.OS === 'ios' ? "padding" : "padding"
 
 // These are the default values for all of the input boxes
 const DEFAULT_NAME = ""
@@ -81,32 +80,32 @@ class NewContact extends Component {
 
    };
 
-   renderRequiredText(bodyText, reqText = "(*)") {
-      return (
-         <Text style={globalStyles.whiteText}>
-            {bodyText}
-            <Text style={globalStyles.requiredHighlight}>
-               {reqText}
-            </Text>
-         </Text>
-      );
-   }
+   // renderRequiredText(bodyText, reqText = "(*)") {
+   //    return (
+   //       <Text style={globalStyles.whiteText}>
+   //          {bodyText}
+   //          <Text style={globalStyles.requiredHighlight}>
+   //             {reqText}
+   //          </Text>
+   //       </Text>
+   //    );
+   // }
 
    renderModalElement = () => {
       return (
          <Layout
             level='3'
             style={styles.modalContainer}>
-            <Text category='h6' >Create New List</Text>
+            <Text category='h6' >Add New Group</Text>
             <Input
                style={styles.input}
-               placeholder='List Name...'
+               placeholder='Enter a group name'
                onChangeText={group => this.setState({ group })}
-               autoFocus={this.state.modalVisible ? true : false}
+               autoFocus={this.state.isDialogVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
+               <Button style={styles.modalButton} onPress={() => this.handleCancel()}>Cancel</Button>
                <Button style={styles.modalButton} onPress={() => { this.handleCreate() }}>Create</Button>
-               <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
             </Layout>
          </Layout>
       );
@@ -123,80 +122,47 @@ class NewContact extends Component {
                alignment='center'
                leftControl={renderMenuAction()}
             />
-            <Layout>
-               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
-                  <Modal style={styles.modal}
-                     allowBackdrop={true}
-                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setModalVisible}
-                     visible={this.state.modalVisible}>
-                     {this.renderModalElement()}
-                  </Modal>
-                  {/* <View style={styles.rowSorter}>
-                     <View style={{ flex: 1 }}>
-                        {this.renderRequiredText("Name: ")}
-                     </View>
-
-                     <View style={{ flex: 1 }}>
-                        <TextInput
-                           style={styles.textInput}
-                           placeholder="Name"
-                           onChangeText={(name) => this.setState({ name })}
-                           value={this.state.name}
-                        />
-                     </View>
-                  </View>
-
-                  <View style={styles.rowSorter}>
-                     <View style={{ flex: 1 }}>
-                        <Text style={globalStyles.whiteText}>Group: </Text>
-                     </View>
-
-                     <View style={{ flex: 1 }}>
-                        <RNPickerSelect
-                           value={this.state.group}
-                           items={this.state.allGroups}
-                           style={pickerStyle}
-                           useNativeAndroidPickerStyle={false}
-                           placeholder={{ label: "Select a group...", value: "" }}
-                           onValueChange={(group) => this.setState({ group })} />
-                     </View>
-
-                     <TouchableOpacity
-                        onPress={() => this.setState({ isDialogVisible: true })}
-                     >
-                        <Image source={require("../assets/icons/new.png")} />
-                     </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.rowSorter}>
-                     <View style={{ flex: 1 }}>
-                        {this.renderRequiredText("Email: ")}
-                     </View>
-
-                     <View style={{ flex: 1 }}>
-                        <TextInput
-                           style={styles.textInput}
-                           placeholder="Email"
-                           onChangeText={(email) => this.setState({ email })}
+            <Modal style={styles.modal}
+               allowBackdrop={true}
+               backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+               onBackdropPress={() => { this.setState({ isDialogVisible: !this.state.isDialogVisible }) }}
+               visible={this.state.isDialogVisible}>
+               {this.renderModalElement()}
+            </Modal>
+            <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
+               <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+                  <Layout style={styles.formOuterContainer} level='3'>
+                     <Layout style={styles.formInnerContainer}>
+                        <Input style={styles.inputRow}
+                           label='Email'
+                           placeholder='Enter an email'
                            value={this.state.email}
-                           editable={this.state.lockEmail}
+                           onChangeText={(email) => this.setState({ email })}
                         />
-                     </View>
-                  </View>
-               </KeyboardAvoidingView>
-
-               <View style={styles.botContainer}>
-                  <TouchableHighlight
-                     style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-                     onPress={this.handleAdd}
-                  >
-                     <Text style={globalStyles.whiteText}>{"Add Contact"}</Text>
-                  </TouchableHighlight>
-               </View> */}
-               </KeyboardAvoidingView>
-            </Layout>
-         </React.Fragment>
+                        <Input style={styles.inputRow}
+                           label='Name'
+                           placeholder='Enter a name'
+                           value={this.state.name}
+                           onChangeText={(name) => this.setState({ name })}
+                        />
+                        <Select style={styles.selectBox}
+                           label='Group'
+                           data={this.state.allGroups}
+                           placeholder='Select a group...'
+                           selectedOption={this.state.group}
+                           onSelect={(group) => () => this.handleChangeGroup(group)}
+                        />
+                        <TouchableOpacity
+                           onPress={() => this.setState({ isDialogVisible: true })}
+                        >
+                           <Image source={require("../assets/icons/new.png")} />
+                        </TouchableOpacity>
+                        <Button style={styles.button} onPress={() => this.handleAdd()} >Add Contact</Button>
+                     </Layout>
+                  </Layout>
+               </ScrollView>
+            </KeyboardAvoidingView>
+         </React.Fragment >
       );
    }
 }
