@@ -8,20 +8,20 @@ The items in the dictionary are as follows:
     value: The corresponding value saved to the database
 */
 const departmentList = [
-    {label: "Bakery", value: "BAKERY"},
-    {label: "Beer", value: "BEER"},
-    {label: "Bulk", value: "BULK"},
-    {label: "Cheese", value: "CHEESE"},
-    {label: "Coffee And Tea", value: "COFFEE_AND_TEA"},
-    {label: "Flowers And Floral Arrangements", value: "FLOWERS_AND_FLORAL_ARRANGEMENTS"},
-    {label: "Grocery", value: "GROCERY"},
-    {label: "Meat And Poultry", value: "MEAT_AND_POULTRY"},
-    {label: "Prepared Foods", value: "PREPARED_FOODS"},
-    {label: "Produce", value: "PRODUCE"},
-    {label: "Pets", value: "PETS"},
-    {label: "Seafood", value: "SEAFOOD"},
-    {label: "Wine", value: "WINE"},
-    {label: "Whole Body", value: "WHOLE_BODY"},
+    {text:"Bakery", label: "Bakery", value: "BAKERY"},
+    {text:"Beer", label: "Beer", value: "BEER"},
+    {text:"Bulk", label: "Bulk", value: "BULK"},
+    {text:"Cheese", label: "Cheese", value: "CHEESE"},
+    {text:"Coffee And Tea", label: "Coffee And Tea", value: "COFFEE_AND_TEA"},
+    {text:"Flowers And Floral Arrangements", label: "Flowers And Floral Arrangements", value: "FLOWERS_AND_FLORAL_ARRANGEMENTS"},
+    {text:"Grocery", label: "Grocery", value: "GROCERY"},
+    {text:"Meat And Poultry", label: "Meat And Poultry", value: "MEAT_AND_POULTRY"},
+    {text:"Prepared Foods", label: "Prepared Foods", value: "PREPARED_FOODS"},
+    {text:"Produce", label: "Produce", value: "PRODUCE"},
+    {text:"Pets", label: "Pets", value: "PETS"},
+    {text:"Seafood", label: "Seafood", value: "SEAFOOD"},
+    {text:"Wine", label: "Wine", value: "WINE"},
+    {text:"Whole Body", label: "Whole Body", value: "WHOLE_BODY"},
 ];
 
 export const departments = departmentList;
