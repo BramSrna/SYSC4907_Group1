@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@eva-design/eva": "^1.2.0",
+    "@ui-kitten/eva-icons": "^4.2.0",
     "braces": "^3.0.2",
     "eslint": "^6.6.0",
     "expo": "^33.0.0",
@@ -21,7 +23,9 @@
     "react-native-double-tap": "^1.0.1",
     "react-native-elements": "^1.2.7",
     "react-native-picker-select": "^6.3.3",
+    "react-native-svg": "~9.4.0",
     "react-native-swipeout": "^2.3.6",
+    "react-native-ui-kitten": "^4.2.0",
     "react-native-web": "^0.11.4",
     "react-navigation": "^3.11.0",
     "react-navigation-stack": "^1.7.3"

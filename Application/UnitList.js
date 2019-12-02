@@ -6,9 +6,9 @@ The items in the dictionary are as follows:
     value: The corresponding value saved to the database
 */
 const unitList = [
-    {label: "Grams", value: "GRAMS"},
-    {label: "Litres", value: "LITRES"},
-    {label: "Units", value: "UNITS"},
+    {label: "Grams", text: "Grams", value: "GRAMS"},
+    {label: "Litres", text: "Litres",value: "LITRES"},
+    {label: "Units", text: "Units",value: "UNITS"},
 ];
 
 export const units = unitList;

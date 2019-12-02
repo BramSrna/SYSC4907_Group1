@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Image, Platform, StatusBar, StyleSheet, SafeAreaView, } from 'react-native';
+import { mapping, } from '@eva-design/eva';
+import { dark, light } from './assets/Themes.js';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
 import * as firebase from 'firebase';
 import RootNavigation from './navigation/RootNavigation';
@@ -7,15 +11,20 @@ import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
 import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
+import lf from './pages/ListFunctions.js';
 import _ from 'lodash';
+
+const themes = { light, dark };
 
 export default class App extends Component {
   constructor(props) {
     super(props);
+    global.theme = light;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
-      isAuthenticated: false
+      isAuthenticated: false,
+      theme: 'light',
     };
 
     //Temprory Solution to remove Timer warning on android
@@ -36,16 +45,24 @@ export default class App extends Component {
   onAuthStateChanged = (user) => {
     this.setState({ isAuthProcessReady: true });
     this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
+
+    if (this.state.isAuthenticated) {
+      lf.GetTheme(this);
+    }
   }
 
   componentDidMount() {
     SplashScreen.preventAutoHide();
   }
 
-  render() {
+  componentWillUnmount() {
+    this.eventListener.remove();
+  }
+
+  renderCurrentState() {
     if ((!this.state.isLoadingComplete || !this.state.isAuthProcessReady) && !this.props.skipLoadingScreen) {
       return (
-        <View style={{
+        <Layout style={{
           justifyContent: 'center',
           alignItems: 'center',
         }}>
@@ -56,15 +73,29 @@ export default class App extends Component {
             source={require('./assets/splash.gif')}
             onLoad={this._loadResourcesAsync}
           />
-        </View>
+        </Layout>
       );
     }
     return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+      <Layout style={styles.container}>
+        {Platform.OS === 'ios' && <StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />}
+        {Platform.OS === 'android' && <Layout style={{ marginTop: StatusBar.currentHeight }} />}
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
-      </View>
+      </Layout>
+    );
+  }
+
+  render() {
+    global.theme = this.state.theme == 'light' ? light : dark;
+    return (
+      <React.Fragment>
+        <IconRegistry icons={EvaIconsPack} />
+        <ApplicationProvider mapping={mapping} theme={global.theme}>
+          <SafeAreaView style={[styles.container, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+            {this.renderCurrentState()}
+          </SafeAreaView>
+        </ApplicationProvider>
+      </React.Fragment>
     );
   }
 
@@ -90,10 +121,5 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  statusBarUnderlay: {
-    height: 24,
-    backgroundColor: 'rgba(0,0,0,0.2)',
   },
 });

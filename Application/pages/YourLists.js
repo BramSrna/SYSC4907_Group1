@@ -1,17 +1,11 @@
 import React, { Component } from "react";
-import {
-   TouchableOpacity,
-   Text,
-   View,
-   FlatList,
-   Image
-} from "react-native";
-import styles from "./pageStyles/YourListsPageStyle";
-import Swipeout from "react-native-swipeout";
-import Dialog from "react-native-dialog";
+import { FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./ListFunctions";
-import Menu from "./Menu"
+import ListItemContainer from '../components/ListItemContainer.js';
 
+const PAGE_TITLE = "Your Lists";
 
 class YourLists extends Component {
    constructor(props) {
@@ -20,7 +14,7 @@ class YourLists extends Component {
       this.state = {
          listTitles: [],
          apiData: [],
-         isDialogVisible: false
+         modalVisible: false,
       };
    }
 
@@ -48,114 +42,151 @@ class YourLists extends Component {
       });
    }
 
-   FlatListItemSeparator = () => {
-      return (
-         <View
-            style={{
-               height: 1,
-               width: "100%",
-               backgroundColor: "#00b5ec"
-            }}
-         />
-      );
-   };
-   handleCancel = () => {
-      this.newListName = "";
-      this.setState({ isDialogVisible: false });
-   };
-
    handleCreate = () => {
       lf.CreateNewList(this.newListName);
       this.newListName = "";
       this.setState({
-         isDialogVisible: false
+         modalVisible: false
       });
    };
-
-   handleSwipeOpen(rowId, direction) {
-      if (typeof direction !== "undefined") {
-         this.setState({ activeRow: rowId });
-      }
-   }
 
    setNewListName(name) {
       this.newListName = name;
    }
 
+   deleteListWithID = (id) => {
+      lf.DeleteList(id);
+   }
+
+   renderModalElement = () => {
+      return (
+         <Layout
+            level='3'
+            style={styles.modalContainer}>
+            <Text category='h6' >Create New List</Text>
+            <Input
+               style={styles.input}
+               placeholder='List Name...'
+               onChangeText={name => this.setNewListName(name)}
+               autoFocus={this.state.modalVisible ? true : false}
+            />
+            <Layout style={styles.buttonContainer}>
+               <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+               <Button style={styles.modalButton} onPress={() => { this.handleCreate() }}>Create</Button>
+            </Layout>
+         </Layout>
+      );
+   };
+
+   setModalVisible = () => {
+      this.setState({ modalVisible: !this.state.modalVisible });
+   };
+
    render() {
-      const swipeButtons = [
-         {
-            component: (
-               <View
-                  style={{
-                     flex: 1,
-                     alignItems: "center",
-                     justifyContent: "center",
-                     flexDirection: "column"
-                  }}
-               >
-                  <Image source={require("../assets/icons/delete.png")} />
-               </View>
-            ),
-            backgroundColor: "red",
-            onPress: () => {
-               lf.DeleteList(this.state.apiData[this.state.activeRow].key);
-            }
-         }
+      const AddAction = (props) => (
+         <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
+      );
+
+      const renderRightControls = () => [
+         <AddAction />,
       ];
+
+      const renderMenuAction = () => (
+         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+      );
+
       return (
          <React.Fragment>
-            <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
-            <View style={styles.ListContainer}>
-               <Dialog.Container visible={this.state.isDialogVisible} style={{}}>
-                  <Dialog.Title>New List</Dialog.Title>
-                  <Dialog.Description>
-                     Enter the name of the new list you would like to create:
-               </Dialog.Description>
-                  <Dialog.Input
-                     onChangeText={name => this.setNewListName(name)}
-                  ></Dialog.Input>
-                  <Dialog.Button label="Cancel" onPress={this.handleCancel} />
-                  <Dialog.Button label="Create" onPress={this.handleCreate} />
-               </Dialog.Container>
-               <Text style={styles.pageTitle}>
-                  All Lists: {this.state.listTitles.length}
-               </Text>
-               <TouchableOpacity
-                  onPress={() => this.setState({ isDialogVisible: true })}
-               >
-                  <Image source={require("../assets/icons/new.png")} />
-               </TouchableOpacity>
+            <TopNavigation
+               title={PAGE_TITLE}
+               alignment='center'
+               leftControl={renderMenuAction()}
+               rightControls={renderRightControls()}
+            />
+            <Layout style={styles.ListContainer}>
+               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
+                  <Modal style={styles.modal}
+                     allowBackdrop={true}
+                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+                     onBackdropPress={this.setModalVisible}
+                     visible={this.state.modalVisible}>
+                     {this.renderModalElement()}
+                  </Modal>
+               </KeyboardAvoidingView>
                <FlatList
+                  contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}
                   data={this.state.listTitles}
                   width="100%"
-                  extraData={this.state.activeRow}
                   keyExtractor={index => index.toString()}
-                  ItemSeparatorComponent={this.FlatListItemSeparator}
                   renderItem={({ item, index }) => (
-                     <Swipeout
-                        right={swipeButtons}
-                        backgroundColor="#000000"
-                        underlayColor="white"
-                        rowID={index}
-                        sectionId={1}
-                        autoClose={true}
-                        onOpen={(secId, rowId, direction) =>
-                           this.handleSwipeOpen(rowId, direction)
-                        }
-                        close={this.state.activeRow !== index}
-                     >
-                        <TouchableOpacity onPress={this.GoToList.bind(this, item)}>
-                           <Text style={styles.item}>{item}</Text>
-                        </TouchableOpacity>
-                     </Swipeout>
+                     <ListItemContainer title={item} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                   )}
                />
-            </View>
+            </Layout>
          </React.Fragment>
       );
    }
 }
+
+const styles = StyleSheet.create({
+   container: {
+
+   },
+   ListContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      flex: 1,
+   },
+   flatList: {
+      paddingTop: 8,
+      paddingHorizontal: 4,
+   },
+   pageTitle: {
+      padding: 30,
+      paddingBottom: 15,
+      color: "white",
+      fontSize: 30
+   },
+   item: {
+      padding: 10,
+      fontSize: 18,
+      // height: 40,
+      color: "white"
+   },
+   addButton: {
+      padding: 10,
+      paddingTop: 50,
+      paddingBottom: 15,
+      color: "white"
+   },
+   modalContainer: {
+      flex: 1,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+   },
+   modal: {
+      paddingBottom: 300, // TODO: Make this dynamic...
+   },
+   input: {
+      flexDirection: 'row',
+      borderRadius: 30,
+      width: 250,
+      margin: 4,
+   },
+   buttonContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      width: 250,
+      borderRadius: 30,
+   },
+   modalButton: {
+      flex: 1,
+      margin: 4,
+      borderRadius: 30,
+   },
+});
 
 export default YourLists;

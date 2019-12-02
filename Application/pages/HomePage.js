@@ -1,66 +1,144 @@
 import React, { Component } from "react";
-import { Text, View, TouchableHighlight } from "react-native";
-import globalStyles from "../pages/pageStyles/GlobalStyle";
-import firebase from 'firebase';
-import Menu from "./Menu"
+import { StyleSheet, Dimensions } from 'react-native';
+import { Layout, TopNavigation, TopNavigationAction, OverflowMenu, } from 'react-native-ui-kitten';
+import { MenuOutline, SunIcon, MenuIcon } from "../assets/icons/icons.js";
+import { dark, light } from '../assets/Themes.js';
+import { ScrollView } from "react-native-gesture-handler";
+import HomeSquareContainer from "../components/HomeSquareContainer.js";
+import lf from '../pages/ListFunctions.js';
 
-const YOUR_LISTS = "Go To Your Lists Page"
-const CROWD_SOURCE = "Go To Crowd Source Page"
-const SIGN_OUT = "Sign Out"
-
+const PAGE_TITLE = "Home";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
-
-
+const MARGIN_RATIO = 30; // higher number = smaller margin
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").height,
+      menuVisible: false,
+    };
+    this.onLayout = this.onLayout.bind(this);
   }
 
+  /**
+   * Updates the width and height state varibles if the screen is rotated.
+   * @param {*} e this
+   */
+  onLayout(e) {
+    this.setState({
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
+    });
+  }
 
-  buttonListener = buttonId => {
-    if (buttonId == CROWD_SOURCE) {
-      this.props.navigation.navigate(CROWD_SOURCE_PAGE);
-    } else if (buttonId == SIGN_OUT) {
-      firebase.auth().signOut();
-    } else if (buttonId == YOUR_LISTS) {
-      this.props.navigation.navigate(YOUR_LISTS_PAGE);
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the margin size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Margin Size
+   */
+  calcMarginValue = (deviceWidth, tpr) => {
+    marginValue = deviceWidth / (tpr * MARGIN_RATIO);
+    return marginValue;
+  };
+
+  /**
+   * To be used with HomeSquareContainer,
+   * Determines the container size.
+   * @param {integer} deviceWidth The current width of the device in the current orientation
+   * @param {integer} tpr THis value determines the number containers in one row
+   * @returns {integer} Container size
+   */
+  calcSizeValue = (deviceWidth, tpr) => {
+    marginValue = deviceWidth / (tpr * MARGIN_RATIO);
+    sizeValue = (deviceWidth - marginValue * (tpr * 2)) / tpr;
+    return sizeValue;
+  };
+
+  menuData = [
+    { title: 'Toggle Theme', icon: SunIcon },
+  ];
+
+  renderLeftMenuAction = () => (
+    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+  );
+
+  renderRightMenuAction = () => (
+    <OverflowMenu
+      style={styles.overflowMenu}
+      visible={this.state.menuVisible}
+      data={this.menuData}
+      placement='bottom end'
+      onSelect={this.onMenuItemSelect}
+      onBackdropPress={this.onMenuActionPress}>
+      <TopNavigationAction
+        icon={MenuIcon}
+        onPress={() => this.onMenuActionPress()}
+      />
+    </OverflowMenu>
+  );
+
+  onMenuActionPress = () => {
+    this.setState({ menuVisible: !this.state.menuVisible });
+  };
+
+  onMenuItemSelect = (index) => {
+    if (index = 1) {
+      lf.ToggleTheme();
     }
+    this.setState({ menuVisible: false });
   };
 
   render() {
+    aspectRatio = this.state.height / this.state.width;
+    gridShape = aspectRatio > 1.6 ? 2 : 4;
+    marginValue = this.calcMarginValue(this.state.width, gridShape);
+    sizeValue = this.calcSizeValue(this.state.width, gridShape);
     return (
-      <React.Fragment>
-        <Menu toggleAction={() => this.props.navigation.toggleDrawer()} />
-        <View style={globalStyles.defaultContainer}>
-          <Text style={globalStyles.whiteText}>HomePage</Text>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(CROWD_SOURCE)}
-          >
-            <Text style={globalStyles.whiteText}>{CROWD_SOURCE}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(YOUR_LISTS)}
-          >
-            <Text style={globalStyles.whiteText}>{YOUR_LISTS}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={[globalStyles.defaultButtonContainer, globalStyles.defaultButton]}
-            onPress={() => this.buttonListener(SIGN_OUT)}
-          >
-            <Text style={globalStyles.whiteText}>{SIGN_OUT}</Text>
-          </TouchableHighlight>
-
-        </View>
+      <React.Fragment >
+        <TopNavigation
+          title={PAGE_TITLE}
+          alignment='center'
+          leftControl={this.renderLeftMenuAction()}
+          rightControls={this.renderRightMenuAction()}
+        />
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+          <Layout style={styles.container} onLayout={this.onLayout} >
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Search Recipes' icon='search-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Recommendations' icon='bulb-outline' shape={2} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Shared With You' icon='share-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Crowd-Source' icon='loader-outline' onPress={() => this.props.navigation.navigate(CROWD_SOURCE_PAGE)} />
+          </Layout>
+        </ScrollView>
       </React.Fragment>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  overflowMenu: {
+    padding: 4,
+    shadowColor: 'black',
+    shadowOpacity: .5,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
+  },
+});
 
 export default HomePage;

@@ -7,7 +7,6 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000000',
   },
   defaultButtonContainer: {
     height: 45,
@@ -65,5 +64,5 @@ export default StyleSheet.create({
   },
   requiredHighlight: {
     color: "red",
-  }
+  },
 });
