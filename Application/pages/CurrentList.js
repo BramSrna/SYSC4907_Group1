@@ -103,8 +103,8 @@ class CurrentList extends Component {
                autoFocus={this.state.modalVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
-               <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
                <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+               <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
             </Layout>
          </Layout>
       );
