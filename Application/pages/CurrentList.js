@@ -20,7 +20,8 @@ class CurrentList extends Component {
          modalMode: 'item',
          itemName: "",
          modalVisible: false,
-         message: ''
+         message: '',
+         userCount: 0
       };
    }
 
@@ -176,7 +177,8 @@ class CurrentList extends Component {
                rightControls={renderRightControls()}
             />
             <Layout style={styles.ListContainer}>
-               {renderNotification()}
+               {this.state.userCount > 1 ? renderNotification() : null}
+               {/* {console.log(this.state.userCount)} */}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}

@@ -4,7 +4,7 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
 
    sendNotification = (token, title, body, data) => {
       let response = fetch('https://exp.host/--/api/v2/push/send', {
@@ -49,25 +49,25 @@ class ListFunctions {
             }
          }).then(
             firebase
-               .database()
-               .ref("/userInfo/")
-               .once("value", function (snapshot) {
-                  if (snapshot.val()) {
-                     for (user in snapshot.val()) {
-                        if (uids.includes(snapshot.val()[user].uid)) {
-                           if (snapshot.val()[user].notificationToken) {
-                              tokens.push(snapshot.val()[user].notificationToken)
-                           } else {
-                              console.log("User did not give notification access " + snapshot.val()[user])
-                           }
+            .database()
+            .ref("/userInfo/")
+            .once("value", function (snapshot) {
+               if (snapshot.val()) {
+                  for (user in snapshot.val()) {
+                     if (uids.includes(snapshot.val()[user].uid)) {
+                        if (snapshot.val()[user].notificationToken) {
+                           tokens.push(snapshot.val()[user].notificationToken)
                         } else {
-                           console.log("User did not log in correctly")
+                           console.log("User did not give notification access " + snapshot.val()[user])
                         }
+                     } else {
+                        console.log("User did not log in correctly")
                      }
-                  } else {
-                     console.log("Users not configured properly!")
                   }
-               })
+               } else {
+                  console.log("Users not configured properly!")
+               }
+            })
          ).finally(that.tokensToNotifications(uids, tokens, listID, listName, message))
    }
 
@@ -170,15 +170,21 @@ class ListFunctions {
             var items = [];
             var ids = [];
             var ssv = snapshot.val();
+            var userCount = 0;
             if (ssv && ssv.items) {
                for (var item in ssv.items) {
                   items.push(ssv.items[item]);
                   ids.push(item);
                }
+
+            }
+            if (ssv.user_count) {
+               userCount = ssv.user_count;
             }
             that.setState({
                listItems: items,
-               listItemIds: ids
+               listItemIds: ids,
+               userCount: userCount
             });
          });
    }
@@ -290,7 +296,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => { })
+         .then(data => {})
          .catch(error => {
             console.log("Failed to create list: " + error);
          });
