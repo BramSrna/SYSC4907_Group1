@@ -35,12 +35,21 @@ class ListFunctions {
             if (snapshot.val()) {
                for (var user in snapshot.val()) {
                   if (snapshot.val()[user].lists.shared) {
-                     var lists = snapshot.val()[user].lists.shared
-                     for (var shared in lists) {
-                        if (shared == listID) {
-                           uids.push(user);
+                     if (snapshot.val()[user] != firebase.auth().currentUser.uid) {
+                        var lists = snapshot.val()[user].lists.shared
+                        for (var shared in lists) {
+                           if (shared == listID) {
+                              uids.push(user);
+                           }
+                        }
+                        var otherLists = snapshot.val()[user].lists.created
+                        for (var created in otherLists) {
+                           if (created == listID) {
+                              uids.push(user);
+                           }
                         }
                      }
+
                   }
 
                }
