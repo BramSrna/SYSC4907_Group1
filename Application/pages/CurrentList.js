@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Image, View, FlatList, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { Image, View, FlatList, StyleSheet, KeyboardAvoidingView, Alert, TouchableOpacity } from "react-native";
 import { Layout, Button, Input, Icon, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
@@ -17,9 +17,10 @@ class CurrentList extends Component {
          listId: "",
          listItems: [],
          listItemIds: [],
-
+         modalMode: 'item',
          itemName: "",
          modalVisible: false,
+         message: ''
       };
    }
 
@@ -75,9 +76,9 @@ class CurrentList extends Component {
    };
    DELETEME2 = () => {
       lf.AddItemToList(this.state.listId, this.state.itemName, 1, "aSize mL", "aNote");
-      this.state.itemName = "";
       this.setState({
-         modalVisible: false
+         modalVisible: false,
+         itemName: ''
       });
    };
    DELETEME3 = (name) => {
@@ -86,37 +87,72 @@ class CurrentList extends Component {
       });
    }
 
+   notificationMessage = (message) => {
+      this.setState({ message: message })
+   }
+
+   sendNotification = () => {
+      var message = this.state.message;
+      if (message == '') {
+         message = 'Hey, just wanted you to check out the list!'
+      }
+      lf.sendNotificationToSharedUsers(this.state.listId, this.state.listName, message);
+      this.setState({
+         modalVisible: false, message: ''
+      });
+   }
+
    deleteItem = (listID, itemID) => {
       lf.DeleteItemInList(listID, itemID);
    }
 
    renderModalElement = () => {
-      return (
-         <Layout
-            level='3'
-            style={styles.modalContainer}>
-            <Text category='h6' >Add New Item</Text>
-            <Input
-               style={styles.input}
-               placeholder='Item Name...'
-               onChangeText={name => this.DELETEME3(name)}
-               autoFocus={this.state.modalVisible ? true : false}
-            />
-            <Layout style={styles.buttonContainer}>
-               <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
-               <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
+      if (this.state.modalMode == 'item') {
+         return (
+            <Layout
+               level='3'
+               style={styles.modalContainer}>
+               <Text category='h6' >Add New Item</Text>
+               <Input
+                  style={styles.input}
+                  placeholder='Item Name...'
+                  onChangeText={name => this.DELETEME3(name)}
+                  autoFocus={this.state.modalVisible ? true : false}
+               />
+               <Layout style={styles.buttonContainer}>
+                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
+               </Layout>
             </Layout>
-         </Layout>
-      );
+         );
+      } else if (this.state.modalMode == 'notify') {
+         return (
+            <Layout
+               level='3'
+               style={styles.modalContainer}>
+               <Text category='h6' >Enter Notification Message</Text>
+               <Input
+                  style={styles.input}
+                  placeholder='Optional message...'
+                  onChangeText={message => this.notificationMessage(message)}
+                  autoFocus={this.state.modalVisible ? true : false}
+               />
+               <Layout style={styles.buttonContainer}>
+                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={() => { this.sendNotification() }}>Send</Button>
+               </Layout>
+            </Layout>
+         );
+      }
    };
 
-   setModalVisible = () => {
-      this.setState({ modalVisible: !this.state.modalVisible });
+   setModalVisible = (mode = 'item') => {
+      this.setState({ modalMode: mode, modalVisible: !this.state.modalVisiblem, itemName: '', message: '' });
    };
 
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => { this.setModalVisible() }} />
       );
 
       const renderRightControls = () => [
@@ -127,6 +163,10 @@ class CurrentList extends Component {
          <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
       );
 
+      renderNotification = () => {
+         return (<TouchableOpacity onPress={() => this.setModalVisible('notify')} ><Image source={require("../assets/notify.png")} /></TouchableOpacity>);
+      }
+
       return (
          <React.Fragment>
             <TopNavigation
@@ -136,6 +176,7 @@ class CurrentList extends Component {
                rightControls={renderRightControls()}
             />
             <Layout style={styles.ListContainer}>
+               {renderNotification()}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}

@@ -4,7 +4,103 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
+
+   sendNotification = (token, title, body, data) => {
+      let response = fetch('https://exp.host/--/api/v2/push/send', {
+         method: 'POST',
+         headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            to: token,
+            sound: 'default',
+            title: title,
+            body: body,
+            data: data
+         })
+      });
+   }
+
+   sendNotificationToSharedUsers(listID, listName, message) {
+      var uids = [];
+      var tokens = [];
+      firebase
+         .database()
+         .ref("/users/")
+         .once("value", function (snapshot) {
+
+            if (snapshot.val()) {
+               for (var user in snapshot.val()) {
+                  if (snapshot.val()[user].lists.shared) {
+                     var lists = snapshot.val()[user].lists.shared
+                     for (var shared in lists) {
+                        if (shared == listID) {
+                           uids.push(user);
+                        }
+                     }
+                  }
+
+               }
+            } else {
+               console.group("Something went wrong!")
+            }
+         }).then(
+            firebase
+            .database()
+            .ref("/userInfo/")
+            .once("value", function (snapshot) {
+               if (snapshot.val()) {
+                  for (user in snapshot.val()) {
+                     if (uids.includes(snapshot.val()[user].uid)) {
+                        if (snapshot.val()[user].notificationToken) {
+                           tokens.push(snapshot.val()[user].notificationToken)
+                        } else {
+                           console.log("User did not give notification access " + snapshot.val()[user])
+                        }
+                     } else {
+                        console.log("User did not log in correctly")
+                     }
+                  }
+               } else {
+                  console.log("Users not configured properly!")
+               }
+            })
+         ).finally(tokensToNotifications(uids, tokens, listID, listName, message))
+   }
+
+   tokensToNotifications(uids, tokens, listID, listName, message) {
+      var that = this;
+      firebase
+         .database()
+         .ref("/contacts/")
+         .once("value", function (snapshot) {
+            for (var pos in tokens) {
+               var name = firebase.auth().currentUser.email;
+               if (snapshot.val()) {
+                  if (snapshot.val()[uids[pos]]) {
+                     for (contact in snapshot.val()[uids[pos]]) {
+                        if (snapshot.val()[uids[pos]][contact].email == currentEmail) {
+                           name = snapshot.val()[uids[pos]][contact].name
+                           break
+                        }
+                     }
+                     that.sendNotification(tokens[pos], name + ' to ' + listName, message, {
+                        "page": "CurrentListPage",
+                        "name": listName,
+                        "listID": listID
+                     });
+                  } else {
+                     console.log("There are no contacts for that person")
+                  }
+               } else {
+                  console.log("tokensToNotifications messed up")
+               }
+            }
+         })
+
+   }
 
    /**
     * This function is used to add items to a list.
@@ -193,7 +289,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => { })
+         .then(data => {})
          .catch(error => {
             console.log("Failed to create list: " + error);
          });

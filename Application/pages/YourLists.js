@@ -123,7 +123,8 @@ class YourLists extends Component {
                      <ListItemContainer navigate={() => {
                         this.props.navigation.navigate("YourContacts", {
                            share: true,
-                           listID: this.state.apiData[index].key
+                           listID: this.state.apiData[index].key,
+                           listName: item
                         })
                      }} title={item} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listName={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                   )}

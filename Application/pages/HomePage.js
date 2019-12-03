@@ -42,6 +42,7 @@ class HomePage extends Component {
           });
         }
       });
+
     const { status: existingStatus } = await Permissions.getAsync(
       Permissions.NOTIFICATIONS
     );
@@ -74,7 +75,15 @@ class HomePage extends Component {
   }
 
   _handleNotification = (notification) => {
-    this.props.navigation.navigate(notification.data.page)
+    if (notification.data.page == "CurrentListPage" && notification.data.name && notification.data.listID) {
+      this.props.navigation.navigate(notification.data.page, {
+        name: notification.data.name,
+        listID: notification.data.listID
+      })
+
+    } else {
+      this.props.navigation.navigate(notification.data.page)
+    }
   };
 
   /**

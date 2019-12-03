@@ -35,20 +35,24 @@ class NewContact extends Component {
          email: DEFAULT_EMAIL,
          isDialogVisible: false,
          allGroups: [],
-         lockEmail: true,
          fromPending: false
       };
    }
 
    componentDidMount() {
-      this.setState({ allGroups: this.props.navigation.getParam("groups", []) });
-      this.setState({ email: this.props.navigation.getParam("email", DEFAULT_EMAIL) });
-      var bool = true;
-      if (this.props.navigation.getParam("email", DEFAULT_EMAIL) != DEFAULT_EMAIL) {
-         bool = false;
+      var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
+      var bool = false;
+      if (email != DEFAULT_EMAIL) {
+         bool = true;
       }
-      this.setState({ lockEmail: bool });
-      this.setState({ fromPending: !bool });
+      var temp = [];
+      temp.push({
+         label: 'Select a group...',
+         value: 'Select a group...',
+         text: 'Select a group...'
+      });
+      temp.concat(this.props.navigation.getParam("groups", []))
+      this.setState({ email: email, fromPending: bool, allGroups: temp });
    }
 
    handleChangeGroup(val) {
@@ -69,12 +73,21 @@ class NewContact extends Component {
 
 
    handleAdd = () => {
+      var aGroup = "";
+      if (this.state.group != DEFAULT_GROUP && this.state.group.text && this.state.group.text != 'Select a group...') {
+         aGroup = this.state.group.text
+      }
       //Try adding the contact
       if (this.state.fromPending) {
-         cf.AcceptContactRequest(this.state.email, this.state.name, this.state.group)
+         cf.AcceptContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
+            props.navigation.navigate("YourContacts")
+         })
+         this.setState({ fromPending: false })
 
       } else {
-         cf.SendContactRequest(this.state.email, this.state.name, this.state.group)
+         cf.SendContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
+            props.navigation.navigate("YourContacts")
+         })
 
       }
 
@@ -100,7 +113,7 @@ class NewContact extends Component {
             <Input
                style={styles.input}
                placeholder='Enter a group name'
-               onChangeText={group => this.setState({ group })}
+               onChangeText={(group) => this.setState({ group })}
                autoFocus={this.state.isDialogVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
@@ -138,6 +151,7 @@ class NewContact extends Component {
                            placeholder='Enter an email'
                            value={this.state.email}
                            onChangeText={(email) => this.setState({ email })}
+                           disabled={this.state.fromPending ? true : false}
                         />
                         <Input style={styles.inputRow}
                            label='Name'
@@ -150,13 +164,9 @@ class NewContact extends Component {
                            data={this.state.allGroups}
                            placeholder='Select a group...'
                            selectedOption={this.state.group}
-                           onSelect={(group) => () => this.handleChangeGroup(group)}
+                           onSelect={(group) => this.handleChangeGroup(group)}
                         />
-                        <TouchableOpacity
-                           onPress={() => this.setState({ isDialogVisible: true })}
-                        >
-                           <Image source={require("../assets/icons/new.png")} />
-                        </TouchableOpacity>
+                        <Button style={styles.groupButton} onPress={() => this.setState({ isDialogVisible: true })} >New Group</Button>
                         <Button style={styles.button} onPress={() => this.handleAdd()} >Add Contact</Button>
                      </Layout>
                   </Layout>

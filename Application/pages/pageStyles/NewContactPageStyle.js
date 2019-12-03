@@ -68,4 +68,10 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
   },
+  groupButton: {
+    backgroundColor: '#00FF00',
+    flex: 1,
+    marginTop: 8,
+    width: '75%',
+  }
 });

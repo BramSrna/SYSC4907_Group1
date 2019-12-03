@@ -15,13 +15,14 @@ import ListItemContainer from '../components/ListItemContainer.js';
 class YourContacts extends Component {
    constructor(props) {
       super(props);
-      this.state = { listID: '', sections: [], groups: [], share: false, selected: [], sectionsWoPending: [], groupsWoPending: [], sectionsSelected: [] };
+      this.state = { listName: '', listID: '', sections: [], groups: [], share: false, selected: [], sectionsWoPending: [], groupsWoPending: [], sectionsSelected: [] };
    }
 
    componentDidMount() {
       this.setState({
          share: this.props.navigation.getParam("share", false),
-         listID: this.props.navigation.getParam("listID", '')
+         listID: this.props.navigation.getParam("listID", ''),
+         listName: this.props.navigation.getParam("listName", '')
       });
       cf.GetContactInfo(this);
 
@@ -147,7 +148,7 @@ class YourContacts extends Component {
                   <Button
                      title="SHARE"
                      color="#13FF00"
-                     onPress={() => cf.ShareList(this.props, this.state.listID, this.state.selected, function (props) {
+                     onPress={() => cf.ShareList(this.props, this.state.listName, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
                      })}
                   />
