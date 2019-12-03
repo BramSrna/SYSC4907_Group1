@@ -22,7 +22,7 @@ import { ScrollView } from "react-native-gesture-handler";
 
 // These are the default values for all of the input boxes
 const DEFAULT_NAME = ""
-const DEFAULT_GROUP = "";
+const DEFAULT_GROUP = [];
 const DEFAULT_EMAIL = ""
 
 class NewContact extends Component {
@@ -35,24 +35,51 @@ class NewContact extends Component {
          email: DEFAULT_EMAIL,
          isDialogVisible: false,
          allGroups: [],
-         fromPending: false
+         fromPending: false, fromEdit: false
       };
    }
 
    componentDidMount() {
-      var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
-      var bool = false;
-      if (email != DEFAULT_EMAIL) {
-         bool = true;
+      if (this.props.navigation.getParam("edit", false)) {
+         var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
+         var name = this.props.navigation.getParam("name", DEFAULT_NAME);
+         var groups = [];
+         groups.push({
+            label: 'Select a group...',
+            value: 'Select a group...',
+            text: 'Select a group...'
+         });
+         groups = groups.concat(this.props.navigation.getParam("groups", []))
+         var group = this.props.navigation.getParam("group", "");
+         if (group != "") {
+            group = {
+               label: group,
+               value: group,
+               text: group
+            }
+         } else {
+            group = {
+               label: 'Select a group...',
+               value: 'Select a group...',
+               text: 'Select a group...'
+            }
+         }
+         this.setState({ email: email, name: name, allGroups: groups, group: group, fromEdit: true })
+      } else {
+         var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
+         var bool = false;
+         if (email != DEFAULT_EMAIL) {
+            bool = true;
+         }
+         var temp = [];
+         temp.push({
+            label: 'Select a group...',
+            value: 'Select a group...',
+            text: 'Select a group...'
+         });
+         temp = temp.concat(this.props.navigation.getParam("groups", []))
+         this.setState({ email: email, fromPending: bool, allGroups: temp, fromEdit: false });
       }
-      var temp = [];
-      temp.push({
-         label: 'Select a group...',
-         value: 'Select a group...',
-         text: 'Select a group...'
-      });
-      temp.concat(this.props.navigation.getParam("groups", []))
-      this.setState({ email: email, fromPending: bool, allGroups: temp });
    }
 
    handleChangeGroup(val) {
@@ -78,11 +105,18 @@ class NewContact extends Component {
          aGroup = this.state.group.text
       }
       //Try adding the contact
+
       if (this.state.fromPending) {
          cf.AcceptContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
          this.setState({ fromPending: false })
+
+      } else if (this.state.fromEdit) {
+         cf.EditContact(this.props, this.state.email, this.state.name, aGroup, function (props) {
+            props.navigation.navigate("YourContacts")
+         })
+         this.setState({ fromEdit: false })
 
       } else {
          cf.SendContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
@@ -151,7 +185,7 @@ class NewContact extends Component {
                            placeholder='Enter an email'
                            value={this.state.email}
                            onChangeText={(email) => this.setState({ email })}
-                           disabled={this.state.fromPending ? true : false}
+                           disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
                         />
                         <Input style={styles.inputRow}
                            label='Name'

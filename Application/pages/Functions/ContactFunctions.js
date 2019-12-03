@@ -7,9 +7,10 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ContactFunctions {
-   constructor() {}
+   constructor() { }
 
    sendNotification = (token, title, body, data) => {
+      // console.log(token + " " + title + " " + body + " " + "\n" + data)
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -24,7 +25,31 @@ class ContactFunctions {
             data: data
          })
       });
-      console.log(response)
+   }
+
+   EditContact(props, contactEmail, contactName, contactGroup, callback) {
+      var currentUser = firebase.auth().currentUser
+      firebase
+         .database()
+         .ref("/contacts/" + currentUser.uid)
+         .once("value", function (snapshot) {
+            var ssv = snapshot.val();
+            if (ssv) {
+               for (var contact in ssv) {
+                  if (ssv[contact].email == contactEmail) {
+                     firebase
+                        .database()
+                        .ref("/contacts/" + currentUser.uid + "/" + contact)
+                        .update({
+                           "name": contactName,
+                           "group": contactGroup
+                        });
+                     callback(props)
+                     break
+                  }
+               }
+            }
+         })
    }
 
    ShareList(props, listName, listID, usersToShareWith, callback) {
@@ -69,17 +94,19 @@ class ContactFunctions {
                                                    for (contact in snapshot.val()) {
                                                       if (snapshot.val()[contact].email == name) {
                                                          name = snapshot.val()[contact].name;
+                                                         that.sendNotification(notificationToken, 'Grocery Shopping List Sharing', name + ' has shared the following list with you: ' + listName, {
+                                                            "page": "CurrentListPage",
+                                                            "name": listName,
+                                                            "listID": listID
+                                                         });
+                                                         break;
                                                       }
                                                    }
                                                 } else {
                                                    console.log("Contacts not configured properly")
                                                 }
                                              })
-                                          that.sendNotification(notificationToken, 'Grocery Shopping List Sharing', name + ' has shared the following list with you: ' + listName, {
-                                             "page": "CurrentListPage",
-                                             "name": listName,
-                                             "listID": listID
-                                          });
+
                                           callback(props)
                                        }).catch(error => {
                                           Alert.alert("ERROR: Contact developer")
@@ -217,7 +244,6 @@ class ContactFunctions {
             if (ssv) {
                for (var contact in ssv) {
                   if (ssv[contact].email == contactEmail) {
-                     console.log(contactGroup)
                      firebase
                         .database()
                         .ref("/contacts/" + currentUser.uid + "/" + contact)
@@ -234,6 +260,7 @@ class ContactFunctions {
                         .ref("/userInfo/" + userInfoKey)
                         .once("value", function (snapshot) {
                            if (snapshot.val()) {
+                              token = snapshot.val().notificationToken
                               var newuid = snapshot.val().uid
                               firebase
                                  .database()
@@ -250,7 +277,9 @@ class ContactFunctions {
                                                    "status": "contact"
                                                 });
                                              name = ssv[contact].name
-                                             token = snapshot.val().notificationToken
+                                             that.sendNotification(token, 'Grocery Shopping List New Contact', name + ' has accepted your contact request!', {
+                                                "page": "YourContacts"
+                                             });
                                              break;
                                           }
                                        }
@@ -258,10 +287,8 @@ class ContactFunctions {
                                        console.log("Something went wrong!")
                                     }
                                  })
+
                               callback(props)
-                              that.sendNotification(token, 'Grocery Shopping List New Contact', name + ' has accepted your contact request!', {
-                                 "page": "YourContacts"
-                              });
 
                            } else {
                               console.log("The app was not configured properly.")
@@ -353,13 +380,14 @@ class ContactFunctions {
                                     status: "pending"
                                  });
                               token = snapshot.val().notificationToken
+                              that.sendNotification(token, 'Grocery Shopping List Contact Request', 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!', {
+                                 "page": "YourContacts"
+                              });
                            } else {
                               console.log("The app was not configured properly.")
                            }
                         });
-                     that.sendNotification(token, 'Grocery Shopping List Contact Request', 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!', {
-                        "page": "YourContacts"
-                     });
+
                      callback(props)
                      Alert.alert("Your contact will appear once the other person accepts it.")
 
@@ -390,7 +418,7 @@ class ContactFunctions {
             var groupsWithoutPending = [];
             var sectionsWithoutPending = [];
             snapshot.forEach(function (child) {
-               if (child.val().status == "sent") {} else if (child.val().status == "pending") {
+               if (child.val().status == "sent") { } else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
                      pendingList["Pending"].push(child.val())
                   } else {

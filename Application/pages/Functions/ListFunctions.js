@@ -4,7 +4,7 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ListFunctions {
-   constructor() {}
+   constructor() { }
 
    sendNotification = (token, title, body, data) => {
       let response = fetch('https://exp.host/--/api/v2/push/send', {
@@ -26,6 +26,7 @@ class ListFunctions {
    sendNotificationToSharedUsers(listID, listName, message) {
       var uids = [];
       var tokens = [];
+      var that = this
       firebase
          .database()
          .ref("/users/")
@@ -44,30 +45,30 @@ class ListFunctions {
 
                }
             } else {
-               console.group("Something went wrong!")
+               console.log("Something went wrong!")
             }
          }).then(
             firebase
-            .database()
-            .ref("/userInfo/")
-            .once("value", function (snapshot) {
-               if (snapshot.val()) {
-                  for (user in snapshot.val()) {
-                     if (uids.includes(snapshot.val()[user].uid)) {
-                        if (snapshot.val()[user].notificationToken) {
-                           tokens.push(snapshot.val()[user].notificationToken)
+               .database()
+               .ref("/userInfo/")
+               .once("value", function (snapshot) {
+                  if (snapshot.val()) {
+                     for (user in snapshot.val()) {
+                        if (uids.includes(snapshot.val()[user].uid)) {
+                           if (snapshot.val()[user].notificationToken) {
+                              tokens.push(snapshot.val()[user].notificationToken)
+                           } else {
+                              console.log("User did not give notification access " + snapshot.val()[user])
+                           }
                         } else {
-                           console.log("User did not give notification access " + snapshot.val()[user])
+                           console.log("User did not log in correctly")
                         }
-                     } else {
-                        console.log("User did not log in correctly")
                      }
+                  } else {
+                     console.log("Users not configured properly!")
                   }
-               } else {
-                  console.log("Users not configured properly!")
-               }
-            })
-         ).finally(tokensToNotifications(uids, tokens, listID, listName, message))
+               })
+         ).finally(that.tokensToNotifications(uids, tokens, listID, listName, message))
    }
 
    tokensToNotifications(uids, tokens, listID, listName, message) {
@@ -81,7 +82,7 @@ class ListFunctions {
                if (snapshot.val()) {
                   if (snapshot.val()[uids[pos]]) {
                      for (contact in snapshot.val()[uids[pos]]) {
-                        if (snapshot.val()[uids[pos]][contact].email == currentEmail) {
+                        if (snapshot.val()[uids[pos]][contact].email == name) {
                            name = snapshot.val()[uids[pos]][contact].name
                            break
                         }
@@ -289,7 +290,7 @@ class ListFunctions {
          .ref("/users/" + uid + "/lists/created")
          .child(key)
          .set(0)
-         .then(data => {})
+         .then(data => { })
          .catch(error => {
             console.log("Failed to create list: " + error);
          });
