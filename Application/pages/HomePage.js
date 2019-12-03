@@ -41,6 +41,11 @@ class HomePage extends Component {
             // console.log(snapshot);
           });
         }
+        if (!snapshot.val().uid) {
+          firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
+            // console.log(snapshot);
+          })
+        }
       });
 
     const { status: existingStatus } = await Permissions.getAsync(
