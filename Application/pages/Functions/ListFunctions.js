@@ -94,14 +94,15 @@ class ListFunctions {
                      for (contact in snapshot.val()[uids[pos]]) {
                         if (snapshot.val()[uids[pos]][contact].email == firebase.auth().currentUser.email) {
                            name = snapshot.val()[uids[pos]][contact].name
+                           that.sendNotification(tokens[pos], name + ' to ' + listName, message, {
+                              "page": "CurrentListPage",
+                              "name": listName,
+                              "listID": listID
+                           });
                            break
                         }
                      }
-                     that.sendNotification(tokens[pos], name + ' to ' + listName, message, {
-                        "page": "CurrentListPage",
-                        "name": listName,
-                        "listID": listID
-                     });
+                     //TODO WHAT IF NOT CONTACT?
                   } else {
                      console.log("There are no contacts for that person")
                   }
