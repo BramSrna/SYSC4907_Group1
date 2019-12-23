@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
+import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 
@@ -33,25 +34,30 @@ class ForgotPasswordPage extends Component {
         return (
             <Layout style={globalStyles.defaultContainer}>
                 <KeyboardAvoidingView behavior="padding">
-                    <Layout style={styles.columnContainer}>
-                        <Layout style={styles.rowContainer}>
-                            <Input
-                                style={styles.input}
-                                placeholder="Enter your email..."
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                autoCompleteType="email"
-                                onChangeText={email => this.setState({ email })}
-                                value={this.state.email} />
+                    <ScrollView contentContainerStyle={styles.scrollContainer}>
+                        <Layout style={styles.columnContainer}>
+                            <Layout style={styles.rowContainer}>
+                                <Input
+                                    style={styles.input}
+                                    placeholder="Enter your email..."
+                                    ref="email"
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCompleteType="email"
+                                    onChangeText={email => this.setState({ email })}
+                                    onSubmitEditing={() => this.refs.reset.scrollTo}
+                                    value={this.state.email} />
+                            </Layout>
+                            <Layout style={styles.rowContainer}>
+                                <Button
+                                    style={styles.button}
+                                    ref="reset"
+                                    onPress={this.resetPassword}>
+                                    {RESETPASS}
+                                </Button>
+                            </Layout>
                         </Layout>
-                        <Layout style={styles.rowContainer}>
-                            <Button
-                                style={styles.button}
-                                onPress={this.resetPassword}>
-                                {RESETPASS}
-                            </Button>
-                        </Layout>
-                    </Layout>
+                    </ScrollView>
                 </KeyboardAvoidingView>
             </Layout>
         );
@@ -59,6 +65,11 @@ class ForgotPasswordPage extends Component {
 }
 
 const styles = StyleSheet.create({
+    scrollContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     rowContainer: {
         flexDirection: 'row',
         alignItems: 'center',

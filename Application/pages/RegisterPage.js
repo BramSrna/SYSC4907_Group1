@@ -118,6 +118,7 @@ class RegisterPage extends Component {
               ref="email"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCompleteType="email"
               returnKeyType='next'
               onChangeText={email => this.setState({ email })}
               onSubmitEditing={() => this.refs.password.focus()}
@@ -130,8 +131,8 @@ class RegisterPage extends Component {
               placeholder="Enter your password..."
               ref="password"
               autoCapitalize="none"
-              returnKeyType='next'
               autoCompleteType="password"
+              returnKeyType='next'
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
