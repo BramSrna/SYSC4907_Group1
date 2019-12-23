@@ -1,12 +1,9 @@
 import React, { Component } from "react";
-import { Image, View, FlatList, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { FlatList, StyleSheet, KeyboardAvoidingView, BackHandler } from "react-native";
 import { Layout, Button, Input, Icon, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Swipeout from "react-native-swipeout";
 import DoubleClick from "react-native-double-tap";
 import lf from "./ListFunctions";
-import Dialog from "react-native-dialog";
 import ListItemContainer from '../components/ListItemContainer.js';
 
 const PAGE_TITLE = "Current List";
@@ -28,10 +25,6 @@ class CurrentList extends Component {
 
    componentWillUnmount() {
       this.focusListener.remove();
-   }
-
-   GoBackToYourLists() {
-      this.props.navigation.navigate("YourListsPage");
    }
 
    componentDidMount() {
@@ -69,8 +62,6 @@ class CurrentList extends Component {
    HandleDoubleTapItem(indexPosition) {
       lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId, this.state.listItemIds[indexPosition])
    }
-
-
 
    DELETEME1 = () => {
       this.state.itemName = "";
@@ -113,8 +104,26 @@ class CurrentList extends Component {
       );
    };
 
+   //This is important when handling modal back press on Android
+   handleBackPress = () => {
+      if (this.state.modalVisible) {
+          const modalVisible = false;
+          this.setState({ modalVisible });
+      }
+      this.backHandler.remove();
+      return true;
+  }
+
+   // This handles Modal visibility even with Android back button press (use with handleBackPress())
    setModalVisible = () => {
-      this.setState({ modalVisible: !this.state.modalVisible });
+      const modalVisible = !this.state.modalVisible;
+      if (modalVisible) {
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+      }
+      else {
+         this.backHandler.remove();
+      }
+      this.setState({ modalVisible });
    };
 
    render() {

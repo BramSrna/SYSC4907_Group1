@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
-import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { FlatList, KeyboardAvoidingView, StyleSheet, BackHandler } from "react-native";
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -25,6 +25,15 @@ class YourLists extends Component {
    componentDidMount() {
       this.GenerateNeededData();
    }
+
+   handleBackPress = () => {
+      if (this.state.modalVisible) {
+          const modalVisible = false;
+          this.setState({ modalVisible });
+      }
+      this.backHandler.remove();
+      return true;
+  }
 
    GetListID(listName) {
       var data = this.state.apiData;
@@ -79,7 +88,14 @@ class YourLists extends Component {
    };
 
    setModalVisible = () => {
-      this.setState({ modalVisible: !this.state.modalVisible });
+      const modalVisible = !this.state.modalVisible;
+      if (modalVisible) {
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+      }
+      else {
+         this.backHandler.remove();
+      }
+      this.setState({ modalVisible });
    };
 
    render() {

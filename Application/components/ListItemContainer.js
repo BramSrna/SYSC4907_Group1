@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, BackHandler } from 'react-native';
-import { Layout, ListItem, Text, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
+import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
 /**
