@@ -1,12 +1,12 @@
 import React, { Component } from "react";
-import { Text, View, TextInput, TouchableHighlight, Image, Alert } from "react-native";
+import { Alert, StyleSheet, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
-import styles from "./pageStyles/GlobalStyle"
 import * as firebase from "firebase";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 
-const LOGINPAGE = "Login";
+const RESETPASS = "Reset Password";
 
-export default class ForgotPasswordPage extends Component {
+class ForgotPasswordPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -31,37 +31,61 @@ export default class ForgotPasswordPage extends Component {
 
     render() {
         return (
-            <Layout style={styles.defaultContainer}>
-                <Layout style={styles.defaultInputContainer}>
-                    <Image
-                        style={styles.defaultInputIcon}
-                        source={require("../assets/icons/icons8-mail-account-64.png")}
-                    />
-                    <TextInput
-                        style={styles.defaultInputs}
-                        placeholder="Enter your email..."
-                        label="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        underlineColorAndroid="transparent"
-                        onChangeText={email => this.setState({ email })}
-                        value={this.state.email}
-                    />
-                </Layout>
-                <TouchableHighlight
-                    style={[styles.defaultButtonContainer, styles.defaultButton]}
-                    onPress={this.resetPassword}
-                >
-                    <Text style={styles.whiteText}>{"Reset Password"}</Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                    style={styles.defaultButtonContainer}
-                    onPress={this.onBackToLoginPress}
-                >
-                    <Text style={styles.whiteText}>{"Back to Login"}</Text>
-                </TouchableHighlight>
+            <Layout style={globalStyles.defaultContainer}>
+                <KeyboardAvoidingView behavior="padding">
+                    <Layout style={styles.columnContainer}>
+                        <Layout style={styles.rowContainer}>
+                            <Input
+                                style={styles.input}
+                                placeholder="Enter your email..."
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCompleteType="email"
+                                captionIcon={this.emailIcon}
+                                onChangeText={email => this.setState({ email })}
+                                value={this.state.email} />
+                        </Layout>
+                        <Layout style={styles.rowContainer}>
+                            <Button
+                                style={styles.button}
+                                onPress={this.resetPassword}>
+                                {RESETPASS}
+                            </Button>
+                        </Layout>
+                    </Layout>
+                </KeyboardAvoidingView>
             </Layout>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    rowContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+    },
+    columnContainer: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+    },
+    button: {
+        marginVertical: 4,
+        marginHorizontal: 4,
+        borderRadius: 30,
+        width: 250,
+    },
+    input: {
+        flexDirection: 'row',
+        borderRadius: 30,
+        width: 250,
+    },
+});
+
+export default ForgotPasswordPage;
