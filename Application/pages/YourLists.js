@@ -26,15 +26,6 @@ class YourLists extends Component {
       this.GenerateNeededData();
    }
 
-   handleBackPress = () => {
-      if (this.state.modalVisible) {
-          const modalVisible = false;
-          this.setState({ modalVisible });
-      }
-      this.backHandler.remove();
-      return true;
-  }
-
    GetListID(listName) {
       var data = this.state.apiData;
       for (var list in data) {
@@ -87,10 +78,18 @@ class YourLists extends Component {
       );
    };
 
+   // This handles Modal visibility even with Android back button press (use with handleBackPress())
    setModalVisible = () => {
       const modalVisible = !this.state.modalVisible;
       if (modalVisible) {
-         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.state.modalVisible) {
+               const modalVisible = false;
+               this.setState({ modalVisible });
+            }
+            this.backHandler.remove();
+            return true;
+         });
       }
       else {
          this.backHandler.remove();

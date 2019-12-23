@@ -47,9 +47,9 @@ class CurrentList extends Component {
 
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       } else {
-         return <ListItemContainer title={item.name} fromItemView={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       }
    }
 
@@ -104,27 +104,24 @@ class CurrentList extends Component {
       );
    };
 
-   //This is important when handling modal back press on Android
-   handleBackPress = () => {
-      if (this.state.modalVisible) {
-          const modalVisible = false;
-          this.setState({ modalVisible });
-      }
-      this.backHandler.remove();
-      return true;
-  }
-
-   // This handles Modal visibility even with Android back button press (use with handleBackPress())
-   setModalVisible = () => {
-      const modalVisible = !this.state.modalVisible;
-      if (modalVisible) {
-         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-      }
-      else {
-         this.backHandler.remove();
-      }
-      this.setState({ modalVisible });
-   };
+      // This handles Modal visibility even with Android back button press (use with handleBackPress())
+      setModalVisible = () => {
+         const modalVisible = !this.state.modalVisible;
+         if (modalVisible) {
+            this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+               if (this.state.modalVisible) {
+                  const modalVisible = false;
+                  this.setState({ modalVisible });
+               }
+               this.backHandler.remove();
+               return true;
+            });
+         }
+         else {
+            this.backHandler.remove();
+         }
+         this.setState({ modalVisible });
+      };
 
    render() {
       const AddAction = (props) => (

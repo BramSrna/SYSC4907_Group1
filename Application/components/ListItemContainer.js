@@ -30,15 +30,6 @@ export default class ListItemContainer extends Component {
     componentWillUnmount() {
     }
 
-    handleBackPress = () => {
-        if (this.state.menuVisible) {
-            const menuVisible = false;
-            this.setState({ menuVisible });
-        }
-        this.backHandler.remove();
-        return true;
-    }
-
     listViewMenuData = [
         { title: 'Share', icon: ShareIcon },
         { title: 'Delete', icon: Trash2Icon },
@@ -48,12 +39,20 @@ export default class ListItemContainer extends Component {
         { title: 'Delete', icon: Trash2Icon },
     ];
 
+    // This handles Modal visibility even with Android back button press (use with handleBackPress())
     onMenuActionPress = () => {
         const menuVisible = !this.state.menuVisible;
         if (menuVisible) {
-            this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+            this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+                if (this.state.menuVisible) {
+                    const menuVisible = false;
+                    this.setState({ menuVisible });
+                }
+                this.backHandler.remove();
+                return true;
+            });
         }
-        else{
+        else {
             this.backHandler.remove();
         }
         this.setState({ menuVisible });
