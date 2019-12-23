@@ -35,25 +35,31 @@ class ListFunctions {
             if (snapshot.val()) {
                for (var user in snapshot.val()) {
                   if (user != firebase.auth().currentUser.uid) {
-
                      if (snapshot.val()[user].lists.shared) {
                         var lists = snapshot.val()[user].lists.shared
                         for (var shared in lists) {
                            if (shared == listID) {
                               uids.push(user);
+
                            }
                         }
+                     }
+                     if (snapshot.val()[user].lists.created) {
+
                         var otherLists = snapshot.val()[user].lists.created
                         for (var created in otherLists) {
                            if (created == listID) {
                               uids.push(user);
+
                            }
                         }
                      }
 
+
                   }
 
                }
+
             } else {
                console.log("Something went wrong!")
             }
@@ -71,14 +77,16 @@ class ListFunctions {
                            console.log("User did not give notification access " + snapshot.val()[user])
                         }
                      } else {
-                        console.log("User did not log in correctly")
+                        // console.log("User did not log in correctly")
                      }
                   }
                } else {
                   console.log("Users not configured properly!")
                }
             })
-         ).finally(that.tokensToNotifications(uids, tokens, listID, listName, message))
+         ).finally(
+            that.tokensToNotifications(uids, tokens, listID, listName, message)
+         )
    }
 
    tokensToNotifications(uids, tokens, listID, listName, message) {
@@ -88,21 +96,20 @@ class ListFunctions {
          .ref("/contacts/")
          .once("value", function (snapshot) {
             for (var pos in tokens) {
-               var name = firebase.auth().currentUser.email;
                if (snapshot.val()) {
                   if (snapshot.val()[uids[pos]]) {
+                     var name = firebase.auth().currentUser.email;
                      for (contact in snapshot.val()[uids[pos]]) {
                         if (snapshot.val()[uids[pos]][contact].email == firebase.auth().currentUser.email) {
                            name = snapshot.val()[uids[pos]][contact].name
-                           that.sendNotification(tokens[pos], name + ' to ' + listName, message, {
-                              "page": "CurrentListPage",
-                              "name": listName,
-                              "listID": listID
-                           });
                            break
                         }
                      }
-                     //TODO WHAT IF NOT CONTACT?
+                     that.sendNotification(tokens[pos], name + ' to ' + listName, message, {
+                        "page": "CurrentListPage",
+                        "name": listName,
+                        "listID": listID
+                     });
                   } else {
                      console.log("There are no contacts for that person")
                   }
