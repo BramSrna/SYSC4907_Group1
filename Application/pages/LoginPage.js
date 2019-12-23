@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Image, Alert, ActivityIndicator } from "react-native";
+import { KeyboardAvoidingView, Image, Alert, ActivityIndicator, StyleSheet } from "react-native";
 import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
 import Firebase from "firebase";
-import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
 import { EmailIcon, PasswordIcon } from "../assets/icons/icons.js";
@@ -15,7 +14,7 @@ const REGISTERPAGE = "Registration";
 const FORGOTPASSWORDPAGE = "ForgotPassword";
 const VERIFICATIONPAGE = "Verification";
 
-export default class LoginPage extends Component {
+class LoginPage extends Component {
   userAlreadyLoggedIn = false;
   state = {
     email: "",
@@ -170,3 +169,34 @@ export default class LoginPage extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  columnContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  button: {
+    marginVertical: 4,
+    marginHorizontal: 4,
+    borderRadius: 30,
+    width: 250,
+  },
+  input: {
+    flexDirection: 'row',
+    borderRadius: 30,
+    width: 250,
+  },
+});
+
+export default LoginPage;

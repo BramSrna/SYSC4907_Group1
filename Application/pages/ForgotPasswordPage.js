@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Text, View, TextInput, TouchableHighlight, Image, Alert } from "react-native";
+import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
 import styles from "./pageStyles/GlobalStyle"
 import * as firebase from "firebase";
 
@@ -30,8 +31,8 @@ export default class ForgotPasswordPage extends Component {
 
     render() {
         return (
-            <View style={styles.defaultContainer}>
-                <View style={styles.defaultInputContainer}>
+            <Layout style={styles.defaultContainer}>
+                <Layout style={styles.defaultInputContainer}>
                     <Image
                         style={styles.defaultInputIcon}
                         source={require("../assets/icons/icons8-mail-account-64.png")}
@@ -46,7 +47,7 @@ export default class ForgotPasswordPage extends Component {
                         onChangeText={email => this.setState({ email })}
                         value={this.state.email}
                     />
-                </View>
+                </Layout>
                 <TouchableHighlight
                     style={[styles.defaultButtonContainer, styles.defaultButton]}
                     onPress={this.resetPassword}
@@ -60,7 +61,7 @@ export default class ForgotPasswordPage extends Component {
                 >
                     <Text style={styles.whiteText}>{"Back to Login"}</Text>
                 </TouchableHighlight>
-            </View>
+            </Layout>
         );
     }
 }
