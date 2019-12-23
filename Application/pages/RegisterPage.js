@@ -95,6 +95,7 @@ class RegisterPage extends Component {
               returnKeyType='next'
               onChangeText={firstname => this.setState({ firstname })}
               onSubmitEditing={() => this.refs.lastname.focus()}
+              blurOnSubmit={false}
               value={this.state.firstname} />
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -107,6 +108,7 @@ class RegisterPage extends Component {
               returnKeyType='next'
               onChangeText={lastname => this.setState({ lastname })}
               onSubmitEditing={() => this.refs.email.focus()}
+              blurOnSubmit={false}
               value={this.state.lastname} />
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -119,6 +121,7 @@ class RegisterPage extends Component {
               returnKeyType='next'
               onChangeText={email => this.setState({ email })}
               onSubmitEditing={() => this.refs.password.focus()}
+              blurOnSubmit={false}
               value={this.state.email} />
           </Layout>
           <Layout style={styles.rowContainer}>
@@ -134,6 +137,7 @@ class RegisterPage extends Component {
               onIconPress={this.onPasswordEyeIconPress}
               onChangeText={password => this.setState({ password })}
               onSubmitEditing={() => this.refs.confirmPassword.focus()}
+              blurOnSubmit={false}
               value={this.state.password} />
           </Layout>
           <Layout style={styles.rowContainer}>
