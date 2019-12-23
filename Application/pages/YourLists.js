@@ -78,7 +78,7 @@ class YourLists extends Component {
       );
    };
 
-   // This handles Modal visibility even with Android back button press (use with handleBackPress())
+   // This handles Modal visibility even with Android back button press
    setModalVisible = () => {
       const modalVisible = !this.state.modalVisible;
       if (modalVisible) {

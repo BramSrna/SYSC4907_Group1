@@ -39,7 +39,7 @@ export default class ListItemContainer extends Component {
         { title: 'Delete', icon: Trash2Icon },
     ];
 
-    // This handles Modal visibility even with Android back button press (use with handleBackPress())
+    // This handles Modal visibility even with Android back button press
     onMenuActionPress = () => {
         const menuVisible = !this.state.menuVisible;
         if (menuVisible) {
