@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, } from 'react-native';
-import { Layout, ListItem, Text, Icon, OverflowMenu, Button, TopNavigationAction } from 'react-native-ui-kitten';
+import { StyleSheet, BackHandler } from 'react-native';
+import { Layout, ListItem, Text, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
 /**
@@ -22,15 +22,21 @@ export default class ListItemContainer extends Component {
         this.state = {
             menuVisible: false,
         };
-        this._isMounted = false;
     }
 
     componentDidMount() {
-        this._isMounted = true;
     }
 
     componentWillUnmount() {
-        this._isMounted = false;
+    }
+
+    handleBackPress = () => {
+        if (this.state.menuVisible) {
+            const menuVisible = false;
+            this.setState({ menuVisible });
+        }
+        this.backHandler.remove();
+        return true;
     }
 
     listViewMenuData = [
@@ -44,6 +50,12 @@ export default class ListItemContainer extends Component {
 
     onMenuActionPress = () => {
         const menuVisible = !this.state.menuVisible;
+        if (menuVisible) {
+            this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        }
+        else{
+            this.backHandler.remove();
+        }
         this.setState({ menuVisible });
     };
 
