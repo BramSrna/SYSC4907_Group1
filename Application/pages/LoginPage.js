@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Image, Alert, ActivityIndicator, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Alert, ActivityIndicator, StyleSheet } from "react-native";
 import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
 import Firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
@@ -114,7 +114,6 @@ class LoginPage extends Component {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCompleteType="email"
-              captionIcon={this.emailIcon}
               onChangeText={email => this.setState({ email })}
               value={this.state.email} />
           </Layout>
@@ -124,7 +123,6 @@ class LoginPage extends Component {
               placeholder="Enter your password..."
               autoCapitalize="none"
               autoCompleteType="password"
-              captionIcon={this.passwordIcon}
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}

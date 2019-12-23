@@ -41,7 +41,6 @@ class ForgotPasswordPage extends Component {
                                 keyboardType="email-address"
                                 autoCapitalize="none"
                                 autoCompleteType="email"
-                                captionIcon={this.emailIcon}
                                 onChangeText={email => this.setState({ email })}
                                 value={this.state.email} />
                         </Layout>
