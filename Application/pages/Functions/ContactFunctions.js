@@ -10,7 +10,7 @@ class ContactFunctions {
    constructor() { }
 
    sendNotification = (token, title, body, data) => {
-      // console.log(token + " " + title + " " + body + " " + "\n" + data)
+
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -94,10 +94,14 @@ class ContactFunctions {
                                                    for (contact in snapshot.val()) {
                                                       if (snapshot.val()[contact].email == name) {
                                                          name = snapshot.val()[contact].name;
-                                                         that.sendNotification(notificationToken, 'Grocery Shopping List Sharing', name + ' has shared the following list with you: ' + listName, {
+                                                         var title = 'Grocery Shopping List Sharing';
+                                                         var message = name + ' has shared the following list with you: ' + listName;
+                                                         that.sendNotification(notificationToken, title, message, {
                                                             "page": "CurrentListPage",
                                                             "name": listName,
-                                                            "listID": listID
+                                                            "listID": listID,
+                                                            "title": title,
+                                                            "message": message
                                                          });
                                                          break;
                                                       }
@@ -277,8 +281,12 @@ class ContactFunctions {
                                                    "status": "contact"
                                                 });
                                              name = ssv[contact].name
-                                             that.sendNotification(token, 'Grocery Shopping List New Contact', name + ' has accepted your contact request!', {
-                                                "page": "YourContacts"
+                                             var title = 'Grocery Shopping List New Contact';
+                                             var message = name + ' has accepted your contact request!';
+                                             that.sendNotification(token, title, message, {
+                                                "page": "YourContacts",
+                                                "title": title,
+                                                "message": message
                                              });
                                              break;
                                           }
@@ -380,8 +388,12 @@ class ContactFunctions {
                                     status: "pending"
                                  });
                               token = snapshot.val().notificationToken
-                              that.sendNotification(token, 'Grocery Shopping List Contact Request', 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!', {
-                                 "page": "YourContacts"
+                              var title = 'Grocery Shopping List Contact Request';
+                              var message = 'A user with the email ' + firebase.auth().currentUser.email.toString() + ' has sent you a contact request!';
+                              that.sendNotification(token, title, message, {
+                                 "page": "YourContacts",
+                                 "title": title,
+                                 "message": message
                               });
                            } else {
                               console.log("The app was not configured properly.")

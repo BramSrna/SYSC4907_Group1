@@ -17,6 +17,8 @@ import { Layout, Button, Text, Input, Modal, Select, TopNavigation, TopNavigatio
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 
 
@@ -40,6 +42,8 @@ class NewContact extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
+
       if (this.props.navigation.getParam("edit", false)) {
          var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
          var name = this.props.navigation.getParam("name", DEFAULT_NAME);
@@ -206,6 +210,7 @@ class NewContact extends Component {
                   </Layout>
                </ScrollView>
             </KeyboardAvoidingView>
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );
    }

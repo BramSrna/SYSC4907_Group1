@@ -4,6 +4,8 @@ import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationA
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Your Lists";
 
@@ -23,6 +25,8 @@ class YourLists extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
+
       this.GenerateNeededData();
    }
 
@@ -130,6 +134,7 @@ class YourLists extends Component {
                   )}
                />
             </Layout>
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
    }

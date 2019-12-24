@@ -7,6 +7,8 @@ import { dark, light } from '../assets/Themes.js';
 import globalStyles from "./pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import { departments } from "../DepartmentList";
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Add Item Location";
 
@@ -30,6 +32,10 @@ class AddItemLocationPage extends Component {
     };
 
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
+  }
+
+  componentDidMount() {
+    nm.setThat(this)
   }
 
   /**
@@ -194,6 +200,7 @@ class AddItemLocationPage extends Component {
             </Layout>
           </ScrollView>
         </KeyboardAvoidingView>
+        <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
   }

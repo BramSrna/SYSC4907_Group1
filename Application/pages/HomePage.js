@@ -9,8 +9,10 @@ import lf from '../pages/Functions/ListFunctions.js';
 import * as firebase from "firebase";
 import { Notifications } from 'expo'
 import * as Permissions from 'expo-permissions'
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
-const PAGE_TITLE = "Home";
+var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
 const CONTACTS = "YourContacts"
@@ -28,6 +30,7 @@ class HomePage extends Component {
   }
 
   async componentDidMount() {
+    nm.setThat(this)
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
@@ -72,30 +75,11 @@ class HomePage extends Component {
 
     try {
       firebase.database().ref('/userInfo/' + emailId + '/notificationToken').set(token)
-      this._notificationSubscription = Notifications.addListener(this._handleNotification);
+      this._notificationSubscription = Notifications.addListener(nm._handleNotification);
     } catch (error) {
       console.log(error)
     }
-
   }
-
-  _handleNotification = (notification) => {
-    if (notification.origin == "selected") {
-      if (notification.data.page == "CurrentListPage" && notification.data.name && notification.data.listID) {
-        this.props.navigation.navigate(notification.data.page, {
-          name: notification.data.name,
-          listID: notification.data.listID
-        })
-
-      } else {
-        this.props.navigation.navigate(notification.data.page)
-      }
-    } else if (notification.origin == "received") {
-      console.log("reached here")
-    } else {
-      console.log("notification origin not recognized")
-    }
-  };
 
   /**
    * Updates the width and height state varibles if the screen is rotated.
@@ -172,6 +156,7 @@ class HomePage extends Component {
     gridShape = aspectRatio > 1.6 ? 2 : 4;
     marginValue = this.calcMarginValue(this.state.width, gridShape);
     sizeValue = this.calcSizeValue(this.state.width, gridShape);
+    PAGE_TITLE += firebase.auth().currentUser.email.toString();
     return (
       <React.Fragment >
         <TopNavigation
@@ -191,6 +176,7 @@ class HomePage extends Component {
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Crowd-Source' icon='loader-outline' onPress={() => this.props.navigation.navigate(CROWD_SOURCE_PAGE)} />
           </Layout>
         </ScrollView>
+        <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
   }

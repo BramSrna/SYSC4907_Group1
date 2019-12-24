@@ -5,6 +5,8 @@ import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Current List";
 
@@ -34,6 +36,7 @@ class CurrentList extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
       // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
       this.focusListener = this.props.navigation.addListener(
          "willFocus",
@@ -206,6 +209,7 @@ class CurrentList extends Component {
                   )}
                />
             </Layout>
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
    }

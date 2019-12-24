@@ -11,6 +11,8 @@ import cf from "./Functions/ContactFunctions";
 import { Layout, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import ListItemContainer from '../components/ListItemContainer.js';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 class YourContacts extends Component {
    constructor(props) {
@@ -19,6 +21,8 @@ class YourContacts extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
+
       this.setState({
          share: this.props.navigation.getParam("share", false),
          listID: this.props.navigation.getParam("listID", ''),
@@ -154,6 +158,7 @@ class YourContacts extends Component {
                   />
                </Layout>
             }
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );
    }
