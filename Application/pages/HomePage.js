@@ -80,14 +80,20 @@ class HomePage extends Component {
   }
 
   _handleNotification = (notification) => {
-    if (notification.data.page == "CurrentListPage" && notification.data.name && notification.data.listID) {
-      this.props.navigation.navigate(notification.data.page, {
-        name: notification.data.name,
-        listID: notification.data.listID
-      })
+    if (notification.origin == "selected") {
+      if (notification.data.page == "CurrentListPage" && notification.data.name && notification.data.listID) {
+        this.props.navigation.navigate(notification.data.page, {
+          name: notification.data.name,
+          listID: notification.data.listID
+        })
 
+      } else {
+        this.props.navigation.navigate(notification.data.page)
+      }
+    } else if (notification.origin == "received") {
+      console.log("reached here")
     } else {
-      this.props.navigation.navigate(notification.data.page)
+      console.log("notification origin not recognized")
     }
   };
 
