@@ -1,23 +1,18 @@
 import React, { Component } from "react";
-import {
-    Text,
-    View,
-    TouchableHighlight,
-    TextInput,
-    Alert,
-    Image
-} from "react-native";
+import { Text, View, TouchableHighlight, TextInput, Alert, Image, StyleSheet } from "react-native";
 import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
-
-import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
+import { dark, light } from '../assets/Themes.js';
+import { ScrollView } from "react-native-gesture-handler";
+import DraggableFlatList from 'react-native-draggable-flatlist'
 
-const PAGE_TITLE="Map Creator";
+
+const PAGE_TITLE = "Map Creator";
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -33,6 +28,7 @@ class MapCreatorPage extends Component {
         this.state = {
             arrayHolder: [], // The departments added so far
             storeName: "", // The name of the store
+            storeAddress: "", // The address of the store
         };
     }
 
@@ -249,15 +245,46 @@ class MapCreatorPage extends Component {
 
     render() {
         return (
-
             <React.Fragment>
                 <TopNavigation
                     title={PAGE_TITLE}
                     alignment="center"
                     leftControl={this.renderMenuAction()}
                 />
-                <View style={styles.mainContainer}>
-                    <View style={styles.topContainer}>
+                <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Layout style={styles.formInnerContainer}>
+                            <Input style={styles.inputRow}
+                                label='Store Name'
+                                ref="storename"
+                                placeholder='Enter store name...'
+                                returnKeyType='next'
+                                value={this.state.storeName}
+                                onChangeText={(storeName) => this.setState({ storeName })}
+                                onSubmitEditing={() => this.refs.storeaddress.focus()}
+                                blurOnSubmit={false}
+                            />
+                            <Input style={styles.inputRow}
+                                label='Store Address'
+                                ref="storeaddress"
+                                placeholder='Enter store address...'
+                                value={this.state.storeAddress}
+                                onChangeText={(storeAddress) => this.setState({ storeAddress })}
+                            />
+                        </Layout>
+                    </Layout>
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Layout style={styles.formInnerContainer}>
+                            <DraggableFlatList
+                                data={this.state.arrayHolder}
+                                renderItem={this.renderItem}
+                                keyExtractor={(item, index) => `draggable-item-${item.key}`}
+                                onDragEnd={({ data }) => this.setState({ data })} />
+                        </Layout>
+                    </Layout>
+                </ScrollView>
+                {/* <Layout style={styles.mainContainer}>
+                    <Layout style={styles.topContainer}>
                         <View style={styles.headerContainer}>
                             <Text style={styles.blackHeaderText}>Map Creator</Text>
                         </View>
@@ -277,7 +304,7 @@ class MapCreatorPage extends Component {
                             </View>
 
                         </View>
-                    </View>
+                    </Layout>
 
                     <View style={styles.midContainer}>
                         <FlatList
@@ -309,10 +336,64 @@ class MapCreatorPage extends Component {
                             </View>
                         </View>
                     </View>
-                </View>
+                </Layout> */}
             </React.Fragment>
         );
     }
+
+    _renderRow = ({ data, active }) => {
+        return <Row data={data} active={active} />
+    }
 }
+
+const styles = StyleSheet.create({
+    list: {
+        flex: 1,
+    },
+    container: {
+        flex: 1,
+        height: '100%',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    scrollContainer: {
+        flex: 1,
+    },
+    avoidingView: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
+    overflowMenu: {
+        padding: 4,
+        shadowColor: 'black',
+        shadowOpacity: .5,
+        shadowOffset: { width: 0, height: 0 },
+        elevation: 8,
+    },
+    formOuterContainer: {
+        margin: 8,
+        padding: 8,
+        borderRadius: 10,
+    },
+    formInnerContainer: {
+        flex: 1,
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    inputRow: {
+        paddingVertical: 4,
+    },
+    selectBox: {
+        width: '100%',
+    },
+    button: {
+        flex: 1,
+        marginTop: 8,
+        width: '100%',
+    },
+});
 
 export default MapCreatorPage;  
