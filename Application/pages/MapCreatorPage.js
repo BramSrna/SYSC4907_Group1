@@ -9,8 +9,6 @@ import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
-import DraggableFlatList from 'react-native-draggable-flatlist'
-
 
 const PAGE_TITLE = "Map Creator";
 
@@ -275,11 +273,6 @@ class MapCreatorPage extends Component {
                     </Layout>
                     <Layout style={styles.formOuterContainer} level='3'>
                         <Layout style={styles.formInnerContainer}>
-                            <DraggableFlatList
-                                data={this.state.arrayHolder}
-                                renderItem={this.renderItem}
-                                keyExtractor={(item, index) => `draggable-item-${item.key}`}
-                                onDragEnd={({ data }) => this.setState({ data })} />
                         </Layout>
                     </Layout>
                 </ScrollView>
