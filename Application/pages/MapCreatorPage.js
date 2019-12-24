@@ -7,7 +7,7 @@ import {
     Alert,
     Image
 } from "react-native";
-import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 
 import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";

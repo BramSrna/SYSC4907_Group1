@@ -1,20 +1,10 @@
 import React, { Component } from "react";
 import {
-   View,
-   TextInput,
-   TouchableHighlight,
-   Alert,
-   Platform,
-   KeyboardAvoidingView, TouchableOpacity, Image
+   KeyboardAvoidingView, StyleSheet
 } from "react-native";
-import { Header } from "react-navigation"
-import { styles } from "./pageStyles/NewContactPageStyle";
-import globalStyles from "./pageStyles/GlobalStyle";
-import RNPickerSelect from 'react-native-picker-select';
-import Dialog from "react-native-dialog";
 import cf from "./Functions/ContactFunctions";
 import { Layout, Button, Text, Input, Modal, Select, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import { MenuOutline } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import NotificationPopup from 'react-native-push-notification-popup';
@@ -215,5 +205,79 @@ class NewContact extends Component {
       );
    }
 }
+
+const styles = StyleSheet.create({
+   container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'black',
+      color: "black",
+   },
+   modal: {
+      paddingBottom: 300, // TODO: Make this dynamic...
+   },
+   formOuterContainer: {
+      margin: 8,
+      padding: 8,
+      borderRadius: 10,
+   },
+   formInnerContainer: {
+      flex: 1,
+      padding: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+   },
+   inputRow: {
+      paddingVertical: 4,
+   },
+   selectBox: {
+      width: '100%',
+   },
+   modalContainer: {
+      flex: 1,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 16,
+   },
+   input: {
+      flexDirection: 'row',
+      borderRadius: 30,
+      width: 250,
+      margin: 4,
+   },
+   buttonContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      width: 250,
+      borderRadius: 30,
+   },
+   modalButton: {
+      flex: 1,
+      margin: 4,
+      borderRadius: 30,
+   },
+   button: {
+      flex: 1,
+      marginTop: 8,
+      width: '100%',
+   },
+   scrollContainer: {
+      flex: 1,
+   },
+   avoidingView: {
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'center',
+   },
+   groupButton: {
+      backgroundColor: '#00FF00',
+      flex: 1,
+      marginTop: 8,
+      width: '75%',
+   }
+});
 
 export default NewContact;

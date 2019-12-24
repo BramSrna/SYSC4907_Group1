@@ -5,7 +5,6 @@ import Firebase from "firebase";
 import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
-import { EmailIcon, PasswordIcon } from "../assets/icons/icons.js";
 
 const LOGIN = "Login";
 const REGISTER = "Register";

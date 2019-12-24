@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Image, View, FlatList, StyleSheet, KeyboardAvoidingView, Alert, TouchableOpacity } from "react-native";
-import { Layout, Button, Input, Icon, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
+import { Image, FlatList, StyleSheet, KeyboardAvoidingView, Alert, TouchableOpacity } from "react-native";
+import { Layout, Button, Input, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";

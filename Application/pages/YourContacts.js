@@ -6,9 +6,8 @@ import {
    Alert,
    Button
 } from "react-native";
-// import styles from "./pageStyles/YourContactsPageStyle";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Text, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
