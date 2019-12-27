@@ -156,7 +156,7 @@ class HomePage extends Component {
     gridShape = aspectRatio > 1.6 ? 2 : 4;
     marginValue = this.calcMarginValue(this.state.width, gridShape);
     sizeValue = this.calcSizeValue(this.state.width, gridShape);
-    PAGE_TITLE += firebase.auth().currentUser.email.toString();
+    // PAGE_TITLE += firebase.auth().currentUser.email.toString();
     return (
       <React.Fragment >
         <TopNavigation
