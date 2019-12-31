@@ -55,3 +55,11 @@ export const SunIcon = (style) => (
 export const UploadIcon = (style) => (
     <Icon {...style} name='upload-outline' />
 );
+
+export const MoveUpIcon = (style) => (
+    <Icon {...style} name='arrow-ios-upward-outline' />
+);
+
+export const MoveDownIcon = (style) => (
+    <Icon {...style} name='arrow-ios-downward-outline' />
+);

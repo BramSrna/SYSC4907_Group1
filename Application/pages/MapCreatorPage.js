@@ -1,14 +1,13 @@
 import React, { Component } from "react";
-import { Text, View, TouchableHighlight, TextInput, Alert, Image, StyleSheet } from "react-native";
-import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Alert, StyleSheet } from "react-native";
+import { Select, Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
-import globalStyles from "../pages/pageStyles/GlobalStyle";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
-import RNPickerSelect from 'react-native-picker-select';
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
+import { MoveUpIcon, MoveDownIcon, Trash2Icon } from '../assets/icons/icons.js';
 
 const PAGE_TITLE = "Map Creator";
 
@@ -177,63 +176,20 @@ class MapCreatorPage extends Component {
     @return void
     */
     renderListElem(index) {
-        // Images taken from https://material.io/resources/icons/?icon=cancel&style=baseline
         return (
-            // Use the row sorter for rendering the item
-            <View style={styles.rowSorter}>
-                {/* Render the up button */}
-                <TouchableHighlight
-                    style={[styles.listButton, { backgroundColor: "black" }]}
-                    onPress={() => this.upButtonPressed(index)}>
-                    <Image
-                        style={styles.image}
-                        resizeMode="contain"
-                        source={require("../assets/icons/up_button.png")}
-                    />
-                </TouchableHighlight>
-
-                {/* Place buffers between elements to make it clearer */}
-                <View style={styles.bufferView}></View>
-
-                {/* Render the delete button */}
-                <TouchableHighlight
-                    style={[styles.listButton, { backgroundColor: "black" }]}
-                    onPress={() => this.delButtonPressed(index)}>
-                    <Image
-                        style={styles.image}
-                        resizeMode="contain"
-                        source={require("../assets/icons/delete_button.png")}
-                    />
-                </TouchableHighlight>
-
-                <View style={styles.bufferView}></View>
-
-                {/* Render the down button */}
-                <TouchableHighlight
-                    style={[styles.listButton, { backgroundColor: "black" }]}
-                    onPress={() => this.downButtonPressed(index)}>
-                    <Image
-                        style={styles.image}
-                        resizeMode="contain"
-                        source={require("../assets/icons/down_button.png")}
-                    />
-                </TouchableHighlight>
-
-                <View style={styles.bufferView}></View>
-
-                {/* Render the department picker */}
-                <View style={{ flex: 5 }}>
-                    <RNPickerSelect
-                        value={this.currDepartments[index]["depName"]}
-                        items={departments}
-                        placeholder={{}}
-                        style={pickerStyle}
-                        onValueChange={(val) => this.updateDepartment(index, val)} />
-                </View>
-
-                {/* Add a blank area at the end of the row to allow for scrolling */}
-                {/* <View style={{ flex: 1, backgroundColor: "white" }} /> */}
-            </View>
+            <Layout style={styles.listItem} level='2'>
+                <ButtonGroup appearance='outline' status='primary'>
+                    <Button icon={MoveUpIcon} onPress={() => this.upButtonPressed(index)} />
+                    <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
+                </ButtonGroup>
+                <Select style={styles.selectMenu}
+                    data={departments}
+                    placeholder='Select a department...'
+                    placeholderStyle={styles.placeholderStyle}
+                    onSelect={(val) => this.updateDepartment(index, val)}
+                />
+                <Button icon={Trash2Icon} appearance='outline' status='danger' onPress={() => this.delButtonPressed(index)} />
+            </Layout>
         )
     }
 
@@ -273,63 +229,20 @@ class MapCreatorPage extends Component {
                     </Layout>
                     <Layout style={styles.formOuterContainer} level='3'>
                         <Layout style={styles.formInnerContainer}>
+                            <FlatList
+                                style={styles.flatList}
+                                width="100%"
+                                data={this.state.arrayHolder}
+                                renderItem={({ item, index }) => this.renderListElem(index)}
+                                keyExtractor={(item, index) => index.toString()}
+                            />
+                            <Layout style={styles.mainButtonGroup} >
+                                <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
+                                <Button style={styles.mainPageButton} status='success' onPress={this.handleSaveMap}>{'Save Map'}</Button>
+                            </Layout>
                         </Layout>
                     </Layout>
                 </ScrollView>
-                {/* <Layout style={styles.mainContainer}>
-                    <Layout style={styles.topContainer}>
-                        <View style={styles.headerContainer}>
-                            <Text style={styles.blackHeaderText}>Map Creator</Text>
-                        </View>
-
-                        <View style={styles.rowSorter}>
-                            <View style={styles.textContainer}>
-                                <Text style={globalStyles.whiteText}>Store Name: </Text>
-                            </View>
-
-                            <View style={styles.pickerContainer}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    placeholder="Store Name"
-                                    onChangeText={(storeName) => this.setState({ storeName })}
-                                    value={this.state.storeName}
-                                />
-                            </View>
-
-                        </View>
-                    </Layout>
-
-                    <View style={styles.midContainer}>
-                        <FlatList
-                            data={this.state.arrayHolder}
-                            renderItem={({ item, index }) => this.renderListElem(index)}
-                            keyExtractor={(item, index) => index.toString()}
-                        />
-                    </View>
-
-                    <View style={styles.botContainer}>
-                        <View style={styles.rowSorter}>
-                            <View style={styles.outerButtonContainer}>
-                                <TouchableHighlight
-                                    style={[styles.buttonContainer, styles.button]}
-                                    onPress={this.addDepartment}
-                                >
-                                    <Text style={globalStyles.whiteText}>{"Add Department"}</Text>
-                                </TouchableHighlight>
-                            </View>
-
-                            <View style={styles.outerButtonContainer}>
-                                <TouchableHighlight
-                                    style={[styles.buttonContainer, styles.button]}
-                                    onPress={this.handleSaveMap}
-                                >
-
-                                    <Text style={globalStyles.whiteText}>{"Save Map"}</Text>
-                                </TouchableHighlight>
-                            </View>
-                        </View>
-                    </View>
-                </Layout> */}
             </React.Fragment>
         );
     }
@@ -376,6 +289,23 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
     },
+    listItem: {
+        flex: 1,
+        marginVertical: 8,
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        borderRadius: 10,
+    },
+    selectMenu: {
+        flex: 1,
+        paddingHorizontal: 8,
+        minWidth: 60,
+    },
+    flatList: {
+        flex: 1
+    },
     inputRow: {
         paddingVertical: 4,
     },
@@ -386,6 +316,21 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: 8,
         width: '100%',
+    },
+    placeholderStyle: {
+        color: 'gray',
+    },
+    mainButtonGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    mainPageButton: {
+        flex: 1,
+        padding: 8,
+        marginVertical: 8,
+        marginHorizontal: 2,
     },
 });
 
