@@ -18,7 +18,7 @@ class MapCreatorPage extends Component {
         // Use a list for keeping track of all the departments
         this.currDepartments = [
             {
-                depName: departments[0].label,
+                department: departments[0],
             },
         ]
 
@@ -36,9 +36,8 @@ class MapCreatorPage extends Component {
     @return void
     */
     componentDidMount() {
-        this._mounted = true
-
-        this.setState({ arrayHolder: [...this.currDepartments] })
+        this._mounted = true;
+        this.setState({ arrayHolder: [...this.currDepartments] });
     }
 
     /*
@@ -49,7 +48,7 @@ class MapCreatorPage extends Component {
     @return void
     */
     componentWillUnmount() {
-        this._mounted = false
+        this._mounted = false;
     }
 
     /*
@@ -62,7 +61,7 @@ class MapCreatorPage extends Component {
     */
     addDepartment = () => {
         // Add a department to the list
-        this.currDepartments.push({ depName: departments[0].label });
+        this.currDepartments.push({ department: departments[0].label });
 
         // Rerender the screen
         this.setState({ arrayHolder: [...this.currDepartments] })
@@ -81,7 +80,7 @@ class MapCreatorPage extends Component {
 
         // Copy the current list of departments
         for (var i = 0; i < this.currDepartments.length; i++) {
-            deps.push(this.currDepartments[i]["depName"])
+            deps.push(this.currDepartments[i]["department"])
         }
 
         // Push the list to the database
@@ -101,10 +100,9 @@ class MapCreatorPage extends Component {
     @input  newVal  The new value for the index
     @return void
     */
-    updateDepartment(ind, newVal) {
-        this.currDepartments[ind]["depName"] = newVal
-
-        this.setState({ arrayHolder: [...this.currDepartments] })
+    updateDepartment = (ind, newVal) => {
+        this.currDepartments[ind]["department"] = newVal;
+        this.setState({ arrayHolder: [...this.currDepartments] });
     }
 
     /*
@@ -116,13 +114,13 @@ class MapCreatorPage extends Component {
     @input  ind     The index to move
     @return void
     */
-    upButtonPressed(ind) {
+    upButtonPressed = (ind) => {
         // Check if the index is at the top of the list
         if (ind != 0) {
             // Swap the element at the index with the one above it
-            var aboveItem = this.currDepartments[ind - 1]["depName"]
-            this.currDepartments[ind - 1]["depName"] = this.currDepartments[ind]["depName"]
-            this.currDepartments[ind]["depName"] = aboveItem
+            var aboveItem = this.currDepartments[ind - 1]["department"]
+            this.currDepartments[ind - 1]["department"] = this.currDepartments[ind]["department"]
+            this.currDepartments[ind]["department"] = aboveItem
 
             // Update the state
             this.setState({ arrayHolder: [...this.currDepartments] })
@@ -136,7 +134,7 @@ class MapCreatorPage extends Component {
     @input  ind     The index to delete
     @return void
     */
-    delButtonPressed(ind) {
+    delButtonPressed = (ind) => {
         // Remove the department from the list
         this.currDepartments.splice(ind, 1)
 
@@ -153,13 +151,13 @@ class MapCreatorPage extends Component {
     @input  ind     The index to move
     @return void
     */
-    downButtonPressed(ind) {
+    downButtonPressed = (ind) => {
         // Check if the index is at the bottom of the list
         if (ind != this.currDepartments.length - 1) {
             // Swap the element at the index with the below it
-            var belowItem = this.currDepartments[ind + 1]["depName"]
-            this.currDepartments[ind + 1]["depName"] = this.currDepartments[ind]["depName"]
-            this.currDepartments[ind]["depName"] = belowItem
+            var belowItem = this.currDepartments[ind + 1]["department"]
+            this.currDepartments[ind + 1]["department"] = this.currDepartments[ind]["department"]
+            this.currDepartments[ind]["department"] = belowItem
 
             // Update the state
             this.setState({ arrayHolder: [...this.currDepartments] })
@@ -175,7 +173,7 @@ class MapCreatorPage extends Component {
     @input  index   The index of the element being rendered
     @return void
     */
-    renderListElem(index) {
+    renderListElem = (index) => {
         return (
             <Layout style={styles.listItem} level='2'>
                 <ButtonGroup appearance='outline' status='primary'>
@@ -183,14 +181,16 @@ class MapCreatorPage extends Component {
                     <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
                 </ButtonGroup>
                 <Select style={styles.selectMenu}
+                    multiSelect={false}
                     data={departments}
                     placeholder='Select a department...'
                     placeholderStyle={styles.placeholderStyle}
+                    selectedOption={this.state.arrayHolder[index]['text']}
                     onSelect={(val) => this.updateDepartment(index, val)}
                 />
                 <Button icon={Trash2Icon} appearance='outline' status='danger' onPress={() => this.delButtonPressed(index)} />
             </Layout>
-        )
+        );
     }
 
     renderMenuAction = () => (
@@ -198,6 +198,7 @@ class MapCreatorPage extends Component {
     );
 
     render() {
+        console.log(this.state.arrayHolder);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -235,6 +236,7 @@ class MapCreatorPage extends Component {
                                 data={this.state.arrayHolder}
                                 renderItem={({ item, index }) => this.renderListElem(index)}
                                 keyExtractor={(item, index) => index.toString()}
+                                extraData={this.state}
                             />
                             <Layout style={styles.mainButtonGroup} >
                                 <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
@@ -245,10 +247,6 @@ class MapCreatorPage extends Component {
                 </ScrollView>
             </React.Fragment>
         );
-    }
-
-    _renderRow = ({ data, active }) => {
-        return <Row data={data} active={active} />
     }
 }
 
