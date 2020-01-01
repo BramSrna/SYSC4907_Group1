@@ -11,7 +11,7 @@ import MainDrawerNavigator from './navigation/MainDrawerNavigator';
 import { Asset } from 'expo-asset';
 import { SplashScreen } from 'expo';
 import { YellowBox } from 'react-native';
-import lf from './pages/ListFunctions.js';
+import lf from './pages/Functions/ListFunctions.js';
 import _ from 'lodash';
 
 const themes = { light, dark };

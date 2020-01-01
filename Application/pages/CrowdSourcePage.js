@@ -5,6 +5,8 @@ import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Croud-Source";
 const MARGIN_RATIO = 30; // higher number = smaller margin
@@ -22,6 +24,11 @@ class CrowdSourcePage extends Component {
       height: Dimensions.get("window").height,
     };
     this.onLayout = this.onLayout.bind(this);
+  }
+
+  componentDidMount() {
+    nm.setThat(this)
+
   }
 
   /**
@@ -83,6 +90,7 @@ class CrowdSourcePage extends Component {
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Map Creator' icon='map-outline' shape={2} onPress={() => this.props.navigation.navigate(MAP_CREATOR_PAGE)} />
           </Layout>
         </ScrollView>
+        <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
   }

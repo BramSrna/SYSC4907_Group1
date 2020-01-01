@@ -7,7 +7,7 @@ import {
     Alert,
     Image
 } from "react-native";
-import { Layout, Button, Input, Icon, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 
 import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";
@@ -16,8 +16,10 @@ import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
-const PAGE_TITLE="Map Creator";
+const PAGE_TITLE = "Map Creator";
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -43,8 +45,8 @@ class MapCreatorPage extends Component {
     @return void
     */
     componentDidMount() {
+        nm.setThat(this)
         this._mounted = true
-
         this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
@@ -310,6 +312,7 @@ class MapCreatorPage extends Component {
                         </View>
                     </View>
                 </View>
+                <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
         );
     }
