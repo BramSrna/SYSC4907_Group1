@@ -18,7 +18,6 @@ class MapCreatorPage extends Component {
         // Use a list for keeping track of all the departments
         this.currDepartments = [
             {
-                department: departments[0],
             },
         ]
 
@@ -61,7 +60,7 @@ class MapCreatorPage extends Component {
     */
     addDepartment = () => {
         // Add a department to the list
-        this.currDepartments.push({ department: departments[0].label });
+        this.currDepartments.push({});
 
         // Rerender the screen
         this.setState({ arrayHolder: [...this.currDepartments] })
@@ -118,9 +117,9 @@ class MapCreatorPage extends Component {
         // Check if the index is at the top of the list
         if (ind != 0) {
             // Swap the element at the index with the one above it
-            var aboveItem = this.currDepartments[ind - 1]["department"];
-            this.currDepartments[ind - 1]["department"] = this.currDepartments[ind]["department"];
-            this.currDepartments[ind]["department"] = aboveItem;
+            var aboveItem = this.currDepartments[ind - 1];
+            this.currDepartments[ind - 1] = this.currDepartments[ind];
+            this.currDepartments[ind] = aboveItem;
 
             // Update the state
             this.setState({ arrayHolder: [...this.currDepartments] });
@@ -155,9 +154,9 @@ class MapCreatorPage extends Component {
         // Check if the index is at the bottom of the list
         if (ind != this.currDepartments.length - 1) {
             // Swap the element at the index with the below it
-            var belowItem = this.currDepartments[ind + 1]["department"];
-            this.currDepartments[ind + 1]["department"] = this.currDepartments[ind]["department"];
-            this.currDepartments[ind]["department"] = belowItem;
+            var belowItem = this.currDepartments[ind + 1];
+            this.currDepartments[ind + 1] = this.currDepartments[ind];
+            this.currDepartments[ind] = belowItem;
 
             // Update the state
             this.setState({ arrayHolder: [...this.currDepartments] });
@@ -175,17 +174,17 @@ class MapCreatorPage extends Component {
     */
     renderListElem = (index) => {
         return (
-            <Layout style={styles.listItem} level='2' key={index}>
+            <Layout style={styles.listItem} level='2'>
                 <ButtonGroup appearance='outline' status='primary'>
                     <Button icon={MoveUpIcon} onPress={() => this.upButtonPressed(index)} />
                     <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
                 </ButtonGroup>
-                <Select style={styles.selectMenu} ref="selectInput"
-                    multiSelect={false}
+                <Select style={styles.selectMenu}
+                    key={index}
                     data={departments}
                     placeholder='Select a department...'
                     placeholderStyle={styles.placeholderStyle}
-                    selectedOption={this.state.arrayHolder[index]['text']}
+                    selectedOption={this.currDepartments[index]['department']}
                     onSelect={(val) => this.updateDepartment(index, val)}
                 />
                 <Button icon={Trash2Icon} appearance='outline' status='danger' onPress={() => this.delButtonPressed(index)} />
@@ -198,7 +197,8 @@ class MapCreatorPage extends Component {
     );
 
     render() {
-        console.log(this.state.arrayHolder);
+        console.log('ArrayHolder', this.state.arrayHolder);
+        console.log('currDepartments', this.currDepartments);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -236,7 +236,7 @@ class MapCreatorPage extends Component {
                                 data={this.state.arrayHolder}
                                 renderItem={({ item, index }) => this.renderListElem(index)}
                                 keyExtractor={(item, index) => index.toString()}
-                                extraData={this.state.arrayHolder.text}
+                                extraData={this.state}
                             />
                             <Layout style={styles.mainButtonGroup} >
                                 <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
