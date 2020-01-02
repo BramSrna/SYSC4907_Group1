@@ -1,8 +1,8 @@
 'use strict';
-const dataRegFuncs = require('./src/dataRegFuncs');
-const globalFuncs = require('./src/globalFuncs');
-const listFuncs = require('./src/listFuncs');
-const reorgFuncs = require('./src/reorgFuncs');
+const dataRegFuncs = require('./src/DataRegFuncs');
+const globalFuncs = require('./src/GlobalFuncs');
+const listFuncs = require('./src/ListFuncs');
+const reorgFuncs = require('./src/ReorgFuncs');
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');

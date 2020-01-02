@@ -27,7 +27,7 @@ class AddItemLocationPage extends Component {
     this.state = {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
-      itemDepartment: departments[0].value,
+      itemDepartment: departments[0],
       storeName: DEFAULT_STORE_NAME,
       aisleNum: DEFAULT_AISLE_NUM,
       address: DEFAULT_ADDRESS
@@ -128,7 +128,7 @@ class AddItemLocationPage extends Component {
                    this.state.storeName,
                    this.state.address,
                    this.state.aisleNum,
-                   this.state.itemDepartment);
+                   this.state.itemDepartment.value);
 
     Alert.alert("Item saved successfully");
   };

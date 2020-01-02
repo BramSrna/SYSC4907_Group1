@@ -5,11 +5,9 @@ import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
 import globalStyles from "../pages/pageStyles/GlobalStyle";
-import * as firebase from "firebase";
 import { units } from "../UnitList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import Menu from "./Menu";
 import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Register Item";
@@ -29,7 +27,7 @@ class RegisterItemPage extends Component {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
       size: DEFAULT_SIZE,
-      sizeUnit: units[0].value,
+      sizeUnit: units[0],
       price: DEFAULT_PRICE
     };
   }
@@ -56,7 +54,7 @@ class RegisterItemPage extends Component {
 
     var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
     var tempSize = this.state.size === DEFAULT_SIZE ? null : this.state.size;
-    var tempSizeUnit = this.state.sizeUnit;
+    var tempSizeUnit = this.state.sizeUnit.value;
     var tempPrice = this.state.price === DEFAULT_PRICE ? null : this.state.price;
 
     dbi.registerItem(this.state.genericName,

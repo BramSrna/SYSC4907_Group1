@@ -4,14 +4,12 @@ import { Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction 
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
-import * as firebase from "firebase";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/icons.js';
 import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import Menu from "./Menu";
 import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Map Creator";

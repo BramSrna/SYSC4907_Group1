@@ -1,4 +1,4 @@
-const dataRegFuncs = require('./dataRegFuncs');
+const dataRegFuncs = require('./DataRegFuncs');
 
 function createListPath(listId) {
     var listPath = "/lists/" + listId;
