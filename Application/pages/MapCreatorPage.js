@@ -118,12 +118,12 @@ class MapCreatorPage extends Component {
         // Check if the index is at the top of the list
         if (ind != 0) {
             // Swap the element at the index with the one above it
-            var aboveItem = this.currDepartments[ind - 1]["department"]
-            this.currDepartments[ind - 1]["department"] = this.currDepartments[ind]["department"]
-            this.currDepartments[ind]["department"] = aboveItem
+            var aboveItem = this.currDepartments[ind - 1]["department"];
+            this.currDepartments[ind - 1]["department"] = this.currDepartments[ind]["department"];
+            this.currDepartments[ind]["department"] = aboveItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] })
+            this.setState({ arrayHolder: [...this.currDepartments] });
         }
     }
 
@@ -136,10 +136,10 @@ class MapCreatorPage extends Component {
     */
     delButtonPressed = (ind) => {
         // Remove the department from the list
-        this.currDepartments.splice(ind, 1)
+        this.currDepartments.splice(ind, 1);
 
         // Update the state
-        this.setState({ arrayHolder: [...this.currDepartments] })
+        this.setState({ arrayHolder: [...this.currDepartments] });
     }
 
     /*
@@ -155,12 +155,12 @@ class MapCreatorPage extends Component {
         // Check if the index is at the bottom of the list
         if (ind != this.currDepartments.length - 1) {
             // Swap the element at the index with the below it
-            var belowItem = this.currDepartments[ind + 1]["department"]
-            this.currDepartments[ind + 1]["department"] = this.currDepartments[ind]["department"]
-            this.currDepartments[ind]["department"] = belowItem
+            var belowItem = this.currDepartments[ind + 1]["department"];
+            this.currDepartments[ind + 1]["department"] = this.currDepartments[ind]["department"];
+            this.currDepartments[ind]["department"] = belowItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] })
+            this.setState({ arrayHolder: [...this.currDepartments] });
         }
     }
 
@@ -175,12 +175,12 @@ class MapCreatorPage extends Component {
     */
     renderListElem = (index) => {
         return (
-            <Layout style={styles.listItem} level='2'>
+            <Layout style={styles.listItem} level='2' key={index}>
                 <ButtonGroup appearance='outline' status='primary'>
                     <Button icon={MoveUpIcon} onPress={() => this.upButtonPressed(index)} />
                     <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
                 </ButtonGroup>
-                <Select style={styles.selectMenu}
+                <Select style={styles.selectMenu} ref="selectInput"
                     multiSelect={false}
                     data={departments}
                     placeholder='Select a department...'
@@ -236,7 +236,7 @@ class MapCreatorPage extends Component {
                                 data={this.state.arrayHolder}
                                 renderItem={({ item, index }) => this.renderListElem(index)}
                                 keyExtractor={(item, index) => index.toString()}
-                                extraData={this.state}
+                                extraData={this.state.arrayHolder.text}
                             />
                             <Layout style={styles.mainButtonGroup} >
                                 <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
