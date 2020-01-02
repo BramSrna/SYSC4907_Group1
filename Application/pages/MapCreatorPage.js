@@ -11,8 +11,15 @@ import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/
 import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import Menu from "./Menu";
+import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Map Creator";
+
+// The default value for all input fields
+const DEFAULT_STORE_NAME = "";
+const DEFAULT_FRANCHISE_NAME = "";
+const DEFAULT_ADDRESS = "";
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -26,8 +33,9 @@ class MapCreatorPage extends Component {
 
         this.state = {
             arrayHolder: [], // The departments added so far
-            storeName: "", // The name of the store
-            storeAddress: "", // The address of the store
+            storeName: DEFAULT_STORE_NAME, // The name of the store
+            franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
+            address: DEFAULT_ADDRESS, // The address of the store
         };
     }
 
@@ -79,20 +87,81 @@ class MapCreatorPage extends Component {
     @return void
     */
     handleSaveMap = () => {
+        if (!this.checkReqFields()){
+            return;
+        }
+
         var deps = []
 
         // Copy the current list of departments
         for (var i = 0; i < this.currDepartments.length; i++) {
             deps.push(this.currDepartments[i]["department"])
         }
+        
+        // Saves the data if all required fields have values
+        var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
 
-        // Push the list to the database
-        firebase.database().ref("/stores").push({
-            name: this.state.storeName,
-            map: deps
-        });
+        dbi.registerStore(this.state.storeName,
+                          this.state.address,
+                          deps,
+                          tempFranchiseName);
 
         Alert.alert("Map Saved! Thank you!")
+    }
+
+    /**
+     * checkReqFields
+     * 
+     * Checks that the user has inputted values for
+     * all mandatory fields. Determines if the user
+     * has inputted a value by comparing the default
+     * to the current value to see if they match. If
+     * the current value matches the default value,
+     * then the user has not entered a value.
+     * 
+     * @param None
+     * 
+     * @returns Boolean True if the user has inputted a value for all valid fields
+     *                  False otherwise
+     */
+    checkReqFields() {
+        // Check the generic name field
+        if (this.state.storeName == DEFAULT_STORE_NAME) {
+          Alert.alert("Please enter a value for the store name.");
+          return (false);
+        }
+  
+        // Check the specific name field
+        if (this.state.address == DEFAULT_ADDRESS) {
+          Alert.alert("Please enter a value for the address.");
+          return (false);
+        }
+  
+        return (true);
+    }
+
+    /**
+     * 
+     * renderRequiredText
+     * 
+     * Renders a required text Text fields.
+     * Prints the body of the text field with
+     * the required text marker.
+     * 
+     * @param {String}  bodyText  The text of the Text field
+     * @param {String}  reqText   The text to signify it is required text (Default = (*))
+     * 
+     * @returns None
+     */
+    renderRequiredText(bodyText, reqText = "(*)") {
+    return (
+        <Text style={globalStyles.whiteText}>
+            {bodyText}
+            <Text style={globalStyles.requiredHighlight}>
+                {reqText}
+            </Text>
+            </Text>
+    );
     }
 
     /*
@@ -250,6 +319,35 @@ class MapCreatorPage extends Component {
                                 onChangeText={(storeName) => this.setState({ storeName })}
                                 onSubmitEditing={() => this.refs.storeaddress.focus()}
                                 blurOnSubmit={false}
+                        </View>
+
+                        <View style={styles.rowSorter}>
+                            <View style={styles.textContainer}>
+                                <Text style={globalStyles.whiteText}>Franchise Name: </Text>
+                            </View>
+
+                            <View style={styles.pickerContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder="Franchise Name"
+                                    onChangeText={(franchiseName) => this.setState({ franchiseName })}
+                                    value={this.state.franchiseName}
+                                />
+                            </View>
+
+                        </View>
+
+                        <View style={styles.rowSorter}>
+                            <View style={styles.textContainer}>
+                                {this.renderRequiredText("Address: ")}
+                            </View>
+
+                            <View style={styles.pickerContainer}>
+                                <TextInput
+                                    style={styles.textInput}
+                                    placeholder="Address"
+                                    onChangeText={(address) => this.setState({ address })}
+                                    value={this.state.address}
                             />
                             <Input style={styles.inputRow}
                                 label='Store Address'

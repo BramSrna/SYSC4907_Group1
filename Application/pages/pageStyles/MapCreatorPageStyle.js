@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     topContainer: {
-        flex: 2,
+        flex: 5,
     },
     headerContainer: {
         flex: 1,
@@ -95,7 +95,7 @@ export const pickerStyle = {
         borderColor: "black",
         borderWidth: 1,
         justifyContent: "flex-end",
-        color: "black",
+        color: "white",
         paddingRight: 30,
         height: 40
     },

@@ -9,6 +9,8 @@ import * as firebase from "firebase";
 import { units } from "../UnitList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import Menu from "./Menu";
+import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Register Item";
 
@@ -17,6 +19,7 @@ const DEFAULT_GENERIC_NAME = ""
 const DEFAULT_SPECIFIC_NAME = ""
 const DEFAULT_SIZE = ""
 const DEFAULT_SIZE_UNIT = ""
+const DEFAULT_PRICE = ""
 
 class RegisterItemPage extends Component {
   constructor(props) {
@@ -26,7 +29,8 @@ class RegisterItemPage extends Component {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
       size: DEFAULT_SIZE,
-      sizeUnit: DEFAULT_SIZE_UNIT,
+      sizeUnit: units[0].value,
+      price: DEFAULT_PRICE
     };
   }
 
@@ -46,20 +50,22 @@ class RegisterItemPage extends Component {
    * @returns None
   */
   handleRegister = () => {
-    // Check the required fields
-    var retVal = this.checkReqFields();
-
-    // Saves the data if all required fields have values
-    if (retVal) {
-      firebase.database().ref("/items").push({
-        genericName: this.state.genericName,
-        specificName: this.state.specificName,
-        size: this.state.size,
-        sizeUnit: this.state.sizeUnit,
-      });
-
-      Alert.alert("Item saved successfully");
+    if (!this.checkReqFields()){
+      return;
     }
+
+    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
+    var tempSize = this.state.size === DEFAULT_SIZE ? null : this.state.size;
+    var tempSizeUnit = this.state.sizeUnit;
+    var tempPrice = this.state.price === DEFAULT_PRICE ? null : this.state.price;
+
+    dbi.registerItem(this.state.genericName,
+                      tempSpecificName,
+                      tempSize,
+                      tempSizeUnit,
+                      tempPrice);
+
+    Alert.alert("Item saved successfully");
   };
 
   /**
@@ -81,12 +87,6 @@ class RegisterItemPage extends Component {
     // Check the generic name field
     if (this.state.genericName == DEFAULT_GENERIC_NAME) {
       Alert.alert("Please enter a value for the generic name.");
-      return (false);
-    }
-
-    // Check the specific name field
-    if (this.state.specificName == DEFAULT_SPECIFIC_NAME) {
-      Alert.alert("Please enter a value for the specific name.");
       return (false);
     }
 
@@ -143,6 +143,13 @@ class RegisterItemPage extends Component {
                   placeholder='Specific Name'
                   value={this.state.specificName}
                   onChangeText={(specificName) => this.setState({ specificName })}
+                />
+                <Input style={styles.inputRow}
+                  label='Price'
+                  placeholder='Price'
+                  keyboardType='numeric'
+                  value={this.state.price}
+                  onChangeText={(price) => this.setState({ price })}
                 />
                 <Layout style={styles.horizontalInnerContainer}>
                   <Input style={styles.inputLeftColumn}

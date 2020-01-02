@@ -3,6 +3,12 @@ import yaml
 import json
 import numpy as np
 
+import StoreObj
+import DepartmentObj
+import AisleObj
+import ItemLocObj
+import ItemObj
+
 GEN_FILE_PATH = "./"
 FILE_NAME = GEN_FILE_PATH + "GeneratedData"
 YAML_EXTENSION = ".yaml"
@@ -10,12 +16,9 @@ JSON_EXTENSION = ".json"
 
 """
 normSumOne
-
 Normalizes the integers in the list such that
 the items add up to a total of 1
-
 @input  listToNorm  The list of integers to normalize
-
 @return The normalized list
 """
 def normSumOne(listToNorm):
@@ -26,20 +29,17 @@ def normSumOne(listToNorm):
 
 """
 getNItemsFromList
-
 Returns a list of random elements from the given list.
 Can control whether or not to grab duplicate elements.
 Additionally, can control the probability of grabbing each
 independent item. Casts the items in the list to strings
 by default.
-
 @input  itemList    The list of items
 @input  numElems    The number of elements to retrieve from the list
 @input  getDups     Whether or not to get duplicate items (defualt = False)
 @input  probs       The probability to grap each independent item
                     If None, assumes equal probability (defualt = None)
 @input  elemType    The type to cast each item in the list to (default = str)
-
 @return List of retrieved elements
 """
 def getNItemsFromList(itemList, numElems, getDups=False, probs=None, elemType=str):
@@ -56,11 +56,8 @@ def getNItemsFromList(itemList, numElems, getDups=False, probs=None, elemType=st
 
 """
 getRandInRange
-
 Returns a random integer in the given range
-
 @input  intRange    The range to retrieve from [min, max]
-
 @return A random integer in the given range
 """
 def getRandInRange(intRange):
@@ -68,13 +65,10 @@ def getRandInRange(intRange):
 
 """
 genNames
-
 Returns a number of generated names using the given pattern.
 The names are of the format $pattern_$integer
-
 @input  pattern     The pattern to generate names from
 @input  numItems    The number of names to generate
-
 @return A list of the generated names
 """
 def genNames(pattern, numItems):
@@ -88,7 +82,6 @@ def genNames(pattern, numItems):
 
 """
 genData
-
 Generates a dictionary of grocery store data. Uses the
 input parameters to control the number of possible
 items, departments, and stores. The storeSizeInfo
@@ -97,13 +90,11 @@ This is a dictionary that controls the number of items in
 each aisle, number of aisle in each department, and number
 of departments in each store. The itemLocInfo controls how
 many possible departments each item can be found in.
-
 @input  sizeItemPool    The size of the pool of items to use
 @input  sizeDepPool     The size of the pool of departments to use
 @input  sizeStorePool   The size of the pool of store to use
 @input  storeSizeInfo   The dictionary describing the possible sizes for each store
 @input  itemLocInfo     The dictionary describing the possible locations for each item
-
 @return The generated data
 """
 def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo):
@@ -225,17 +216,14 @@ def genData(sizeItemPool, sizeDepPool, sizeStorePool, storeSizeInfo, itemLocInfo
 
 """
 genWithDups
-
 Uses a store size info library more likely
 to generate stores with duplicate items.
-
 @input  None
-
 @return None
 """
 def genWithDups():
-    sizeItemPool = 80
-    sizeDepPool = 7
+    sizeItemPool = 200
+    sizeDepPool = 10
     sizeStorePool = 10
 
     """
@@ -300,12 +288,53 @@ def defaultGen():
 
     return(data)
 
+"""
+loadInfo
+Loads the yaml file at the given path and
+places the data in a dictionary in the
+format that the algorithm needs.
+@input  pathToYaml  The path to the yaml file to parse
+@return A list of the stores parsed from the yaml file
+"""
+def loadInfo(pathToYaml):
+    data = {}
+
+    # Write the generated data to a yaml file
+    with open(pathToYaml, "r") as f:
+        data = yaml.load(f, yaml.SafeLoader)
+
+    stores = []
+
+    for storeName in data:
+        store = StoreObj.Store(storeName)
+
+        for departmentName in data[storeName]["DEPARTMENTS"]:
+            department = DepartmentObj.Department(departmentName)
+
+            for aisleNum in data[storeName]["DEPARTMENTS"][departmentName]:
+                num = int(aisleNum.split("_")[1])
+                aisle = AisleObj.Aisle(num, [])                
+
+                for itemName in data[storeName]["DEPARTMENTS"][departmentName][aisleNum]:
+                    loc = ItemLocObj.ItemLoc(store, department, aisle)
+                    item = ItemObj.Item(itemName, loc)
+
+                    aisle.addItem(item)
+
+                department.addAisle(aisle)
+
+            store.addDepartment(department)
+
+        stores.append(store)
+
+    return(stores)
+
 if __name__ == "__main__":
     data = genWithDups()
 
     # Write the generated data to a yaml file
     with open(FILE_NAME + YAML_EXTENSION, "w") as f:
-        yaml.dump(data, f)
+        yaml.dump(data, f, sort_keys=False)
 
     # Write the generated data to a json file
     with open(FILE_NAME + JSON_EXTENSION, "w") as f:
