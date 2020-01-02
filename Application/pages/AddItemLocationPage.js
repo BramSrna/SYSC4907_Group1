@@ -5,19 +5,20 @@ import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
 import globalStyles from "./pageStyles/GlobalStyle";
-import * as firebase from "firebase";
 import { departments } from "../DepartmentList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Add Item Location";
 
 // These are the default values for all of the input boxes
-const DEFAULT_GENERIC_NAME = ""
-const DEFAULT_SPECIFIC_NAME = ""
-const DEFAULT_ITEM_DEPARTMENT = ""
-const DEFAULT_STORE_NAME = ""
-const DEFAULT_AISLE_NUM = ""
+const DEFAULT_GENERIC_NAME = "";
+const DEFAULT_SPECIFIC_NAME = "";
+const DEFAULT_ITEM_DEPARTMENT = "Please select the department...";
+const DEFAULT_STORE_NAME = "";
+const DEFAULT_AISLE_NUM = "";
+const DEFAULT_ADDRESS = "";
 
 class AddItemLocationPage extends Component {
   constructor(props) {
@@ -26,9 +27,10 @@ class AddItemLocationPage extends Component {
     this.state = {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
-      itemDepartment: DEFAULT_ITEM_DEPARTMENT,
+      itemDepartment: departments[0].value,
       storeName: DEFAULT_STORE_NAME,
       aisleNum: DEFAULT_AISLE_NUM,
+      address: DEFAULT_ADDRESS
     };
 
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
@@ -77,15 +79,21 @@ class AddItemLocationPage extends Component {
       return (false);
     }
 
-    // Check the department field
-    if (this.state.itemDepartment == DEFAULT_ITEM_DEPARTMENT) {
-      Alert.alert("Please enter a value for the item department.");
-      return (false);
-    }
-
     // Check the store name field
     if (this.state.storeName == DEFAULT_STORE_NAME) {
       Alert.alert("Please enter a value for the store name.");
+      return (false);
+    }
+
+    // Check the address field
+    if (this.state.address == DEFAULT_ADDRESS) {
+      Alert.alert("Please enter a value for the address.");
+      return (false);
+    }
+
+    // Check the department field
+    if (this.state.itemDepartment == DEFAULT_ITEM_DEPARTMENT) {
+      Alert.alert("Please enter a value for the department.");
       return (false);
     }
 
@@ -109,19 +117,20 @@ class AddItemLocationPage extends Component {
    * @returns None
    */
   handleAdd = () => {
-    var retVal = this.checkReqFields();
-
-    if (retVal == true) {
-      firebase.database().ref("/itemLocs").push({
-        genericName: this.state.genericName,
-        specificName: this.state.specificName,
-        department: this.state.itemDepartment,
-        store: this.state.storeName,
-        aisleNum: this.state.aisleNum,
-      });
-
-      Alert.alert("Item saved successfully");
+    if (!this.checkReqFields()){
+      return;
     }
+
+    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
+
+    dbi.addItemLoc(this.state.genericName,
+                   tempSpecificName,
+                   this.state.storeName,
+                   this.state.address,
+                   this.state.aisleNum,
+                   this.state.itemDepartment);
+
+    Alert.alert("Item saved successfully");
   };
 
   /**
@@ -175,18 +184,24 @@ class AddItemLocationPage extends Component {
                   value={this.state.specificName}
                   onChangeText={(specificName) => this.setState({ specificName })}
                 />
+                <Input style={styles.inputRow}
+                  label='Store Name'
+                  placeholder='Enter the store name'
+                  value={this.state.storeName}
+                  onChangeText={(storeName) => this.setState({ storeName })}
+                />
+                <Input style={styles.inputRow}
+                  label='Address'
+                  placeholder='Enter the address'
+                  value={this.state.address}
+                  onChangeText={(address) => this.setState({ address })}
+                />
                 <Select style={styles.selectBox}
                   label='Item Department'
                   data={departments}
                   placeholder='Select a department'
                   selectedOption={this.state.itemDepartment}
                   onSelect={(itemDepartment) => this.setState({ itemDepartment })}
-                />
-                <Input style={styles.inputRow}
-                  label='Store Name'
-                  placeholder='Enter the store name'
-                  value={this.state.storeName}
-                  onChangeText={(storeName) => this.setState({ storeName })}
                 />
                 <Input style={styles.inputRow}
                   label='Aisle Number'

@@ -89,6 +89,210 @@ class ListFunctions {
          )
    }
 
+   /**
+    * This function is used to add items to a list.
+    * @param {*} listId: id of the list we are adding items to
+    * @param {*} name: name of the item
+    * @param {*} quantity: quantity of the item
+    * @param {*} size: size of the item
+    * @param {*} notes: additional notes regarding the item
+    */
+   async AddItemToList(listId, name, quantity, size, notes, purchased = false) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudAddItemToList')({
+            listId: listId,
+            name: name,
+            purchased: purchased,
+            quantity: quantity,
+            size: size,
+            notes: notes,
+         });
+
+         return true;
+      } catch (e) {
+         console.error(e);
+
+         return false;
+      }
+   }
+
+   /**
+    * This function is used to remove an item from a list
+    * @param {*} listId: id of the list the item is in
+    * @param {*} itemId: id of the item of the list
+    */
+   async DeleteItemInList(listId, itemId) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudDeleteItemInList')({
+            listId: listId,
+            itemId: itemId,
+         });
+
+         return true;
+      } catch (e) {
+         console.error(e);
+
+         return false;
+      }
+   }
+
+   /**
+    * This function is used to change the purchased boolean in the database
+    * @param {*} listId: id of the list the item is in
+    * @param {*} itemId: id of the item in the list
+    */
+   async UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudUpdatePurchasedBoolOfAnItemInAList')({
+            listId: listId,
+            itemId: itemId,
+         });
+
+         return true;
+      } catch (e) {
+         console.error(e);
+
+         return false;
+      }
+   }
+
+   /**
+    * Delete the list from the user created/shared section. If nobody selse has the list then the list will be removed from the list table.
+    * @param {*} listId: id of the list being removed
+    */
+   export DeleteList(listId) {
+      var uid = firebase.auth().currentUser.uid;
+
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudDeleteList')({
+            listId: listId,
+            uid: uid,
+         });
+
+         var items = data.items;
+         var ids = data.ids;
+
+         return {
+            items: items,
+            ids: ids
+         };
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   /**
+    * Create a new list
+    * @param {*} listName: name of the list
+    */
+   export CreateNewList(listName) {
+      var uid = firebase.auth().currentUser.uid;
+
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudCreateNewList')({
+            uid: uid,
+            listName: listName,
+            items: {},
+            userCount: 1
+         });
+
+         var items = data.items;
+         var ids = data.ids;
+
+         return {
+            items: items,
+            ids: ids
+         };
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   /**
+    * Get the list keys and names to populate the YourLists.js page
+    * @param {*} that: this for caller
+    */
+   export GetListsKeyAndName() {
+      var uid = firebase.auth().currentUser.uid;
+
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudGetListsKeyAndName')({
+            uid: uid,
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   export getAvailableStores() {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableStores')({
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   /**
+    * Get all the items in the current list
+    * @param {*} listId: id of the list we are currently viewing
+    */
+   export reorgListAdded(listId) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudGetItemsInAList')({
+            listId: listId,
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   export reorgListLoc(storeId, listId) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudReorgListLoc')({
+            storeId: storeId,
+            listId: listId
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   export reorgListFastest(storeId, listId) {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudReorgListFastest')({
+            storeId: storeId,
+            listId: listId
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   };
+
    tokensToNotifications(uids, tokens, listID, listName, message) {
       var that = this;
       firebase
@@ -123,278 +327,6 @@ class ListFunctions {
             }
          })
 
-   }
-
-   /**
-    * This function is used to add items to a list.
-    * @param {*} listId: id of the list we are adding items to
-    * @param {*} name: name of the item
-    * @param {*} quantity: quantity of the item
-    * @param {*} size: size of the item
-    * @param {*} notes: additional notes regarding the item
-    */
-   AddItemToList(listId, name, quantity, size, notes) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/")
-         .push({
-            name: name,
-            purchased: false,
-            quantity: quantity,
-            size: size,
-            notes: notes
-         });
-   }
-
-   /**
-    * This function is used to remove an item from a list
-    * @param {*} listId: id of the list the item is in
-    * @param {*} itemId: id of the item of the list
-    */
-   DeleteItemInList(listId, itemId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/")
-         .child(itemId)
-         .remove();
-   }
-
-   /**
-    * This function is used to change the purchased boolean in the database
-    * @param {*} listId: id of the list the item is in
-    * @param {*} itemId: id of the item in the list
-    */
-   UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/" + itemId)
-         .once("value", function (snapshot) {
-            var currentBool = snapshot.val().purchased;
-            firebase
-               .database()
-               .ref("/lists/" + listId + "/items/" + itemId)
-               .update({
-                  purchased: !currentBool
-               });
-         });
-   }
-
-   /**
-    * Get all the items in the current list
-    * @param {*} that: this for calling function
-    * @param {*} listId: id of the list we are currently viewing
-    */
-   GetItemsInAList(that, listId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId)
-         .on("value", function (snapshot) {
-            var items = [];
-            var ids = [];
-            var ssv = snapshot.val();
-            var userCount = 0;
-            if (ssv && ssv.items) {
-               for (var item in ssv.items) {
-                  items.push(ssv.items[item]);
-                  ids.push(item);
-               }
-
-            }
-            if (ssv.user_count) {
-               userCount = ssv.user_count;
-            }
-            that.setState({
-               listItems: items,
-               listItemIds: ids,
-               userCount: userCount
-            });
-         });
-   }
-
-   /**
-    * Delete the list from the user created/shared section. If nobody selse has the list then the list will be removed from the list table.
-    * @param {*} listId: id of the list being removed
-    */
-   DeleteList(listId) {
-      var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists")
-         .once("value", function (snapshot) {
-            if (snapshot.val()) {
-               // Remove from the user created section if exists
-               var createdLists = snapshot.val().created;
-               for (var cList in createdLists) {
-                  if (cList === listId) {
-                     firebase
-                        .database()
-                        .ref("/users/" + uid + "/lists/created/")
-                        .child(cList)
-                        .remove();
-                     firebase
-                        .database()
-                        .ref("/lists/" + cList)
-                        .once("value", function (snapshot) {
-                           if (snapshot.val()) {
-                              if (snapshot.val().user_count == 1) {
-                                 firebase
-                                    .database()
-                                    .ref("/lists/")
-                                    .child(cList)
-                                    .remove();
-                              } else {
-                                 var newCount = snapshot.val().user_count - 1;
-                                 firebase
-                                    .database()
-                                    .ref("/lists/" + cList)
-                                    .update({
-                                       user_count: newCount
-                                    });
-                              }
-                           }
-                        });
-                     break;
-                  }
-               }
-
-               // Remove from the user shared section if exists
-               var sharedLists = snapshot.val().shared;
-               for (sList in sharedLists) {
-                  if (sList === listId) {
-                     firebase
-                        .database()
-                        .ref("/users/" + uid + "/lists/shared/")
-                        .child(sList)
-                        .remove();
-                     firebase
-                        .database()
-                        .ref("/lists/" + sList)
-                        .once("value", function (snapshot) {
-                           if (snapshot.val()) {
-                              if (snapshot.val().user_count == 1) {
-                                 firebase
-                                    .database()
-                                    .ref("/lists/")
-                                    .child(sList)
-                                    .remove();
-                              } else {
-                                 var newCount = snapshot.val().user_count - 1;
-                                 firebase
-                                    .database()
-                                    .ref("/lists/" + cList)
-                                    .update({
-                                       user_count: newCount
-                                    });
-                              }
-                           }
-                        });
-                     break;
-                  }
-               }
-            }
-         });
-   }
-
-   /**
-    * Create a new list
-    * @param {*} listName: name of the list
-    */
-   CreateNewList(listName) {
-      // Add the list to the lists table
-      var push = firebase
-         .database()
-         .ref("/lists")
-         .push({
-            name: listName,
-            items: {},
-            user_count: 1
-         });
-
-      // Add the list to the user table
-      var key = push.key;
-      var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists/created")
-         .child(key)
-         .set(0)
-         .then(data => { })
-         .catch(error => {
-            console.log("Failed to create list: " + error);
-         });
-   }
-
-   /**
-    * Get the list keys and names to populate the YourLists.js page
-    * @param {*} that: this for caller
-    */
-   GetListsKeyAndName(that) {
-      var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists")
-         .on("value", function (snapshot) {
-            listIds = [];
-            var ssv = snapshot.val();
-            if (ssv) {
-               for (var created in ssv.created) {
-                  listIds.push(created);
-               }
-               for (var shared in ssv.shared) {
-                  listIds.push(shared);
-               }
-
-               var curApiData = [];
-               var listTitles = [];
-               var listIdLength = listIds.length;
-               var counter = 1;
-               var bool = true;
-               for (var idKey in listIds) {
-                  bool = false;
-                  var currentListId = listIds[idKey];
-                  firebase
-                     .database()
-                     .ref("/lists/" + currentListId)
-                     .once("value", function (snapshot) {
-                        var ssv = snapshot.val();
-                        if (ssv) {
-                           curApiData.push({
-                              key: snapshot.key,
-                              name: ssv.name
-                           });
-                           listTitles.push(ssv.name);
-                           listTitles.sort((a, b) => a.localeCompare(b))
-                           if (counter == listIdLength) {
-                              that.setState({
-                                 apiData: curApiData,
-                                 listTitles: listTitles
-                              });
-                           }
-                           counter++;
-                        } else {
-                           console.log("ERROR: List does not exist.");
-
-                           that.setState({
-                              apiData: curApiData,
-                              listTitles: listTitles
-                           });
-                        }
-                     });
-               }
-               if (bool) {
-                  that.setState({
-                     apiData: [],
-                     listTitles: []
-                  });
-               }
-            } else {
-               console.log("No API data...");
-               that.setState({
-                  apiData: [],
-                  listTitles: []
-               });
-            }
-         });
    }
 
    /**

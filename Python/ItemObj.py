@@ -4,7 +4,7 @@ import sys
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
-from ItemLocObj import ItemLoc
+import ItemLocObj
 
 """
 Item object used to model real life items
@@ -15,25 +15,19 @@ ItemLoc object.
 class Item(object):
     """
     init
-
     Intitializes a new Item object.
-
     @input  name    The name of the Item
     @input  locationObj The location of the Item
-
     @return None
     """
     def __init__(self, name, locationObj):
-        self.name = name
-        self.location = locationObj
+        self.setName(name)
+        self.setLoc(locationObj)
 
     """
     str
-
     Returns a string describing this Item object.
-
     @input  None
-
     @return A string describing this Item object.
     """
     def __str__(self):
@@ -41,24 +35,31 @@ class Item(object):
 
     """
     getName
-
     Returns the name of this Item
-
     @input  None
-
     @return The name of the Item
     """
     def getName(self):
         return(self.name)
+
+    def setName(self, newName):
+        if type(newName) != str:
+            raise ValueError("Error in ItemObj: newName parameter must be a string")
+
+        self.name = newName
 		
     """
     getLoc
-
     Returns the location of this Item
-
     @input  None
-
     @return The location of the Item
     """
     def getLoc(self):
         return(self.location)
+
+    def setLoc(self, newLoc):
+        if (type(newLoc) != ItemLocObj.ItemLoc) and \
+            (newLoc != None):
+            raise ValueError("Error in ItemObj: newLoc parameter must be an ItemLoc object")
+
+        self.location = newLoc

@@ -1,11 +1,14 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { FlatList, KeyboardAvoidingView, StyleSheet, Image, Alert } from "react-native";
 import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import * as lf from "./ListFunctions";
+import Menu from "./Menu";
+import * as firebase from "firebase";
 
 const PAGE_TITLE = "Your Lists";
 
@@ -20,14 +23,118 @@ class YourLists extends Component {
       };
    }
 
-   GenerateNeededData() {
-      lf.GetListsKeyAndName(this);
+   GenerateNeededData(that) {
+      var uid = firebase.auth().currentUser.uid;
+
+      var ref = firebase.database().ref("/users/" + uid + "/lists")
+      var retVal = ref.on("value", function(snapshot) {
+         var ssv = snapshot.val();
+         var childVals = [];
+         var listIds = [];
+
+         if (ssv) {
+            for (var created in ssv.created) {
+               listIds.push(created);
+            }
+
+            for (var shared in ssv.shared) {
+               listIds.push(shared);
+            }          
+
+            for (var idKey in listIds) {
+               var currentListId = listIds[idKey];
+
+               var childRef = firebase.database().ref("/lists/" + currentListId).once("value");
+
+               childVals.push(childRef);
+            }
+         }
+
+         Promise.all(childVals).then(result => {
+            var listIdLength = result.length;
+
+            var apiData = [];
+            var listTitles = [];
+
+            for (var i = 0; i < result.length; i++){
+                  var ssv = result[i];
+
+                  if (ssv) {
+                     apiData.push({
+                        key: ssv.key,
+                        name: ssv.val().name
+                     });
+
+                     listTitles.push(ssv.val().name);
+
+                     if ((i - 1) === listIdLength) {
+                        break;
+                     }
+                  } else {
+                     console.log("ERROR: List does not exist.");    
+                     break;
+                  }
+            }
+
+            that.updateListState(apiData, listTitles);
+         });
+      });
+   }
+
+   updateListState(newApiData, newListTitles) {
+      var localApiData = this.state.apiData;
+      var localListTitles = this.state.listTitles;
+
+      function checkArrayApi(arr, api) {
+         for (var i = 0; i < arr.length; i++) {
+            var tempApi = arr[i];
+            if ((tempApi.key === api.key) && (tempApi.name === api.name)) {
+               return true;
+            }
+         }
+         return false;
+      }
+
+      var itemsAdded = newApiData.filter(x => !checkArrayApi(localApiData, x));
+      var itemsRemoved = localApiData.filter(x => !checkArrayApi(newApiData, x));
+
+      if (itemsAdded.length > 0) {
+         for (var i = 0; i < itemsAdded.length; i++) {
+            var ind = newApiData.indexOf(itemsAdded[i]);
+
+            localApiData.push(newApiData[ind]);
+            localListTitles.push(newListTitles[ind]);
+         }
+      } else if (itemsRemoved.length > 0) {
+         for (var i = 0; i < itemsRemoved.length; i++) {
+            var ind = localApiData.indexOf(itemsRemoved[i]);
+
+            if (ind > -1) {
+               localApiData.splice(ind, 1);
+               localListTitles.splice(ind, 1);
+            }
+         }
+      } else {
+         for (var i = 0; i < newApiData.length; i++) {
+            var id = newApiData[i];
+            var ind = localApiData.indexOf(id);
+
+            if (ind > -1) {
+               localListTitles[ind] = newListTitles[i];
+            }
+         }
+      }
+
+      this.setState({
+         listTitles: localListTitles.slice(),
+         apiData: localApiData.slice()
+      });
    }
 
    componentDidMount() {
       nm.setThat(this)
 
-      this.GenerateNeededData();
+      this.GenerateNeededData(this);
    }
 
    GetListID(listName) {
