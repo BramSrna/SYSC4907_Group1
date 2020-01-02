@@ -1,20 +1,31 @@
 import React, { Component } from "react";
-import { Modal, TouchableHighlight, Text, Image, View, FlatList, Alert, Dimensions } from "react-native";
-import { styles, pickerStyle } from "./pageStyles/CurrentListPageStyle";
-import { Image, FlatList, StyleSheet, KeyboardAvoidingView, Alert, TouchableOpacity } from "react-native";
-import { Layout, Button, Input, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
+import { TouchableHighlight,
+         Image,
+         View,
+         FlatList,
+         Alert,
+         StyleSheet,
+         KeyboardAvoidingView,
+         Dimensions,
+         TouchableOpacity } from "react-native";
+import { Modal as RNModal} from "react-native";
+import { Layout,
+         Button,
+         Input,
+         Modal,
+         TopNavigation,
+         TopNavigationAction,
+         Select,
+         Text } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
-import * as lf from "./ListFunctions";
+import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import Menu from "./Menu";
-import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import { organizationOptions } from "../OrgMethods";
-import RNPickerSelect from 'react-native-picker-select';
 import Autocomplete from 'react-native-autocomplete-input';
 
 var availableStores = [];
@@ -193,7 +204,9 @@ class CurrentList extends Component {
    }
 
    handleReorg(selection){
-      switch(selection){
+      selectionVal = selection.value;
+      
+      switch(selectionVal){
          case "ORDER_ADDED":
             this.reorganizeListAdded();
             break;
@@ -410,6 +423,46 @@ class CurrentList extends Component {
       }
    };
 
+   renderEnterStoreModal() {
+      const testItems = this.loadItems();
+      const testStore = this.state.currStore;
+
+      return (
+         <View style={enterStoreModalStyles.modalContainer}>
+            <View style={enterStoreModalStyles.modalSubContainer}>                        
+               <Text style={enterStoreModalStyles.modalTitle}>
+                  Store Name:
+               </Text>
+               <View style={enterStoreModalStyles.modalAutocompleteContainer}>
+                  <Autocomplete
+                     data={testItems}
+                     defaultValue={testStore}
+                     hideResults={false}
+                     onChangeText={text => this.updateCurrStore(text)}
+                     keyExtractor={(item, index) => index.toString()}
+                     renderItem={({ item, i }) => (
+                        <TouchableHighlight
+                           style={{zIndex: 10}}
+                           onPress={() => this.updateCurrStore(item)}>
+                           <Text>{item}</Text>
+                        </TouchableHighlight>
+                     )}
+                  />
+               </View>
+
+               <TouchableHighlight
+                  style={enterStoreModalStyles.modalDoneButton}
+                  onPress={() => {
+                     this.setModalDetails(!this.state.storeModalVisible, this.state.closeFunc);
+                     this.state.closeFunc(context=this);
+                  }}>
+                  <Text style={enterStoreModalStyles.modalButtonText}>Submit</Text>
+               </TouchableHighlight>
+            </View>
+         </View>
+      );
+   }
+
    setModalVisible = (mode = 'item') => {
       this.setState({ modalMode: mode, modalVisible: !this.state.modalVisiblem, itemName: '', message: '' });
    };
@@ -429,10 +482,7 @@ class CurrentList extends Component {
 
       renderNotification = () => {
          return (<TouchableOpacity onPress={() => this.setModalVisible('notify')} ><Image source={require("../assets/notify.png")} /></TouchableOpacity>);
-      }
-
-      const testItems = this.loadItems();
-      const testStore = this.state.currStore;
+      }      
 
       return (
          <React.Fragment>
@@ -443,41 +493,12 @@ class CurrentList extends Component {
                rightControls={renderRightControls()}
             />
             <Layout style={styles.ListContainer}>
-               <Modal
+               <RNModal
                   transparent={true}
-                  visible={this.state.storeModalVisible}>
-                     <View style={styles.modalContainer}>
-                        <View style={styles.modalSubContainer}>                        
-                           <Text style={styles.modalTitle}>
-                              Store Name:
-                           </Text>
-                           <View style={styles.modalAutocompleteContainer}>
-                              <Autocomplete
-                                 data={testItems}
-                                 defaultValue={testStore}
-                                 hideResults={false}
-                                 onChangeText={text => this.updateCurrStore(text)}
-                                 renderItem={({ item, i }) => (
-                                    <TouchableHighlight
-                                       style={{zIndex: 10}}
-                                       onPress={() => this.updateCurrStore(item)}>
-                                       <Text>{item}</Text>
-                                    </TouchableHighlight>
-                                 )}
-                              />
-                           </View>
-
-                           <TouchableHighlight
-                              style={styles.modalDoneButton}
-                              onPress={() => {
-                                 this.setModalDetails(!this.state.storeModalVisible, this.state.closeFunc);
-                                 this.state.closeFunc(context=this);
-                              }}>
-                              <Text style={styles.modalButtonText}>Hide Modal</Text>
-                           </TouchableHighlight>
-                        </View>
-                     </View>
-               </Modal>
+                  visible={this.state.storeModalVisible}
+               >
+                  {this.renderEnterStoreModal()}
+               </RNModal>
                {this.state.userCount > 1 ? renderNotification() : null}
                {/* {console.log(this.state.userCount)} */}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
@@ -494,11 +515,11 @@ class CurrentList extends Component {
                   // this.state.listItems.length
                }
                <Select style={styles.selectBox}
-                 label='Sort'
+                 label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
                  data={organizationOptions}
                  placeholder='Select an organization method'
                  selectedOption={this.state.orgMethod}
-                 onSelect={(orgMethod) => this.setState({ orgMethod })}
+                 onSelect={(selection) => this.handleReorg(selection)}
                />
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
@@ -519,6 +540,46 @@ class CurrentList extends Component {
       );
    }
 }
+
+const enterStoreModalStyles = StyleSheet.create({
+   modalContainer: {
+      flex: 1,
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.7)",
+   },
+   modalSubContainer: {
+      width: Dimensions.get("window").width * 0.75,
+      height: Dimensions.get("window").height * 0.5,
+      backgroundColor: "black",
+      position: "absolute",
+      top: Dimensions.get("window").height * 0.1,
+      alignItems: "center",
+      borderRadius: 20,
+   },
+   modalTitle: {
+      position: 'absolute',
+      top: Dimensions.get("window").height * 0.1,
+      color: "white",
+      fontSize: 20
+   },
+   modalAutocompleteContainer: {
+      flex: 1,
+      position: 'absolute',
+      top: Dimensions.get("window").height * 0.2,
+      width: "60%",
+      zIndex: 5,
+   },
+   modalDoneButton: {
+      position: 'absolute',
+      top: Dimensions.get("window").height * 0.3,
+      backgroundColor: 'black',
+   },
+   modalButtonText: {
+      color: "white"
+   },
+})
 
 const styles = StyleSheet.create({
    container: {

@@ -1,4 +1,4 @@
-const dataRegFuncs = require('./dataRegFuncs');
+const dataRegFuncs = require('./DataRegFuncs');
 
 exports.cloudLoadAvailableStores = function(data, context, database) {
    // The "once" method reads a value from the database, returning a promise

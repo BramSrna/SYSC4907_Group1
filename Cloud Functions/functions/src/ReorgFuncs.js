@@ -1,4 +1,4 @@
-const dataRegFuncs = require('./dataRegFuncs');
+const dataRegFuncs = require('./DataRegFuncs');
 
 function getStoreFromId(knownStores, storeId) {
    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);

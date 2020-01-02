@@ -14,11 +14,9 @@ import { styles, pickerStyle } from "../pages/pageStyles/MapCreatorPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
-import * as firebase from "firebase";
 import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import Menu from "./Menu";
 import * as dbi from "./DBInterface";
 
 const PAGE_TITLE = "Map Creator";

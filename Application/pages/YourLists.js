@@ -6,8 +6,6 @@ import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import * as lf from "./ListFunctions";
-import Menu from "./Menu";
 import * as firebase from "firebase";
 
 const PAGE_TITLE = "Your Lists";

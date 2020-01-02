@@ -160,7 +160,7 @@ class ListFunctions {
     * Delete the list from the user created/shared section. If nobody selse has the list then the list will be removed from the list table.
     * @param {*} listId: id of the list being removed
     */
-   export DeleteList(listId) {
+   async DeleteList(listId) {
       var uid = firebase.auth().currentUser.uid;
 
       try {
@@ -187,7 +187,7 @@ class ListFunctions {
     * Create a new list
     * @param {*} listName: name of the list
     */
-   export CreateNewList(listName) {
+   async CreateNewList(listName) {
       var uid = firebase.auth().currentUser.uid;
 
       try {
@@ -216,7 +216,7 @@ class ListFunctions {
     * Get the list keys and names to populate the YourLists.js page
     * @param {*} that: this for caller
     */
-   export GetListsKeyAndName() {
+   async GetListsKeyAndName() {
       var uid = firebase.auth().currentUser.uid;
 
       try {
@@ -232,7 +232,7 @@ class ListFunctions {
       }
    }
 
-   export getAvailableStores() {
+   async getAvailableStores() {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableStores')({
          });
@@ -249,7 +249,7 @@ class ListFunctions {
     * Get all the items in the current list
     * @param {*} listId: id of the list we are currently viewing
     */
-   export reorgListAdded(listId) {
+   async reorgListAdded(listId) {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudGetItemsInAList')({
             listId: listId,
@@ -263,7 +263,7 @@ class ListFunctions {
       }
    }
 
-   export reorgListLoc(storeId, listId) {
+   async reorgListLoc(storeId, listId) {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudReorgListLoc')({
             storeId: storeId,
@@ -278,7 +278,7 @@ class ListFunctions {
       }
    }
 
-   export reorgListFastest(storeId, listId) {
+   async reorgListFastest(storeId, listId) {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudReorgListFastest')({
             storeId: storeId,
