@@ -1,158 +1,274 @@
 const dataRegFuncs = require('./DataRegFuncs');
 
+/**
+ * getStoreFromId
+ * 
+ * Returns the state of the store with the given
+ * store id.
+ * 
+ * @param {Array} knownStores The array of all known stores
+ * @param {String} storeId The id of the store to find
+ * 
+ * @returns The state of the store with the given id
+ *          Null if the store is unknown
+ */
 function getStoreFromId(knownStores, storeId) {
-   var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
-   var address = info.address;
-   var storeName = info.storeName;
-
-   var store = knownStores[address][storeName];
-   return(store);
-}
-
-function getStoreMap(database, storeId) {
+    // Get the store's info from the given id
     var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
 
     var address = info.address;
     var storeName = info.storeName;
 
+    // Get the store
+    if (knownStores.address && knownStores.address.storeName) {
+        var store = knownStores[address][storeName];
+    } else {
+        return null;
+    }
+
+    return(store);
+}
+
+/**
+ * getStoreMap
+ * 
+ * Calculates the most likely map of the given store
+ * based on the known data. The map is calculate as follows:
+ *  For each known map:
+ *      Assign a weight to the department in the map
+ *      based on the map's weight and the location of
+ *      the department in the list
+ * 
+ *  Take the sum of the weights
+ *  Sort the list based on the weights
+ * 
+ * @param {Database} database The database to parse
+ * @param {String} storeId The id of the store
+ */
+function getStoreMap(database, storeId) {
+    // Get the store's info from the id
+    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
+    var address = info.address;
+    var storeName = info.storeName;
+
+    // Get the path to the store
     var storePath = (new dataRegFuncs.StoreObj(address, storeName)).getPath();
 
+    // Get the current state of the store's maps
     var map = database.ref(storePath + "maps").once("value").then((snapshot) => {
         var ssv = snapshot.val();
 
         var mapCount = {};
 
+        // Loop through all of the store's maps
         for (var tempMapId in ssv) {
             var tempMapObj = ssv[tempMapId];
 
+            // Get the weight and order of the current map
             var weight = tempMapObj.weight;
             var tempMap = tempMapObj.map;
 
+            // Loop through all of the departments in the current map
             for (var i = 0; i < tempMap.length; i++) {
                 var dep = tempMap[i];
+
+                // Add the department to the map count object if
+                // it has not already been added
                 if (!(dep in mapCount)) {
                     mapCount[dep] = 0;
                 }
 
+                // Update the current departments count
                 mapCount[dep] = mapCount[dep] + i * weight;
             }
         }
 
+        // Copy the map count data to a list
         var sortMap = [];
         for (dep in mapCount) {
             sortMap.push([dep, mapCount[dep]]);
         }
 
+        // Sort the list based on the department's counts
         sortMap.sort((a, b) => {
             return a[1] - b[1];
         });
 
+        // Parse out the final data
         var finalMap = [];
         for (i = 0; i < sortMap.length; i++){
             finalMap.push(sortMap[i][0]);
         }
 
-        console.log(finalMap);
-
+        // Return the final map
         return finalMap;
     });
 
     return map;
 }
 
+/**
+ * getItemLocInStore
+ * 
+ * Retrieves the location of the given item in
+ * the given store. The location is the candidate
+ * location with the highest count.
+ * 
+ * @param {Array} knownStores The array of known stores
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns An object containing the location with
+ *          the location's department, aisle number,
+ *          and aisle tags
+ */
 function getItemLocInStore(knownStores, storeId, itemId){
-   var department = null;
-   var aisleNum = null;
-   var aisleTags = [];
+    var department = null;
+    var aisleNum = null;
+    var aisleTags = [];
 
-   var itemList = getStoreFromId(knownStores, storeId).items;
+    // Get the store's items
+    var itemList = getStoreFromId(knownStores, storeId).items;
 
-   for (var tempItemId in itemList) {
-      if (tempItemId === itemId) {
-         var candItemInfo = itemList[tempItemId];
-         var maxCount = -1;
-         var info = null;
+    // Parse the store's items to find the target item
+    for (var tempItemId in itemList) {
+        if (tempItemId === itemId) {
+            // Item found
+            var candItemInfo = itemList[tempItemId];
+            var maxCount = -1;
+            var info = null;
 
-         for (var tempCandItemInfoId in candItemInfo) {
+            // Loop through all of the candidate item infos to
+            // find the location with the highest cound
+            for (var tempCandItemInfoId in candItemInfo) {
             var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
             if (tempCandItemInfo.count > maxCount) {
-               info = tempCandItemInfo;
-               maxCount = tempCandItemInfo.count;
+                info = tempCandItemInfo;
+                maxCount = tempCandItemInfo.count;
             }
-         }
+            }
 
-         department = info.department;
-         aisleNum = info.aisleNum;
-         for (var tag in info.tags){
-               aisleTags.push(info.tags[tag]);
-         }
-      }
-   }
+            // Get the location's information
+            department = info.department;
+            aisleNum = info.aisleNum;
+            for (var tag in info.tags){
+                aisleTags.push(info.tags[tag]);
+            }
+        }
+    }
 
-   return {
-      department: department,
-      aisleNum: aisleNum,
-      aisleTags: aisleTags
-   };
+    // Return the information
+    return {
+        department: department,
+        aisleNum: aisleNum,
+        aisleTags: aisleTags
+    };
 }
 
+/**
+ * loadAllStoreInfo
+ * 
+ * Load the store table from the given database.
+ * 
+ * @param {Database} database The database to parse
+ * 
+ * @returns The stores table in an object
+ */
 function loadAllStoreInfo(database) {
-   // The "once" method reads a value from the database, returning a promise
-   // Use "then" to access the promise
-   var ref = database.ref('/stores');
-   var retItems = ref.once('value').then((snapshot) => {
-      var ssv = snapshot.val();
+    // Load the stores table
+    var ref = database.ref('/stores');
+    var retItems = ref.once('value').then((snapshot) => {
+        var ssv = snapshot.val();
 
-      return {
-         stores: ssv
-      };
-   });
+        return {
+            stores: ssv
+        };
+    });
 
-   return retItems;
-
+    return retItems;
 }
 
+/**
+ * calcStoreSimilarity
+ * 
+ * Calculate the similarity between the two given stores.
+ * 
+ * TODO: Update the algorithm of this store
+ * 
+ * @param {Database} knownStores The array of known stores
+ * @param {String} storeId1 The id of the first store
+ * @param {String} storeId2 The id of the second store
+ * 
+ * @returns The similarity with 1 being the highest and 0 being the lowest
+ */
 function calcStoreSimilarity(knownStores, storeId1, storeId2){
-   var items1 = getStoreFromId(knownStores, storeId1).items;
-   var items2 = getStoreFromId(knownStores, storeId2).items;
+    // Get the two stores' items
+    var items1 = getStoreFromId(knownStores, storeId1).items;
+    var items2 = getStoreFromId(knownStores, storeId2).items;
 
-   var itemIntersect = [];
-   var maxNumItems = 0;
+    var itemIntersect = [];
+    var maxNumItems = 0;
 
-   for (var itemId in items1){
-      maxNumItems += 1;
+    // Get the items common between both sets of items
+    for (var itemId in items1){
+        maxNumItems += 1;
 
-      for (var itemId2 in items2){
-         if (itemId === itemId2) {
+        for (var itemId2 in items2){
+            if (itemId === itemId2) {
             itemIntersect.push(itemId);
-         }
-      }
-   }
+            }
+        }
+    }
 
-   var similarity = 0;
+    var similarity = 0;
 
-   for (var i = 0; i < itemIntersect.length; i++) {
-      itemId = itemIntersect[i];
+    // Calculate the similarity between the two items' locations
+    for (var i = 0; i < itemIntersect.length; i++) {
+        itemId = itemIntersect[i];
 
-      var loc1 = getItemLocInStore(knownStores, storeId1, itemid);
-      var loc2 = getItemLocInStore(knownStores, storeId2, itemid);
+        // Get the location of both items in their respective stores
+        var loc1 = getItemLocInStore(knownStores, storeId1, itemid);
+        var loc2 = getItemLocInStore(knownStores, storeId2, itemid);
 
-      var depComp = loc1.department === loc1.department ? 1 : 0;
-      var aisleComp = loc1.aisleNum === loc2.aisleNum ? 1 : 0;
+        // Compare the departments and aisles
+        var depComp = loc1.department === loc1.department ? 1 : 0;
+        var aisleComp = loc1.aisleNum === loc2.aisleNum ? 1 : 0;
 
-      similarity += (0.8 * depComp) + (0.2 * aisleComp);
-   }
+        // Calculate and update the similarity
+        similarity += (0.8 * depComp) + (0.2 * aisleComp);
+    }
 
-   similarity = similarity / maxNumItems;
+    // Calculate the average similarity
+    similarity = similarity / maxNumItems;
 
-   return(similarity);
-
+    return(similarity);
 }
 
+/**
+ * predictItemLoc
+ * 
+ * Predicts the given item's location in the given store.
+ * If the location is known, then it is returned. Otherwise
+ * the location is predicted. To predict the location, the
+ * algorithm first calculates the three most similar stores
+ * that contain the item. The majority location is then used to
+ * predict the location.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns An object containing the predicted location with
+ *          the department, aisle number, and aisle tags.
+ */
 function predictItemLoc(database, storeId, itemId) {
+    // Load the stores table
     var temp = loadAllStoreInfo(database);
     var retItems = temp.then((value) => {
         var knownStores = value.stores;
+
+        // Check if the item location of the item in the
+        // store is known
         var loc = getItemLocInStore(knownStores, storeId, itemId);
 
         var department = null;
@@ -160,34 +276,42 @@ function predictItemLoc(database, storeId, itemId) {
         var aisleTags = [];
 
         if (loc.department !== null){
+            // If the location is known, then get the location's information
             department = loc.department;
             aisleNum = loc.aisleNum;
             aisleTags = loc.aisleTags;
         } else {
+            // If the location is unknown, predict it
             var storesWithItem = [];
 
+            // Check all known stores to check if they contain the target item
             for (var tempAddress in knownStores){
                 for (var tempStoreName in knownStores[tempAddress]){
-                var tempStoreId = (new dataRegFuncs.StoreObj(tempAddress, tempStoreName)).getId();
+                    // Get the id of the current store
+                    var tempStoreId = (new dataRegFuncs.StoreObj(tempAddress, tempStoreName)).getId();
 
-                var tempLoc = getItemLocInStore(knownStores, tempStoreId, itemId);
+                    // Check if the current store contains the item
+                    var tempLoc = getItemLocInStore(knownStores, tempStoreId, itemId);
 
-                if (tempLoc.department !== null) {
-                    storesWithItem.push({
-                        id: tempStoreId,
-                        department: tempLoc.department,
-                        aisleNum: tempLoc.aisleNum,
-                        aisleTags: tempLoc.aisleTags
-                    });
-                }
+                    if (tempLoc.department !== null) {
+                        // If the store contains the item, then save the location
+                        storesWithItem.push({
+                            id: tempStoreId,
+                            department: tempLoc.department,
+                            aisleNum: tempLoc.aisleNum,
+                            aisleTags: tempLoc.aisleTags
+                        });
+                    }
                 }
             }
 
+            // Calculate the similarity of all stores that contain the item
             for (var i = 0; i < storesWithItem.length; i++) {
                 var temp = calcStoreSimilarity(knownStores, storeId, storesWithItem[i].id);
                 storesWithItem[i].score = temp;
             }
 
+            // Sort the stores with the item based on their score
             storesWithItem.sort((a, b) => {
                 var valueA, valueB;
 
@@ -203,11 +327,13 @@ function predictItemLoc(database, storeId, itemId) {
                 }
             })
 
+            // Get the three most similar stores
             storesWithItem = storesWithItem.slice(0, 3);
 
             depCount = {};
             aisleCount = {};
 
+            // Calculate how often each department appears
             for (i = 0; i < storesWithItem.length; i++){
                 var store = storesWithItem[i];
                 var dep = store.department;
@@ -226,6 +352,7 @@ function predictItemLoc(database, storeId, itemId) {
                 }
             }
 
+            // Sort the locations based on their occurance counts
             department = Object.keys(depCount);
             if (department.length > 0) {
                 department = department.reduce((a, b) => depCount.a > depCount.b ? a : b);
@@ -242,6 +369,7 @@ function predictItemLoc(database, storeId, itemId) {
 
         }
 
+        // Return the average location
         return {
             department : department,
             aisleNum : aisleNum,
@@ -252,16 +380,32 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
+/**
+ * cloudReorgListLoc
+ * 
+ * Reorganize the given list based on
+ * the locations of the items in the store.
+ * Predicts locations as needed.
+ * the groupings of items are then sorted based
+ * on the alphabetical order of the department titles.
+ * 
+ * @param {Object}  data    The object containing the inputted data
+ * @param {Component} context   The context of the caller
+ * @param {Database}    database    The database to save the data to
+ * 
+ * @returns The new order of the items and ids
+ */
 exports.cloudReorgListLoc = function(data, context, database) {
+    // Parse the data object
     var listId = data.listId;
     var storeId = data.storeId;
 
-    // The "once" method reads a value from the database, returning a promise
-    // Use "then" to access the promise
     var ref = database.ref('/lists/' + listId);
     var retItems = ref.once('value').then((snapshot) => {
         var items = [];
         var ids = [];
+
+        // Get all of the items and their ids in the list
         var ssv = snapshot.val();
         if (ssv && ssv.items) {
            for (var item in ssv.items) {
@@ -278,6 +422,7 @@ exports.cloudReorgListLoc = function(data, context, database) {
         var items = result.items;
         var ids = result.ids;
 
+        // Get the locations of all items in the store
         var locs = [];
         for (var i = 0; i < ids.length; i++) {
             loc = predictItemLoc(database, storeId, ids[i]); 
@@ -290,8 +435,8 @@ exports.cloudReorgListLoc = function(data, context, database) {
         var ids = result[1];
         var items = result[2];
 
+        // Copy all of the needed location information
         var locs = [];
-
         for (var i = 0; i < predictedLocs.length; i++) {
             var loc = predictedLocs[i];
 
@@ -304,6 +449,8 @@ exports.cloudReorgListLoc = function(data, context, database) {
             })
         }
 
+        // Group and sort the locations based on their
+        // departments and aisle numbers
         locs.sort((a, b) => {
             var depA, depB;
             var aisleA, aisleB;
@@ -329,14 +476,15 @@ exports.cloudReorgListLoc = function(data, context, database) {
             }
         });
 
+        // Get just the item names and ids
         items = [];
         ids = [];
-
         for (i = 0; i < locs.length; i++) {
             items.push(locs[i].item);
             ids.push(locs[i].id);
         }
 
+        // Return the information
         return {
             items: items,
             ids: ids,
@@ -346,16 +494,30 @@ exports.cloudReorgListLoc = function(data, context, database) {
     return retItems;
 }
 
+/**
+ * cloudReorgListFastest
+ * 
+ * Reorganize the given list based on
+ * the fastest path through the store.
+ * Predicts locations as needed.
+ * 
+ * @param {Object}  data    The object containing the inputted data
+ * @param {Component} context   The context of the caller
+ * @param {Database}    database    The database to save the data to
+ * 
+ * @returns The new order of the items and ids
+ */
 exports.cloudReorgListFastest = function(data, context, database) {
+    // Parse the data object
     var storeId = data.storeId;
     var listId = data.listId;
 
-    // The "once" method reads a value from the database, returning a promise
-    // Use "then" to access the promise
     var ref = database.ref('/lists/' + listId);
     var retItems = ref.once('value').then((snapshot) => {
         var items = [];
         var ids = [];
+
+        // Get the item names and ids in the list
         var ssv = snapshot.val();
         if (ssv && ssv.items) {
            for (var item in ssv.items) {
@@ -372,12 +534,14 @@ exports.cloudReorgListFastest = function(data, context, database) {
         var items = result.items;
         var ids = result.ids;
 
+        // Get the location of all items in the store
         var locs = [];
         for (var i = 0; i < ids.length; i++) {
             loc = predictItemLoc(database, storeId, ids[i]); 
             locs.push(loc);  
         }
 
+        // Get teh store map
         var map = getStoreMap(database, storeId);
 
         return Promise.all([
@@ -392,8 +556,8 @@ exports.cloudReorgListFastest = function(data, context, database) {
         var items = result[2];
         var map = result[3];
 
+        // Retrieve the needed location information
         var locs = [];
-
         for (var i = 0; i < predictedLocs.length; i++) {
             var loc = predictedLocs[i];
 
@@ -406,6 +570,8 @@ exports.cloudReorgListFastest = function(data, context, database) {
             })
         }
 
+        // Group and sort the items based on their location in
+        // the store
         locs.sort((a, b) => {
             var nameA, nameB;
             var depA, depB;
@@ -421,6 +587,7 @@ exports.cloudReorgListFastest = function(data, context, database) {
             aisleA = a.aisleNum;
             aisleB = b.aisleNum;
 
+            // Get the department locations in the map
             depIndA = Object.keys(map).find(key => map[key] === depA);
             depIndB = Object.keys(map).find(key => map[key] === depB);
 
@@ -460,9 +627,9 @@ exports.cloudReorgListFastest = function(data, context, database) {
             }
         });
 
+        // Get the final items and ids
         items = [];
         ids = [];
-
         for (i = 0; i < locs.length; i++) {
             items.push(locs[i].item);
             ids.push(locs[i].id);

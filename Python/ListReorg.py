@@ -7,17 +7,43 @@ import StoreObj
 import LocPredictor
 import DataCreator
 
+"""
+reorgGrocListAlpha
+
+Reorganizes the given list in alphabetical order
+
+@input  grocItems   The GrocListObj to sort
+@input  store   The store the user is in
+@input  knownStore  The list of known stores
+
+@return The sorted list
+"""
 def reorgGrocListAlpha(grocItems, store, knownStores):
     items = copy.copy(grocItems.getItems())
     items = sorted(items, key=lambda x: x.getName())
     finalDict = {"ITEMS" : items}
     return(finalDict)
 
+"""
+reorgGrocListLoc
+
+Reorganizes the given list based on the location
+of the items in the store
+
+@input  grocItems   The GrocListObj to sort
+@input  store   The store the user is in
+@input  knownStore  The list of known stores
+
+@return The sorted list
+"""
 def reorgGrocListLoc(grocItems, store, knownStores):
     items = grocItems.getItems()
+
+    # Get the location of all items in the store
     for item in items:
         item.setLoc(LocPredictor.predictLoc(knownStores, store, item.getName()))
 
+    # Group the items based on their locations
     locDict = {}
     for item in items:
         itemName = item.getName()
@@ -49,7 +75,20 @@ def reorgGrocListLoc(grocItems, store, knownStores):
 
     return(finalDict)
 
+"""
+reorgGrocListFastest
+
+Reorganizes the given list to put the items
+in their fastest order
+
+@input  grocItems   The GrocListObj to sort
+@input  store   The store the user is in
+@input  knownStore  The list of known stores
+
+@return The sorted list
+"""
 def reorgGrocListFastest(grocItems, store, knownStores):
+    # Reorganize the list based on the item's locations
     dictList = reorgGrocListLoc(grocItems, store, knownStores)
 
     grocDepartments = list(dictList.keys())
@@ -59,6 +98,7 @@ def reorgGrocListFastest(grocItems, store, knownStores):
 
     finalDict = collections.OrderedDict()
 
+    # Sort the groupings based on the map
     for department in storeDepartments:
         if department in grocDepartments:
             finalDict[department] = dictList[department]

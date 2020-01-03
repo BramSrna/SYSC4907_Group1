@@ -37,36 +37,52 @@ class MapCreatorPage extends Component {
         };
     }
 
-    /*
-    componentDidMount
-    Set mounted to True
-    @input  None
-    @return void
+    /**
+    * componentDidMount
+    * 
+    * Function called after component was mounted.
+    * Sets the context of the notification manager.
+    * Sets the mounted boolean and the arrayHolder value.
+    * 
+    * @params  None
+    * 
+    * @return None
     */
     componentDidMount() {
         nm.setThat(this);
         this._mounted = true;
         this.setState({ arrayHolder: [...this.currDepartments] });
+
+        this._mounted = true;
+
+        this.setState({
+            arrayHolder: [...this.currDepartments]
+        });
     }
 
-    /*
-    componentWillUnmount
-    Set mounted to False
-    
-    @input  None
-    @return void
+    /**
+    * componentWillUnmount
+    * 
+    * Set mounted to False
+    *
+    * @params  None
+    * 
+    * @return void
     */
     componentWillUnmount() {
         this._mounted = false;
     }
 
-    /*
-    addDepartment
-    Adds a department to the list of departments and
-    intializes it to the first item in the list.
-    Rerenders the screen + state.
-    @input  None
-    @return void
+    /**
+    * addDepartment
+    *
+    * Adds a department to the list of departments and
+    * intializes it to the first item in the list.
+    * Rerenders the screen + state.
+    * 
+    * @params  None
+    * 
+    * @return void
     */
     addDepartment = () => {
         // Add a department to the list
@@ -76,29 +92,34 @@ class MapCreatorPage extends Component {
         this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
-    /*
-    handleSaveMap
-    Handles the Save Map button being clicked.
-    Copies the current department setting list and
-    pushes it to the database.
-    @input  None
-    @return void
+    /**
+    * handleSaveMap
+    * 
+    * Handles the Save Map button being clicked.
+    * Checks that all required information has been given.
+    * Copies the current department setting list and
+    * pushes it to the database.
+    * 
+    * @params  None
+    * 
+    * @return void
     */
     handleSaveMap = () => {
+        // Check that all required information was given
         if (!this.checkReqFields()){
             return;
-        }
-
-        var deps = []
+        }       
 
         // Copy the current list of departments
+        var deps = [];
         for (var i = 0; i < this.currDepartments.length; i++) {
             deps.push(this.currDepartments[i]["department"])
         }
         
-        // Saves the data if all required fields have values
+        // Get the franchise name
         var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
 
+        // Save the store to the database
         dbi.registerStore(this.state.storeName,
                           this.state.address,
                           deps,
@@ -139,7 +160,6 @@ class MapCreatorPage extends Component {
     }
 
     /**
-     * 
      * renderRequiredText
      * 
      * Renders a required text Text fields.
@@ -147,42 +167,52 @@ class MapCreatorPage extends Component {
      * the required text marker.
      * 
      * @param {String}  bodyText  The text of the Text field
-     * @param {String}  reqText   The text to signify it is required text (Default = (*))
+     * @param {String}  reqText   The text to signify it is required text
+     *                            (Default = (*))
      * 
      * @returns None
      */
     renderRequiredText(bodyText, reqText = "(*)") {
-    return (
-        <Text style={globalStyles.whiteText}>
-            {bodyText}
-            <Text style={globalStyles.requiredHighlight}>
-                {reqText}
+        return (
+            <Text style={globalStyles.whiteText}>
+                {bodyText}
+                <Text style={globalStyles.requiredHighlight}>
+                    {reqText}
+                </Text>
             </Text>
-            </Text>
-    );
+        );
     }
 
-    /*
-    updateDepartment
-    Updates the current index in the list, setting
-    it to the given value.
-    @input  ind     The index to update
-    @input  newVal  The new value for the index
-    @return void
+    /**
+    * updateDepartment
+    *
+    * Updates the current index in the list, setting
+    * it to the given value.
+    * 
+    * @param {Integer}  ind     The index to update
+    * @param {String}  newVal  The new value for the index
+    * 
+    * @returns void
     */
     updateDepartment = (ind, newVal) => {
         this.currDepartments[ind]["department"] = newVal;
         this.setState({ arrayHolder: [...this.currDepartments] });
+        this.setState({
+            arrayHolder: [...this.currDepartments]
+        });
     }
 
-    /*
-    upButtonPressed
-    Handler for the up button. Swaps the department at
-    the given index with the department above it. If
-    the department is at the top of the list, nothing
-    happens.
-    @input  ind     The index to move
-    @return void
+    /**
+    * upButtonPressed
+    * 
+    * Handler for the up button. Swaps the department at
+    * the given index with the department above it. If
+    * the department is at the top of the list, nothing
+    * happens.
+    * 
+    * @param {Integer}  ind     The index to move
+    * 
+    * @returns void
     */
     upButtonPressed = (ind) => {
         // Check if the index is at the top of the list
@@ -197,12 +227,15 @@ class MapCreatorPage extends Component {
         }
     }
 
-    /*
-    delButtonPressed
-    Handler for the delete button. Deletes the button
-    at the given index from the list. Updates the state.
-    @input  ind     The index to delete
-    @return void
+    /**
+    * delButtonPressed
+    * 
+    * Handler for the delete button. Deletes the button
+    * at the given index from the list. Updates the state.
+    * 
+    * @param {Integer}  ind     The index to delete
+    * 
+    * @returns void
     */
     delButtonPressed = (ind) => {
         // Remove the department from the list
@@ -212,14 +245,17 @@ class MapCreatorPage extends Component {
         this.setState({ arrayHolder: [...this.currDepartments] });
     }
 
-    /*
-    downButtonPressed
-    Handler for the down button. Swaps the department at
-    the given index with the department below it. If
-    the department is at the bottom of the list, nothing
-    happens.
-    @input  ind     The index to move
-    @return void
+    /**
+    * downButtonPressed
+    * 
+    * Handler for the down button. Swaps the department at
+    * the given index with the department below it. If
+    * the department is at the bottom of the list, nothing
+    * happens.
+    * 
+    * @param {Integer}  ind     The index to move
+    * 
+    * @return void
     */
     downButtonPressed = (ind) => {
         // Check if the index is at the bottom of the list
@@ -234,14 +270,17 @@ class MapCreatorPage extends Component {
         }
     }
 
-    /*
-            renderListElem
-            Renders the items in the department list. Each
-            item has an up button, delete button, down button,
-            picker for selecting the department, and a blank spot
-            to allow for scrolling.
-            @input  index   The index of the element being rendered
-            @return void
+    /**
+    * renderListElem
+    * 
+    * Renders the items in the department list. Each
+    * item has an up button, delete button, down button,
+    * picker for selecting the department, and a blank spot
+    * to allow for scrolling.
+    * 
+    * @param {Integer}  index   The index of the element being rendered
+    * 
+    * @return void
             */
     renderListElem = (index) => {
         const placeholder = {

@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView} from "react-native";
 import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
-import globalStyles from "./pageStyles/GlobalStyle";
 import { departments } from "../DepartmentList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
+import { styles } from "./pageStyles/AddItemLocationPageStyle"
 
 const PAGE_TITLE = "Add Item Location";
 
@@ -36,6 +36,16 @@ class AddItemLocationPage extends Component {
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
   }
 
+  /**
+   * componentDidMount
+   * 
+   * Function to call when the page is mounted. Sets
+   * the value of "that" for the notification manager.
+   * 
+   * @param None
+   * 
+   * @returns None
+   */
   componentDidMount() {
     nm.setThat(this)
   }
@@ -110,19 +120,23 @@ class AddItemLocationPage extends Component {
    * handleAdd
    * 
    * Handler for the add item location button.
-   * Saves all of the information to the database.
+   * Checks if all required data has been given and if so,
+   * saves all of the information to the database.
    * 
    * @param None
    * 
    * @returns None
    */
   handleAdd = () => {
+    // Check the required fields
     if (!this.checkReqFields()){
       return;
     }
 
+    // Set the specific name
     var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
 
+    // Add the value to the database
     dbi.addItemLoc(this.state.genericName,
                    tempSpecificName,
                    this.state.storeName,
@@ -134,30 +148,20 @@ class AddItemLocationPage extends Component {
   };
 
   /**
-   * renderRequiredText
+   * renderMenuAction
    * 
-   * Renders a required text Text fields.
-   * Prints the body of the text field with
-   * the required text marker.
+   * Handles the menu toggle being pressed.
+   * Displays the menu to the user.
    * 
-   * @param {String}  bodyText  The text of the Text field
-   * @param {String}  reqText   The text to signify it is required text (Default = (*))
+   * @param None
    * 
    * @returns None
    */
-  renderRequiredText(bodyText, reqText = "(*)") {
-    return (
-      <Text style={globalStyles.whiteText}>
-        {bodyText}
-        <Text style={globalStyles.requiredHighlight}>
-          {reqText}
-        </Text>
-      </Text>
-    );
-  }
-
   renderMenuAction = () => (
-    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+    <TopNavigationAction
+      icon={MenuOutline}
+      onPress={() => this.props.navigation.toggleDrawer()}
+    />
   );
 
   render() {
@@ -220,52 +224,5 @@ class AddItemLocationPage extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  avoidingView: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  overflowMenu: {
-    padding: 4,
-    shadowColor: 'black',
-    shadowOpacity: .5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
-  },
-  formOuterContainer: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 10,
-  },
-  formInnerContainer: {
-    flex: 1,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  inputRow: {
-    paddingVertical: 4,
-  },
-  selectBox: {
-    width: '100%',
-  },
-  button: {
-    flex: 1,
-    marginTop: 8,
-    width: '100%',
-  },
-});
 
 export default AddItemLocationPage;

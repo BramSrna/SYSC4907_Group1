@@ -31,20 +31,44 @@ class GrocList(object):
 
 		return(retStr)
 
+	"""
+	setName
+	Sets the name of the object to given name
+	@input	newName	The new name of the object
+	@return None
+	"""
 	def setName(self, newName):
 		if type(newName) != str:
 			raise ValueError("Error in GrocListObj: name parameter must be a string")
 
 		self.name = newName
 
+	"""
+	getName
+	Returns the name of the object
+	@input	None
+	@return	The name of the object
+	"""
 	def getName(self):
 		return(self.name)
 
+	"""
+	addItem
+	Adds the given item to the list of items
+	@input	newItem	The item to add to the list
+	@return	None
+	"""
 	def addItem(self, newItem):
 		if type(newItem) != ItemObj.Item:
 			raise ValueError("Error in GrocListObj: items must be Item objects")
 
 		self.items.append(newItem)
 
+	"""
+	getItems
+	Returns the current list of items
+	@input	None
+	@return	The current list of items
+	"""
 	def getItems(self):
 		return(self.items)

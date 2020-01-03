@@ -22,6 +22,12 @@ class ItemLoc(object):
 		self.setDepartment(department)
 		self.setAisle(aisle)
 
+	"""
+	str
+	Returns the string representation of this object
+	@input	None
+	@return	The string representation of this object
+	"""
 	def __str__(self):
 		storeName = "None"
 		departmentName = "None"
@@ -83,6 +89,12 @@ class ItemLoc(object):
 	def getAisle(self):
 		return(self.aisle)
 
+	"""
+	setAisle
+	Sets the aisle of this object to the given value
+	@input	newAisle	The new aisle of the object
+	@return	None
+	"""
 	def setAisle(self, newAisle):
 		if type(newAisle) != AisleObj.Aisle:
 			raise ValueError("Error in ItemLocObj: newAisle parameter must be an Aisle object")

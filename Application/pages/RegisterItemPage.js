@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
-import globalStyles from "../pages/pageStyles/GlobalStyle";
 import { units } from "../UnitList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
+import { styles } from "./pageStyles/RegisterItemPageStyle";
 
 const PAGE_TITLE = "Register Item";
 
@@ -32,6 +32,16 @@ class RegisterItemPage extends Component {
     };
   }
 
+  /**
+   * componentDidMount
+   * 
+   * Function called when the component has mounted.
+   * Sets the context of the notification manager.
+   * 
+   * @param None
+   * 
+   * @returns None
+   */
   componentDidMount() {
     nm.setThat(this)
 
@@ -41,6 +51,7 @@ class RegisterItemPage extends Component {
    * handleRegister
    * 
    * Handler for the register item button.
+   * Checks that all necessary data has been given.
    * Saves all of the information to the database.
    * 
    * @param None
@@ -48,15 +59,18 @@ class RegisterItemPage extends Component {
    * @returns None
   */
   handleRegister = () => {
+    // Check that all required information has been given
     if (!this.checkReqFields()){
       return;
     }
 
+    // Set all of the optional data
     var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
     var tempSize = this.state.size === DEFAULT_SIZE ? null : this.state.size;
     var tempSizeUnit = this.state.sizeUnit.value;
     var tempPrice = this.state.price === DEFAULT_PRICE ? null : this.state.price;
 
+    // Register the item
     dbi.registerItem(this.state.genericName,
                       tempSpecificName,
                       tempSize,
@@ -89,29 +103,6 @@ class RegisterItemPage extends Component {
     }
 
     return (true);
-  }
-  /**
-   * 
-   * renderRequiredText
-   * 
-   * Renders a required text Text fields.
-   * Prints the body of the text field with
-   * the required text marker.
-   * 
-   * @param {String}  bodyText  The text of the Text field
-   * @param {String}  reqText   The text to signify it is required text (Default = (*))
-   * 
-   * @returns None
-   */
-  renderRequiredText(bodyText, reqText = "(*)") {
-    return (
-      <Text style={globalStyles.whiteText}>
-        {bodyText}
-        <Text style={globalStyles.requiredHighlight}>
-          {reqText}
-        </Text>
-      </Text>
-    );
   }
 
   renderMenuAction = () => (
@@ -174,63 +165,5 @@ class RegisterItemPage extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  avoidingView: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  overflowMenu: {
-    padding: 4,
-    shadowColor: 'black',
-    shadowOpacity: .5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
-  },
-  formOuterContainer: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 10,
-  },
-  formInnerContainer: {
-    flex: 1,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  inputRow: {
-    paddingVertical: 4,
-  },
-  horizontalInnerContainer: {
-    flexDirection: 'row',
-  },
-  inputLeftColumn: {
-    flex: 4,
-    paddingVertical: 4,
-  },
-  inputRightColumn: {
-    flex: 1,
-    paddingTop: 21,
-    paddingLeft: 8,
-    paddingVertical: 4,
-    minWidth: 60,
-  },
-  button: {
-    flex: 1,
-    marginTop: 8,
-    width: '100%',
-  },
-});
 
 export default RegisterItemPage;

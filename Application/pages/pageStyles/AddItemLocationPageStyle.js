@@ -2,80 +2,49 @@ import {
   StyleSheet
 } from 'react-native';
 
-export const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
+    height: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
-  topContainer: {
+  scrollContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
   },
-  midContainer: {
-    flex: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
-  },
-  botContainer: {
+  avoidingView: {
     flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
+  },
+  overflowMenu: {
+    padding: 4,
+    shadowColor: 'black',
+    shadowOpacity: .5,
+    shadowOffset: { width: 0, height: 0 },
+    elevation: 8,
+  },
+  formOuterContainer: {
+    margin: 8,
+    padding: 8,
+    borderRadius: 10,
+  },
+  formInnerContainer: {
+    flex: 1,
+    padding: 8,
     alignItems: 'center',
-    backgroundColor: 'black',
-    color: "black",
+    justifyContent: 'center',
+    borderRadius: 10,
   },
-  scrollView: {
-    backgroundColor: "black",
+  inputRow: {
+    paddingVertical: 4,
   },
-  whiteHeaderText: {
-    color: 'white',
-    fontSize: 20,
+  selectBox: {
+    width: '100%',
   },
-  blackText: {
-    color: 'black',
-  },
-  textInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-  },
-  picker: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-  },
-  rowSorter: {
-    flexDirection: "row",
-    padding: 20,
+  button: {
+    flex: 1,
+    marginTop: 8,
+    width: '100%',
   },
 });
-
-export const pickerStyle = {
-  inputAndroid: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-    paddingRight: 30,
-  },
-  inputIOS: {
-    borderColor: "gray",
-    borderWidth: 1,
-    justifyContent: "flex-end",
-    color: "white",
-    height: 40,
-    paddingRight: 30,
-  },
-};
