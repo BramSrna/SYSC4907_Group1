@@ -4,94 +4,107 @@ import {
 } from 'react-native';
 
 export const styles = StyleSheet.create({
-    list: {
+    mainContainer: {
+        flex: 1,
+        backgroundColor: "black",
+        borderLeftWidth: Dimensions.get('window').width / 20,
+        borderRightWidth: Dimensions.get('window').width / 20,
+        borderColor: "black",
+        justifyContent: "space-between",
+    },
+    topContainer: {
+        flex: 2,
+    },
+    headerContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    rowSorter: {
+        flexDirection: "row",
         flex: 1,
     },
-    container: {
+    textContainer: {
         flex: 1,
-        height: '100%',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
     },
-    scrollContainer: {
+    outerButtonContainer: {
         flex: 1,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
     },
-    avoidingView: {
+    pickerContainer: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "stretch",
     },
-    overflowMenu: {
-        padding: 4,
-        shadowColor: 'black',
-        shadowOpacity: .5,
-        shadowOffset: { width: 0, height: 0 },
-        elevation: 8,
+    midContainer: {
+        flex: 8
     },
-    formOuterContainer: {
-        margin: 8,
-        padding: 8,
-        borderRadius: 10,
+    botContainer: {
+        flex: 2,
     },
-    formInnerContainer: {
-        flex: 1,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
+    textInput: {
+        height: 40,
+        borderColor: "white",
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "white",
     },
-    listItem: {
-        flex: 1,
-        marginVertical: 8,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        borderRadius: 10,
+    blackHeaderText: {
+        color: 'white',
+        fontSize: 20,
     },
-    selectMenu: {
-        flex: 1,
-        paddingHorizontal: 8,
-        minWidth: 60,
+    picker: {
+        height: 40,
+        borderColor: "white",
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "white",
     },
-    flatList: {
-        flex: 1
-    },
-    inputRow: {
-        paddingVertical: 4,
-    },
-    selectBox: {
-        width: '100%',
+    buttonContainer: {
+        height: 45,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: 0,
+        width: Dimensions.get('window').width / 3,
+        borderRadius: 30,
     },
     button: {
+        backgroundColor: "#00b5ec",
+    },
+    bufferView: {
+        flex: 0.1,
+    },
+    listButton: {
         flex: 1,
-        marginTop: 8,
-        width: '100%',
+        borderRadius: 20,
     },
-    placeholderStyle: {
-        color: 'gray',
-    },
-    mainButtonGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    mainPageButton: {
+    image: {
         flex: 1,
-        padding: 8,
-        marginVertical: 8,
-        marginHorizontal: 2,
-    },
-    pickerIOS: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-    },
-    pickerAndroid: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-
-    },
+    }
 });
+
+export const pickerStyle = {
+    inputAndroid: {
+        borderColor: "black",
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "black",
+        paddingRight: 30,
+        height: 40
+    },
+    inputIOS: {
+        borderColor: "gray",
+        borderWidth: 1,
+        justifyContent: "flex-end",
+        color: "white",
+        paddingRight: 30,
+        height: 40
+    },
+};
