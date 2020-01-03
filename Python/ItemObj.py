@@ -57,6 +57,12 @@ class Item(object):
     def getLoc(self):
         return(self.location)
 
+    """
+    setLoc
+    Sets the location of this object to the given location
+    @input  newLoc  The new location of the object
+    @return None
+    """
     def setLoc(self, newLoc):
         if (type(newLoc) != ItemLocObj.ItemLoc) and \
             (newLoc != None):

@@ -84,12 +84,24 @@ class Store(object):
 	def getName(self):
 		return(self.name)
 
+	"""
+	setName
+	Sets the name of the object to the given name
+	@input	newName	The new name of the object
+	@return	None
+	"""
 	def setName(self, newName):
 		if type(newName) != str:
 			raise ValueError("Error in StoreObj: newName parameter must be a string")
 	
 		self.name = newName
 
+	"""
+	getItem
+	Returns the item in the store with the given name
+	@input	itemName	The name of the item to look for
+	@return	The item if found, None otherwise
+	"""
 	def getItem(self, itemName):
 		items = self.getAllItems()
 

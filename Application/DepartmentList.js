@@ -4,8 +4,11 @@ for adding items to stores and creating maps.
 The keys in the dictionary are the names of
 the departments.
 The items in the dictionary are as follows:
+    text: The value of the department to be displayed in dropdown boxes
     label: The name of the department to be displayed to users
     value: The corresponding value saved to the database
+
+TODO: Might be able to remove labels
 */
 const departmentList = [
     {text: "Bakery", label: "Bakery", value: "BAKERY"},

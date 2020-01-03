@@ -1,3 +1,14 @@
+/*
+The dictionary of available sorting methods
+for sorting grocery lists.
+
+The items in the dictionary are as follows:
+    text: The value of the organization method to be displayed in dropdown boxes
+    label: The name of the organization method to be displayed to users
+    value: The corresponding value saved to the database
+
+TODO: Might be able to remove labels
+*/
 const options = [
     {text: "Order Added", label: "Order Added", value: "ORDER_ADDED"},
     {text: "Alphabetically", label: "Alphabetically", value: "ALPHABETICALLY"},

@@ -4,9 +4,7 @@ import { TouchableHighlight,
          View,
          FlatList,
          Alert,
-         StyleSheet,
          KeyboardAvoidingView,
-         Dimensions,
          TouchableOpacity } from "react-native";
 import { Modal as RNModal} from "react-native";
 import { Layout,
@@ -27,7 +25,9 @@ import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import { organizationOptions } from "../OrgMethods";
 import Autocomplete from 'react-native-autocomplete-input';
+import { styles, enterStoreModalStyles } from './pageStyles/CurrentListPageStyle'
 
+// The Arrays for populating that autocomplete fields
 var availableStores = [];
 var availableItems = [];
 
@@ -63,17 +63,50 @@ class CurrentList extends Component {
       };
    }
 
+   /**
+    * componentWillUnmount
+    * 
+    * Function to call before the component is unmounted.
+    * Removes the focus listener on this object.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    componentWillUnmount() {
       this.focusListener.remove();
    }
 
+   /**
+    * GoBackToYourLists
+    * 
+    * Returns to the user's lists page.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    GoBackToYourLists() {
       this.props.navigation.navigate("YourListsPage");
    }
 
+   /**
+    * componentDidMount
+    * 
+    * Function called after component mounts.
+    * Adds a focus listener to the component.
+    * Populates the arrays for the autocomplete fields.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    componentDidMount() {
+      // Set "that" for the notification manager
       nm.setThat(this)
-      // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
+
+      // Need this because componentDidMount only gets called once,
+      // therefore add willFocus listener for when the user comes back
       this.focusListener = this.props.navigation.addListener(
          "willFocus",
          () => {
@@ -81,23 +114,46 @@ class CurrentList extends Component {
          }
       );
 
-      this.loadAvailableStores();
-
+      // Populate the Arrays for the autocomplete fields
+      this.loadAvailableStores();      
       this.loadAvailableItems();
    }
 
+   /**
+    * SetNameAndCurrentItems
+    * 
+    * Sets the name and id of this list and
+    * loads the current contents of the list.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    SetNameAndCurrentItems() {
+      // Set the current name and list id
       this.setState({
          listName: this.props.navigation.getParam("name", "(Invalid Name)"),
          listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
       });
 
-      this.loadCurrList(this, this.props.navigation.getParam("listID", "(Invalid List ID)"));
+      // Load the current contents of the list
+      this.loadCurrList(this,
+                        this.props.navigation.getParam("listID", "(Invalid List ID)"));
    }
 
+   /**
+    * loadCurrList
+    * 
+    * Loads the current contents of the list and updates
+    * the current state of the component. Loads the items
+    * and their corresponding ids to save to the state.
+    * 
+    * @param {Component} that   The context that the function was called under
+    * @param {String}    listId The id of this list
+    */
    loadCurrList(that, listId) {
-      // The "once" method reads a value from the database, returning a promise
-      // Use "then" to access the promise
+      // The "once" method reads a value from the database,
+      // returning a promise. Use "then" to access the promise
       var ref = firebase.database().ref('/lists/' + listId);
       var retItems = ref.on('value', function(snapshot) {
          var items = [];
@@ -106,6 +162,8 @@ class CurrentList extends Component {
          var ssv = snapshot.val();
          var userCount = 0;
  
+         // Parse the item objects and their
+         // corresponding ids
          if (ssv && ssv.items) {
              var listItems = ssv.items;
              for (var itemId in listItems) {
@@ -114,26 +172,54 @@ class CurrentList extends Component {
             }
          }
  
+         // Get the user count of the list
          if (ssv.user_count) {
             userCount = ssv.user_count;
          }
 
+         // Update the state of the context
          that.updateListState(items, ids, userCount = userCount);
       });
    }
 
+   /**
+    * updateListState
+    * 
+    * Updates this component's context with
+    * the passed in information. Modifies the current list
+    * of ids and list of items to match the new information,
+    * removing and adding items as needed.
+    * 
+    * If reorg is set to true, the order of the lists is
+    * rearranged to match the new order. If userCount is not
+    * null, then userCount is set to the given value, otherwise
+    * it is unchanged.
+    * 
+    * @param {Array}   newItems  The new array of Item objects
+    * @param {Array}   newIds    The new array of ID objects
+    * @param {Boolean} reorg     If true, then the local arrays are
+    *                            rearranged to match the given order.
+    *                            Default is false
+    * @param {Integer} userCount If non-null, the userCount is set to this value
+    *                            Default is null
+    */
    updateListState(newItems, newIds, reorg = false, userCount = null) {
+      // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
 
       if (reorg) {
+         // If reorg is true, then just rearrange the current arrays
          localIds = newIds;
          localItems = newItems;
       } else {
+         // Get the list of items added and removed
          var itemsAdded = newIds.filter(x => !localIds.includes(x));
          var itemsRemoved = localIds.filter(x => !newIds.includes(x));
 
          if (itemsAdded.length > 0) {
+            // New items were given
+            // Add the missing items and their corresponding ids
             for (var i = 0; i < itemsAdded.length; i++) {
                var ind = newIds.indexOf(itemsAdded[i]);
 
@@ -141,6 +227,8 @@ class CurrentList extends Component {
                localItems.push(newItems[ind]);
             }
          } else if (itemsRemoved.length > 0) {
+            // Items were removed
+            // Remove the items and their corresponding ids
             for (var i = 0; i < itemsRemoved.length; i++) {
                var ind = localIds.indexOf(itemsRemoved[i]);
 
@@ -150,6 +238,7 @@ class CurrentList extends Component {
                }
             }
          } else {
+            // Effectively the same as reorg != false
             for (var i = 0; i < newIds.length; i++) {
                var id = newIds[i];
                var ind = localIds.indexOf(id);
@@ -161,6 +250,7 @@ class CurrentList extends Component {
          }
       }      
 
+      // Set the new state values
       this.setState({
          listItems: localItems,
          listItemIds: localIds,
@@ -168,16 +258,43 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * getDispName
+    * 
+    * Gets the name of the given object to
+    * display to the user.
+    * 
+    * If there is no specific name, the name is the generic name
+    * Otherwise, the name is the generic name with the specific name in brackets
+    * 
+    * @param {Object} item The object item to parse
+    * 
+    * @returns The name to display to the user
+    */
    getDispName(item) {
+      // Set the return string to just the generic name
       var retStr = item.genName;
+
+      // If the specific name is given add it to the string
       if ((item.spec !== undefined) &&
           (item.specName !== null) &&
           (item.specName !== "null")) {
          retStr += " (" + item.specName + ")";
       }
+
       return(retStr);
    }
 
+   /**
+    * GenerateListItem
+    * 
+    * Generates the render data for the given item.
+    * 
+    * @param {Object}   item  The item object being displayed
+    * @param {Integer}  index The index of the item in the Array
+    * 
+    * @returns None
+    */
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
          return (
@@ -205,22 +322,53 @@ class CurrentList extends Component {
       }
    }
 
+   /**
+    * handleSwipeOpen
+    * 
+    * Handles an item being swipped left on to open
+    * the swipe menu. Opens the menu and sets the active
+    * row.
+    * 
+    * @param {String} rowId     The id of the row
+    * @param {String} direction The direction that the user swipped
+    * 
+    * @returns None
+    */
    handleSwipeOpen(rowId, direction) {
+      // If the user swipped, set the active row
       if (typeof direction !== "undefined") {
-         this.setState({ activeRow: rowId });
+         this.setState({
+            activeRow: rowId
+         });
       }
    }
 
+   /**
+    * Handler for the user double-tapping on an items.
+    * Toggles the purchased boolean on that item.
+    * 
+    * @param {Integer} indexPosition   The index of the item that the user pressed on
+    * 
+    * @returns None
+    */
    HandleDoubleTapItem(indexPosition) {
-      lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId, this.state.listItemIds[indexPosition])
+      lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId,
+                                            this.state.listItemIds[indexPosition])
    }
 
-   DELETEME1 = () => {
-      this.state.itemName = "";
-      this.setState({ isDialogVisible: false });
-   };
-
-   DELETEME2 = () => {
+   /**
+    * addItem
+    * 
+    * Adds the current item saved in the state
+    * to the current list. Toggles the add item
+    * modal visibility and clears the item name.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
+   addItem() {
+      // Add the item to the list
       lf.AddItemToList(this.state.listId,
                        this.state.genName,
                        1,
@@ -228,25 +376,44 @@ class CurrentList extends Component {
                        "aNote",
                        specName = this.state.specName);
 
+      // Clear the needed state variables
       this.setState({
          itemModalVisible: false,
          itemName: ''
       });
    };
 
-   DELETEME3 = (name) => {
+   /**
+    * notificationMessage
+    * 
+    * Sets the message to the given input.
+    * 
+    * @param {String}   message  The message to display to the user
+    * 
+    * @returns None
+    */
+   notificationMessage = (message) => {
       this.setState({
-         itemName: name
+         message: message
       });
    }
 
-   notificationMessage = (message) => {
-      this.setState({ message: message })
-   }
-
+   /**
+    * handleReorg
+    * 
+    * Handles a reorganization method being selected.
+    * Sets the method to the selected option and calls
+    * the corresponding function.
+    * 
+    * @param {Object} selection The selection method chosen
+    * 
+    * @returns None
+    */
    handleReorg(selection){
+      // Get the value for the organization method
       selectionVal = selection.value;
       
+      // Call the corresponding selection function
       switch(selectionVal){
          case "ORDER_ADDED":
             this.reorganizeListAdded();
@@ -264,15 +431,27 @@ class CurrentList extends Component {
             break;
       }
 
+      // Set the state
       this.setState({
          orgMethod : selection
       });
-
    }
 
+   /**
+    * reorganizeListAdded
+    * 
+    * Reorganizes the list to match the order that
+    * the items were added to the list.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    reorganizeListAdded() {
+      // Get the reorganized list and rearrange the local list
       var tempList = lf.reorgListAdded(this.props.navigation.getParam("listID", "(Invalid List ID)"));
       tempList.then((value) => {
+         // Update the list state to the new order
          this.updateListState(value.items,
                               value.ids,
                               userCount = value.userCount,
@@ -280,30 +459,114 @@ class CurrentList extends Component {
       })
    }
 
+   /**
+    * reorganizeListAlphabetically
+    * 
+    * Reorganizes the list to put the items in alphabetical
+    * order based on the item's names.
+    * 
+    * @params  None
+    * 
+    * @returns None
+    */
    reorganizeListAlphabetically() {
+      // Get the items and ids
       var items = this.state.listItems;
       var ids = this.state.listItemIds;
 
+      // Put the items and their ids in a nested list
       var temp = [];
       for (var j = 0; j < items.length; j++){
          temp.push({"item" : items[j], "id" : ids[j]});
       }
 
+      // Rearrage the nested list to put it in alphabetical order
       temp.sort(function(a, b) {
          var itemA = this.getDispName(a.item).toUpperCase();
          var itemB = this.getDispName(b.item).toUpperCase();
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
       });
 
+      // Retrieve the organized items and ids
       for (var k = 0; k < temp.length; k++){
          items[k] = temp[k].item;
          ids[k] = temp[k].id;
       }
 
+      // Update the list state to the reorganized values
       this.updateListState(items, ids, reorg = true);
    }
 
+   /**
+    * reorganizeListLoc
+    * 
+    * Reorganize the list to group the items based on
+    * their locations. Sorts the groups based on their departments
+    * in alphabetical order. Only works if the current store is valid.
+    * 
+    * @param {Component} context The context that the method was called in
+    * 
+    * @returns None
+    */
+   reorganizeListLoc(context=this) {
+      // Check the current store in the state
+      if (context.checkIfCurrStoreValid()) {
+         // Reorganize the list
+         var tempList = lf.reorgListLoc(context.state.currStoreId,
+                                        context.props.navigation.getParam("listID", "(Invalid List ID)"));
+         tempList.then((value) => {
+            // Update the local state of the list
+            context.updateListState(value.items, value.ids, reorg = true);
+         });
+
+         return;
+      } else {
+         // If the current store is invalid, print an alert to the user
+         Alert.alert("Sorry, we do not have information on that store!");
+      }
+   }
+
+   /**
+    * reorganizeListFastest
+    * 
+    * Reorganize the list to group the items based on
+    * their locations. Sorts the groups to put them in the fastest
+    * order based on the known map of the store.
+    * 
+    * @param {Component} context The context that called this method
+    * 
+    * @returns None
+    */
+   reorganizeListFastest(context=this) {
+      // Check the current store in the state
+      if (context.checkIfCurrStoreValid()) {
+         // Reorganize the list
+         var tempList = lf.reorgListFastest(context.state.currStoreId,
+                                            context.props.navigation.getParam("listID", "(Invalid List ID)"));
+         tempList.then((value) => {
+            // Update the local state of the list
+            context.updateListState(value.items, value.ids, reorg = true);
+         });
+
+         return;
+      } else {
+         // If the current store is invalid, print an alert to the user
+         Alert.alert("Sorry, we do not have information on that store!");
+      }
+   }
+
+   /**
+    * checkIfCurrStoreValid
+    * 
+    * Checks if the current store in the state is known
+    * in the database. Returns true if valid, and false otherwise.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    checkIfCurrStoreValid() {
+      // Check if the given id matches a known id
       for (var i = 0; i < availableStores.length; i++) {
          if (availableStores[i].id === context.state.currStoreId) {
             return(true);
@@ -311,43 +574,27 @@ class CurrentList extends Component {
       }
 
       return(false);
-
    }
 
-   reorganizeListLoc(context=this) {
-      if (context.checkIfCurrStoreValid()) {
-         var tempList = lf.reorgListLoc(context.state.currStoreId,
-                                        context.props.navigation.getParam("listID", "(Invalid List ID)"));
-         tempList.then((value) => {
-            context.updateListState(value.items, value.ids, reorg = true);
-         });
-
-         return;
-      } else {
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
-   }
-
-   reorganizeListFastest(context=this) {
-      if (context.checkIfCurrStoreValid()) {
-         var tempList = lf.reorgListFastest(context.state.currStoreId,
-                                            context.props.navigation.getParam("listID", "(Invalid List ID)"));
-         tempList.then((value) => {
-            context.updateListState(value.items, value.ids, reorg = true);
-         });
-
-         return;
-      } else {
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
-   }
-
+   /**
+    * loadAvailableStores
+    * 
+    * Loads the known store names and their
+    * corresponding ids from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    loadAvailableStores() {
+      // Load the available stores and parses the data
       var tempList = lf.getAvailableStores();
       tempList.then((value) => {
+         // Get the stores and ids
          var stores = value.stores;
          var ids = value.ids;
 
+         // Save the names and ids to the state
          var temp  = [];
          for (var i = 0; i < ids.length; i++) {
             temp.push({
@@ -360,14 +607,27 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * loadAvailableItems
+    * 
+    * Loads the known item names and their
+    * corresponding ids from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    loadAvailableItems() {
+      // Load the available items and parses the data
       var tempList = lf.getAvailableItems();
       tempList.then((value) => {
+         // Get the items, their ids, and data
          var items = value.items;
          var ids = value.ids;
          var genNames = value.genNames;
          var specNames = value.specNames;
 
+         // Save the item information
          var temp  = [];
          for (var i = 0; i < ids.length; i++) {
             temp.push({
@@ -382,21 +642,40 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * loadStores
+    * 
+    * Filters the list of available stores based
+    * on what the user has input so far. Returns an
+    * empty list if nothing has been entered, otherwise
+    * returns a list of the items that match the users input.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    loadStores() {
+      // Get the current store
       var currStore = this.state.currStore;
       var startList = [];
 
+      // Copy the available stores to the initial list
       for (var i = 0; i < availableStores.length; i++) {
          startList.push(availableStores[i].name);
       }
 
+      // Filter the list
       if (currStore.length <= 0) {
+         // If nothing has been entered, return an empty list
          startList = [];
       } else {
+         // Get the items that start with what the user has entered so far
          startList = startList.filter(name => 
             name.toLowerCase().startsWith(currStore.toLowerCase())
          );
 
+         // If the first item in the filtered list matches the inputted value,
+         // return an empty list as the value has been found
          if (startList.length > 0) {
             if (currStore.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
                startList = [];
@@ -404,24 +683,44 @@ class CurrentList extends Component {
          }
       }
 
+      // Return the filtered list
       return(startList);
    }
 
+   /**
+    * loadItems
+    * 
+    * Filters the list of available items based
+    * on what the user has input so far. Returns an
+    * empty list if nothing has been entered, otherwise
+    * returns a list of the items that match the users input.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    loadItems() {
+      // Get the current item
       var itemName = this.state.itemName;
       var startList = [];
 
+      // Copy the available stores to the initial list
       for (var i = 0; i < availableItems.length; i++) {
          startList.push(availableItems[i].name);
       }
 
+      // Filter the list
       if (itemName.length <= 0) {
+         // If nothing has been entered, return an empty list
          startList = [];
       } else {
+         // Get the items that start with what the user has entered so far
          startList = startList.filter(name => 
             name.toLowerCase().startsWith(itemName.toLowerCase())
          );
 
+         // If the first item in the filtered list matches the inputted value,
+         // return an empty list as the value has been found
          if (startList.length > 0) {
             if (itemName.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
                startList = [];
@@ -429,9 +728,20 @@ class CurrentList extends Component {
          }
       }
 
+      // Return the filtered list
       return(startList);
    }
 
+   /**
+    * setModalDetails
+    * 
+    * Sets the store input modal details to the given information
+    * 
+    * @param {Boolean} visible Whether or not the modal is visible
+    * @param {Function} closeFunc The function to call when the modal is closed
+    * 
+    * @returns None
+    */
    setModalDetails(visible, closeFunc) {
       this.setState({
          storeModalVisible: visible,
@@ -439,38 +749,66 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * updateCurrStore
+    * 
+    * Updates the current store name and id in
+    * the state based on the given information.
+    * 
+    * @param {String} newStore The name of the store given by the user
+    * 
+    * @returns None
+    */
    updateCurrStore(newStore) {
-      var id = "";
+      var id = ""; // Empty id to handle unknown stores
+
       newStore = newStore.toString();
 
+      // Find the name of the store in the list of available stores
       for (var i = 0; i < availableStores.length; i++) {
          var name = availableStores[i].name;
          if (name === newStore) {
+            // Set the id of the store if known
             id = availableStores[i].id;
          }
       }
 
+      // Update the state
       this.setState({
          currStore: newStore,
          currStoreId: id
       });
    }
 
+   /**
+    * updateCurrItem
+    * 
+    * Updates the current item name and id in
+    * the state based on the given information.
+    * 
+    * @param {String} newStore The name of the store given by the user
+    * 
+    * @returns None
+    */
    updateCurrItem(newItem) {
-      var id = "";
-      var genName = newItem;
-      var specName = null;
+      var id = ""; // Assume an empty id
+      var genName = newItem; // Assume the given name is the generic name
+      var specName = null; // Assume no specific name has been given
+
       newItem = newItem.toString();
 
+      // Check if the item is a known item
       for (var i = 0; i < availableItems.length; i++) {
          var name = availableItems[i].name;
          if (name === newItem) {
+            // Set the data for the item if known
             id = availableItems[i].id;
             genName = availableItems[i].genName;
             specName = availableItems[i].specName;
          }
       }
 
+      // Update the state
       this.setState({
          itemName: newItem,
          genName: genName,
@@ -479,21 +817,60 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * sendNotification
+    * 
+    * Sends the current notification to all users that the
+    * list has been shared with
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    sendNotification = () => {
+      // Get the current message
       var message = this.state.message;
+
+      // If no message has been entered, use a default message
       if (message == '') {
-         message = 'Hey, just wanted you to check out the list!'
+         message = 'Hey, just wanted you to check out the list!';
       }
-      lf.sendNotificationToSharedUsers(this.state.listId, this.state.listName, message);
+
+      // Send the notification to all shared users
+      lf.sendNotificationToSharedUsers(this.state.listId,
+                                       this.state.listName,
+                                       message);
+
+      // Set the state to the new value
       this.setState({
-         modalVisible: false, message: ''
+         modalVisible: false,
+         message: ''
       });
    }
 
+   /**
+    * deleteItem
+    * 
+    * Handles the delete option being selected
+    * on an item. Deletes the item from the list.
+    * 
+    * @param {String} listID  The ID of the list to remove the item from
+    * @param {String} itemID  The ID of the item to remove from the list
+    */
    deleteItem = (listID, itemID) => {
       lf.DeleteItemInList(listID, itemID);
    }
 
+   /**
+    * renderModalElement
+    * 
+    * Renders the notificaiton modal so that the user
+    * can enter a notificaiton message.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    renderModalElement = () => {
       if (this.state.modalMode == 'notify') {
          return (
@@ -516,7 +893,22 @@ class CurrentList extends Component {
       }
    };
 
+   /**
+    * renderEnterItemModal
+    * 
+    * Renders the enter item modal so that the user
+    * can enter an item to add to the list.
+    * 
+    * NOTE: This uses the default React Native modal
+    * because absolute positioning is needed for the
+    * autocomplete box.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    renderEnterItemModal() {
+      // Load the items and current item for the Autocomplete box
       const itemList = this.loadItems();
       const currItemIn = this.state.itemName;
 
@@ -545,7 +937,7 @@ class CurrentList extends Component {
 
                <TouchableHighlight
                   style={enterStoreModalStyles.modalDoneButton}
-                  onPress={this.DELETEME2}>
+                  onPress={this.addItem}>
                   <Text style={enterStoreModalStyles.modalButtonText}>Add</Text>
                </TouchableHighlight>
             </View>
@@ -553,7 +945,22 @@ class CurrentList extends Component {
       );
    }
 
+   /**
+    * renderEnterStoreModal
+    * 
+    * Renders the enter store modal so that the user
+    * can enter the store name for sorting the list
+    * 
+    * NOTE: This uses the default React Native modal
+    * because absolute positioning is needed for the
+    * autocomplete box.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    renderEnterStoreModal() {
+      // Load the stores and current store for the Autocomplete box
       const storeList = this.loadStores();
       const currStoreIn = this.state.currStore;
 
@@ -593,6 +1000,17 @@ class CurrentList extends Component {
       );
    }
 
+   /**
+    * setModalVisible
+    * 
+    * Toggles the visibility of the notification modal.
+    * Also clears the message and itemName in the state.
+    * 
+    * @param {String} mode The mode for the modal
+    *                      Default is "item"
+    * 
+    * @returns None
+    */
    setModalVisible = (mode = 'item') => {
       this.setState({
          modalMode: mode,
@@ -698,117 +1116,5 @@ class CurrentList extends Component {
       );
    }
 }
-
-const enterStoreModalStyles = StyleSheet.create({
-   modalContainer: {
-      flex: 1,
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
-   },
-   modalSubContainer: {
-      width: Dimensions.get("window").width * 0.75,
-      height: Dimensions.get("window").height * 0.5,
-      backgroundColor: "black",
-      position: "absolute",
-      top: Dimensions.get("window").height * 0.1,
-      alignItems: "center",
-      borderRadius: 20,
-   },
-   modalTitle: {
-      position: 'absolute',
-      top: Dimensions.get("window").height * 0.1,
-      color: "white",
-      fontSize: 20
-   },
-   modalAutocompleteContainer: {
-      flex: 1,
-      position: 'absolute',
-      top: Dimensions.get("window").height * 0.2,
-      width: "60%",
-      zIndex: 5,
-   },
-   modalDoneButton: {
-      position: 'absolute',
-      top: Dimensions.get("window").height * 0.3,
-      backgroundColor: 'black',
-   },
-   modalButtonText: {
-      color: "white"
-   },
-})
-
-const styles = StyleSheet.create({
-   container: {
-
-   },
-   ListContainer: {
-      justifyContent: "center",
-      alignItems: "center",
-      flex: 1,
-   },
-   notPurchasedItem: {
-      padding: 10,
-      fontSize: 18,
-      color: "white"
-   },
-   purchasedItem: {
-      padding: 10,
-      fontSize: 18,
-      color: "red",
-      textDecorationLine: "line-through"
-   },
-   flatList: {
-      paddingTop: 8,
-      paddingHorizontal: 4,
-   },
-   backButton: {
-      padding: 10,
-      paddingTop: 50,
-      paddingBottom: 15,
-      color: "white",
-      fontSize: 12
-   },
-   pageTitle: {
-      padding: 30,
-      paddingTop: 50,
-      paddingBottom: 15,
-      justifyContent: "center",
-      alignItems: "center",
-      color: "white",
-      fontSize: 30
-   },
-   modalContainer: {
-      flex: 1,
-      borderRadius: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: 16,
-   },
-   modal: {
-      paddingBottom: 300, // TODO: Make this dynamic...
-   },
-   input: {
-      flexDirection: 'row',
-      borderRadius: 30,
-      width: 250,
-      margin: 4,
-   },
-   selectBox: {
-     width: '100%',
-   },
-   buttonContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      width: 250,
-      borderRadius: 30,
-   },
-   modalButton: {
-      flex: 1,
-      margin: 4,
-      borderRadius: 30,
-   },
-});
 
 export default CurrentList;
