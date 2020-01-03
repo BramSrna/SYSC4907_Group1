@@ -63,3 +63,7 @@ export const MoveUpIcon = (style) => (
 export const MoveDownIcon = (style) => (
     <Icon {...style} name='arrow-ios-downward-outline' />
 );
+
+export const FlipIcon = (style) => (
+    <Icon {...style} name='flip-outline' />
+);

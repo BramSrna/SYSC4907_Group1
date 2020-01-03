@@ -1,13 +1,14 @@
 import React, { Component } from "react";
-import { Alert, StyleSheet } from "react-native";
-import { Select, Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Alert, StyleSheet, Platform, Picker } from "react-native";
+import { Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
-import { MoveUpIcon, MoveDownIcon, Trash2Icon } from '../assets/icons/icons.js';
+import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/icons.js';
+import RNPickerSelect from 'react-native-picker-select';
 
 const PAGE_TITLE = "Map Creator";
 
@@ -164,29 +165,58 @@ class MapCreatorPage extends Component {
     }
 
     /*
-    renderListElem
-    Renders the items in the department list. Each
-    item has an up button, delete button, down button,
-    picker for selecting the department, and a blank spot
-    to allow for scrolling.
-    @input  index   The index of the element being rendered
-    @return void
-    */
+            renderListElem
+            Renders the items in the department list. Each
+            item has an up button, delete button, down button,
+            picker for selecting the department, and a blank spot
+            to allow for scrolling.
+            @input  index   The index of the element being rendered
+            @return void
+            */
     renderListElem = (index) => {
+        const placeholder = {
+            label: 'Select a department...',
+            value: null,
+        };
+
+        renderIosPicker = () => {
+            return (
+                <RNPickerSelect style={styles.pickerIOS}
+                    key={index}
+                    items={departments}
+                    placeholder={placeholder}
+                    value={this.state.arrayHolder[index]['department']}
+                    onValueChange={(val) => this.updateDepartment(index, val)}
+                />
+            );
+        }
+
+        renderAndroidPicker = () => {
+            return (
+                <Picker
+                    style={styles.pickerAndroid}
+                    prompt={placeholder.label}
+                    selectedValue={this.state.arrayHolder[index]['department']}
+                    onValueChange={(val) => this.updateDepartment(index, val)}
+                >
+                    {
+                        departments.map((v) => {
+                            return <Picker.Item key={index} label={v.label} value={v.value} color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} />
+                        })
+                    }
+                </Picker>
+            );
+        }
+
         return (
             <Layout style={styles.listItem} level='2'>
                 <ButtonGroup appearance='outline' status='primary'>
                     <Button icon={MoveUpIcon} onPress={() => this.upButtonPressed(index)} />
                     <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
                 </ButtonGroup>
-                <Select style={styles.selectMenu}
-                    key={index}
-                    data={departments}
-                    placeholder='Select a department...'
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedOption={this.currDepartments[index]['department']}
-                    onSelect={(val) => this.updateDepartment(index, val)}
-                />
+                <Layout level='2' style={styles.selectMenu}>
+                    {Platform.OS === 'ios' ? renderIosPicker() : renderAndroidPicker()}
+                </Layout>
                 <Button icon={Trash2Icon} appearance='outline' status='danger' onPress={() => this.delButtonPressed(index)} />
             </Layout>
         );
@@ -198,7 +228,6 @@ class MapCreatorPage extends Component {
 
     render() {
         console.log('ArrayHolder', this.state.arrayHolder);
-        console.log('currDepartments', this.currDepartments);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -236,7 +265,7 @@ class MapCreatorPage extends Component {
                                 data={this.state.arrayHolder}
                                 renderItem={({ item, index }) => this.renderListElem(index)}
                                 keyExtractor={(item, index) => index.toString()}
-                                extraData={this.state}
+                                extraData={this.state.arrayHolder}
                             />
                             <Layout style={styles.mainButtonGroup} >
                                 <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
@@ -329,6 +358,17 @@ const styles = StyleSheet.create({
         padding: 8,
         marginVertical: 8,
         marginHorizontal: 2,
+    },
+    pickerIOS: {
+        marginHorizontal: 4,
+        borderRadius: 10,
+        borderWidth: 1,
+    },
+    pickerAndroid: {
+        marginHorizontal: 4,
+        borderRadius: 10,
+        borderWidth: 1,
+
     },
 });
 
