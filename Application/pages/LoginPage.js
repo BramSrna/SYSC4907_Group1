@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Alert, ActivityIndicator, StyleSheet } from "react-native";
-import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
+import { KeyboardAvoidingView, Alert, StyleSheet } from "react-native";
+import { Layout, Button, Input, Icon, Spinner } from 'react-native-ui-kitten';
 import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
@@ -99,7 +99,7 @@ class LoginPage extends Component {
     if (this.state.authenticating) {
       return (
         <Layout style={styles.columnContainer}>
-          <ActivityIndicator size="large" />
+          <Spinner />
         </Layout>
       )
     }

@@ -1,11 +1,6 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  Alert,
-  TouchableHighlight
-} from "react-native";
-import styles from "./pageStyles/VerificationPageStyle";
+import { Alert, StyleSheet } from "react-native";
+import { Text, Layout, Button, ButtonGroup } from 'react-native-ui-kitten';
 import globalStyles from "./pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
 
@@ -13,49 +8,79 @@ const VERIFY = "Verify";
 const RESEND = "Resend confirmation link";
 const HOMEPAGE = "Home";
 
-export default class VerificationPage extends Component {
+class VerificationPage extends Component {
   constructor(props) {
     super(props);
+    state = {
+      emailVerified: false,
+    }
+    firebaseUser = new FirebaseUser();
   }
 
   buttonListener = buttonId => {
     if (buttonId === VERIFY) {
-      if (this.checkEmailVerification()) {
+      if (this.firebaseUser.isUserEmailVerified()) {
         this.props.navigation.navigate(HOMEPAGE);
       } else {
         Alert.alert("Email Not Verified", "Check email for verification link.");
         console.log("Email Verification Check Failed!");
       }
     } else if (buttonId === RESEND) {
-      firebaseUser = new FirebaseUser();
-      firebaseUser.requestVerificationEmail();
+      this.firebaseUser.requestVerificationEmail();
     }
   };
 
-  checkEmailVerification() {
-    firebaseUser = new FirebaseUser();
-    return firebaseUser.isUserEmailVerified();
-  }
-
   render() {
     return (
-      <View style={globalStyles.defaultContainer}>
-        <Text style={globalStyles.whiteTextPadding}>Please confirm your email address by clicking the verification link that was send to the email address that was provided during registration.</Text>
-        <Text style={globalStyles.whiteTextPadding}>Check your junk folder if you cannot find the email or you can request a new confirmation email.</Text>
-        <TouchableHighlight
-          style={[styles.buttonContainer, styles.loginButton]}
-          onPress={() => this.buttonListener(VERIFY)}
-        >
-          <Text style={styles.whiteText}>{VERIFY}</Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          style={styles.buttonContainer}
-          onPress={() => this.buttonListener(RESEND)}
-        >
-          <Text style={styles.whiteText}>{RESEND}</Text>
-        </TouchableHighlight>
-      </View>
+      <Layout style={globalStyles.defaultContainer}>
+        <Text style={styles.textPadding}>Please confirm your email address by clicking the verification link that was send to the email address that was provided during registration.</Text>
+        <Text style={styles.textPadding}>Check your junk folder if you cannot find the email or you can request a new confirmation email.</Text>
+        <ButtonGroup appearance='outline' status='primary'>
+          <Button onPress={() => this.buttonListener(VERIFY)} >{VERIFY}</Button>
+          <Button onPress={() => this.buttonListener(RESEND)} >{RESEND}</Button>
+        </ButtonGroup>
+      </Layout>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  columnContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  button: {
+    marginVertical: 4,
+    marginHorizontal: 4,
+    borderRadius: 30,
+    width: 250,
+  },
+  input: {
+    flexDirection: 'row',
+    borderRadius: 30,
+    width: 250,
+  },
+  textPadding: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    textAlign: 'center'
+  },
+});
+
+export default VerificationPage;
