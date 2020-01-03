@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, StyleSheet, BackHandler } from "react-native";
+import { FlatList, KeyboardAvoidingView, StyleSheet, Image, Alert } from "react-native";
 import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
@@ -337,7 +337,9 @@ class YourLists extends Component {
       else {
          this.backHandler.remove();
       }
-      this.setState({ modalVisible });
+      this.setState({
+         modalVisible
+      });
    };
 
    render() {

@@ -4,6 +4,7 @@ import { Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction 
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
+import * as firebase from "firebase";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/icons.js';
@@ -11,6 +12,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
+import { styles } from "../pages/pageStyles/MapCreatorPageStyle";
 
 const PAGE_TITLE = "Map Creator";
 
@@ -50,11 +52,9 @@ class MapCreatorPage extends Component {
     */
     componentDidMount() {
         nm.setThat(this);
-        this._mounted = true;
-        this.setState({ arrayHolder: [...this.currDepartments] });
 
         this._mounted = true;
-
+        
         this.setState({
             arrayHolder: [...this.currDepartments]
         });
@@ -108,22 +108,22 @@ class MapCreatorPage extends Component {
         // Check that all required information was given
         if (!this.checkReqFields()){
             return;
-        }       
+        }  
 
         // Copy the current list of departments
         var deps = [];
         for (var i = 0; i < this.currDepartments.length; i++) {
             deps.push(this.currDepartments[i]["department"])
         }
-        
+
         // Get the franchise name
         var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
 
         // Save the store to the database
         dbi.registerStore(this.state.storeName,
-                          this.state.address,
-                          deps,
-                          tempFranchiseName);
+            this.state.address,
+            deps,
+            tempFranchiseName);
 
         Alert.alert("Map Saved! Thank you!")
     }
@@ -149,38 +149,14 @@ class MapCreatorPage extends Component {
           Alert.alert("Please enter a value for the store name.");
           return (false);
         }
-  
+
         // Check the specific name field
         if (this.state.address == DEFAULT_ADDRESS) {
           Alert.alert("Please enter a value for the address.");
           return (false);
         }
-  
-        return (true);
-    }
 
-    /**
-     * renderRequiredText
-     * 
-     * Renders a required text Text fields.
-     * Prints the body of the text field with
-     * the required text marker.
-     * 
-     * @param {String}  bodyText  The text of the Text field
-     * @param {String}  reqText   The text to signify it is required text
-     *                            (Default = (*))
-     * 
-     * @returns None
-     */
-    renderRequiredText(bodyText, reqText = "(*)") {
-        return (
-            <Text style={globalStyles.whiteText}>
-                {bodyText}
-                <Text style={globalStyles.requiredHighlight}>
-                    {reqText}
-                </Text>
-            </Text>
-        );
+        return (true);
     }
 
     /**
@@ -195,8 +171,10 @@ class MapCreatorPage extends Component {
     * @returns void
     */
     updateDepartment = (ind, newVal) => {
+        // Set the new value in the current departments array
         this.currDepartments[ind]["department"] = newVal;
-        this.setState({ arrayHolder: [...this.currDepartments] });
+
+        // Update the state
         this.setState({
             arrayHolder: [...this.currDepartments]
         });
@@ -223,7 +201,9 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = aboveItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] });
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
         }
     }
 
@@ -242,7 +222,9 @@ class MapCreatorPage extends Component {
         this.currDepartments.splice(ind, 1);
 
         // Update the state
-        this.setState({ arrayHolder: [...this.currDepartments] });
+        this.setState({
+            arrayHolder: [...this.currDepartments]
+        });
     }
 
     /**
@@ -266,7 +248,9 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = belowItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] });
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
         }
     }
 
@@ -281,7 +265,7 @@ class MapCreatorPage extends Component {
     * @param {Integer}  index   The index of the element being rendered
     * 
     * @return void
-            */
+    */
     renderListElem = (index) => {
         const placeholder = {
             label: 'Select a department...',
@@ -354,44 +338,22 @@ class MapCreatorPage extends Component {
                                 returnKeyType='next'
                                 value={this.state.storeName}
                                 onChangeText={(storeName) => this.setState({ storeName })}
-                                onSubmitEditing={() => this.refs.storeaddress.focus()}
+                                onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
-                        </View>
-
-                        <View style={styles.rowSorter}>
-                            <View style={styles.textContainer}>
-                                <Text style={globalStyles.whiteText}>Franchise Name: </Text>
-                            </View>
-
-                            <View style={styles.pickerContainer}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    placeholder="Franchise Name"
-                                    onChangeText={(franchiseName) => this.setState({ franchiseName })}
-                                    value={this.state.franchiseName}
-                                />
-                            </View>
-
-                        </View>
-
-                        <View style={styles.rowSorter}>
-                            <View style={styles.textContainer}>
-                                {this.renderRequiredText("Address: ")}
-                            </View>
-
-                            <View style={styles.pickerContainer}>
-                                <TextInput
-                                    style={styles.textInput}
-                                    placeholder="Address"
-                                    onChangeText={(address) => this.setState({ address })}
-                                    value={this.state.address}
                             />
                             <Input style={styles.inputRow}
                                 label='Store Address'
-                                ref="storeaddress"
+                                ref="address"
                                 placeholder='Enter store address...'
-                                value={this.state.storeAddress}
-                                onChangeText={(storeAddress) => this.setState({ storeAddress })}
+                                value={this.state.address}
+                                onChangeText={(address) => this.setState({ address })}
+                            />
+                            <Input style={styles.inputRow}
+                                label='Franchise Name'
+                                ref="fName"
+                                placeholder='Enter franchise name...'
+                                value={this.state.franchiseName}
+                                onChangeText={(franchiseName) => this.setState({ franchiseName })}
                             />
                         </Layout>
                     </Layout>
@@ -417,98 +379,5 @@ class MapCreatorPage extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    list: {
-        flex: 1,
-    },
-    container: {
-        flex: 1,
-        height: '100%',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
-    scrollContainer: {
-        flex: 1,
-    },
-    avoidingView: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    overflowMenu: {
-        padding: 4,
-        shadowColor: 'black',
-        shadowOpacity: .5,
-        shadowOffset: { width: 0, height: 0 },
-        elevation: 8,
-    },
-    formOuterContainer: {
-        margin: 8,
-        padding: 8,
-        borderRadius: 10,
-    },
-    formInnerContainer: {
-        flex: 1,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    listItem: {
-        flex: 1,
-        marginVertical: 8,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        borderRadius: 10,
-    },
-    selectMenu: {
-        flex: 1,
-        paddingHorizontal: 8,
-        minWidth: 60,
-    },
-    flatList: {
-        flex: 1
-    },
-    inputRow: {
-        paddingVertical: 4,
-    },
-    selectBox: {
-        width: '100%',
-    },
-    button: {
-        flex: 1,
-        marginTop: 8,
-        width: '100%',
-    },
-    placeholderStyle: {
-        color: 'gray',
-    },
-    mainButtonGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    mainPageButton: {
-        flex: 1,
-        padding: 8,
-        marginVertical: 8,
-        marginHorizontal: 2,
-    },
-    pickerIOS: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-    },
-    pickerAndroid: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-
-    },
-});
 
 export default MapCreatorPage;  

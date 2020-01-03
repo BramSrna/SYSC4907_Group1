@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { FlatList, StyleSheet, KeyboardAvoidingView, BackHandler } from "react-native";
-         Image,
-         FlatList,
-import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
-         KeyboardAvoidingView,
-         TouchableOpacity } from "react-native";
-import { Modal as RNModal} from "react-native";
+import { FlatList,
+   StyleSheet,
+   KeyboardAvoidingView,
+   TouchableHighlight,
+   View,
+   Alert,
+   BackHandler } from "react-native";
 import { Layout,
          Button,
          Input,
@@ -14,6 +14,8 @@ import { Layout,
          TopNavigationAction,
          Select,
          Text } from 'react-native-ui-kitten';
+import { Modal as RNModal} from "react-native";
+import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -40,6 +42,7 @@ class CurrentList extends Component {
          listId: "",
          listItems: [],
          listItemIds: [],
+         modalMode: 'item',
 
          itemName: "",
          genName: "",
@@ -57,7 +60,7 @@ class CurrentList extends Component {
          modalVisible: false,
          modalMode: 'item',
          message: '',
-         userCount: 0,
+         userCount: 0
       };
    }
 
@@ -75,15 +78,6 @@ class CurrentList extends Component {
       this.focusListener.remove();
    }
 
-   /**
-    * GoBackToYourLists
-    * 
-    * Returns to the user's lists page.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
    /**
     * componentDidMount
     * 
@@ -133,6 +127,7 @@ class CurrentList extends Component {
       // Load the current contents of the list
       this.loadCurrList(this,
                         this.props.navigation.getParam("listID", "(Invalid List ID)"));
+
    }
 
    /**
@@ -152,10 +147,10 @@ class CurrentList extends Component {
       var retItems = ref.on('value', function(snapshot) {
          var items = [];
          var ids = [];
- 
+
          var ssv = snapshot.val();
          var userCount = 0;
- 
+
          // Parse the item objects and their
          // corresponding ids
          if (ssv && ssv.items) {
@@ -165,7 +160,7 @@ class CurrentList extends Component {
                  ids.push(itemId);
             }
          }
- 
+
          // Get the user count of the list
          if (ssv.user_count) {
             userCount = ssv.user_count;
@@ -291,23 +286,21 @@ class CurrentList extends Component {
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return (
             <ListItemContainer
                title={this.getDispName(item)}
                fromItemView={true}
                purchased={true}
-               description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'}
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
                onDelete={this.deleteItem}
             />
          );
       } else {
-         return <ListItemContainer title={item.name} fromItemView={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return (
             <ListItemContainer
                title={this.getDispName(item)}
                fromItemView={true}
-               description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'}
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
                onDelete={this.deleteItem}
@@ -369,8 +362,6 @@ class CurrentList extends Component {
                        "aSize mL",
                        "aNote",
                        specName = this.state.specName);
-
-      // Clear the needed state variables
       this.setState({
          itemModalVisible: false,
          itemName: ''
@@ -406,7 +397,7 @@ class CurrentList extends Component {
    handleReorg(selection){
       // Get the value for the organization method
       selectionVal = selection.value;
-      
+
       // Call the corresponding selection function
       switch(selectionVal){
          case "ORDER_ADDED":
@@ -836,8 +827,6 @@ class CurrentList extends Component {
       lf.sendNotificationToSharedUsers(this.state.listId,
                                        this.state.listName,
                                        message);
-
-      // Set the state to the new value
       this.setState({
          modalVisible: false,
          message: ''
@@ -888,7 +877,7 @@ class CurrentList extends Component {
          );
       }
    };
-   // This handles Modal visibility even with Android back button press
+
    /**
     * renderEnterItemModal
     * 
@@ -1022,25 +1011,33 @@ class CurrentList extends Component {
       else {
          this.backHandler.remove();
       }
-      this.setState({ modalMode: mode, modalVisible, itemName: '', message: '' });
+      this.setState({
+         modalMode: mode,
+         modalVisible,
+         itemName: '',
+         message: ''
+      });
    };
 
    render() {
       const AddAction = (props) => (
          <TopNavigationAction
-            {...props}
-            icon={AddIcon}
+            {...props} icon={AddIcon}
             onPress={() => {
                this.setState({
-                  itemModalVisible: true,
-                  itemName: ''
+                  itemModalVisible:  true,
+                  itemName: ""
                })}
             }
          />
       );
 
       const NotificationAction = (props) => (
-         <TopNavigationAction {...props} icon={BellIcon} onPress={() => { this.setModalVisible('notify') }} />
+         <TopNavigationAction
+            {...props}
+            icon={BellIcon}
+            onPress={() => { this.setModalVisible('notify') }}
+         />
       );
 
       const renderRightControls = () => [
@@ -1059,11 +1056,6 @@ class CurrentList extends Component {
          />
       );
 
-            <TouchableOpacity
-               onPress={() => this.setModalVisible('notify')}
-            >
-               <Image source={require("../assets/notify.png")} />
-            </TouchableOpacity>);
       return (
          <React.Fragment>
             <TopNavigation
