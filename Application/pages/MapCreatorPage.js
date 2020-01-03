@@ -12,7 +12,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
-import { styles } from "../pages/pageStyles/MapCreatorPageStyle";
+import styles from "../pages/pageStyles/MapCreatorPageStyle";
 
 const PAGE_TITLE = "Map Creator";
 
