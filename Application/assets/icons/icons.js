@@ -67,3 +67,11 @@ export const MoveDownIcon = (style) => (
 export const FlipIcon = (style) => (
     <Icon {...style} name='flip-outline' />
 );
+
+export const BellIcon = (style) => (
+    <Icon {...style} name='bell-outline' />
+);
+
+export const BellFilledIcon = (style) => (
+    <Icon {...style} name='bell' />
+);

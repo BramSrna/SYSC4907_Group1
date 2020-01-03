@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { FlatList, StyleSheet, KeyboardAvoidingView, BackHandler } from "react-native";
-import { Layout, Button, Input, Icon, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import { Layout, Button, Input, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
+import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
-
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
@@ -144,31 +143,40 @@ class CurrentList extends Component {
          );
       }
    };
-      // This handles Modal visibility even with Android back button press
-      setModalVisible = () => {
-         const modalVisible = !this.state.modalVisible;
-         if (modalVisible) {
-            this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-               if (this.state.modalVisible) {
-                  const modalVisible = false;
-                  this.setState({ modalVisible });
-               }
-               this.backHandler.remove();
-               return true;
-            });
-         }
-         else {
+   // This handles Modal visibility even with Android back button press
+   setModalVisible = (mode = 'item') => {
+      const modalVisible = !this.state.modalVisible;
+      if (modalVisible) {
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.state.modalVisible) {
+               const modalVisible = false;
+               this.setState({ modalVisible });
+            }
             this.backHandler.remove();
-         }
-         this.setState({ modalVisible });
-      };
+            return true;
+         });
+      }
+      else {
+         this.backHandler.remove();
+      }
+      this.setState({ modalMode: mode, modalVisible, itemName: '', message: '' });
+   };
 
    render() {
       const AddAction = (props) => (
          <TopNavigationAction {...props} icon={AddIcon} onPress={() => { this.setModalVisible() }} />
       );
 
+      const NotificationAction = (props) => (
+         <TopNavigationAction {...props} icon={BellIcon} onPress={() => { this.setModalVisible('notify') }} />
+      );
+
       const renderRightControls = () => [
+         <NotificationAction />,
+         <AddAction />,
+      ];
+
+      const renderRightControl = () => [
          <AddAction />,
       ];
 
@@ -176,21 +184,15 @@ class CurrentList extends Component {
          <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
       );
 
-      renderNotification = () => {
-         return (<TouchableOpacity onPress={() => this.setModalVisible('notify')} ><Image source={require("../assets/notify.png")} /></TouchableOpacity>);
-      }
-
       return (
          <React.Fragment>
             <TopNavigation
                title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
                alignment="center"
                leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
+               rightControls={this.state.userCount > 1 ? renderRightControls(): renderRightControl()}
             />
             <Layout style={styles.ListContainer}>
-               {this.state.userCount > 1 ? renderNotification() : null}
-               {/* {console.log(this.state.userCount)} */}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
