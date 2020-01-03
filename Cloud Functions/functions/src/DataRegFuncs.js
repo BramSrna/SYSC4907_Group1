@@ -94,7 +94,10 @@ class ItemObj {
     }
 
     getDispName() {
-        var itemName = this.genericName + " (" + this.specificName + ")";
+        var itemName = this.genericName;
+        if ((this.specificName !== "null") && (this.specificName !== null)) {
+            itemName += " (" + this.specificName + ")";
+        }
         return(itemName);
 
     }

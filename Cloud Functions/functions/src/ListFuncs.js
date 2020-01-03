@@ -12,25 +12,27 @@ function createUserPath(userId) {
 
 exports.cloudAddItemToList = function(data, context, database) {
     var listId = data.listId;
-    var itemName = data.name;
+    var genName = data.genName;
+    var specName = data.specName;
     var itemPurchased = data.purchased;
     var itemQuantity = data.quantity;
     var itemSize = data.size;
     var itemNotes = data.notes;
 
-    var retVal = dataRegFuncs.getItem(database, itemName).then((itemInfo) => {
+    var retVal = dataRegFuncs.getItem(database, genName, specificName = specName).then((itemInfo) => {
         var item = itemInfo.item;
 
         if (item === null) {
-            var temp = dataRegFuncs.registerItem(database, itemName);
+            var temp = dataRegFuncs.registerItem(database, genName, specificName = specName);
         }
 
         return Promise.all([temp]);
     }).then(result => {
         var listPath = createListPath(listId);
-        var itemId = (new dataRegFuncs.ItemObj(itemName)).getId();
+        var itemId = (new dataRegFuncs.ItemObj(genName, specificName = specName)).getId();
         database.ref(listPath + "/items/" + itemId).update({
-            name: itemName,
+            genName: genName,
+            specName: specName,
             purchased: itemPurchased,
             quantity: itemQuantity,
             size: itemSize,
