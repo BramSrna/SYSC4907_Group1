@@ -37,6 +37,10 @@ exports.cloudLoadAvailableStores = functions.https.onCall((data, context) => {
    return globalFuncs.cloudLoadAvailableStores(data, context, database);
 });
 
+exports.cloudLoadAvailableItems = functions.https.onCall((data, context) => {
+   return globalFuncs.cloudLoadAvailableItems(data, context, database);
+});
+
 exports.cloudAddItemToList = functions.https.onCall((data, context) => {
    return listFuncs.cloudAddItemToList(data, context, database);
 });

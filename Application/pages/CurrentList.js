@@ -27,6 +27,7 @@ import { organizationOptions } from "../OrgMethods";
 import Autocomplete from 'react-native-autocomplete-input';
 
 var availableStores = [];
+var availableItems = [];
 
 const PAGE_TITLE = "Current List";
 
@@ -41,6 +42,8 @@ class CurrentList extends Component {
          listItemIds: [],
 
          itemName: "",
+         genName: "",
+         specName: null,
          isDialogVisible: false,
 
          orgMethod: organizationOptions[0],
@@ -48,10 +51,13 @@ class CurrentList extends Component {
          currStoreId: "",
          storeModalVisible: false,
 
+         currItemId: "",
+         itemModalVisible: false,
+
          modalVisible: false,
          modalMode: 'item',
          message: '',
-         userCount: 0
+         userCount: 0,
       };
    }
 
@@ -70,6 +76,8 @@ class CurrentList extends Component {
       );
 
       this.loadAvailableStores();
+
+      this.loadAvailableItems();
    }
 
    SetNameAndCurrentItems() {
@@ -145,9 +153,7 @@ class CurrentList extends Component {
                }
             }
          }
-      }
-
-      
+      }      
 
       this.setState({
          listItems: localItems,
@@ -156,11 +162,40 @@ class CurrentList extends Component {
       });
    }
 
+   getDispName(item) {
+      var retStr = item.genName;
+      if ((item.spec !== undefined) &&
+          (item.specName !== null) &&
+          (item.specName !== "null")) {
+         retStr += " (" + item.specName + ")";
+      }
+      return(retStr);
+   }
+
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
          return <ListItemContainer title={item.name} fromItemView={true} purchased={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+            <ListItemContainer
+               title={this.getDispName(item)}
+               fromItemView={true}
+               purchased={true}
+               description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'}
+               listID={this.state.listId}
+               itemID={this.state.listItemIds[index]}
+               onDelete={this.deleteItem}
+            />
+         );
       } else {
          return <ListItemContainer title={item.name} fromItemView={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+            <ListItemContainer
+               title={this.getDispName(item)}
+               fromItemView={true}
+               description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'}
+               listID={this.state.listId}
+               itemID={this.state.listItemIds[index]}
+               onDelete={this.deleteItem}
+            />
+         );
       }
    }
 
@@ -180,9 +215,15 @@ class CurrentList extends Component {
    };
 
    DELETEME2 = () => {
-      lf.AddItemToList(this.state.listId, this.state.itemName, 1, "aSize mL", "aNote");
+      lf.AddItemToList(this.state.listId,
+                       this.state.genName,
+                       1,
+                       "aSize mL",
+                       "aNote",
+                       specName = this.state.specName);
+
       this.setState({
-         modalVisible: false,
+         itemModalVisible: false,
          itemName: ''
       });
    };
@@ -243,8 +284,8 @@ class CurrentList extends Component {
       }
 
       temp.sort(function(a, b) {
-         var itemA = a.item.name.toUpperCase();
-         var itemB = b.item.name.toUpperCase();
+         var itemA = this.getDispName(a.item).toUpperCase();
+         var itemB = this.getDispName(b.item).toUpperCase();
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
       });
 
@@ -313,7 +354,29 @@ class CurrentList extends Component {
       });
    }
 
-   loadItems() {
+   loadAvailableItems() {
+      var tempList = lf.getAvailableItems();
+      tempList.then((value) => {
+         var items = value.items;
+         var ids = value.ids;
+         var genNames = value.genNames;
+         var specNames = value.specNames;
+
+         var temp  = [];
+         for (var i = 0; i < ids.length; i++) {
+            temp.push({
+               name: items[i],
+               id: ids[i],
+               genName: genNames[i],
+               specName: specNames[i]
+            });
+         }
+
+         availableItems = temp;
+      });
+   }
+
+   loadStores() {
       var currStore = this.state.currStore;
       var startList = [];
 
@@ -330,6 +393,31 @@ class CurrentList extends Component {
 
          if (startList.length > 0) {
             if (currStore.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
+               startList = [];
+            }
+         }
+      }
+
+      return(startList);
+   }
+
+   loadItems() {
+      var itemName = this.state.itemName;
+      var startList = [];
+
+      for (var i = 0; i < availableItems.length; i++) {
+         startList.push(availableItems[i].name);
+      }
+
+      if (itemName.length <= 0) {
+         startList = [];
+      } else {
+         startList = startList.filter(name => 
+            name.toLowerCase().startsWith(itemName.toLowerCase())
+         );
+
+         if (startList.length > 0) {
+            if (itemName.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
                startList = [];
             }
          }
@@ -362,6 +450,29 @@ class CurrentList extends Component {
       });
    }
 
+   updateCurrItem(newItem) {
+      var id = "";
+      var genName = newItem;
+      var specName = null;
+      newItem = newItem.toString();
+
+      for (var i = 0; i < availableItems.length; i++) {
+         var name = availableItems[i].name;
+         if (name === newItem) {
+            id = availableItems[i].id;
+            genName = availableItems[i].genName;
+            specName = availableItems[i].specName;
+         }
+      }
+
+      this.setState({
+         itemName: newItem,
+         genName: genName,
+         specName: specName,
+         currItemId: id
+      });
+   }
+
    sendNotification = () => {
       var message = this.state.message;
       if (message == '') {
@@ -378,25 +489,7 @@ class CurrentList extends Component {
    }
 
    renderModalElement = () => {
-      if (this.state.modalMode == 'item') {
-         return (
-            <Layout
-               level='3'
-               style={styles.modalContainer}>
-               <Text category='h6' >Add New Item</Text>
-               <Input
-                  style={styles.input}
-                  placeholder='Item Name...'
-                  onChangeText={name => this.DELETEME3(name)}
-                  autoFocus={this.state.modalVisible ? true : false}
-               />
-               <Layout style={styles.buttonContainer}>
-                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
-                  <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
-               </Layout>
-            </Layout>
-         );
-      } else if (this.state.modalMode == 'notify') {
+      if (this.state.modalMode == 'notify') {
          return (
             <Layout
                level='3'
@@ -417,9 +510,46 @@ class CurrentList extends Component {
       }
    };
    // This handles Modal visibility even with Android back button press
+   renderEnterItemModal() {
+      const itemList = this.loadItems();
+      const currItemIn = this.state.itemName;
+
+      return (
+         <View style={enterStoreModalStyles.modalContainer}>
+            <View style={enterStoreModalStyles.modalSubContainer}>                        
+               <Text style={enterStoreModalStyles.modalTitle}>
+                  Add New Item
+               </Text>
+               <View style={enterStoreModalStyles.modalAutocompleteContainer}>
+                  <Autocomplete
+                     data={itemList}
+                     defaultValue={currItemIn}
+                     hideResults={false}
+                     onChangeText={text => this.updateCurrItem(text)}
+                     keyExtractor={(item, index) => index.toString()}
+                     renderItem={({ item, i }) => (
+                        <TouchableHighlight
+                           style={{zIndex: 10}}
+                           onPress={() => this.updateCurrItem(item)}>
+                           <Text>{item}</Text>
+                        </TouchableHighlight>
+                     )}
+                  />
+               </View>
+
+               <TouchableHighlight
+                  style={enterStoreModalStyles.modalDoneButton}
+                  onPress={this.DELETEME2}>
+                  <Text style={enterStoreModalStyles.modalButtonText}>Add</Text>
+               </TouchableHighlight>
+            </View>
+         </View>
+      );
+   }
+
    renderEnterStoreModal() {
-      const testItems = this.loadItems();
-      const testStore = this.state.currStore;
+      const storeList = this.loadStores();
+      const currStoreIn = this.state.currStore;
 
       return (
          <View style={enterStoreModalStyles.modalContainer}>
@@ -429,8 +559,8 @@ class CurrentList extends Component {
                </Text>
                <View style={enterStoreModalStyles.modalAutocompleteContainer}>
                   <Autocomplete
-                     data={testItems}
-                     defaultValue={testStore}
+                     data={storeList}
+                     defaultValue={currStoreIn}
                      hideResults={false}
                      onChangeText={text => this.updateCurrStore(text)}
                      keyExtractor={(item, index) => index.toString()}
@@ -477,7 +607,16 @@ class CurrentList extends Component {
 
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={() => { this.setModalVisible() }} />
+         <TopNavigationAction
+            {...props}
+            icon={AddIcon}
+            onPress={() => {
+               this.setState({
+                  itemModalVisible: true,
+                  itemName: ''
+               })}
+            }
+         />
       );
 
       const NotificationAction = (props) => (
@@ -494,9 +633,17 @@ class CurrentList extends Component {
       ];
 
       renderMenuAction = () => (
-         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+         <TopNavigationAction
+            icon={MenuOutline}
+            onPress={() => this.props.navigation.toggleDrawer()}
+         />
       );
 
+            <TouchableOpacity
+               onPress={() => this.setModalVisible('notify')}
+            >
+               <Image source={require("../assets/notify.png")} />
+            </TouchableOpacity>);
       return (
          <React.Fragment>
             <TopNavigation
@@ -511,6 +658,12 @@ class CurrentList extends Component {
                   visible={this.state.storeModalVisible}
                >
                   {this.renderEnterStoreModal()}
+               </RNModal>
+               <RNModal
+                  transparent={true}
+                  visible={this.state.itemModalVisible}
+               >
+                  {this.renderEnterItemModal()}
                </RNModal>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
@@ -537,7 +690,7 @@ class CurrentList extends Component {
                   style={styles.flatList}
                   data={this.state.listItems}
                   width="100%"
-                  keyExtractor={index => index.name}
+                  keyExtractor={(item, index) => index.toString()}
                   renderItem={({ item, index }) => (
                      <DoubleClick
                         doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >

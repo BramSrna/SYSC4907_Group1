@@ -97,11 +97,12 @@ class ListFunctions {
     * @param {*} size: size of the item
     * @param {*} notes: additional notes regarding the item
     */
-   async AddItemToList(listId, name, quantity, size, notes, purchased = false) {
+   async AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudAddItemToList')({
             listId: listId,
-            name: name,
+            genName: genName,
+            specName: specName,
             purchased: purchased,
             quantity: quantity,
             size: size,
@@ -235,6 +236,19 @@ class ListFunctions {
    async getAvailableStores() {
       try {
          const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableStores')({
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return(null);
+      }
+   }
+
+   async getAvailableItems() {
+      try {
+         const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableItems')({
          });
 
          return data;

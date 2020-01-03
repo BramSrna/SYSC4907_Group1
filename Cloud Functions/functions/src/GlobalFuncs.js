@@ -29,4 +29,44 @@ exports.cloudLoadAvailableStores = function(data, context, database) {
    });
 
    return retItems;
+}
+
+exports.cloudLoadAvailableItems = function(data, context, database) {
+   // The "once" method reads a value from the database, returning a promise
+   // Use "then" to access the promise
+   var ref = database.ref('/items');
+   var retItems = ref.once('value').then((snapshot) => {
+      var dispNames = [];
+      var itemIds = [];
+      var genNames = [];
+      var specNames = [];
+
+      var ssv = snapshot.val();
+
+      if (ssv) {
+         for (var tempGenName in ssv) {
+            var subItems = ssv[tempGenName];
+            for (var tempSpecName in subItems) {
+               var tempItem = new dataRegFuncs.ItemObj(tempGenName, tempSpecName);
+
+               var itemId = tempItem.getId();
+               var itemName = tempItem.getDispName();
+
+               dispNames.push(itemName);
+               itemIds.push(itemId);
+               genNames.push(tempGenName);
+               specNames.push(tempSpecName);
+            }
+         }
+      }
+
+      return {
+         ids: itemIds,
+         items: dispNames,
+         genNames: genNames,
+         specNames: specNames
+      };
+   });
+
+   return retItems;
 } 
