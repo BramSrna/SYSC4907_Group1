@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Image, Alert, ActivityIndicator } from "react-native";
+import { KeyboardAvoidingView, Alert, ActivityIndicator, StyleSheet } from "react-native";
 import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
+import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
-import styles from "../pages/pageStyles/LoginPageStyle";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
 
@@ -14,7 +14,7 @@ const REGISTERPAGE = "Registration";
 const FORGOTPASSWORDPAGE = "ForgotPassword";
 const VERIFICATIONPAGE = "Verification";
 
-export default class LoginPage extends Component {
+class LoginPage extends Component {
   userAlreadyLoggedIn = false;
   state = {
     email: "",
@@ -111,29 +111,34 @@ export default class LoginPage extends Component {
             <Input
               style={styles.input}
               placeholder="Enter your email..."
+              ref="email"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCompleteType="email"
-              captionIcon={this.emailIcon}
+              returnKeyType='next'
               onChangeText={email => this.setState({ email })}
+              onSubmitEditing={() => this.refs.password.focus()}
+              blurOnSubmit={false}
               value={this.state.email} />
           </Layout>
           <Layout style={styles.rowContainer}>
             <Input
               style={styles.input}
               placeholder="Enter your password..."
+              ref="password"
               autoCapitalize="none"
               autoCompleteType="password"
-              captionIcon={this.passwordIcon}
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
               onChangeText={password => this.setState({ password })}
+              onSubmitEditing={() => this.refs.login.scrollTo}
               value={this.state.password} />
           </Layout>
           <Layout style={styles.rowContainer}>
             <Button
               style={styles.button}
+              ref="login"
               onPress={() => this.buttonListener(LOGIN)}>
               {LOGIN}
             </Button>
@@ -163,9 +168,47 @@ export default class LoginPage extends Component {
     return (
       <Layout style={globalStyles.defaultContainer}>
         <KeyboardAvoidingView behavior="padding">
-          {this.renderCurrentState()}
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {this.renderCurrentState()}
+          </ScrollView>
         </KeyboardAvoidingView>
       </Layout>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  columnContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  button: {
+    marginVertical: 4,
+    marginHorizontal: 4,
+    borderRadius: 30,
+    width: 250,
+  },
+  input: {
+    flexDirection: 'row',
+    borderRadius: 30,
+    width: 250,
+  },
+});
+
+export default LoginPage;

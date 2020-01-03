@@ -14,17 +14,15 @@ import { YellowBox } from 'react-native';
 import lf from './pages/Functions/ListFunctions.js';
 import _ from 'lodash';
 
-const themes = { light, dark };
-
 export default class App extends Component {
   constructor(props) {
     super(props);
-    global.theme = light;
+    global.theme = dark;
     this.state = {
       isLoadingComplete: false,
       isAuthProcessReady: false,
       isAuthenticated: false,
-      theme: 'light',
+      theme: 'dark',
     };
 
     //Temprory Solution to remove Timer warning on android

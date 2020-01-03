@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { Image, FlatList, StyleSheet, KeyboardAvoidingView, Alert, TouchableOpacity } from "react-native";
+import { FlatList, StyleSheet, KeyboardAvoidingView, BackHandler } from "react-native";
 import { Layout, Button, Input, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -31,10 +31,6 @@ class CurrentList extends Component {
       this.focusListener.remove();
    }
 
-   GoBackToYourLists() {
-      this.props.navigation.navigate("YourListsPage");
-   }
-
    componentDidMount() {
       nm.setThat(this)
       // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
@@ -56,9 +52,9 @@ class CurrentList extends Component {
 
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} purchased={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       } else {
-         return <ListItemContainer title={item.name} fromItemView={true} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
+         return <ListItemContainer title={item.name} fromItemView={true} listID={this.state.listId} itemID={this.state.listItemIds[index]} onDelete={this.deleteItem} />;
       }
    }
 
@@ -71,8 +67,6 @@ class CurrentList extends Component {
    HandleDoubleTapItem(indexPosition) {
       lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId, this.state.listItemIds[indexPosition])
    }
-
-
 
    DELETEME1 = () => {
       this.state.itemName = "";
@@ -149,9 +143,23 @@ class CurrentList extends Component {
          );
       }
    };
-
+   // This handles Modal visibility even with Android back button press
    setModalVisible = (mode = 'item') => {
-      this.setState({ modalMode: mode, modalVisible: !this.state.modalVisiblem, itemName: '', message: '' });
+      const modalVisible = !this.state.modalVisible;
+      if (modalVisible) {
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.state.modalVisible) {
+               const modalVisible = false;
+               this.setState({ modalVisible });
+            }
+            this.backHandler.remove();
+            return true;
+         });
+      }
+      else {
+         this.backHandler.remove();
+      }
+      this.setState({ modalMode: mode, modalVisible, itemName: '', message: '' });
    };
 
    render() {
@@ -159,7 +167,16 @@ class CurrentList extends Component {
          <TopNavigationAction {...props} icon={AddIcon} onPress={() => { this.setModalVisible() }} />
       );
 
+      const NotificationAction = (props) => (
+         <TopNavigationAction {...props} icon={BellIcon} onPress={() => { this.setModalVisible('notify') }} />
+      );
+
       const renderRightControls = () => [
+         <NotificationAction />,
+         <AddAction />,
+      ];
+
+      const renderRightControl = () => [
          <AddAction />,
       ];
 
@@ -167,21 +184,15 @@ class CurrentList extends Component {
          <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
       );
 
-      renderNotification = () => {
-         return (<TouchableOpacity onPress={() => this.setModalVisible('notify')} ><Image source={require("../assets/notify.png")} /></TouchableOpacity>);
-      }
-
       return (
          <React.Fragment>
             <TopNavigation
                title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
                alignment="center"
                leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
+               rightControls={this.state.userCount > 1 ? renderRightControls(): renderRightControl()}
             />
             <Layout style={styles.ListContainer}>
-               {this.state.userCount > 1 ? renderNotification() : null}
-               {/* {console.log(this.state.userCount)} */}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}

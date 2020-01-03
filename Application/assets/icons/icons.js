@@ -55,3 +55,23 @@ export const SunIcon = (style) => (
 export const UploadIcon = (style) => (
     <Icon {...style} name='upload-outline' />
 );
+
+export const MoveUpIcon = (style) => (
+    <Icon {...style} name='arrow-ios-upward-outline' />
+);
+
+export const MoveDownIcon = (style) => (
+    <Icon {...style} name='arrow-ios-downward-outline' />
+);
+
+export const FlipIcon = (style) => (
+    <Icon {...style} name='flip-outline' />
+);
+
+export const BellIcon = (style) => (
+    <Icon {...style} name='bell-outline' />
+);
+
+export const BellFilledIcon = (style) => (
+    <Icon {...style} name='bell' />
+);

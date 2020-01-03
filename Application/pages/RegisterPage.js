@@ -1,23 +1,16 @@
 import React, { Component } from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  TouchableHighlight,
-  Image,
-  Alert,
-  ActivityIndicator
-} from "react-native";
-import styles from "./pageStyles/RegisterPageStyle";
-import FirebaseUser from "../components/FirebaseUser"
+import { KeyboardAvoidingView, Alert, ActivityIndicator, StyleSheet } from "react-native";
+import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
+import { ScrollView } from "react-native-gesture-handler";
+import FirebaseUser from "../components/FirebaseUser";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 
 const REGISTER = "Register";
 const LOGIN = "Already Registered/Login";
-
 const LOGINPAGE = "Login";
 const VERIFICATIONPAGE = "Verification";
 
-export default class RegisterPage extends Component {
+class RegisterPage extends Component {
   userAlreadyLoggedIn = false;
   state = {
     firstname: "",
@@ -25,6 +18,7 @@ export default class RegisterPage extends Component {
     email: "",
     password: "",
     confirmPassword: "",
+    secureTextEntry: true,
     registering: false
   }
   buttonListener = buttonId => {
@@ -38,7 +32,10 @@ export default class RegisterPage extends Component {
   updateRegisterInfo() {
     if (this.checkInputs()) {
       this.setState({ registering: true });
-      var displayName = this.state.firstname + " " + this.state.lastname;
+      var firstName = this.state.firstname.replace(/^\w/, c => c.toUpperCase());
+      var lastName = this.state.lastname.replace(/^\w/, c => c.toUpperCase());
+      var displayName = firstName + " " + lastName;
+      displayName = displayName.replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '');
       firebaseUser = new FirebaseUser();
       if (firebaseUser.register(this.state.email, this.state.password, displayName)) {
         this.props.navigation.navigate(VERIFICATIONPAGE);
@@ -64,117 +61,158 @@ export default class RegisterPage extends Component {
     this.setState({ firstname: "", lastname: "", email: "", password: "" });
   }
 
+  renderPasswordEyeIcon = (style) => {
+    const iconName = this.state.secureTextEntry ? 'eye-off' : 'eye';
+    return (
+      <Icon {...style} name={iconName} />
+    );
+  };
+
+  onPasswordEyeIconPress = () => {
+    const secureTextEntry = !this.state.secureTextEntry;
+    this.setState({ secureTextEntry });
+  };
+
   renderCurrentState() {
     if (this.state.registering) {
       return (
-        <View style={styles.container}>
+        <Layout style={styles.columnContainer}>
           <ActivityIndicator size="large" />
-        </View>
+        </Layout>
       );
     }
 
     if (!this.userAlreadyLoggedIn) {
       return (
-        <View style={styles.container}>
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-name-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
+        <Layout style={styles.columnContainer}>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
               placeholder="First Name"
-              label="First Name"
+              ref="firstname"
               keyboardType="default"
-              underlineColorAndroid="transparent"
+              autoCapitalize="words"
+              returnKeyType='next'
               onChangeText={firstname => this.setState({ firstname })}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-last-name-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
+              onSubmitEditing={() => this.refs.lastname.focus()}
+              blurOnSubmit={false}
+              value={this.state.firstname} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
               placeholder="Last Name"
-              label="Last Name"
+              ref="lastname"
               keyboardType="default"
-              underlineColorAndroid="transparent"
+              autoCapitalize="words"
+              returnKeyType='next'
               onChangeText={lastname => this.setState({ lastname })}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-mail-account-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
+              onSubmitEditing={() => this.refs.email.focus()}
+              blurOnSubmit={false}
+              value={this.state.lastname} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
               placeholder="Email"
-              label="Email"
+              ref="email"
               keyboardType="email-address"
               autoCapitalize="none"
-              underlineColorAndroid="transparent"
+              autoCompleteType="email"
+              returnKeyType='next'
               onChangeText={email => this.setState({ email })}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-key-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
-              placeholder="Password"
-              label="Password"
-              secureTextEntry={true}
-              underlineColorAndroid="transparent"
+              onSubmitEditing={() => this.refs.password.focus()}
+              blurOnSubmit={false}
+              value={this.state.email} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
+              placeholder="Enter your password..."
+              ref="password"
+              autoCapitalize="none"
+              autoCompleteType="password"
+              returnKeyType='next'
+              icon={this.renderPasswordEyeIcon}
+              secureTextEntry={this.state.secureTextEntry}
+              onIconPress={this.onPasswordEyeIconPress}
               onChangeText={password => this.setState({ password })}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Image
-              style={styles.inputIcon}
-              source={require("../assets/icons/icons8-re-key-64.png")}
-            />
-            <TextInput
-              style={styles.inputs}
-              placeholder="Confirm Password"
-              label="Confirm Password"
-              secureTextEntry={true}
-              underlineColorAndroid="transparent"
+              onSubmitEditing={() => this.refs.confirmPassword.focus()}
+              blurOnSubmit={false}
+              value={this.state.password} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Input
+              style={styles.input}
+              placeholder="Confirm your password..."
+              ref="confirmPassword"
+              autoCapitalize="none"
+              autoCompleteType="password"
+              icon={this.renderPasswordEyeIcon}
+              secureTextEntry={this.state.secureTextEntry}
+              onIconPress={this.onPasswordEyeIconPress}
               onChangeText={confirmPassword => this.setState({ confirmPassword })}
-            />
-          </View>
-
-          <TouchableHighlight
-            style={[styles.buttonContainer, styles.loginButton]}
-            onPress={() => this.buttonListener(REGISTER)}
-          >
-            <Text style={styles.whiteText}>{REGISTER}</Text>
-          </TouchableHighlight>
-
-          <TouchableHighlight
-            style={styles.buttonContainer}
-            onPress={() => this.buttonListener(LOGIN)}
-          >
-            <Text style={styles.whiteText}>{LOGIN}</Text>
-          </TouchableHighlight>
-        </View>
+              onSubmitEditing={() => this.refs.register.scrollTo}
+              value={this.state.confirmPassword} />
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
+              ref="register"
+              onPress={() => this.buttonListener(REGISTER)}>
+              {REGISTER}
+            </Button>
+          </Layout>
+        </Layout>
       );
     }
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        {this.renderCurrentState()}
-      </View>
+      <Layout style={globalStyles.defaultContainer}>
+        <KeyboardAvoidingView behavior="padding">
+          <ScrollView contentContainerStyle={styles.scrollContainer}>
+            {this.renderCurrentState()}
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Layout>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  columnContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  button: {
+    marginVertical: 4,
+    marginHorizontal: 4,
+    borderRadius: 30,
+    width: 250,
+  },
+  input: {
+    flexDirection: 'row',
+    borderRadius: 30,
+    width: 250,
+  },
+});
+
+export default RegisterPage;

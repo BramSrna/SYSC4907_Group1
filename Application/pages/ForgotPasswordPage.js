@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { Text, View, TextInput, TouchableHighlight, Image, Alert } from "react-native";
-import styles from "./pageStyles/GlobalStyle"
+import { Alert, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { Layout, Button, Input } from 'react-native-ui-kitten';
+import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from "firebase";
+import globalStyles from "../pages/pageStyles/GlobalStyle";
 
-const LOGINPAGE = "Login";
+const RESETPASS = "Reset Password";
 
-export default class ForgotPasswordPage extends Component {
+class ForgotPasswordPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -30,37 +32,70 @@ export default class ForgotPasswordPage extends Component {
 
     render() {
         return (
-            <View style={styles.defaultContainer}>
-                <View style={styles.defaultInputContainer}>
-                    <Image
-                        style={styles.defaultInputIcon}
-                        source={require("../assets/icons/icons8-mail-account-64.png")}
-                    />
-                    <TextInput
-                        style={styles.defaultInputs}
-                        placeholder="Enter your email..."
-                        label="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        underlineColorAndroid="transparent"
-                        onChangeText={email => this.setState({ email })}
-                        value={this.state.email}
-                    />
-                </View>
-                <TouchableHighlight
-                    style={[styles.defaultButtonContainer, styles.defaultButton]}
-                    onPress={this.resetPassword}
-                >
-                    <Text style={styles.whiteText}>{"Reset Password"}</Text>
-                </TouchableHighlight>
-
-                <TouchableHighlight
-                    style={styles.defaultButtonContainer}
-                    onPress={this.onBackToLoginPress}
-                >
-                    <Text style={styles.whiteText}>{"Back to Login"}</Text>
-                </TouchableHighlight>
-            </View>
+            <Layout style={globalStyles.defaultContainer}>
+                <KeyboardAvoidingView behavior="padding">
+                    <ScrollView contentContainerStyle={styles.scrollContainer}>
+                        <Layout style={styles.columnContainer}>
+                            <Layout style={styles.rowContainer}>
+                                <Input
+                                    style={styles.input}
+                                    placeholder="Enter your email..."
+                                    ref="email"
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    autoCompleteType="email"
+                                    onChangeText={email => this.setState({ email })}
+                                    onSubmitEditing={() => this.refs.reset.scrollTo}
+                                    value={this.state.email} />
+                            </Layout>
+                            <Layout style={styles.rowContainer}>
+                                <Button
+                                    style={styles.button}
+                                    ref="reset"
+                                    onPress={this.resetPassword}>
+                                    {RESETPASS}
+                                </Button>
+                            </Layout>
+                        </Layout>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </Layout>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    scrollContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+    },
+    columnContainer: {
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        paddingVertical: 4,
+        paddingHorizontal: 4,
+    },
+    button: {
+        marginVertical: 4,
+        marginHorizontal: 4,
+        borderRadius: 30,
+        width: 250,
+    },
+    input: {
+        flexDirection: 'row',
+        borderRadius: 30,
+        width: 250,
+    },
+});
+
+export default ForgotPasswordPage;

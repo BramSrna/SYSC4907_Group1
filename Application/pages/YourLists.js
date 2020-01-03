@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, StyleSheet } from "react-native";
-import { Layout, Button, Text, Input, Modal, Icon, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { FlatList, KeyboardAvoidingView, StyleSheet, BackHandler } from "react-native";
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -82,8 +82,23 @@ class YourLists extends Component {
       );
    };
 
+   // This handles Modal visibility even with Android back button press
    setModalVisible = () => {
-      this.setState({ modalVisible: !this.state.modalVisible });
+      const modalVisible = !this.state.modalVisible;
+      if (modalVisible) {
+         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (this.state.modalVisible) {
+               const modalVisible = false;
+               this.setState({ modalVisible });
+            }
+            this.backHandler.remove();
+            return true;
+         });
+      }
+      else {
+         this.backHandler.remove();
+      }
+      this.setState({ modalVisible });
    };
 
    render() {
