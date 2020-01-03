@@ -6,6 +6,125 @@ import * as firebase from "firebase";
 class ListFunctions {
    constructor() { }
 
+   sendNotification = (token, title, body, data) => {
+      let response = fetch('https://exp.host/--/api/v2/push/send', {
+         method: 'POST',
+         headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+         },
+         body: JSON.stringify({
+            to: token,
+            sound: 'default',
+            title: title,
+            body: body,
+            data: data
+         })
+      });
+   }
+
+   sendNotificationToSharedUsers(listID, listName, message) {
+      var uids = [];
+      var tokens = [];
+      var that = this
+      firebase
+         .database()
+         .ref("/users/")
+         .once("value", function (snapshot) {
+
+            if (snapshot.val()) {
+               for (var user in snapshot.val()) {
+                  if (user != firebase.auth().currentUser.uid) {
+                     if (snapshot.val()[user].lists.shared) {
+                        var lists = snapshot.val()[user].lists.shared
+                        for (var shared in lists) {
+                           if (shared == listID) {
+                              uids.push(user);
+
+                           }
+                        }
+                     }
+                     if (snapshot.val()[user].lists.created) {
+
+                        var otherLists = snapshot.val()[user].lists.created
+                        for (var created in otherLists) {
+                           if (created == listID) {
+                              uids.push(user);
+
+                           }
+                        }
+                     }
+
+
+                  }
+
+               }
+
+            } else {
+               console.log("Something went wrong!")
+            }
+         }).then(
+            firebase
+               .database()
+               .ref("/userInfo/")
+               .once("value", function (snapshot) {
+                  if (snapshot.val()) {
+                     for (user in snapshot.val()) {
+                        if (uids.includes(snapshot.val()[user].uid)) {
+                           if (snapshot.val()[user].notificationToken) {
+                              tokens.push(snapshot.val()[user].notificationToken)
+                           } else {
+                              console.log("User did not give notification access " + snapshot.val()[user])
+                           }
+                        } else {
+                           // console.log("User did not log in correctly")
+                        }
+                     }
+                  } else {
+                     console.log("Users not configured properly!")
+                  }
+               })
+         ).finally(
+            that.tokensToNotifications(uids, tokens, listID, listName, message)
+         )
+   }
+
+   tokensToNotifications(uids, tokens, listID, listName, message) {
+      var that = this;
+      firebase
+         .database()
+         .ref("/contacts/")
+         .once("value", function (snapshot) {
+            for (var pos in tokens) {
+               if (snapshot.val()) {
+                  if (snapshot.val()[uids[pos]]) {
+                     var name = firebase.auth().currentUser.email;
+                     for (contact in snapshot.val()[uids[pos]]) {
+                        if (snapshot.val()[uids[pos]][contact].email == firebase.auth().currentUser.email) {
+                           name = snapshot.val()[uids[pos]][contact].name
+                           break
+                        }
+                     }
+                     var title = name + ' to ' + listName;
+                     that.sendNotification(tokens[pos], title, message, {
+                        "page": "CurrentListPage",
+                        "name": listName,
+                        "listID": listID,
+                        "message": message,
+                        "title": title
+
+                     });
+                  } else {
+                     console.log("There are no contacts for that person")
+                  }
+               } else {
+                  console.log("tokensToNotifications messed up")
+               }
+            }
+         })
+
+   }
+
    /**
     * This function is used to add items to a list.
     * @param {*} listId: id of the list we are adding items to
@@ -73,15 +192,21 @@ class ListFunctions {
             var items = [];
             var ids = [];
             var ssv = snapshot.val();
+            var userCount = 0;
             if (ssv && ssv.items) {
                for (var item in ssv.items) {
                   items.push(ssv.items[item]);
                   ids.push(item);
                }
+
+            }
+            if (ssv.user_count) {
+               userCount = ssv.user_count;
             }
             that.setState({
                listItems: items,
-               listItemIds: ids
+               listItemIds: ids,
+               userCount: userCount
             });
          });
    }
@@ -238,6 +363,7 @@ class ListFunctions {
                               name: ssv.name
                            });
                            listTitles.push(ssv.name);
+                           listTitles.sort((a, b) => a.localeCompare(b))
                            if (counter == listIdLength) {
                               that.setState({
                                  apiData: curApiData,

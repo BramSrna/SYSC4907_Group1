@@ -9,6 +9,8 @@ import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/icons.js';
 import RNPickerSelect from 'react-native-picker-select';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Map Creator";
 
@@ -36,6 +38,7 @@ class MapCreatorPage extends Component {
     @return void
     */
     componentDidMount() {
+        nm.setThat(this);
         this._mounted = true;
         this.setState({ arrayHolder: [...this.currDepartments] });
     }
@@ -274,6 +277,7 @@ class MapCreatorPage extends Component {
                         </Layout>
                     </Layout>
                 </ScrollView>
+                <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
         );
     }

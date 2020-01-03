@@ -3,8 +3,11 @@ import { FlatList, StyleSheet, KeyboardAvoidingView, BackHandler } from "react-n
 import { Layout, Button, Input, Icon, Modal, TopNavigation, TopNavigationAction, Text } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
-import lf from "./ListFunctions";
+
+import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Current List";
 
@@ -17,9 +20,11 @@ class CurrentList extends Component {
          listId: "",
          listItems: [],
          listItemIds: [],
-
+         modalMode: 'item',
          itemName: "",
          modalVisible: false,
+         message: '',
+         userCount: 0
       };
    }
 
@@ -28,6 +33,7 @@ class CurrentList extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
       // Need this because componentDidMount only gets called once, therefore add willFocus listener for when the user comes back
       this.focusListener = this.props.navigation.addListener(
          "willFocus",
@@ -69,9 +75,9 @@ class CurrentList extends Component {
    };
    DELETEME2 = () => {
       lf.AddItemToList(this.state.listId, this.state.itemName, 1, "aSize mL", "aNote");
-      this.state.itemName = "";
       this.setState({
-         modalVisible: false
+         modalVisible: false,
+         itemName: ''
       });
    };
    DELETEME3 = (name) => {
@@ -80,30 +86,64 @@ class CurrentList extends Component {
       });
    }
 
+   notificationMessage = (message) => {
+      this.setState({ message: message })
+   }
+
+   sendNotification = () => {
+      var message = this.state.message;
+      if (message == '') {
+         message = 'Hey, just wanted you to check out the list!'
+      }
+      lf.sendNotificationToSharedUsers(this.state.listId, this.state.listName, message);
+      this.setState({
+         modalVisible: false, message: ''
+      });
+   }
+
    deleteItem = (listID, itemID) => {
       lf.DeleteItemInList(listID, itemID);
    }
 
    renderModalElement = () => {
-      return (
-         <Layout
-            level='3'
-            style={styles.modalContainer}>
-            <Text category='h6' >Add New Item</Text>
-            <Input
-               style={styles.input}
-               placeholder='Item Name...'
-               onChangeText={name => this.DELETEME3(name)}
-               autoFocus={this.state.modalVisible ? true : false}
-            />
-            <Layout style={styles.buttonContainer}>
-               <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
-               <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
+      if (this.state.modalMode == 'item') {
+         return (
+            <Layout
+               level='3'
+               style={styles.modalContainer}>
+               <Text category='h6' >Add New Item</Text>
+               <Input
+                  style={styles.input}
+                  placeholder='Item Name...'
+                  onChangeText={name => this.DELETEME3(name)}
+                  autoFocus={this.state.modalVisible ? true : false}
+               />
+               <Layout style={styles.buttonContainer}>
+                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={this.DELETEME2}>Add</Button>
+               </Layout>
             </Layout>
-         </Layout>
-      );
+         );
+      } else if (this.state.modalMode == 'notify') {
+         return (
+            <Layout
+               level='3'
+               style={styles.modalContainer}>
+               <Text category='h6' >Enter Notification Message</Text>
+               <Input
+                  style={styles.input}
+                  placeholder='Optional message...'
+                  onChangeText={message => this.notificationMessage(message)}
+                  autoFocus={this.state.modalVisible ? true : false}
+               />
+               <Layout style={styles.buttonContainer}>
+                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={() => { this.sendNotification() }}>Send</Button>
+               </Layout>
+            </Layout>
+         );
+      }
    };
-
       // This handles Modal visibility even with Android back button press
       setModalVisible = () => {
          const modalVisible = !this.state.modalVisible;
@@ -125,7 +165,7 @@ class CurrentList extends Component {
 
    render() {
       const AddAction = (props) => (
-         <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
+         <TopNavigationAction {...props} icon={AddIcon} onPress={() => { this.setModalVisible() }} />
       );
 
       const renderRightControls = () => [
@@ -136,6 +176,10 @@ class CurrentList extends Component {
          <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
       );
 
+      renderNotification = () => {
+         return (<TouchableOpacity onPress={() => this.setModalVisible('notify')} ><Image source={require("../assets/notify.png")} /></TouchableOpacity>);
+      }
+
       return (
          <React.Fragment>
             <TopNavigation
@@ -145,6 +189,8 @@ class CurrentList extends Component {
                rightControls={renderRightControls()}
             />
             <Layout style={styles.ListContainer}>
+               {this.state.userCount > 1 ? renderNotification() : null}
+               {/* {console.log(this.state.userCount)} */}
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
@@ -172,6 +218,7 @@ class CurrentList extends Component {
                   )}
                />
             </Layout>
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
    }

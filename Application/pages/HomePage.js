@@ -5,11 +5,17 @@ import { MenuOutline, SunIcon, MenuIcon } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
 import HomeSquareContainer from "../components/HomeSquareContainer.js";
-import lf from '../pages/ListFunctions.js';
+import lf from '../pages/Functions/ListFunctions.js';
+import * as firebase from "firebase";
+import { Notifications } from 'expo'
+import * as Permissions from 'expo-permissions'
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
-const PAGE_TITLE = "Home";
+var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
+const CONTACTS = "YourContacts"
 const MARGIN_RATIO = 30; // higher number = smaller margin
 
 class HomePage extends Component {
@@ -21,6 +27,58 @@ class HomePage extends Component {
       menuVisible: false,
     };
     this.onLayout = this.onLayout.bind(this);
+  }
+
+  async componentDidMount() {
+    nm.setThat(this)
+    // Make sure user information added to the database
+    var currentUser = firebase.auth().currentUser;
+    var emailId = currentUser.email.toString();
+    emailId = emailId.replace(/\./g, ",");
+    firebase
+      .database()
+      .ref("/userInfo/" + emailId)
+      .once("value", function (snapshot) {
+        if (!snapshot.val()) {
+          firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
+            // console.log(snapshot);
+          });
+        }
+        if (!snapshot.val().uid) {
+          firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
+            // console.log(snapshot);
+          })
+        }
+      });
+
+    const { status: existingStatus } = await Permissions.getAsync(
+      Permissions.NOTIFICATIONS
+    );
+    let finalStatus = existingStatus;
+
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+
+    // Get the token that uniquely identifies this device
+    let token = await Notifications.getExpoPushTokenAsync();
+
+    try {
+      firebase.database().ref('/userInfo/' + emailId + '/notificationToken').set(token)
+      this._notificationSubscription = Notifications.addListener(nm._handleNotification);
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   /**
@@ -98,6 +156,7 @@ class HomePage extends Component {
     gridShape = aspectRatio > 1.6 ? 2 : 4;
     marginValue = this.calcMarginValue(this.state.width, gridShape);
     sizeValue = this.calcSizeValue(this.state.width, gridShape);
+    // PAGE_TITLE += firebase.auth().currentUser.email.toString();
     return (
       <React.Fragment >
         <TopNavigation
@@ -109,7 +168,7 @@ class HomePage extends Component {
         <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' onPress={() => this.props.navigation.navigate(CONTACTS)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Search Recipes' icon='search-outline' />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Recommendations' icon='bulb-outline' shape={2} />
@@ -117,6 +176,7 @@ class HomePage extends Component {
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Crowd-Source' icon='loader-outline' onPress={() => this.props.navigation.navigate(CROWD_SOURCE_PAGE)} />
           </Layout>
         </ScrollView>
+        <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
   }

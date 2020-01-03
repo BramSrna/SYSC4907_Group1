@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { FlatList, KeyboardAvoidingView, StyleSheet, BackHandler } from "react-native";
 import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
-import lf from "./ListFunctions";
+import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Your Lists";
 
@@ -23,6 +25,8 @@ class YourLists extends Component {
    }
 
    componentDidMount() {
+      nm.setThat(this)
+
       this.GenerateNeededData();
    }
 
@@ -135,10 +139,17 @@ class YourLists extends Component {
                   width="100%"
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
-                     <ListItemContainer title={item} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
+                     <ListItemContainer navigate={() => {
+                        this.props.navigation.navigate("YourContacts", {
+                           share: true,
+                           listID: this.state.apiData[index].key,
+                           listName: item
+                        })
+                     }} title={item} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listName={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                   )}
                />
             </Layout>
+            <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
    }

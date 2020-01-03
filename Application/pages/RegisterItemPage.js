@@ -7,6 +7,8 @@ import { dark, light } from '../assets/Themes.js';
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as firebase from "firebase";
 import { units } from "../UnitList";
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Register Item";
 
@@ -26,6 +28,11 @@ class RegisterItemPage extends Component {
       size: DEFAULT_SIZE,
       sizeUnit: DEFAULT_SIZE_UNIT,
     };
+  }
+
+  componentDidMount() {
+    nm.setThat(this)
+
   }
 
   /**
@@ -157,6 +164,7 @@ class RegisterItemPage extends Component {
             </Layout>
           </ScrollView>
         </KeyboardAvoidingView>
+        <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment >
     );
   }

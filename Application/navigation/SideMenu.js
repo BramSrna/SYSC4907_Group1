@@ -8,6 +8,7 @@ import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";
 const HOME = "Home";
+const CONTACTS = "Contacts";
 const YOUR_LISTS = "Your Lists";
 const FEEDBACK = "Feedback";
 const ADD_ITEM_LOCATION = "Add Item Location";
@@ -53,6 +54,10 @@ class SideMenu extends Component {
                         <Layout style={styles.navSectionStyle} level='3'>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
                                 {HOME}
+
+                            </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourContacts')}>
+                                {CONTACTS}
                             </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourListsPage')}>
                                 {YOUR_LISTS}
