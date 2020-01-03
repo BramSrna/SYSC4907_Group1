@@ -20,7 +20,7 @@ function getStoreFromId(knownStores, storeId) {
     var storeName = info.storeName;
 
     // Get the store
-    if (knownStores.address && knownStores.address.storeName) {
+    if ((address in knownStores) && (storeName in knownStores[address])) {
         var store = knownStores[address][storeName];
     } else {
         return null;

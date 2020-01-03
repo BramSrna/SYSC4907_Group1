@@ -8,7 +8,7 @@ import { units } from "../UnitList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
-import { styles } from "./pageStyles/RegisterItemPageStyle";
+import styles from "./pageStyles/RegisterItemPageStyle";
 
 const PAGE_TITLE = "Register Item";
 

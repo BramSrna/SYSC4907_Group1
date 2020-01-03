@@ -7,7 +7,7 @@ import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as firebase from "firebase";
-import { styles } from './pageStyles/YourListsPageStyle'
+import styles from './pageStyles/YourListsPageStyle'
 
 const PAGE_TITLE = "Your Lists";
 

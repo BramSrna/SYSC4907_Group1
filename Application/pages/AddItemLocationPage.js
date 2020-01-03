@@ -8,7 +8,7 @@ import { departments } from "../DepartmentList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./DBInterface";
-import { styles } from "./pageStyles/AddItemLocationPageStyle"
+import styles from "./pageStyles/AddItemLocationPageStyle"
 
 const PAGE_TITLE = "Add Item Location";
 

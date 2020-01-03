@@ -1,5 +1,6 @@
 import {
-    StyleSheet
+    StyleSheet,
+    Dimensions
   } from 'react-native';
   
 export const enterStoreModalStyles = StyleSheet.create({

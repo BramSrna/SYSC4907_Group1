@@ -361,7 +361,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   addItem() {
+   addItem = () => {
       // Add the item to the list
       lf.AddItemToList(this.state.listId,
                        this.state.genName,
@@ -475,9 +475,11 @@ class CurrentList extends Component {
       }
 
       // Rearrage the nested list to put it in alphabetical order
+      var that = this;
       temp.sort(function(a, b) {
-         var itemA = this.getDispName(a.item).toUpperCase();
-         var itemB = this.getDispName(b.item).toUpperCase();
+         console.log(this);
+         var itemA = that.getDispName(a.item).toUpperCase();
+         var itemB = that.getDispName(b.item).toUpperCase();
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
       });
 
