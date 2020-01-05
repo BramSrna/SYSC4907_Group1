@@ -372,6 +372,13 @@ class CurrentList extends Component {
       });
    };
 
+   cancelItemModal = () => {
+      this.setState({
+         itemModalVisible: false,
+         itemName: ''
+      });
+   }
+
    /**
     * notificationMessage
     * 
@@ -925,11 +932,15 @@ class CurrentList extends Component {
                   />
                </View>
 
-               <TouchableHighlight
+               {/* <TouchableHighlight
                   style={enterStoreModalStyles.modalDoneButton}
                   onPress={this.addItem}>
                   <Text style={enterStoreModalStyles.modalButtonText}>Add</Text>
-               </TouchableHighlight>
+               </TouchableHighlight> */}
+               <Layout style={enterStoreModalStyles.modalDoneButton}>
+                  <Button style={styles.modalButton} onPress={this.cancelItemModal}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={this.addItem}>Add</Button>
+               </Layout>
             </View>
          </View>
       );
@@ -953,7 +964,7 @@ class CurrentList extends Component {
       // Load the stores and current store for the Autocomplete box
       const storeList = this.loadStores();
       const currStoreIn = this.state.currStore;
-
+      console.log(storeList)
       return (
          <View style={enterStoreModalStyles.modalContainer}>
             <View style={enterStoreModalStyles.modalSubContainer}>
@@ -978,14 +989,21 @@ class CurrentList extends Component {
                   />
                </View>
 
-               <TouchableHighlight
+               {/* <TouchableHighlight
                   style={enterStoreModalStyles.modalDoneButton}
                   onPress={() => {
                      this.setModalDetails(!this.state.storeModalVisible, this.state.closeFunc);
                      this.state.closeFunc(context = this);
                   }}>
                   <Text style={enterStoreModalStyles.modalButtonText}>Submit</Text>
-               </TouchableHighlight>
+               </TouchableHighlight> */}
+               <Layout style={enterStoreModalStyles.modalDoneButton}>
+                  <Button style={styles.modalButton} onPress={() => { this.setModalDetails(false, this.state.closeFunc) }}>Cancel</Button>
+                  <Button style={styles.modalButton} onPress={() => {
+                     this.setModalDetails(false, this.state.closeFunc);
+                     this.state.closeFunc(context = this);
+                  }}>Submit</Button>
+               </Layout>
             </View>
          </View>
       );

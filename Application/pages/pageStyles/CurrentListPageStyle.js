@@ -40,6 +40,7 @@ export const enterStoreModalStyles = StyleSheet.create({
       position: 'absolute',
       top: Dimensions.get("window").height * 0.3,
       backgroundColor: 'black',
+      flexDirection: 'row'
    },
    modalButtonText: {
       color: "white"
