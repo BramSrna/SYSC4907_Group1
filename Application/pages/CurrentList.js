@@ -82,6 +82,8 @@ class CurrentList extends Component {
     */
    componentWillUnmount() {
       this.focusListener.remove();
+
+      this._isMounted = false;
    }
 
    /**
@@ -96,6 +98,8 @@ class CurrentList extends Component {
     * @returns None
     */
    componentDidMount() {
+      this._isMounted = true;
+
       // Set "that" for the notification manager
       nm.setThat(this)
 
@@ -125,7 +129,7 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
-      this.setState({
+      this._isMounted && this.setState({
          listName: this.props.navigation.getParam("name", "(Invalid Name)"),
          listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
       });
@@ -168,7 +172,7 @@ class CurrentList extends Component {
          }
 
          // Get the user count of the list
-         if (user_count in ssv.user_count) {
+         if ('user_count' in ssv) {
             userCount = ssv.user_count;
          }
 
@@ -246,7 +250,7 @@ class CurrentList extends Component {
       }
 
       // Set the new state values
-      this.setState({
+      this._isMounted && this.setState({
          listItems: localItems,
          listItemIds: localIds,
          userCount: userCount === null ? this.state.userCount : userCount
@@ -330,7 +334,7 @@ class CurrentList extends Component {
    handleSwipeOpen(rowId, direction) {
       // If the user swipped, set the active row
       if (typeof direction !== "undefined") {
-         this.setState({
+         this._isMounted && this.setState({
             activeRow: rowId
          });
       }
@@ -368,14 +372,14 @@ class CurrentList extends Component {
          "aSize mL",
          "aNote",
          specName = this.state.specName);
-      this.setState({
+      this._isMounted && this.setState({
          itemModalVisible: false,
          itemName: ''
       });
    };
 
    cancelItemModal = () => {
-      this.setState({
+      this._isMounted && this.setState({
          itemModalVisible: false,
          itemName: ''
       });
@@ -391,7 +395,7 @@ class CurrentList extends Component {
     * @returns None
     */
    notificationMessage = (message) => {
-      this.setState({
+      this._isMounted && this.setState({
          message: message
       });
    }
@@ -430,7 +434,7 @@ class CurrentList extends Component {
       }
 
       // Set the state
-      this.setState({
+      this._isMounted && this.setState({
          orgMethod: selection
       });
    }
@@ -652,7 +656,7 @@ class CurrentList extends Component {
     * @returns None
     */
    setModalDetails(visible, closeFunc) {
-      this.setState({
+      this._isMounted && this.setState({
          storeModalVisible: visible,
          closeFunc: closeFunc
       });
@@ -691,7 +695,7 @@ class CurrentList extends Component {
          }
 
          // Update the state
-         this.setState({
+         this._isMounted && this.setState({
             currStore: newStore,
             currStoreId: id,
             hr: hideResults
@@ -736,7 +740,7 @@ class CurrentList extends Component {
          }
 
          // Update the state
-         this.setState({
+         this._isMounted && this.setState({
             itemName: newItem,
             genName: genName,
             specName: specName,
@@ -769,7 +773,7 @@ class CurrentList extends Component {
       lf.sendNotificationToSharedUsers(this.state.listId,
          this.state.listName,
          message);
-      this.setState({
+      this._isMounted && this.setState({
          modalVisible: false,
          message: ''
       });
@@ -831,7 +835,6 @@ class CurrentList extends Component {
          list = availableItems
       } else if (type == 'stores') {
          list = availableStores
-         console.log(availableStores);
       }
       for (var a = 0; a < list.length; a++) {
          items.push(list[a].name)
@@ -972,7 +975,7 @@ class CurrentList extends Component {
          this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             if (this.state.modalVisible) {
                const modalVisible = false;
-               this.setState({ modalVisible });
+               this._isMounted && this.setState({ modalVisible });
             }
             this.backHandler.remove();
             return true;
@@ -981,7 +984,7 @@ class CurrentList extends Component {
       else {
          this.backHandler.remove();
       }
-      this.setState({
+      this._isMounted && this.setState({
          modalMode: mode,
          modalVisible,
          itemName: '',
@@ -994,7 +997,7 @@ class CurrentList extends Component {
          <TopNavigationAction
             {...props} icon={AddIcon}
             onPress={() => {
-               this.setState({
+               this._isMounted && this.setState({
                   itemModalVisible: true,
                   itemName: ""
                })
