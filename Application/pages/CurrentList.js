@@ -168,7 +168,7 @@ class CurrentList extends Component {
          }
 
          // Get the user count of the list
-         if (ssv.user_count) {
+         if (user_count in ssv.user_count) {
             userCount = ssv.user_count;
          }
 
@@ -831,6 +831,7 @@ class CurrentList extends Component {
          list = availableItems
       } else if (type == 'stores') {
          list = availableStores
+         console.log(availableStores);
       }
       for (var a = 0; a < list.length; a++) {
          items.push(list[a].name)
