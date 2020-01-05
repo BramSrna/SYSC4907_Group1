@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, StyleSheet, Image, Alert } from "react-native";
+import { FlatList, KeyboardAvoidingView, BackHandler } from "react-native";
 import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
@@ -36,7 +36,7 @@ class YourLists extends Component {
       var uid = firebase.auth().currentUser.uid;
 
       var ref = firebase.database().ref("/users/" + uid + "/lists")
-      var retVal = ref.on("value", function(snapshot) {
+      var retVal = ref.on("value", function (snapshot) {
          // Load the list ids
          var ssv = snapshot.val();
          var childVals = [];
@@ -51,7 +51,7 @@ class YourLists extends Component {
             // Get all shared list ids
             for (var shared in ssv.shared) {
                listIds.push(shared);
-            }          
+            }
 
             // Load all lists that the user has access to
             for (var idKey in listIds) {
@@ -71,7 +71,7 @@ class YourLists extends Component {
             var listTitles = [];
 
             // Get the keys and names of each list
-            for (var i = 0; i < result.length; i++){
+            for (var i = 0; i < result.length; i++) {
                var ssv = result[i];
 
                if (ssv) {
@@ -86,7 +86,7 @@ class YourLists extends Component {
                      break;
                   }
                } else {
-                  console.log("ERROR: List does not exist.");    
+                  console.log("ERROR: List does not exist.");
                   break;
                }
             }
