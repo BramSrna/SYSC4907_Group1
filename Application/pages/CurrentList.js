@@ -1,20 +1,24 @@
 import React, { Component } from "react";
-import { FlatList,
+import {
+   FlatList,
    StyleSheet,
    KeyboardAvoidingView,
    TouchableHighlight,
    View,
    Alert,
-   BackHandler } from "react-native";
-import { Layout,
-         Button,
-         Input,
-         Modal,
-         TopNavigation,
-         TopNavigationAction,
-         Select,
-         Text } from 'react-native-ui-kitten';
-import { Modal as RNModal} from "react-native";
+   BackHandler
+} from "react-native";
+import {
+   Layout,
+   Button,
+   Input,
+   Modal,
+   TopNavigation,
+   TopNavigationAction,
+   Select,
+   Text
+} from 'react-native-ui-kitten';
+import { Modal as RNModal } from "react-native";
 import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
@@ -103,7 +107,7 @@ class CurrentList extends Component {
       );
 
       // Populate the Arrays for the autocomplete fields
-      this.loadAvailableStores();      
+      this.loadAvailableStores();
       this.loadAvailableItems();
    }
 
@@ -126,7 +130,7 @@ class CurrentList extends Component {
 
       // Load the current contents of the list
       this.loadCurrList(this,
-                        this.props.navigation.getParam("listID", "(Invalid List ID)"));
+         this.props.navigation.getParam("listID", "(Invalid List ID)"));
 
    }
 
@@ -144,7 +148,7 @@ class CurrentList extends Component {
       // The "once" method reads a value from the database,
       // returning a promise. Use "then" to access the promise
       var ref = firebase.database().ref('/lists/' + listId);
-      var retItems = ref.on('value', function(snapshot) {
+      var retItems = ref.on('value', function (snapshot) {
          var items = [];
          var ids = [];
 
@@ -154,10 +158,10 @@ class CurrentList extends Component {
          // Parse the item objects and their
          // corresponding ids
          if (ssv && ssv.items) {
-             var listItems = ssv.items;
-             for (var itemId in listItems) {
-                 items.push(listItems[itemId]);
-                 ids.push(itemId);
+            var listItems = ssv.items;
+            for (var itemId in listItems) {
+               items.push(listItems[itemId]);
+               ids.push(itemId);
             }
          }
 
@@ -237,7 +241,7 @@ class CurrentList extends Component {
                }
             }
          }
-      }      
+      }
 
       // Set the new state values
       this.setState({
@@ -266,12 +270,12 @@ class CurrentList extends Component {
 
       // If the specific name is given add it to the string
       if ((item.spec !== undefined) &&
-          (item.specName !== null) &&
-          (item.specName !== "null")) {
+         (item.specName !== null) &&
+         (item.specName !== "null")) {
          retStr += " (" + item.specName + ")";
       }
 
-      return(retStr);
+      return (retStr);
    }
 
    /**
@@ -340,7 +344,7 @@ class CurrentList extends Component {
     */
    HandleDoubleTapItem(indexPosition) {
       lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId,
-                                            this.state.listItemIds[indexPosition])
+         this.state.listItemIds[indexPosition])
    }
 
    /**
@@ -357,11 +361,11 @@ class CurrentList extends Component {
    addItem = () => {
       // Add the item to the list
       lf.AddItemToList(this.state.listId,
-                       this.state.genName,
-                       1,
-                       "aSize mL",
-                       "aNote",
-                       specName = this.state.specName);
+         this.state.genName,
+         1,
+         "aSize mL",
+         "aNote",
+         specName = this.state.specName);
       this.setState({
          itemModalVisible: false,
          itemName: ''
@@ -394,12 +398,12 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   handleReorg(selection){
+   handleReorg(selection) {
       // Get the value for the organization method
       selectionVal = selection.value;
 
       // Call the corresponding selection function
-      switch(selectionVal){
+      switch (selectionVal) {
          case "ORDER_ADDED":
             this.reorganizeListAdded();
             break;
@@ -418,7 +422,7 @@ class CurrentList extends Component {
 
       // Set the state
       this.setState({
-         orgMethod : selection
+         orgMethod: selection
       });
    }
 
@@ -438,9 +442,9 @@ class CurrentList extends Component {
       tempList.then((value) => {
          // Update the list state to the new order
          this.updateListState(value.items,
-                              value.ids,
-                              userCount = value.userCount,
-                              reorg = true);
+            value.ids,
+            userCount = value.userCount,
+            reorg = true);
       })
    }
 
@@ -461,13 +465,13 @@ class CurrentList extends Component {
 
       // Put the items and their ids in a nested list
       var temp = [];
-      for (var j = 0; j < items.length; j++){
-         temp.push({"item" : items[j], "id" : ids[j]});
+      for (var j = 0; j < items.length; j++) {
+         temp.push({ "item": items[j], "id": ids[j] });
       }
 
       // Rearrage the nested list to put it in alphabetical order
       var that = this;
-      temp.sort(function(a, b) {
+      temp.sort(function (a, b) {
          console.log(this);
          var itemA = that.getDispName(a.item).toUpperCase();
          var itemB = that.getDispName(b.item).toUpperCase();
@@ -475,7 +479,7 @@ class CurrentList extends Component {
       });
 
       // Retrieve the organized items and ids
-      for (var k = 0; k < temp.length; k++){
+      for (var k = 0; k < temp.length; k++) {
          items[k] = temp[k].item;
          ids[k] = temp[k].id;
       }
@@ -495,12 +499,12 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListLoc(context=this) {
+   reorganizeListLoc(context = this) {
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list
          var tempList = lf.reorgListLoc(context.state.currStoreId,
-                                        context.props.navigation.getParam("listID", "(Invalid List ID)"));
+            context.props.navigation.getParam("listID", "(Invalid List ID)"));
          tempList.then((value) => {
             // Update the local state of the list
             context.updateListState(value.items, value.ids, reorg = true);
@@ -524,12 +528,12 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListFastest(context=this) {
+   reorganizeListFastest(context = this) {
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list
          var tempList = lf.reorgListFastest(context.state.currStoreId,
-                                            context.props.navigation.getParam("listID", "(Invalid List ID)"));
+            context.props.navigation.getParam("listID", "(Invalid List ID)"));
          tempList.then((value) => {
             // Update the local state of the list
             context.updateListState(value.items, value.ids, reorg = true);
@@ -556,11 +560,11 @@ class CurrentList extends Component {
       // Check if the given id matches a known id
       for (var i = 0; i < availableStores.length; i++) {
          if (availableStores[i].id === context.state.currStoreId) {
-            return(true);
+            return (true);
          }
       }
 
-      return(false);
+      return (false);
    }
 
    /**
@@ -582,7 +586,7 @@ class CurrentList extends Component {
          var ids = value.ids;
 
          // Save the names and ids to the state
-         var temp  = [];
+         var temp = [];
          for (var i = 0; i < ids.length; i++) {
             temp.push({
                name: stores[i],
@@ -615,7 +619,7 @@ class CurrentList extends Component {
          var specNames = value.specNames;
 
          // Save the item information
-         var temp  = [];
+         var temp = [];
          for (var i = 0; i < ids.length; i++) {
             temp.push({
                name: items[i],
@@ -657,7 +661,7 @@ class CurrentList extends Component {
          startList = [];
       } else {
          // Get the items that start with what the user has entered so far
-         startList = startList.filter(name => 
+         startList = startList.filter(name =>
             name.toLowerCase().startsWith(currStore.toLowerCase())
          );
 
@@ -671,7 +675,7 @@ class CurrentList extends Component {
       }
 
       // Return the filtered list
-      return(startList);
+      return (startList);
    }
 
    /**
@@ -702,7 +706,7 @@ class CurrentList extends Component {
          startList = [];
       } else {
          // Get the items that start with what the user has entered so far
-         startList = startList.filter(name => 
+         startList = startList.filter(name =>
             name.toLowerCase().startsWith(itemName.toLowerCase())
          );
 
@@ -716,7 +720,7 @@ class CurrentList extends Component {
       }
 
       // Return the filtered list
-      return(startList);
+      return (startList);
    }
 
    /**
@@ -825,8 +829,8 @@ class CurrentList extends Component {
 
       // Send the notification to all shared users
       lf.sendNotificationToSharedUsers(this.state.listId,
-                                       this.state.listName,
-                                       message);
+         this.state.listName,
+         message);
       this.setState({
          modalVisible: false,
          message: ''
@@ -899,12 +903,13 @@ class CurrentList extends Component {
 
       return (
          <View style={enterStoreModalStyles.modalContainer}>
-            <View style={enterStoreModalStyles.modalSubContainer}>                        
+            <View style={enterStoreModalStyles.modalSubContainer}>
                <Text style={enterStoreModalStyles.modalTitle}>
                   Add New Item
                </Text>
                <View style={enterStoreModalStyles.modalAutocompleteContainer}>
                   <Autocomplete
+                     listStyle={enterStoreModalStyles.result}
                      data={itemList}
                      defaultValue={currItemIn}
                      hideResults={false}
@@ -912,7 +917,7 @@ class CurrentList extends Component {
                      keyExtractor={(item, index) => index.toString()}
                      renderItem={({ item, i }) => (
                         <TouchableHighlight
-                           style={{zIndex: 10}}
+                           style={{ zIndex: 10 }}
                            onPress={() => this.updateCurrItem(item)}>
                            <Text>{item}</Text>
                         </TouchableHighlight>
@@ -951,12 +956,13 @@ class CurrentList extends Component {
 
       return (
          <View style={enterStoreModalStyles.modalContainer}>
-            <View style={enterStoreModalStyles.modalSubContainer}>                        
+            <View style={enterStoreModalStyles.modalSubContainer}>
                <Text style={enterStoreModalStyles.modalTitle}>
                   Store Name:
                </Text>
                <View style={enterStoreModalStyles.modalAutocompleteContainer}>
                   <Autocomplete
+                     listStyle={enterStoreModalStyles.result}
                      data={storeList}
                      defaultValue={currStoreIn}
                      hideResults={false}
@@ -964,7 +970,7 @@ class CurrentList extends Component {
                      keyExtractor={(item, index) => index.toString()}
                      renderItem={({ item, i }) => (
                         <TouchableHighlight
-                           style={{zIndex: 10}}
+                           style={{ zIndex: 10 }}
                            onPress={() => this.updateCurrStore(item)}>
                            <Text>{item}</Text>
                         </TouchableHighlight>
@@ -976,7 +982,7 @@ class CurrentList extends Component {
                   style={enterStoreModalStyles.modalDoneButton}
                   onPress={() => {
                      this.setModalDetails(!this.state.storeModalVisible, this.state.closeFunc);
-                     this.state.closeFunc(context=this);
+                     this.state.closeFunc(context = this);
                   }}>
                   <Text style={enterStoreModalStyles.modalButtonText}>Submit</Text>
                </TouchableHighlight>
@@ -1025,9 +1031,10 @@ class CurrentList extends Component {
             {...props} icon={AddIcon}
             onPress={() => {
                this.setState({
-                  itemModalVisible:  true,
+                  itemModalVisible: true,
                   itemName: ""
-               })}
+               })
+            }
             }
          />
       );
@@ -1062,7 +1069,7 @@ class CurrentList extends Component {
                title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
                alignment="center"
                leftControl={renderMenuAction()}
-               rightControls={this.state.userCount > 1 ? renderRightControls(): renderRightControl()}
+               rightControls={this.state.userCount > 1 ? renderRightControls() : renderRightControl()}
             />
             <Layout style={styles.ListContainer}>
                <RNModal
@@ -1091,11 +1098,11 @@ class CurrentList extends Component {
                   // this.state.listItems.length
                }
                <Select style={styles.selectBox}
-                 label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
-                 data={organizationOptions}
-                 placeholder='Select an organization method'
-                 selectedOption={this.state.orgMethod}
-                 onSelect={(selection) => this.handleReorg(selection)}
+                  label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
+                  data={organizationOptions}
+                  placeholder='Select an organization method'
+                  selectedOption={this.state.orgMethod}
+                  onSelect={(selection) => this.handleReorg(selection)}
                />
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
