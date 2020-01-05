@@ -36,7 +36,8 @@ var availableStores = [];
 var availableItems = [];
 
 const PAGE_TITLE = "Current List";
-
+const NEW_ITEM = "Register an item..."
+const NEW_STORE = "Register a store..."
 class CurrentList extends Component {
    constructor(props) {
       super(props);
@@ -64,7 +65,8 @@ class CurrentList extends Component {
          modalVisible: false,
          modalMode: 'item',
          message: '',
-         userCount: 0
+         userCount: 0,
+         hr: false
       };
    }
 
@@ -640,96 +642,6 @@ class CurrentList extends Component {
    }
 
    /**
-    * loadStores
-    * 
-    * Filters the list of available stores based
-    * on what the user has input so far. Returns an
-    * empty list if nothing has been entered, otherwise
-    * returns a list of the items that match the users input.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   // loadStores() {
-   //    // Get the current store
-   //    var currStore = this.state.currStore;
-   //    var startList = [];
-
-   //    // Copy the available stores to the initial list
-   //    for (var i = 0; i < availableStores.length; i++) {
-   //       startList.push(availableStores[i].name);
-   //    }
-
-   //    // Filter the list
-   //    if (currStore.length <= 0) {
-   //       // If nothing has been entered, return an empty list
-   //       startList = [];
-   //    } else {
-   //       // Get the items that start with what the user has entered so far
-   //       startList = startList.filter(name =>
-   //          name.toLowerCase().startsWith(currStore.toLowerCase())
-   //       );
-
-   //       // If the first item in the filtered list matches the inputted value,
-   //       // return an empty list as the value has been found
-   //       if (startList.length > 0) {
-   //          if (currStore.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
-   //             startList = [];
-   //          }
-   //       }
-   //    }
-
-   //    // Return the filtered list
-   //    return (startList);
-   // }
-
-   /**
-    * loadItems
-    * 
-    * Filters the list of available items based
-    * on what the user has input so far. Returns an
-    * empty list if nothing has been entered, otherwise
-    * returns a list of the items that match the users input.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   // loadItems() {
-   //    // Get the current item
-   //    var itemName = this.state.itemName;
-   //    var startList = [];
-
-   //    // Copy the available stores to the initial list
-   //    for (var i = 0; i < availableItems.length; i++) {
-   //       startList.push(availableItems[i].name);
-   //    }
-
-   //    // Filter the list
-   //    if (itemName.length <= 0) {
-   //       // If nothing has been entered, return an empty list
-   //       startList = [];
-   //    } else {
-   //       // Get the items that start with what the user has entered so far
-   //       startList = startList.filter(name =>
-   //          name.toLowerCase().startsWith(itemName.toLowerCase())
-   //       );
-
-   //       // If the first item in the filtered list matches the inputted value,
-   //       // return an empty list as the value has been found
-   //       if (startList.length > 0) {
-   //          if (itemName.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
-   //             startList = [];
-   //          }
-   //       }
-   //    }
-
-   //    // Return the filtered list
-   //    return (startList);
-   // }
-
-   /**
     * setModalDetails
     * 
     * Sets the store input modal details to the given information
@@ -756,25 +668,35 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   updateCurrStore(newStore) {
-      var id = ""; // Empty id to handle unknown stores
+   updateCurrStore(newStore, hideResults) {
+      if (newStore.toString() == NEW_STORE) {
+         this.setModalDetails(false, this.state.closeFunc)
+         this.props.navigation.navigate("MapCreatorPage", {
+            page: "CurrentListPage",
+            listName: this.props.navigation.getParam("name", "(Invalid Name)"),
+            listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+         })
+      } else {
+         var id = ""; // Empty id to handle unknown stores
 
-      newStore = newStore.toString();
+         newStore = newStore.toString();
 
-      // Find the name of the store in the list of available stores
-      for (var i = 0; i < availableStores.length; i++) {
-         var name = availableStores[i].name;
-         if (name === newStore) {
-            // Set the id of the store if known
-            id = availableStores[i].id;
+         // Find the name of the store in the list of available stores
+         for (var i = 0; i < availableStores.length; i++) {
+            var name = availableStores[i].name;
+            if (name === newStore) {
+               // Set the id of the store if known
+               id = availableStores[i].id;
+            }
          }
-      }
 
-      // Update the state
-      this.setState({
-         currStore: newStore,
-         currStoreId: id
-      });
+         // Update the state
+         this.setState({
+            currStore: newStore,
+            currStoreId: id,
+            hr: hideResults
+         });
+      }
    }
 
    /**
@@ -787,31 +709,41 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   updateCurrItem(newItem) {
-      var id = ""; // Assume an empty id
-      var genName = newItem; // Assume the given name is the generic name
-      var specName = null; // Assume no specific name has been given
+   updateCurrItem(newItem, hideResults) {
+      if (newItem.toString() == NEW_ITEM) {
+         this.cancelItemModal()
+         this.props.navigation.navigate("RegisterItemPage", {
+            page: "CurrentListPage",
+            listName: this.props.navigation.getParam("name", "(Invalid Name)"),
+            listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+         })
+      } else {
+         var id = ""; // Assume an empty id
+         var genName = newItem; // Assume the given name is the generic name
+         var specName = null; // Assume no specific name has been given
 
-      newItem = newItem.toString();
+         newItem = newItem.toString();
 
-      // Check if the item is a known item
-      for (var i = 0; i < availableItems.length; i++) {
-         var name = availableItems[i].name;
-         if (name === newItem) {
-            // Set the data for the item if known
-            id = availableItems[i].id;
-            genName = availableItems[i].genName;
-            specName = availableItems[i].specName;
+         // Check if the item is a known item
+         for (var i = 0; i < availableItems.length; i++) {
+            var name = availableItems[i].name;
+            if (name === newItem) {
+               // Set the data for the item if known
+               id = availableItems[i].id;
+               genName = availableItems[i].genName;
+               specName = availableItems[i].specName;
+            }
          }
-      }
 
-      // Update the state
-      this.setState({
-         itemName: newItem,
-         genName: genName,
-         specName: specName,
-         currItemId: id
-      });
+         // Update the state
+         this.setState({
+            itemName: newItem,
+            genName: genName,
+            specName: specName,
+            currItemId: id,
+            hr: hideResults
+         });
+      }
    }
 
    /**
@@ -889,17 +821,28 @@ class CurrentList extends Component {
    };
 
 
-   find(query, list) {
+   find(query, type) {
       if (query === '') {
          return [];
       }
-
+      var list = null;
       var items = [];
+      if (type == 'items') {
+         list = availableItems
+      } else if (type == 'stores') {
+         list = availableStores
+      }
       for (var a = 0; a < list.length; a++) {
          items.push(list[a].name)
       }
       const regex = new RegExp(`${query.trim()}`, 'i');
-      return items.filter(item => item.search(regex) >= 0);
+      var items = items.filter(item => item.search(regex) >= 0);
+      if (type == 'items') {
+         items.push(NEW_ITEM)
+      } else if (type == 'stores') {
+         items.push(NEW_STORE)
+      }
+      return items;
    }
 
    /**
@@ -918,11 +861,9 @@ class CurrentList extends Component {
     */
    renderEnterItemModal() {
       // Load the items and current item for the Autocomplete box
-      // const itemList = this.loadItems();
-      // const currItemIn = this.state.itemName;
 
       const currItemIn = this.state.itemName;
-      const itemList = this.find(currItemIn, availableItems);
+      const itemList = this.find(currItemIn, 'items');
       const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
       return (
          <View style={enterStoreModalStyles.modalContainer}>
@@ -936,24 +877,18 @@ class CurrentList extends Component {
                      listStyle={enterStoreModalStyles.result}
                      data={itemList.length === 1 && comp(currItemIn, itemList[0]) ? [] : itemList}
                      defaultValue={currItemIn}
-                     hideResults={false}
-                     onChangeText={text => this.updateCurrItem(text)}
+                     hideResults={this.state.hr}
+                     onChangeText={text => this.updateCurrItem(text, false)}
                      keyExtractor={(item, index) => index.toString()}
                      renderItem={({ item, i }) => (
                         <TouchableHighlight
                            style={{ zIndex: 10 }}
-                           onPress={() => this.updateCurrItem(item)}>
+                           onPress={() => this.updateCurrItem(item, true)}>
                            <Text>{item}</Text>
                         </TouchableHighlight>
                      )}
                   />
                </View>
-
-               {/* <TouchableHighlight
-                  style={enterStoreModalStyles.modalDoneButton}
-                  onPress={this.addItem}>
-                  <Text style={enterStoreModalStyles.modalButtonText}>Add</Text>
-               </TouchableHighlight> */}
                <Layout style={enterStoreModalStyles.modalDoneButton}>
                   <Button style={styles.modalButton} onPress={this.cancelItemModal}>Cancel</Button>
                   <Button style={styles.modalButton} onPress={this.addItem}>Add</Button>
@@ -979,10 +914,8 @@ class CurrentList extends Component {
     */
    renderEnterStoreModal() {
       // Load the stores and current store for the Autocomplete box
-      // const storeList = this.loadStores();
-      // const currStoreIn = this.state.currStore;
       const currStoreIn = this.state.currStore;
-      const itemList = this.find(currStoreIn, availableStores);
+      const itemList = this.find(currStoreIn, 'stores');
       const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
       return (
          <View style={enterStoreModalStyles.modalContainer}>
@@ -996,27 +929,19 @@ class CurrentList extends Component {
                      listStyle={enterStoreModalStyles.result}
                      data={itemList.length === 1 && comp(currStoreIn, itemList[0]) ? [] : itemList}
                      defaultValue={currStoreIn}
-                     hideResults={false}
-                     onChangeText={text => this.updateCurrStore(text)}
+                     hideResults={this.state.hr}
+                     onChangeText={text => this.updateCurrStore(text, false)}
                      keyExtractor={(item, index) => index.toString()}
                      renderItem={({ item, i }) => (
                         <TouchableHighlight
                            style={{ zIndex: 10 }}
-                           onPress={() => this.updateCurrStore(item)}>
+                           onPress={() => this.updateCurrStore(item, true)}>
                            <Text>{item}</Text>
                         </TouchableHighlight>
                      )}
                   />
                </View>
 
-               {/* <TouchableHighlight
-                  style={enterStoreModalStyles.modalDoneButton}
-                  onPress={() => {
-                     this.setModalDetails(!this.state.storeModalVisible, this.state.closeFunc);
-                     this.state.closeFunc(context = this);
-                  }}>
-                  <Text style={enterStoreModalStyles.modalButtonText}>Submit</Text>
-               </TouchableHighlight> */}
                <Layout style={enterStoreModalStyles.modalDoneButton}>
                   <Button style={styles.modalButton} onPress={() => { this.setModalDetails(false, this.state.closeFunc) }}>Cancel</Button>
                   <Button style={styles.modalButton} onPress={() => {

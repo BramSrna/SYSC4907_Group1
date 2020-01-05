@@ -54,7 +54,7 @@ class MapCreatorPage extends Component {
         nm.setThat(this);
 
         this._mounted = true;
-        
+
         this.setState({
             arrayHolder: [...this.currDepartments]
         });
@@ -106,9 +106,9 @@ class MapCreatorPage extends Component {
     */
     handleSaveMap = () => {
         // Check that all required information was given
-        if (!this.checkReqFields()){
+        if (!this.checkReqFields()) {
             return;
-        }  
+        }
 
         // Copy the current list of departments
         var deps = [];
@@ -126,6 +126,12 @@ class MapCreatorPage extends Component {
             tempFranchiseName);
 
         Alert.alert("Map Saved! Thank you!")
+        if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
+            this.props.navigation.navigate("CurrentListPage", {
+                name: this.props.navigation.getParam("listName", "(Invalid Name)"),
+                listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
+            });
+        }
     }
 
     /**
@@ -146,14 +152,14 @@ class MapCreatorPage extends Component {
     checkReqFields() {
         // Check the generic name field
         if (this.state.storeName == DEFAULT_STORE_NAME) {
-          Alert.alert("Please enter a value for the store name.");
-          return (false);
+            Alert.alert("Please enter a value for the store name.");
+            return (false);
         }
 
         // Check the specific name field
         if (this.state.address == DEFAULT_ADDRESS) {
-          Alert.alert("Please enter a value for the address.");
-          return (false);
+            Alert.alert("Please enter a value for the address.");
+            return (false);
         }
 
         return (true);

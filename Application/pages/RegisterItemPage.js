@@ -60,7 +60,7 @@ class RegisterItemPage extends Component {
   */
   handleRegister = () => {
     // Check that all required information has been given
-    if (!this.checkReqFields()){
+    if (!this.checkReqFields()) {
       return;
     }
 
@@ -72,12 +72,18 @@ class RegisterItemPage extends Component {
 
     // Register the item
     dbi.registerItem(this.state.genericName,
-                      tempSpecificName,
-                      tempSize,
-                      tempSizeUnit,
-                      tempPrice);
+      tempSpecificName,
+      tempSize,
+      tempSizeUnit,
+      tempPrice);
 
     Alert.alert("Item saved successfully");
+    if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
+      this.props.navigation.navigate("CurrentListPage", {
+        name: this.props.navigation.getParam("listName", "(Invalid Name)"),
+        listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
+      });
+    }
   };
 
   /**
