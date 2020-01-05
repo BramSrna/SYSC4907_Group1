@@ -172,7 +172,7 @@ class CurrentList extends Component {
          }
 
          // Get the user count of the list
-         if ('user_count' in ssv) {
+         if (ssv && ('user_count' in ssv)) {
             userCount = ssv.user_count;
          }
 
