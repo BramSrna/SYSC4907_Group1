@@ -479,7 +479,6 @@ class CurrentList extends Component {
       // Rearrage the nested list to put it in alphabetical order
       var that = this;
       temp.sort(function (a, b) {
-         console.log(this);
          var itemA = that.getDispName(a.item).toUpperCase();
          var itemB = that.getDispName(b.item).toUpperCase();
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
@@ -652,38 +651,38 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   loadStores() {
-      // Get the current store
-      var currStore = this.state.currStore;
-      var startList = [];
+   // loadStores() {
+   //    // Get the current store
+   //    var currStore = this.state.currStore;
+   //    var startList = [];
 
-      // Copy the available stores to the initial list
-      for (var i = 0; i < availableStores.length; i++) {
-         startList.push(availableStores[i].name);
-      }
+   //    // Copy the available stores to the initial list
+   //    for (var i = 0; i < availableStores.length; i++) {
+   //       startList.push(availableStores[i].name);
+   //    }
 
-      // Filter the list
-      if (currStore.length <= 0) {
-         // If nothing has been entered, return an empty list
-         startList = [];
-      } else {
-         // Get the items that start with what the user has entered so far
-         startList = startList.filter(name =>
-            name.toLowerCase().startsWith(currStore.toLowerCase())
-         );
+   //    // Filter the list
+   //    if (currStore.length <= 0) {
+   //       // If nothing has been entered, return an empty list
+   //       startList = [];
+   //    } else {
+   //       // Get the items that start with what the user has entered so far
+   //       startList = startList.filter(name =>
+   //          name.toLowerCase().startsWith(currStore.toLowerCase())
+   //       );
 
-         // If the first item in the filtered list matches the inputted value,
-         // return an empty list as the value has been found
-         if (startList.length > 0) {
-            if (currStore.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
-               startList = [];
-            }
-         }
-      }
+   //       // If the first item in the filtered list matches the inputted value,
+   //       // return an empty list as the value has been found
+   //       if (startList.length > 0) {
+   //          if (currStore.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
+   //             startList = [];
+   //          }
+   //       }
+   //    }
 
-      // Return the filtered list
-      return (startList);
-   }
+   //    // Return the filtered list
+   //    return (startList);
+   // }
 
    /**
     * loadItems
@@ -697,38 +696,38 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   loadItems() {
-      // Get the current item
-      var itemName = this.state.itemName;
-      var startList = [];
+   // loadItems() {
+   //    // Get the current item
+   //    var itemName = this.state.itemName;
+   //    var startList = [];
 
-      // Copy the available stores to the initial list
-      for (var i = 0; i < availableItems.length; i++) {
-         startList.push(availableItems[i].name);
-      }
+   //    // Copy the available stores to the initial list
+   //    for (var i = 0; i < availableItems.length; i++) {
+   //       startList.push(availableItems[i].name);
+   //    }
 
-      // Filter the list
-      if (itemName.length <= 0) {
-         // If nothing has been entered, return an empty list
-         startList = [];
-      } else {
-         // Get the items that start with what the user has entered so far
-         startList = startList.filter(name =>
-            name.toLowerCase().startsWith(itemName.toLowerCase())
-         );
+   //    // Filter the list
+   //    if (itemName.length <= 0) {
+   //       // If nothing has been entered, return an empty list
+   //       startList = [];
+   //    } else {
+   //       // Get the items that start with what the user has entered so far
+   //       startList = startList.filter(name =>
+   //          name.toLowerCase().startsWith(itemName.toLowerCase())
+   //       );
 
-         // If the first item in the filtered list matches the inputted value,
-         // return an empty list as the value has been found
-         if (startList.length > 0) {
-            if (itemName.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
-               startList = [];
-            }
-         }
-      }
+   //       // If the first item in the filtered list matches the inputted value,
+   //       // return an empty list as the value has been found
+   //       if (startList.length > 0) {
+   //          if (itemName.toLowerCase().trim() === startList[0].toLowerCase().trim()) {
+   //             startList = [];
+   //          }
+   //       }
+   //    }
 
-      // Return the filtered list
-      return (startList);
-   }
+   //    // Return the filtered list
+   //    return (startList);
+   // }
 
    /**
     * setModalDetails
@@ -889,6 +888,20 @@ class CurrentList extends Component {
       }
    };
 
+
+   find(query, list) {
+      if (query === '') {
+         return [];
+      }
+
+      var items = [];
+      for (var a = 0; a < list.length; a++) {
+         items.push(list[a].name)
+      }
+      const regex = new RegExp(`${query.trim()}`, 'i');
+      return items.filter(item => item.search(regex) >= 0);
+   }
+
    /**
     * renderEnterItemModal
     * 
@@ -905,9 +918,12 @@ class CurrentList extends Component {
     */
    renderEnterItemModal() {
       // Load the items and current item for the Autocomplete box
-      const itemList = this.loadItems();
-      const currItemIn = this.state.itemName;
+      // const itemList = this.loadItems();
+      // const currItemIn = this.state.itemName;
 
+      const currItemIn = this.state.itemName;
+      const itemList = this.find(currItemIn, availableItems);
+      const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
       return (
          <View style={enterStoreModalStyles.modalContainer}>
             <View style={enterStoreModalStyles.modalSubContainer}>
@@ -916,8 +932,9 @@ class CurrentList extends Component {
                </Text>
                <View style={enterStoreModalStyles.modalAutocompleteContainer}>
                   <Autocomplete
+                     placeholder="Enter an item"
                      listStyle={enterStoreModalStyles.result}
-                     data={itemList}
+                     data={itemList.length === 1 && comp(currItemIn, itemList[0]) ? [] : itemList}
                      defaultValue={currItemIn}
                      hideResults={false}
                      onChangeText={text => this.updateCurrItem(text)}
@@ -962,9 +979,11 @@ class CurrentList extends Component {
     */
    renderEnterStoreModal() {
       // Load the stores and current store for the Autocomplete box
-      const storeList = this.loadStores();
+      // const storeList = this.loadStores();
+      // const currStoreIn = this.state.currStore;
       const currStoreIn = this.state.currStore;
-      console.log(storeList)
+      const itemList = this.find(currStoreIn, availableStores);
+      const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
       return (
          <View style={enterStoreModalStyles.modalContainer}>
             <View style={enterStoreModalStyles.modalSubContainer}>
@@ -973,8 +992,9 @@ class CurrentList extends Component {
                </Text>
                <View style={enterStoreModalStyles.modalAutocompleteContainer}>
                   <Autocomplete
+                     placeholder="Enter a store name"
                      listStyle={enterStoreModalStyles.result}
-                     data={storeList}
+                     data={itemList.length === 1 && comp(currStoreIn, itemList[0]) ? [] : itemList}
                      defaultValue={currStoreIn}
                      hideResults={false}
                      onChangeText={text => this.updateCurrStore(text)}
