@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-   View,
    SectionList,
    StyleSheet,
    Alert,
@@ -38,7 +37,7 @@ class YourContacts extends Component {
    FlatListItemSeparator = () => {
       return (
          //Item Separator
-         <View
+         <Layout
             style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }}
          />
       );

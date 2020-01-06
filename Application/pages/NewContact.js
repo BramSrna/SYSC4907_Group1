@@ -121,17 +121,6 @@ class NewContact extends Component {
 
    };
 
-   // renderRequiredText(bodyText, reqText = "(*)") {
-   //    return (
-   //       <Text style={globalStyles.whiteText}>
-   //          {bodyText}
-   //          <Text style={globalStyles.requiredHighlight}>
-   //             {reqText}
-   //          </Text>
-   //       </Text>
-   //    );
-   // }
-
    renderModalElement = () => {
       return (
          <Layout
@@ -191,7 +180,7 @@ class NewContact extends Component {
                            label='Group'
                            data={this.state.allGroups}
                            placeholder='Select a group...'
-                           selectedOption={this.state.group}
+                           selectedOption={this.state.allGroups[0]}
                            onSelect={(group) => this.handleChangeGroup(group)}
                         />
                         <Button style={styles.groupButton} onPress={() => this.setState({ isDialogVisible: true })} >New Group</Button>
@@ -205,6 +194,7 @@ class NewContact extends Component {
       );
    }
 }
+
 
 const styles = StyleSheet.create({
    container: {

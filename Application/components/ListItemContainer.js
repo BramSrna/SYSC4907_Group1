@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, BackHandler } from 'react-native';
+import { StyleSheet, BackHandler, TouchableOpacity, Image } from 'react-native';
 import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
@@ -107,13 +107,13 @@ export default class ListItemContainer extends Component {
                                 placement='left'
                                 onSelect={this.onSelectMenuItem}
                                 onBackdropPress={this.onMenuActionPress}>
-                                <View style={styles.pending}>
+                                <Layout style={styles.pending}>
                                     <TouchableOpacity style={styles.acceptDeny}
                                         onPress={() => this.props.acceptFunction()}>
                                         <Image source={require("../assets/icons/accept.png")} /></TouchableOpacity>
                                     <TouchableOpacity style={styles.acceptDeny}
                                         onPress={() => this.props.rejectFunction()}>
-                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></View>
+                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></Layout>
                             </OverflowMenu>
                         </Layout>
                     </Layout >
