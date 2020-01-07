@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Alert, KeyboardAvoidingView} from "react-native";
+import { Alert, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
@@ -36,8 +36,13 @@ class AddItemLocationPage extends Component {
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
   }
 
+  componentWillUnmount() {
+    this.focusListener.remove();
+    this._isMounted = false;
+  }
+
   /**
-   * componentDidMount
+   * componentWillMount
    * 
    * Function to call when the page is mounted. Sets
    * the value of "that" for the notification manager.
@@ -46,8 +51,14 @@ class AddItemLocationPage extends Component {
    * 
    * @returns None
    */
-  componentDidMount() {
-    nm.setThat(this)
+  componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMounted = true;
+        nm.setThat(this)
+      }
+    );
   }
 
   /**
@@ -63,7 +74,7 @@ class AddItemLocationPage extends Component {
    */
   handleChangeDepartment(val) {
     if (val != DEFAULT_ITEM_DEPARTMENT) {
-      this.setState({ itemDepartment: val });
+      if (this._isMounted) this.setState({ itemDepartment: val });
     }
   }
 
@@ -129,7 +140,7 @@ class AddItemLocationPage extends Component {
    */
   handleAdd = () => {
     // Check the required fields
-    if (!this.checkReqFields()){
+    if (!this.checkReqFields()) {
       return;
     }
 
@@ -138,11 +149,11 @@ class AddItemLocationPage extends Component {
 
     // Add the value to the database
     dbi.addItemLoc(this.state.genericName,
-                   tempSpecificName,
-                   this.state.storeName,
-                   this.state.address,
-                   this.state.aisleNum,
-                   this.state.itemDepartment.value);
+      tempSpecificName,
+      this.state.storeName,
+      this.state.address,
+      this.state.aisleNum,
+      this.state.itemDepartment.value);
 
     Alert.alert("Item saved successfully");
   };
@@ -180,39 +191,39 @@ class AddItemLocationPage extends Component {
                   label='Generic Name'
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
-                  onChangeText={(genericName) => this.setState({ genericName })}
+                  onChangeText={(genericName) => this._isMounted && this.setState({ genericName })}
                 />
                 <Input style={styles.inputRow}
                   label='Specific Name'
                   placeholder='Enter a specific name'
                   value={this.state.specificName}
-                  onChangeText={(specificName) => this.setState({ specificName })}
+                  onChangeText={(specificName) => this._isMounted && this.setState({ specificName })}
                 />
                 <Input style={styles.inputRow}
                   label='Store Name'
                   placeholder='Enter the store name'
                   value={this.state.storeName}
-                  onChangeText={(storeName) => this.setState({ storeName })}
+                  onChangeText={(storeName) => this._isMounted && this.setState({ storeName })}
                 />
                 <Input style={styles.inputRow}
                   label='Address'
                   placeholder='Enter the address'
                   value={this.state.address}
-                  onChangeText={(address) => this.setState({ address })}
+                  onChangeText={(address) => this._isMounted && this.setState({ address })}
                 />
                 <Select style={styles.selectBox}
                   label='Item Department'
                   data={departments}
                   placeholder='Select a department'
                   selectedOption={this.state.itemDepartment}
-                  onSelect={(itemDepartment) => this.setState({ itemDepartment })}
+                  onSelect={(itemDepartment) => this._isMounted && this.setState({ itemDepartment })}
                 />
                 <Input style={styles.inputRow}
                   label='Aisle Number'
                   placeholder='Enter the aisle number'
                   keyboardType="numeric"
                   value={this.state.aisleNum}
-                  onChangeText={(aisleNum) => this.setState({ aisleNum })}
+                  onChangeText={(aisleNum) => this._isMounted && this.setState({ aisleNum })}
                 />
                 <Button style={styles.button} onPress={this.handleAdd} >Add Item Location</Button>
               </Layout>

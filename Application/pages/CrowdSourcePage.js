@@ -26,9 +26,20 @@ class CrowdSourcePage extends Component {
     this.onLayout = this.onLayout.bind(this);
   }
 
-  componentDidMount() {
-    nm.setThat(this)
+  componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        nm.setThat(this)
+        this._isMounted = true;
+      }
+    );
 
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
+    this._isMounted = false;
   }
 
   /**
@@ -36,7 +47,7 @@ class CrowdSourcePage extends Component {
    * @param {*} e this
    */
   onLayout(e) {
-    this.setState({
+    if (this._isMounted) this.setState({
       width: Dimensions.get('window').width,
       height: Dimensions.get('window').height,
     });

@@ -31,7 +31,7 @@ class RegisterPage extends Component {
 
   updateRegisterInfo() {
     if (this.checkInputs()) {
-      this.setState({ registering: true });
+      if (this._isMount) this.setState({ registering: true });
       var firstName = this.state.firstname.replace(/^\w/, c => c.toUpperCase());
       var lastName = this.state.lastname.replace(/^\w/, c => c.toUpperCase());
       var displayName = firstName + " " + lastName;
@@ -39,7 +39,7 @@ class RegisterPage extends Component {
       firebaseUser = new FirebaseUser();
       if (firebaseUser.register(this.state.email, this.state.password, displayName)) {
         this.props.navigation.navigate(VERIFICATIONPAGE);
-        this.setState({ registering: false });
+        if (this._isMount) this.setState({ registering: false });
       }
     } else {
       Alert.alert("Invalid Inputs", "Please Confirm the inputs and try again.");
@@ -58,7 +58,19 @@ class RegisterPage extends Component {
   }
 
   componentWillMount() {
-    this.setState({ firstname: "", lastname: "", email: "", password: "" });
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMount = true;
+        this.setState({ firstname: "", lastname: "", email: "", password: "" });
+      }
+    );
+
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove()
+    this._isMount = false;
   }
 
   renderPasswordEyeIcon = (style) => {
@@ -70,7 +82,7 @@ class RegisterPage extends Component {
 
   onPasswordEyeIconPress = () => {
     const secureTextEntry = !this.state.secureTextEntry;
-    this.setState({ secureTextEntry });
+    if (this._isMount) this.setState({ secureTextEntry });
   };
 
   renderCurrentState() {
@@ -93,7 +105,7 @@ class RegisterPage extends Component {
               keyboardType="default"
               autoCapitalize="words"
               returnKeyType='next'
-              onChangeText={firstname => this.setState({ firstname })}
+              onChangeText={firstname => this._isMount && this.setState({ firstname })}
               onSubmitEditing={() => this.refs.lastname.focus()}
               blurOnSubmit={false}
               value={this.state.firstname} />
@@ -106,7 +118,7 @@ class RegisterPage extends Component {
               keyboardType="default"
               autoCapitalize="words"
               returnKeyType='next'
-              onChangeText={lastname => this.setState({ lastname })}
+              onChangeText={lastname => this._isMount && this.setState({ lastname })}
               onSubmitEditing={() => this.refs.email.focus()}
               blurOnSubmit={false}
               value={this.state.lastname} />
@@ -120,7 +132,7 @@ class RegisterPage extends Component {
               autoCapitalize="none"
               autoCompleteType="email"
               returnKeyType='next'
-              onChangeText={email => this.setState({ email })}
+              onChangeText={email => this._isMount && this.setState({ email })}
               onSubmitEditing={() => this.refs.password.focus()}
               blurOnSubmit={false}
               value={this.state.email} />
@@ -136,7 +148,7 @@ class RegisterPage extends Component {
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
-              onChangeText={password => this.setState({ password })}
+              onChangeText={password => this._isMount && this.setState({ password })}
               onSubmitEditing={() => this.refs.confirmPassword.focus()}
               blurOnSubmit={false}
               value={this.state.password} />
@@ -151,7 +163,7 @@ class RegisterPage extends Component {
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
-              onChangeText={confirmPassword => this.setState({ confirmPassword })}
+              onChangeText={confirmPassword => this._isMount && this.setState({ confirmPassword })}
               onSubmitEditing={() => this.refs.register.scrollTo}
               value={this.state.confirmPassword} />
           </Layout>

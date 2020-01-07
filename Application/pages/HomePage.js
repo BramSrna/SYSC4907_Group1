@@ -29,7 +29,13 @@ class HomePage extends Component {
     this.onLayout = this.onLayout.bind(this);
   }
 
-  async componentDidMount() {
+  componentWillUnmount() {
+    this._isMounted = false;
+    this.focusListener.remove()
+  }
+
+  async load() {
+    this._isMounted = true;
     nm.setThat(this)
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
@@ -81,15 +87,26 @@ class HomePage extends Component {
     }
   }
 
+  async componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this.load();
+      }
+    );
+  }
+
   /**
    * Updates the width and height state varibles if the screen is rotated.
    * @param {*} e this
    */
   onLayout(e) {
-    this.setState({
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
-    });
+    if (this._isMounted) {
+      this.setState({
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+      });
+    }
   }
 
   /**
@@ -141,14 +158,14 @@ class HomePage extends Component {
   );
 
   onMenuActionPress = () => {
-    this.setState({ menuVisible: !this.state.menuVisible });
+    if (this._isMounted) this.setState({ menuVisible: !this.state.menuVisible });
   };
 
   onMenuItemSelect = (index) => {
     if (index = 1) {
       lf.ToggleTheme();
     }
-    this.setState({ menuVisible: false });
+    if (this._isMounted) this.setState({ menuVisible: false });
   };
 
   render() {

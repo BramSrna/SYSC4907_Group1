@@ -24,7 +24,7 @@ export default class ListItemContainer extends Component {
         };
     }
 
-    componentDidMount() {
+    componentWillMount() {
     }
 
     componentWillUnmount() {

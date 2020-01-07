@@ -40,7 +40,7 @@ class MapCreatorPage extends Component {
     }
 
     /**
-    * componentDidMount
+    * componentWillMount
     * 
     * Function called after component was mounted.
     * Sets the context of the notification manager.
@@ -50,14 +50,20 @@ class MapCreatorPage extends Component {
     * 
     * @return None
     */
-    componentDidMount() {
-        nm.setThat(this);
+    componentWillMount() {
+        this.focusListener = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                nm.setThat(this);
 
-        this._mounted = true;
+                this._mounted = true;
 
-        this.setState({
-            arrayHolder: [...this.currDepartments]
-        });
+                this.setState({
+                    arrayHolder: [...this.currDepartments]
+                });
+            }
+        );
+
     }
 
     /**
@@ -70,6 +76,7 @@ class MapCreatorPage extends Component {
     * @return void
     */
     componentWillUnmount() {
+        this.focusListener.remove()
         this._mounted = false;
     }
 
@@ -89,7 +96,7 @@ class MapCreatorPage extends Component {
         this.currDepartments.push({});
 
         // Rerender the screen
-        this.setState({ arrayHolder: [...this.currDepartments] })
+        if (this._mounted) this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
     /**
@@ -181,7 +188,7 @@ class MapCreatorPage extends Component {
         this.currDepartments[ind]["department"] = newVal;
 
         // Update the state
-        this.setState({
+        if (this._mounted) this.setState({
             arrayHolder: [...this.currDepartments]
         });
     }
@@ -207,7 +214,7 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = aboveItem;
 
             // Update the state
-            this.setState({
+            if (this._mounted) this.setState({
                 arrayHolder: [...this.currDepartments]
             });
         }
@@ -228,7 +235,7 @@ class MapCreatorPage extends Component {
         this.currDepartments.splice(ind, 1);
 
         // Update the state
-        this.setState({
+        if (this._mounted) this.setState({
             arrayHolder: [...this.currDepartments]
         });
     }
@@ -254,7 +261,7 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = belowItem;
 
             // Update the state
-            this.setState({
+            if (this._mounted) this.setState({
                 arrayHolder: [...this.currDepartments]
             });
         }
@@ -343,7 +350,7 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter store name...'
                                 returnKeyType='next'
                                 value={this.state.storeName}
-                                onChangeText={(storeName) => this.setState({ storeName })}
+                                onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
                                 onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
                             />
@@ -352,14 +359,14 @@ class MapCreatorPage extends Component {
                                 ref="address"
                                 placeholder='Enter store address...'
                                 value={this.state.address}
-                                onChangeText={(address) => this.setState({ address })}
+                                onChangeText={(address) => this._mounted && this.setState({ address })}
                             />
                             <Input style={styles.inputRow}
                                 label='Franchise Name'
                                 ref="fName"
                                 placeholder='Enter franchise name...'
                                 value={this.state.franchiseName}
-                                onChangeText={(franchiseName) => this.setState({ franchiseName })}
+                                onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
                             />
                         </Layout>
                     </Layout>

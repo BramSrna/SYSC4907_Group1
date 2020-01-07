@@ -33,7 +33,7 @@ class RegisterItemPage extends Component {
   }
 
   /**
-   * componentDidMount
+   * componentWillMount
    * 
    * Function called when the component has mounted.
    * Sets the context of the notification manager.
@@ -42,11 +42,20 @@ class RegisterItemPage extends Component {
    * 
    * @returns None
    */
-  componentDidMount() {
-    nm.setThat(this)
+  componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMount = true;
+        nm.setThat(this)
+      }
+    );
 
   }
-
+  componentWillUnmount() {
+    this.focusListener.remove()
+    this._isMount = false;
+  }
   /**
    * handleRegister
    * 
@@ -131,20 +140,20 @@ class RegisterItemPage extends Component {
                   label='Generic Name'
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
-                  onChangeText={(genericName) => this.setState({ genericName })}
+                  onChangeText={(genericName) => this._isMount && this.setState({ genericName })}
                 />
                 <Input style={styles.inputRow}
                   label='Specific Name'
                   placeholder='Specific Name'
                   value={this.state.specificName}
-                  onChangeText={(specificName) => this.setState({ specificName })}
+                  onChangeText={(specificName) => this._isMount && this.setState({ specificName })}
                 />
                 <Input style={styles.inputRow}
                   label='Price'
                   placeholder='Price'
                   keyboardType='numeric'
                   value={this.state.price}
-                  onChangeText={(price) => this.setState({ price })}
+                  onChangeText={(price) => this._isMount && this.setState({ price })}
                 />
                 <Layout style={styles.horizontalInnerContainer}>
                   <Input style={styles.inputLeftColumn}
@@ -152,13 +161,13 @@ class RegisterItemPage extends Component {
                     placeholder='Size'
                     keyboardType='numeric'
                     value={this.state.size}
-                    onChangeText={(size) => this.setState({ size })}
+                    onChangeText={(size) => this._isMount && this.setState({ size })}
                   />
                   <Select style={styles.inputRightColumn}
                     data={units}
                     placeholder='Unit'
                     selectedOption={this.state.sizeUnit}
-                    onSelect={(sizeUnit) => this.setState({ sizeUnit })}
+                    onSelect={(sizeUnit) => this._isMount && this.setState({ sizeUnit })}
                   />
                 </Layout>
                 <Button style={styles.button} onPress={this.handleRegister} >Register Item</Button>

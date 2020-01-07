@@ -18,7 +18,8 @@ class YourContacts extends Component {
       this.state = { listName: '', listID: '', sections: [], groups: [], share: false, selected: [], sectionsWoPending: [], groupsWoPending: [], sectionsSelected: [] };
    }
 
-   componentDidMount() {
+   load() {
+      this._isMounted = true;
       nm.setThat(this)
 
       this.setState({
@@ -27,7 +28,20 @@ class YourContacts extends Component {
          listName: this.props.navigation.getParam("listName", '')
       });
       cf.GetContactInfo(this);
+   }
+   componentWillMount() {
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
 
+   }
+   componentWillUnmount() {
+      cf.RemoveYourContactsPageListeners()
+      this.focusListener.remove()
+      this._isMounted = false;
    }
 
    GetSectionListItem = item => {
@@ -52,10 +66,10 @@ class YourContacts extends Component {
                a--;
             }
          }
-         this.setState({ selected: newSelected });
+         if (this._isMounted) this.setState({ selected: newSelected });
       } else {
          newSelected.push(email)
-         this.setState({ selected: newSelected });
+         if (this._isMounted) this.setState({ selected: newSelected });
       }
    }
 
@@ -96,7 +110,7 @@ class YourContacts extends Component {
             }
          }
       }
-      this.setState({ selected: newSelected, sectionsSelected: sectionsSelected });
+      if (this._isMounted) this.setState({ selected: newSelected, sectionsSelected: sectionsSelected });
    }
 
    render() {

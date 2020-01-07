@@ -83,13 +83,13 @@ class CurrentList extends Component {
     * @returns None
     */
    componentWillUnmount() {
+      firebase.database().ref('/lists/' + this.props.navigation.getParam("listID", "(Invalid List ID)")).off()
       this.focusListener.remove();
-
       this._isMounted = false;
    }
 
    /**
-    * componentDidMount
+    * componentWillMount
     * 
     * Function called after component mounts.
     * Adds a focus listener to the component.
@@ -99,13 +99,13 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   componentDidMount() {
+   componentWillMount() {
       this._isMounted = true;
 
       // Set "that" for the notification manager
       nm.setThat(this)
 
-      // Need this because componentDidMount only gets called once,
+      // Need this because componentWillMount only gets called once,
       // therefore add willFocus listener for when the user comes back
       this.focusListener = this.props.navigation.addListener(
          "willFocus",
@@ -477,7 +477,7 @@ class CurrentList extends Component {
          items = initItems;
          ids = initIds;
       }
-      
+
       // Put the items and their ids in a nested list
       var temp = [];
       for (var j = 0; j < items.length; j++) {

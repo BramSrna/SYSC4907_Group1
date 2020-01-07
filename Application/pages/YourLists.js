@@ -170,14 +170,14 @@ class YourLists extends Component {
       }
 
       // Updates the state
-      this.setState({
+      if (this._isMount) this.setState({
          listTitles: localListTitles.slice(),
          apiData: localApiData.slice()
       });
    }
 
    /**
-    * componentDidMount
+    * componentWillMount
     * 
     * Function called once the component has been mounted.
     * Sets the context of the notification manager and
@@ -187,12 +187,24 @@ class YourLists extends Component {
     * 
     * @returns None
     */
-   componentDidMount() {
-      // Set the context of the notification manager
-      nm.setThat(this)
+   componentWillMount() {
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this._isMount = true;
+            // Set the context of the notification manager
+            nm.setThat(this)
 
-      // Load the needed data
-      this.GenerateNeededData(this);
+            // Load the needed data
+            this.GenerateNeededData(this);
+         }
+      );
+
+   }
+   componentWillUnmount() {
+      lf.RemoveYourListsPageListeners()
+      this.focusListener.remove()
+      this._isMount = false;
    }
 
    /**
@@ -253,7 +265,7 @@ class YourLists extends Component {
 
       // Clear the list name and hide the modal
       this.newListName = "";
-      this.setState({
+      if (this._isMount) this.setState({
          modalVisible: false
       });
    };
@@ -328,7 +340,7 @@ class YourLists extends Component {
          this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
             if (this.state.modalVisible) {
                const modalVisible = false;
-               this.setState({ modalVisible });
+               if (this._isMount) this.setState({ modalVisible });
             }
             this.backHandler.remove();
             return true;
@@ -337,7 +349,7 @@ class YourLists extends Component {
       else {
          this.backHandler.remove();
       }
-      this.setState({
+      if (this._isMount) this.setState({
          modalVisible
       });
    };
