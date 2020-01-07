@@ -74,7 +74,7 @@ export default class App extends Component {
             height: '100%',
             aspectRatio: .5,
           }}
-            source={require('./assets/splash.gif')}
+            source={require('./assets/splash.png')}
             onLoad={this._loadResourcesAsync}
           />
         </Layout>
