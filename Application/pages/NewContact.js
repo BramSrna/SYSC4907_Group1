@@ -167,11 +167,17 @@ class NewContact extends Component {
                            label='Email'
                            placeholder='Enter an email'
                            value={this.state.email}
+                           autoCapitalize="none"
+                           keyboardType="email-address"
+                           autoCompleteType="email"
+                           returnKeyType='next'
                            onChangeText={(email) => this.setState({ email })}
                            disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
                         />
                         <Input style={styles.inputRow}
                            label='Name'
+                           autoCapitalize="words"
+                           keyboardType="default"
                            placeholder='Enter a name'
                            value={this.state.name}
                            onChangeText={(name) => this.setState({ name })}
