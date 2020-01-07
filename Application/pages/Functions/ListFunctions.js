@@ -41,7 +41,7 @@ function createUserPath(userId) {
  * to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
 
    /**
     * sendNotification
@@ -188,6 +188,11 @@ class ListFunctions {
             dateAdded: date
          });
 
+         // Update date modified of list
+         firebase.database().ref(listPath).update({
+            lastMod: date
+         });
+
          return itemId;
       });
 
@@ -211,6 +216,12 @@ class ListFunctions {
       // Remove the item
       var ref = firebase.database().ref(listPath + "/items/" + itemId);
       ref.remove();
+
+      // Update date modified of list
+
+      firebase.database().ref(listPath).update({
+         lastMod: (new Date()).toString()
+      });
    }
 
    /**

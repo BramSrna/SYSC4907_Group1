@@ -77,7 +77,9 @@ class YourLists extends Component {
                if (ssv) {
                   apiData.push({
                      key: ssv.key,
-                     name: ssv.val().name
+                     name: ssv.val().name,
+                     lastMod: ssv.val().lastMod,
+                     uc: ssv.val().user_count
                   });
 
                   listTitles.push(ssv.val().name);
@@ -398,7 +400,7 @@ class YourLists extends Component {
                            listID: this.state.apiData[index].key,
                            listName: item
                         })
-                     }} title={item} description={'Shared With: XXXXXXXXX\nLast-Modified: Wed, 21 Oct 2015 07:28:00 ET'} listName={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
+                     }} title={item} description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod} listName={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
                   )}
                />
             </Layout>
