@@ -72,8 +72,13 @@ export default class FirebaseUser {
         return true;
     }
 
+    getIdToken() {
+        if (Firebase.auth().currentUser != null) {
+            Firebase.auth().currentUser.getIdToken(true);
+        }
+    }
+
     isUserEmailVerified() {
-        this.reloadUserInfo();
         return this.emailVerified;
     }
 
@@ -85,8 +90,8 @@ export default class FirebaseUser {
         return this.user;
     }
 
-    async reloadUserInfo() {
-        this.user = await Firebase.auth().currentUser.reload().then(() => {
+    reloadUserInfo() {
+        this.user = Firebase.auth().currentUser.reload().then(() => {
             if (this.user != null) {
                 this.name = this.user.displayName;
                 this.email = this.user.email;

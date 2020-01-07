@@ -35,6 +35,7 @@ class SideMenu extends Component {
     signOutUser = async () => {
         try {
             await firebase.auth().signOut();
+            console.log("SideMenu: navigate to LoginPage");
             NavigationActions.navigate('LoginPage');
         } catch (e) {
             console.log(e);

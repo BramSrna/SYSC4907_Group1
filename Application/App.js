@@ -37,17 +37,21 @@ export default class App extends Component {
     if (!firebase.apps.length) { // Check to see if Firebase app is already initialized on Android
       app = firebase.initializeApp(FirebaseConfig.firebaseConfig);
     }
-    firebase.auth().onAuthStateChanged(this.onAuthStateChanged); // See if the user is authenticated
+
+    firebase.auth().onIdTokenChanged(this.onAuthStateChanged); // User is signed in or token was refreshed
   }
-  
+
   onAuthStateChanged = (user) => {
     this.setState({ isAuthProcessReady: true });
-    if(user!=null && user.emailVerified==true){
-      this.setState({ isAuthenticated: true }); // (Bang Bang) !! returns the true value of the obj
+    if (!!user) {
+      if (user != null && user.emailVerified == true) {
+        this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
+      }
+    } else {
+      this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
     }
     if (this.state.isAuthenticated) {
       lf.GetTheme(this);
-      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     }
   }
 
