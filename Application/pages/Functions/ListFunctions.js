@@ -1,5 +1,9 @@
 import * as firebase from "firebase";
 
+const globalComps = require('./GlobalComps');
+const dbInterface = require('./DBInterface');
+const autocomplete = require('./AutocompleteFuncs');
+
 /**
  * createListPath
  * 
@@ -151,21 +155,21 @@ class ListFunctions {
     * 
     * @returns The id of the item
     */
-   async AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {  
+   AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {
       // Retrieve the item from the database
-      var retVal = dataRegFuncs.getItem(database, genName, specificName = specName).then((itemInfo) => {
+      var retVal = globalComps.getItem(genName, specificName = specName).then((itemInfo) => {
           var item = itemInfo.item;
   
           if (item === null) {
               // If the item has not been registered, then register it
-              var temp = dataRegFuncs.registerItem(database, genName, specificName = specName);
+              var temp = dbInterface.registerItem(genName, specificName = specName);
           }
   
           return Promise.all([temp]);
       }).then(result => {
           var listPath = createListPath(listId);
           // Get the id of the item
-          var itemId = (new dataRegFuncs.ItemObj(genName, specificName = specName)).getId();
+          var itemId = (new globalComps.ItemObj(genName, specificName = specName)).getId();
   
           // Add the item to the list
           firebase.database().ref(listPath + "/items/" + itemId).update({
@@ -193,7 +197,7 @@ class ListFunctions {
     * 
     * @returns None
     */
-   async DeleteItemInList(listId, itemId) {  
+   DeleteItemInList(listId, itemId) {  
       // Get the path to the list
       var listPath = createListPath(listId);
   
@@ -213,7 +217,7 @@ class ListFunctions {
     * 
     * @returns The new purchased state
     */
-   async UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {  
+   UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {  
       // Get the path to the list
       var listPath = createListPath(listId);
   
@@ -248,7 +252,9 @@ class ListFunctions {
     * 
     * @returns None
     */
-   async DeleteList(listId) {  
+   DeleteList(listId) {
+      var uid = firebase.auth().currentUser.uid;
+
       // Get the path to the user
       var userPath = createUserPath(uid);
       var ref = firebase.database().ref(userPath + "/lists");
@@ -382,7 +388,9 @@ class ListFunctions {
     * 
     * @returns None
     */
-   async CreateNewList(listName, items = {}, userCount = 1) {  
+   CreateNewList(listName, items = {}, userCount = 1) {
+      var uid = firebase.auth().currentUser.uid;
+
       // Add the list to the lists table
       var ref = firebase.database().ref("/lists");
       var push = ref.push({
@@ -415,7 +423,9 @@ class ListFunctions {
     * @returns An object containing the api data
     *          and names of all the lists the user has access to
     */
-   async GetListsKeyAndName() {  
+   GetListsKeyAndName() {
+      var uid = firebase.auth().currentUser.uid;
+
       // Get the user path in the database
       var userPath = createUserPath(uid);
   
@@ -501,18 +511,10 @@ class ListFunctions {
     * 
     * @returns The available stores
     */
-   async getAvailableStores() {
-      try {
-         // Call the function to load all available stores
-         const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableStores')({
-         });
-
-         return data;
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   getAvailableStores() {
+      // Call the function to load all available stores
+      var data = autocomplete.cloudLoadAvailableStores();
+      return data;
    }
 
    /**
@@ -525,18 +527,10 @@ class ListFunctions {
     * 
     * @returns The available items
     */
-   async getAvailableItems() {
-      try {
-         // Call the function to load all available items
-         const { data } = await firebase.functions().httpsCallable('cloudLoadAvailableItems')({
-         });
-
-         return data;
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   getAvailableItems() {
+      // Call the function to load all available items
+      var data = autocomplete.cloudLoadAvailableItems();
+      return data;
    }
 
    /**
@@ -551,7 +545,7 @@ class ListFunctions {
     *          the ids of the items in the list, and the user cound
     *          of the list
     */
-   async reorgListAdded(listId) {  
+   reorgListAdded(listId) {  
       // Get the path to the list
       var listPath = createListPath(listId);
   

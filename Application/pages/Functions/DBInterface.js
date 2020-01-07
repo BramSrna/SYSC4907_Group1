@@ -1,5 +1,7 @@
 import * as firebase from "firebase";
 
+const globalComps = require('./GlobalComps');
+
 /**
  * compArrays
  * 
@@ -38,279 +40,6 @@ function compArrays(array1, array2) {
 }
 
 /**
- * getItem
- * 
- * Retrives the item object from the given database
- * corresponding to the given generic name and specific name.
- * 
- * @param {Database} database The database to check
- * @param {String} genericName The generic name of the item
- * @param {String} specificName The specific name of the item
- *                              Default is null
- * 
- * @returns The item object corresponding to the given data
- *          Null if no item found
- */
-const getItem = function(database, genericName, specificName = null){
-    var itemInfo = firebase.database().ref("/items").once("value").then((snapshot) => {
-        var ssv = snapshot.val();
-        var item = null;
-
-        // Parse the item table for the item
-        for (var tempGenName in ssv) {
-            if (tempGenName === genericName) {
-                // Generic name subtable found
-                var temp = ssv[tempGenName];
-                for (var tempSpecName in temp) {
-                    if (((tempSpecName === "null") && (specificName === null)) || (tempSpecName === specificName)) {
-                        // Item found
-                        item = ssv[tempGenName][tempSpecName];
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        return {
-            item: item
-        }
-    });
-
-    return itemInfo;
-}
-
-/**
- * getStore
- * 
- * Retrives the store object from the given database
- * corresponding to the given store name and address.
- * 
- * @param {Database} database The database to parse
- * @param {String} storeName The name of the store
- * @param {String} address The address of the store
- * 
- * @returns The store object, null if not found
- */
-const getStore = function(database, storeName, address) {
-    var storeInfo = firebase.database().ref("/stores").once("value").then((snapshot) => {
-        var ssv = snapshot.val();
-        var store = null;
-
-        // Parse the store table
-        for (var tempAddress in ssv) {
-            if (tempAddress === address) {
-                // Address subtable found
-                var temp = ssv[tempAddress];
-
-                for (var tempStoreName in temp) {
-                    if (tempStoreName === storeName) {
-                        // Store found
-                        store = ssv[tempAddress][tempStoreName];
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        return {
-            store: store
-        }
-    });
-
-    return storeInfo;
-}
-
-/**
- * ItemObj
- * 
- * An item object used to format the various paths
- * and ids for items.
- */
-class ItemObj {
-    /**
-     * constructor
-     * 
-     * Creates a new item object
-     * 
-     * @param {String} genericName The generic name of the object
-     * @param {String} specificName The specific name of the object
-     *                              default is null
-     * 
-     * @returns None
-     */
-    constructor(genericName, specificName = null) {
-        this.genericName = genericName;
-        this.specificName = specificName;
-    }
-
-    /**
-     * getPath
-     * 
-     * Returns the expected path to the item.
-     * Path is:
-     *  /items/${genericName}/${specificName}/
-     * 
-     * @param   None
-     * 
-     * @returns The path to the item
-     */
-    getPath() {
-        var itemPath = "/items/" + this.genericName + "/" + this.specificName + "/";
-        return(itemPath);
-    }
-
-    /**
-     * getId
-     * 
-     * Returns the expected id of the item.
-     * The name is:
-     *  ${genericName}&${specificName}
-     * 
-     * @param   None
-     * 
-     * @returns The id of the item
-     */
-    getId() {
-        var itemId = this.genericName + "&" + this.specificName;
-        return(itemId);
-    }
-
-    /**
-     * getDispName
-     * 
-     * Returns the name of this item to display to the user.
-     * The name is:
-     *  ${genericName} (${specificName})
-     * 
-     * @param   None
-     * 
-     * @returns The display name of the item
-     */
-    getDispName() {
-        // Initialize the name to the generic name
-        var itemName = this.genericName;
-
-        // If the specific name is not null, add it to the name
-        if ((this.specificName !== "null") && (this.specificName !== null)) {
-            itemName += " (" + this.specificName + ")";
-        }
-        return(itemName);
-
-    }
-
-    /**
-     * getInfoFromId
-     * 
-     * Returns the item data corresponding to the
-     * given id
-     * 
-     * @param {String} id The id of the item
-     * 
-     * @returns The data of the item
-     */
-    static getInfoFromId(id) {
-        var parts = id.split("&");
-        return {
-            genericName: parts[0],
-            specificName: parts[1]
-        }
-    }
-}
-
-/**
- * StoreObj
- * 
- * A store object used to format the various paths
- * and ids for stores.
- */
-class StoreObj {
-    /**
-     * constructor
-     * 
-     * Creates a new store object
-     * 
-     * @param {String} address The address of the object
-     * @param {String} storeName The store name of the object
-     *                           default is null
-     * 
-     * @returns None
-     */
-    constructor(address, storeName) {
-        this.address = address;
-        this.storeName = storeName;
-    }
-
-    /**
-     * getPath
-     * 
-     * Returns the expected path to the store.
-     * Path is:
-     *  /stores/${address}/${storeName}/
-     * 
-     * @param   None
-     * 
-     * @returns The path to the store
-     */
-    getPath() {
-        var storePath = "/stores/" + this.address + "/" + this.storeName + "/";
-        return(storePath);
-    }
-
-    /**
-     * getId
-     * 
-     * Returns the expected id of the store.
-     * The name is:
-     *  ${address}&${storeName}
-     * 
-     * @param   None
-     * 
-     * @returns The id of the store
-     */
-    getId() {
-        var storeId = this.address + "&" + this.storeName;
-        return(storeId);
-    }
-
-    /**
-     * getDispName
-     * 
-     * Returns the name of this store to display to the user.
-     * The name is:
-     *  ${storeName} - ${address}
-     * 
-     * @param   None
-     * 
-     * @returns The display name of the store
-     */
-    getDispName() {
-        var storeName = this.storeName + " - " + this.address;
-        return(storeName);
-
-    }
-
-    /**
-     * getInfoFromId
-     * 
-     * Returns the store data corresponding to the
-     * given id
-     * 
-     * @param {String} id The id of the store
-     * 
-     * @returns The data of the store
-     */
-    static getInfoFromId(id) {
-        var parts = id.split("&");
-        return {
-            address: parts[0],
-            storeName: parts[1]
-        }
-    }
-}
-
-/**
  * registerItem
  * 
  * Registers the given information to the items database.
@@ -332,11 +61,11 @@ class StoreObj {
  * 
  * @returns None
  */
-export async function registerItem(genericName, specificName = null, size = null, sizeUnit = null, price = null) {
+export function registerItem(genericName, specificName = null, size = null, sizeUnit = null, price = null) {
     // Get the path to the item
-    var itemPath = (new ItemObj(genericName, specificName)).getPath();
+    var itemPath = (new globalComps.ItemObj(genericName, specificName)).getPath();
 
-    var itemInfo = getItem(database, genericName, specificName).then((itemInfo) => {
+    var itemInfo = globalComps.getItem(genericName, specificName).then((itemInfo) => {
         var item = itemInfo.item;
 
         if (item === null) {
@@ -429,12 +158,12 @@ export async function registerItem(genericName, specificName = null, size = null
  * 
  * @returns None
  */
-export async function registerStore(storeName, address, map, franchiseName = null) {
+export function registerStore(storeName, address, map, franchiseName = null) {
     // Get the path of the store
-    var storePath = (new StoreObj(address, storeName)).getPath();
+    var storePath = (new globalComps.StoreObj(address, storeName)).getPath();
 
     // Load the store
-    var storeInfo = getStore(database, storeName, address).then((storeInfo) => {
+    var storeInfo = globalComps.getStore(storeName, address).then((storeInfo) => {
         var store = storeInfo.store;
 
         if (store === null) {
@@ -536,9 +265,11 @@ export async function registerStore(storeName, address, map, franchiseName = nul
  * 
  * @returns None
  */
-export async function addItemLoc(genericName, specificName, storeName, address, aisleNum, itemDepartment) {
+export function addItemLoc(genericName, specificName, storeName, address, aisleNum, itemDepartment) {
+    var database = firebase.database();
+
     // Get the store object
-    var storeInfo = getStore(database, storeName, address).then((storeInfo) => {
+    var storeInfo = globalComps.getStore(storeName, address).then((storeInfo) => {
         var store = storeInfo.store;
 
         return {
@@ -550,7 +281,7 @@ export async function addItemLoc(genericName, specificName, storeName, address, 
         // If the store has not been created, then register the store
         if (store === null) {
             var map = [];
-            var temp = registerStore(database, storeName, address, map);
+            var temp = registerStore(storeName, address, map);
         }
 
         return Promise.all([store]);
@@ -558,7 +289,7 @@ export async function addItemLoc(genericName, specificName, storeName, address, 
         var store = value[0];
 
         // Get the item object
-        var itemInfo = getItem(database, genericName, specificName);
+        var itemInfo = globalComps.getItem(genericName, specificName);
 
         return Promise.all([store, itemInfo]);
     }).then((value) => {
@@ -567,7 +298,7 @@ export async function addItemLoc(genericName, specificName, storeName, address, 
 
         // If the item has not been created, then register the item
         if (item === null) {
-            var temp = registerItem(database, genericName, specificName);
+            var temp = registerItem(genericName, specificName);
         }
 
         return Promise.all([store, item]);
@@ -576,8 +307,8 @@ export async function addItemLoc(genericName, specificName, storeName, address, 
         var item = value[1];
 
         // Create the store and item objects to get the paths and ids
-        var tempStore = new StoreObj(address, storeName);
-        var tempItem = new ItemObj(genericName, specificName);
+        var tempStore = new globalComps.StoreObj(address, storeName);
+        var tempItem = new globalComps.ItemObj(genericName, specificName);
 
         // Get the corresponding paths
         var storePath = tempStore.getPath();

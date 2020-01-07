@@ -1,3 +1,7 @@
+import * as firebase from "firebase";
+
+const globalComps = require('./GlobalComps');
+
 /**
  * cloudLoadAvailableStores
  * 
@@ -11,7 +15,7 @@
  * 
  * @returns The ids and names of each store
  */
-export async function cloudLoadAvailableStores() {
+export function cloudLoadAvailableStores() {
     // Parse the stores table
     var ref = firebase.database().ref('/stores');
     var retItems = ref.once('value').then((snapshot) => {
@@ -23,7 +27,7 @@ export async function cloudLoadAvailableStores() {
           for (var tempAddress in ssv) {
              for (var tempStoreName in ssv[tempAddress]) {
                 // Create a Store object corresponding to the current address and name
-                var tempStore = new dataRegFuncs.StoreObj(tempAddress, tempStoreName);
+                var tempStore = new globalComps.StoreObj(tempAddress, tempStoreName);
  
                 // Get the store ID and display name
                 var storeId = tempStore.getId();
@@ -59,7 +63,7 @@ export async function cloudLoadAvailableStores() {
   * 
   * @returns The ids and names of each item
   */
- export async function cloudLoadAvailableItems() {
+ export function cloudLoadAvailableItems() {
     // Parse the items table
     var ref = firebase.database().ref('/items');
     var retItems = ref.once('value').then((snapshot) => {
@@ -75,7 +79,7 @@ export async function cloudLoadAvailableStores() {
              var subItems = ssv[tempGenName];
              for (var tempSpecName in subItems) {
                 // Create a Store object corresponding to the current generic and specific names
-                var tempItem = new dataRegFuncs.ItemObj(tempGenName, tempSpecName);
+                var tempItem = new globalComps.ItemObj(tempGenName, tempSpecName);
  
                 // Get the item ID and display name
                 var itemId = tempItem.getId();
