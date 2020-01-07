@@ -1,11 +1,11 @@
 import Firebase from "firebase";
-import {Alert} from "react-native";
+import { Alert } from "react-native";
 
-export default class FirebaseUser{
-    constructor(){
+export default class FirebaseUser {
+    constructor() {
         this.auth = Firebase.auth();
         this.user = this.auth.currentUser;
-        if(this.user != null) {
+        if (this.user != null) {
             this.name = this.user.displayName;
             this.email = this.user.email;
             this.photoUrl = this.user.photoURL;
@@ -14,12 +14,12 @@ export default class FirebaseUser{
         }
     }
 
-    register(email, password, displayName){
+    register(email, password, displayName) {
         this.auth = Firebase.auth();
         return this.auth.createUserWithEmailAndPassword(email, password).then(() => {
-            if(Firebase.auth().currentUser) {
+            if (Firebase.auth().currentUser) {
                 Firebase.auth().currentUser.sendEmailVerification().then(() => {
-                    Alert.alert("Verification Email Send..", "Confirm your email by opening the link that was send to the provided email.");
+                    Alert.alert("Verification Email Send..", "For full functionality please confirm your email-address by opening the link that was send to the provided email-address.");
                     Firebase.auth().currentUser.updateProfile({
                         displayName: displayName
                     }).then(() => {
@@ -27,69 +27,73 @@ export default class FirebaseUser{
                     }, (error) => {
                         var errorCode = error.code;
                         var errorMessage = error.message;
-                        console.log(errorCode+" "+errorMessage);
+                        console.log("FirebaseUser: " + errorCode + " " + errorMessage);
                         return false;
                     })
                 }, (error) => {
                     var errorCode = error.code;
                     var errorMessage = error.message;
                     Alert.alert(errorCode, errorMessage);
-                    console.log(errorCode+" "+errorMessage);
+                    console.log("FirebaseUser: " + errorCode + " " + errorMessage);
                     return false;
                 });
-            } else{
+            } else {
                 return false;
             }
         }, (error) => {
             var errorCode = error.code;
             var errorMessage = error.message;
-            if (errorCode == "auth/weak-password"){
+            if (errorCode == "auth/weak-password") {
                 alert("The password is too weak!");
+            }
+            else if (errorCode == "auth/email-already-in-use") {
+                alert("The email-address is already in use!");
             } else {
-                console.log("Error(1) " + errorCode + ": " + errorMessage);
+                console.log("FirebaseUser: " + "Error(1) " + errorCode + ": " + errorMessage);
             }
             return false;
         });
     }
 
-    async requestVerificationEmail(){
-        if(Firebase.auth().currentUser != null) {
-            await Firebase.auth().currentUser.sendEmailVerification().then(async function(){
+    async requestVerificationEmail() {
+        if (Firebase.auth().currentUser != null) {
+            await Firebase.auth().currentUser.sendEmailVerification().then(async function () {
                 Alert.alert("New Verification Email Send.", "Check your email for the new verification email.");
-            }).catch(function(error){
+            }).catch(function (error) {
                 var errorCode = error.code;
                 var errorMessage = error.message;
                 Alert.alert(errorCode, errorMessage);
-                console.log(errorCode+" "+errorMessage);
+                console.log("FirebaseUser: " + errorCode + " " + errorMessage);
                 return false;
             });
-        } else{
+        } else {
             return false;
         }
         return true;
     }
 
-    isUserEmailVerified(){
+    isUserEmailVerified() {
         this.reloadUserInfo();
         return this.emailVerified;
     }
 
-    getDisplayName(){
+    getDisplayName() {
         return this.displayName;
     }
 
-    getCurrentUser(){
+    getCurrentUser() {
         return this.user;
     }
 
-    reloadUserInfo(){
-        this.user = Firebase.auth().currentUser.reload();
-        if(this.user != null) {
-            this.name = this.user.displayName;
-            this.email = this.user.email;
-            this.photoUrl = this.user.photoURL;
-            this.emailVerified = this.user.emailVerified;
-            this.uid = this.user.uid;
-        }
+    async reloadUserInfo() {
+        this.user = await Firebase.auth().currentUser.reload().then(() => {
+            if (this.user != null) {
+                this.name = this.user.displayName;
+                this.email = this.user.email;
+                this.photoUrl = this.user.photoURL;
+                this.emailVerified = this.user.emailVerified;
+                this.uid = this.user.uid;
+            }
+        });
     }
 }

@@ -39,13 +39,15 @@ export default class App extends Component {
     }
     firebase.auth().onAuthStateChanged(this.onAuthStateChanged); // See if the user is authenticated
   }
-
+  
   onAuthStateChanged = (user) => {
     this.setState({ isAuthProcessReady: true });
-    this.setState({ isAuthenticated: !!user }); // (Bang Bang) !! returns the true value of the obj
-
+    if(user!=null && user.emailVerified==true){
+      this.setState({ isAuthenticated: true }); // (Bang Bang) !! returns the true value of the obj
+    }
     if (this.state.isAuthenticated) {
       lf.GetTheme(this);
+      firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     }
   }
 

@@ -36,7 +36,7 @@ class RegisterPage extends Component {
       var lastName = this.state.lastname.replace(/^\w/, c => c.toUpperCase());
       var displayName = firstName + " " + lastName;
       displayName = displayName.replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '');
-      firebaseUser = new FirebaseUser();
+      var firebaseUser = new FirebaseUser();
       if (firebaseUser.register(this.state.email, this.state.password, displayName)) {
         this.props.navigation.navigate(VERIFICATIONPAGE);
         this.setState({ registering: false });

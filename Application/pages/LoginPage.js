@@ -36,7 +36,7 @@ class LoginPage extends Component {
   onPressLoginIn() {
     if (!this.state.email || !this.state.password) {
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
-      return console.log("Email and password required!");
+      console.log("LoginPage: Email and password required!");
     }
     this.setState({ authenticating: true });
 
@@ -44,10 +44,12 @@ class LoginPage extends Component {
       user = new FirebaseUser();
       if (user != null && user.email == this.state.email) {
         if (!user.emailVerified) {
+          console.log("LoginPage: navigate to VerificationPage");
           this.props.navigation.navigate(VERIFICATIONPAGE);
         }
         else {
           this.props.navigation.navigate(HOMEPAGE);
+          console.log("LoginPage: navigate to HomePage");
         }
       }
     }
@@ -68,11 +70,12 @@ class LoginPage extends Component {
   }
 
   userIsCurrentlyLoggedIn() {
-    Firebase.auth().onAuthStateChanged(function (user) {
+    var unsubscribe = Firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         return true;
       }
     });
+    unsubscribe();
     return false;
   }
 

@@ -402,17 +402,19 @@ class ListFunctions {
     * @param {*} that: this for caller
     */
    GetTheme(that) {
-      var uid = firebase.auth().currentUser.uid;
-      if (uid) {
-         firebase
-            .database()
-            .ref("/users/" + uid + "/preferences/theme")
-            .on("value", function (snapshot) {
-               var ssv = snapshot.val();
-               that.setState({
-                  theme: ssv == 'light' ? 'light' : 'dark',
+      if (firebase.auth().currentUser != null) {
+         var uid = firebase.auth().currentUser.uid;
+         if (uid) {
+            firebase
+               .database()
+               .ref("/users/" + uid + "/preferences/theme")
+               .on("value", function (snapshot) {
+                  var ssv = snapshot.val();
+                  that.setState({
+                     theme: ssv == 'light' ? 'light' : 'dark',
+                  });
                });
-            });
+         }
       }
    }
 

@@ -11,22 +11,21 @@ const HOMEPAGE = "Home";
 class VerificationPage extends Component {
   constructor(props) {
     super(props);
-    state = {
-      emailVerified: false,
-    }
-    firebaseUser = new FirebaseUser();
   }
 
   buttonListener = buttonId => {
+    var firebaseUser = new FirebaseUser();
     if (buttonId === VERIFY) {
-      if (this.firebaseUser.isUserEmailVerified()) {
+      firebaseUser.reloadUserInfo();
+      if (firebaseUser.isUserEmailVerified()) {
+        console.log('VerificationPage: navigate to VerificationPage');
         this.props.navigation.navigate(HOMEPAGE);
       } else {
         Alert.alert("Email Not Verified", "Check email for verification link.");
-        console.log("Email Verification Check Failed!");
+        console.log("VerificationPage: Email Verification Check Failed!");
       }
     } else if (buttonId === RESEND) {
-      this.firebaseUser.requestVerificationEmail();
+      firebaseUser.requestVerificationEmail();
     }
   };
 
