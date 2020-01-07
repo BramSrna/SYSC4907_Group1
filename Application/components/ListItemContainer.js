@@ -70,8 +70,12 @@ export default class ListItemContainer extends Component {
             }
         } else {
             if (index == 0) {
-                // Alert.alert("Share the list " + this.props.listID)
-                this.props.navigate()
+                if (this.props.fromContactView) {
+                    this.props.onDelete()
+                } else {
+                    // Alert.alert("Share the list " + this.props.listID)
+                    this.props.navigate()
+                }
             }
             else if (index == 1) {
                 // Delete
@@ -82,7 +86,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
+        const { fromContactView = false, share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
