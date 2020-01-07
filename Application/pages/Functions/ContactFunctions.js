@@ -7,7 +7,7 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ContactFunctions {
-   constructor() {}
+   constructor() { }
 
    sendNotification = (token, title, body, data) => {
 
@@ -30,7 +30,7 @@ class ContactFunctions {
    RemoveYourContactsPageListeners() {
       firebase
          .database()
-         .ref("/contacts/" + firebase.auth().currentUser).off()
+         .ref("/contacts/" + firebase.auth().currentUser.uid).off()
    }
 
    EditContact(props, contactEmail, contactName, contactGroup, callback) {
@@ -436,7 +436,7 @@ class ContactFunctions {
             var groupsWithoutPending = [];
             var sectionsWithoutPending = [];
             snapshot.forEach(function (child) {
-               if (child.val().status == "sent") {} else if (child.val().status == "pending") {
+               if (child.val().status == "sent") { } else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
                      pendingList["Pending"].push(child.val())
                   } else {
