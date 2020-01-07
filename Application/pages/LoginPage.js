@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Alert, StyleSheet } from "react-native";
+import { KeyboardAvoidingView, Alert, StyleSheet, Image } from "react-native";
 import { Layout, Button, Input, Icon, Spinner } from 'react-native-ui-kitten';
 import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
@@ -172,6 +172,10 @@ class LoginPage extends Component {
       <Layout style={globalStyles.defaultContainer}>
         <KeyboardAvoidingView behavior="padding">
           <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <Image
+              style={{ width: 300, height: 300 }}
+              source={require('../assets/splash.png')}
+            />
             {this.renderCurrentState()}
           </ScrollView>
         </KeyboardAvoidingView>
