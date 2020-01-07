@@ -276,118 +276,73 @@ class ListFunctions {
       // Get the path to the user
       var userPath = createUserPath(uid);
       var ref = firebase.database().ref(userPath + "/lists");
-      var retVal = ref.once("value").then((snapshot) => {
-         var cList = null;
-         var sList = null;
-
+      var retVal = ref.once("value").then((snapshot) => {  
          // Get the current state of the user's lists
          if (snapshot.val()) {
-            var createdLists = [];
-            var sharedLists = [];
-
-            // Get all of the user's created lists
-            var temp = snapshot.val().created;
-            for (var id in temp) {
-               createdLists.push(id);
-            }
-
-            // Get all of the user's shared lists
-            temp = snapshot.val().shared;
-            for (id in temp) {
-               sharedLists.push(id);
-            }
-
-            // If the user's created lists contains the target list,
-            // then remove the list from the user's created lists
-            if (createdLists.includes(listId)) {
-               var i = createdLists.findIndex(x => x === listId);
-
-               // Save the id of the list
-               cList = createdLists[i];
-
-               var rmvRef = firebase.database().ref(userPath + "/lists/created/" + cList);
-               rmvRef.remove();
-            }
-
-            // Do the same as above for the user's shared lists
-            if (sharedLists.includes(listId)) {
-               i = sharedLists.findIndex(x => x === listId);
-
-               // Save the id of the list
-               sList = createdLists[i];
-
-               rmvRef = firebase.database().ref(userPath + "/lists/shared/" + sList);
-               rmvRef.remove();
-            }
+             var createdLists = [];
+             var sharedLists = [];
+ 
+             // Get all of the user's created lists
+             var temp = snapshot.val().created;
+             for (var id in temp) {
+                 createdLists.push(id);
+             }
+ 
+             // Get all of the user's shared lists
+             temp = snapshot.val().shared;
+             for (id in temp) {
+                 sharedLists.push(id);
+             }
+ 
+             // If the user's created lists contains the target list,
+             // then remove the list from the user's created lists
+             if (createdLists.includes(listId)) {  
+                 var rmvRef = firebase.database().ref(userPath + "/lists/created/" + listId);
+                 rmvRef.remove();
+             }
+ 
+             // Do the same as above for the user's shared lists
+             if (sharedLists.includes(listId)){  
+                 rmvRef = firebase.database().ref(userPath + "/lists/shared/" + listId);
+                 rmvRef.remove();
+             }
          }
-
+ 
          // Return the created and shared list ids
-         return Promise.all([cList, sList]);
-      }).then(result => {
-         var cList = String(result[0]);
-         var sList = String(result[1]);
-
-         var cListRetVal = null;
-         var sListRetVal = null;
-
+         return Promise.all([listId]);
+     }).then(result => {
+         var listId = result[0];
+ 
          // Get the created list from the lists table
-         if (cList !== null) {
-            cListRetVal = firebase.database().ref("/lists/" + cList).once("value");
+         if (listId !== null) {
+           listRetVal = firebase.database().ref("/lists/" + listId).once("value");
          }
-
-         // Get the shared list from the lists table
-         if (sList !== null) {
-            sListRetVal = firebase.database().ref("/lists/" + sList).once("value");
-         }
-
+ 
          // Return the retrieved lists and their ids
-         return Promise.all([cList, cListRetVal, sList, sListRetVal]);
-      }).then(result => {
-         var cList = result[0];
-         var cListRetVal = result[1];
-         var sList = result[2];
-         var sListRetVal = result[3];
-
+         return Promise.all([listId, listRetVal]);
+     }).then(result => {
+         var listId = result[0];
+         var listRetVal = result[1];
+ 
          // If the created list was found, then
          // handle its changes
-         if (cListRetVal !== null) {
-            cListRetVal = cListRetVal.val();
-            if (cListRetVal) {
-               // If the user was the only one with access to
-               // the list, then delete it, otherwise,
-               // just decrement the user count
-               if (cListRetVal.user_count === 1) {
-                  var childRmvRef = firebase.database().ref("/lists/" + cList);
-                  childRmvRef.remove();
-               } else {
-                  var newCount = cList.user_count - 1;
-                  childRmvRef = firebase.database().ref("/lists/" + cList);
-                  childRmvRef.update({
-                     user_count: newCount
-                  });
-               }
-            }
-         }
-
-         // If the shared list was found, then
-         // handle its changes
-         if (sListRetVal !== null) {
-            sListRetVal = sListRetVal.val();
-            if (sListRetVal) {
-               // If the user was the only one with access to
-               // the list, then delete it, otherwise,
-               // just decrement the user count
-               if (sListRetVal.user_count === 1) {
-                  childRmvRef = firebase.database().ref("/lists/" + sList);
-                  childRmvRef.remove();
-               } else {
-                  newCount = sList.user_count - 1;
-                  childRmvRef = firebase.database().ref("/lists/" + sList);
-                  childRmvRef.update({
-                     user_count: newCount
-                  });
-               }
-            }
+         if (listRetVal !== null) {
+             listRetVal = listRetVal.val();
+             if (listRetVal) {
+                 // If the user was the only one with access to
+                 // the list, then delete it, otherwise,
+                 // just decrement the user count
+                 if (listRetVal.user_count === 1) {
+                     var childRmvRef = firebase.database().ref("/lists/" + listId);
+                     childRmvRef.remove();
+                 } else {
+                     var newCount = listId.user_count - 1;
+                     childRmvRef = firebase.database().ref("/lists/" + listId);
+                     childRmvRef.update({
+                         user_count: newCount
+                     });
+                 }
+             }
          }
 
          return true;

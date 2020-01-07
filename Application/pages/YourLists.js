@@ -394,13 +394,22 @@ class YourLists extends Component {
                   width="100%"
                   keyExtractor={index => index.toString()}
                   renderItem={({ item, index }) => (
-                     <ListItemContainer navigate={() => {
-                        this.props.navigation.navigate("YourContacts", {
-                           share: true,
-                           listID: this.state.apiData[index].key,
-                           listName: item
-                        })
-                     }} title={item} description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod} listName={item} onPress={this.GoToList.bind(this, item)} listIndex={index} listID={this.state.apiData[index].key} onDelete={this.deleteListWithID} />
+                     <ListItemContainer
+                        title={item}
+                        description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod}
+                        listName={item}
+                        onPress={this.GoToList.bind(this, item)}
+                        listIndex={index}
+                        listID={this.state.apiData[index].key}
+                        onDelete={this.deleteListWithID}                     
+                        navigate={() => {
+                           this.props.navigation.navigate("YourContacts", {
+                              share: true,
+                              listID: this.state.apiData[index].key,
+                              listName: item
+                           })
+                        }}
+                     />
                   )}
                />
             </Layout>
