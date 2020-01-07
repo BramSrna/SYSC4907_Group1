@@ -49,6 +49,8 @@ class CurrentList extends Component {
          listItemIds: [],
          modalMode: 'item',
 
+         firstLoadComplete: false,
+
          itemName: "",
          genName: "",
          specName: null,
@@ -177,7 +179,7 @@ class CurrentList extends Component {
          }
 
          // Update the state of the context
-         that.updateListState(items, ids, userCount = userCount);
+         that.updateListState(items, ids, reorg = false, userCount = userCount);
       });
    }
 
@@ -207,11 +209,16 @@ class CurrentList extends Component {
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
 
+      console.log(reorg);
+
       if (reorg) {
+         console.log("HERE1");
+         console.trace();
          // If reorg is true, then just rearrange the current arrays
          localIds = newIds;
          localItems = newItems;
       } else {
+         console.log("HERE2");
          // Get the list of items added and removed
          var itemsAdded = newIds.filter(x => !localIds.includes(x));
          var itemsRemoved = localIds.filter(x => !newIds.includes(x));
@@ -249,8 +256,16 @@ class CurrentList extends Component {
          }
       }
 
+      if (!this.state.firstLoadComplete) {
+         var temp = this.reorganizeListAdded(localItems, localIds);
+
+         localItems = temp.items;
+         localIds = temp.ids;
+      }
+
       // Set the new state values
       this._isMounted && this.setState({
+         firstLoadComplete: true,
          listItems: localItems,
          listItemIds: localIds,
          userCount: userCount === null ? this.state.userCount : userCount
@@ -449,16 +464,50 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListAdded() {
-      // Get the reorganized list and rearrange the local list
-      var tempList = lf.reorgListAdded(this.props.navigation.getParam("listID", "(Invalid List ID)"));
-      tempList.then((value) => {
-         // Update the list state to the new order
-         this.updateListState(value.items,
-            value.ids,
-            userCount = value.userCount,
-            reorg = true);
-      })
+   reorganizeListAdded(initItems = null, initIds = null) {
+      var items = [];
+      var ids = [];
+
+      if (initItems === null) {
+         // Get the items and ids
+         items = this.state.listItems;
+         ids = this.state.listItemIds;
+      } else {
+         // Get the items and ids
+         items = initItems;
+         ids = initIds;
+      }
+      
+      // Put the items and their ids in a nested list
+      var temp = [];
+      for (var j = 0; j < items.length; j++) {
+         temp.push({ "item": items[j], "id": ids[j] });
+      }
+
+      // Rearrage the nested list to put it in alphabetical order
+      var that = this;
+      temp.sort(function (a, b) {
+         var itemA = new Date(a.item.dateAdded);
+         var itemB = new Date(b.item.dateAdded);
+
+         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
+      });
+
+      // Retrieve the organized items and ids
+      for (var k = 0; k < temp.length; k++) {
+         items[k] = temp[k].item;
+         ids[k] = temp[k].id;
+      }
+
+      if (initItems === null) {
+         // Update the list state to the reorganized values
+         this.updateListState(items, ids, reorg = true);
+      }
+
+      return {
+         items: items,
+         ids: ids
+      }
    }
 
    /**

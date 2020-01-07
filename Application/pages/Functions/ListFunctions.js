@@ -170,6 +170,8 @@ class ListFunctions {
           var listPath = createListPath(listId);
           // Get the id of the item
           var itemId = (new globalComps.ItemObj(genName, specificName = specName)).getId();
+
+          var date = (new Date()).toString();
   
           // Add the item to the list
           firebase.database().ref(listPath + "/items/" + itemId).update({
@@ -178,7 +180,8 @@ class ListFunctions {
               purchased: purchased,
               quantity: quantity,
               size: size,
-              notes: notes
+              notes: notes,
+              dateAdded: date
           });
   
           return itemId;
@@ -391,12 +394,15 @@ class ListFunctions {
    CreateNewList(listName, items = {}, userCount = 1) {
       var uid = firebase.auth().currentUser.uid;
 
+      var date = (new Date()).toString();
+
       // Add the list to the lists table
       var ref = firebase.database().ref("/lists");
       var push = ref.push({
           name: listName,
           items: items,
           user_count: userCount,
+          lastMod: date
       });
   
       // Add the list to the user table
@@ -531,55 +537,6 @@ class ListFunctions {
       // Call the function to load all available items
       var data = autocomplete.cloudLoadAvailableItems();
       return data;
-   }
-
-   /**
-    * reorgListAdded
-    * 
-    * Returns the list of items, list of ids,
-    * and the userCount of the given list.
-    * 
-    * @param {String} listId: id of the list to reorganize
-    * 
-    * @returns An object containing the list of items in the list,
-    *          the ids of the items in the list, and the user cound
-    *          of the list
-    */
-   reorgListAdded(listId) {  
-      // Get the path to the list
-      var listPath = createListPath(listId);
-  
-      var ref = firebase.database().ref(listPath);
-      var retItems = ref.once('value').then((snapshot) => {
-          var items = [];
-          var ids = [];
-  
-          var ssv = snapshot.val();
-          var userCount = 0;
-  
-          // Parse the list, getting all of the items and ids
-          if (ssv && ssv.items) {
-              var listItems = ssv.items;
-              for (var itemId in listItems) {
-                  items.push(listItems[itemId]);
-                  ids.push(itemId);
-             }
-          }
-  
-          // Get the user count if it has been set
-          if (ssv.user_count) {
-             userCount = ssv.user_count;
-          }
-  
-          // return the data
-          return {
-              items: items,
-              ids: ids,
-              userCount: userCount
-          };
-      });
-  
-      return retItems;
    }
 
    /**
