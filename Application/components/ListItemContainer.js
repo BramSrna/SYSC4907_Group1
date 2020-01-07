@@ -138,7 +138,7 @@ export default class ListItemContainer extends Component {
                                 <OverflowMenu
                                     style={styles.overflowMenu}
                                     visible={this.state.menuVisible}
-                                    data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
+                                    data={fromItemView ? this.listViewMenuData : this.itemViewMenuData}
                                     placement='left'
                                     onSelect={this.onSelectMenuItem}
                                     onBackdropPress={this.onMenuActionPress}>
