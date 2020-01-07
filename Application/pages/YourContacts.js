@@ -135,7 +135,7 @@ class YourContacts extends Component {
                         return <ListItemContainer share={true} contact={true} title={item.name} purchased={this.CheckIfSelected(item.email)} fromItemView={false} onPress={() => { this.ShareContactPress(item.email) }} />;
                      } else {
                         if (item.status == "contact") {
-                           return <ListItemContainer contact={true} title={item.name} fromItemView={true} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
+                           return <ListItemContainer contact={true} title={item.name} fromItemView={false} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
                         } else if (item.status == "pending") {
                            return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
                         }
