@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { KeyboardAvoidingView, Alert, ActivityIndicator, StyleSheet } from "react-native";
-import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
+import { KeyboardAvoidingView, Alert, StyleSheet, Image } from "react-native";
+import { Layout, Button, Input, Icon, Spinner } from 'react-native-ui-kitten';
 import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
@@ -36,7 +36,7 @@ class LoginPage extends Component {
   onPressLoginIn() {
     if (!this.state.email || !this.state.password) {
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
-      return console.log("Email and password required!");
+      console.log("LoginPage: Email and password required!");
     }
     if (this._isMounted) this.setState({ authenticating: true });
 
@@ -44,10 +44,12 @@ class LoginPage extends Component {
       user = new FirebaseUser();
       if (user != null && user.email == this.state.email) {
         if (!user.emailVerified) {
+          console.log("LoginPage: navigate to VerificationPage");
           this.props.navigation.navigate(VERIFICATIONPAGE);
         }
         else {
           this.props.navigation.navigate(HOMEPAGE);
+          console.log("LoginPage: navigate to HomePage");
         }
       }
     }
@@ -68,11 +70,12 @@ class LoginPage extends Component {
   }
 
   userIsCurrentlyLoggedIn() {
-    Firebase.auth().onAuthStateChanged(function (user) {
+    var unsubscribe = Firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         return true;
       }
     });
+    unsubscribe();
     return false;
   }
 
@@ -111,7 +114,7 @@ class LoginPage extends Component {
     if (this.state.authenticating) {
       return (
         <Layout style={styles.columnContainer}>
-          <ActivityIndicator size="large" />
+          <Spinner />
         </Layout>
       )
     }
@@ -181,6 +184,10 @@ class LoginPage extends Component {
       <Layout style={globalStyles.defaultContainer}>
         <KeyboardAvoidingView behavior="padding">
           <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <Image
+              style={{ width: 300, height: 300 }}
+              source={require('../assets/splash.png')}
+            />
             {this.renderCurrentState()}
           </ScrollView>
         </KeyboardAvoidingView>

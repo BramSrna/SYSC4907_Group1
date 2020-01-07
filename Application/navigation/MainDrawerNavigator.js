@@ -10,7 +10,6 @@ import AddItemLocationPage from '../pages/AddItemLocationPage';
 import YourContacts from '../pages/YourContacts';
 import NewContact from '../pages/NewContact';
 
-
 const StackNavigator = createStackNavigator({
     Home: {
         screen: HomePage
