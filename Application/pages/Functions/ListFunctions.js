@@ -1,6 +1,38 @@
 import * as firebase from "firebase";
 
 /**
+ * createListPath
+ * 
+ * Creates the expected path to the given list
+ * in the database.
+ * 
+ * Path is:
+ *  /lists/${listId}
+ * 
+ * @param {String} listId The id of the list
+ */
+function createListPath(listId) {
+   var listPath = "/lists/" + listId;
+   return(listPath);
+}
+
+/**
+* createUserPath
+* 
+* Creates the expected path to the given user
+* in the database
+* 
+* Path is:
+*  /users/${userId}
+* 
+* @param {String} userId The id of the user
+*/
+function createUserPath(userId) {
+   var userPath = "/users/" + userId;
+   return(userPath);
+}
+
+/**
  * This class contains all the functions that the UI uses
  * to manipulate the database.
  */
@@ -106,7 +138,9 @@ class ListFunctions {
    /**
     * AddItemToList
     * 
-    * Add the given item to the given list
+    * Adds the given item to the given list.
+    * If the item has not previously been registered,
+    * it is registered to the database.
     * 
     * @param {String} listId: id of the list we are adding items to
     * @param {String} genName: name of the item
@@ -115,177 +149,346 @@ class ListFunctions {
     * @param {String} notes: additional notes regarding the item
     * @param {String}   specName: The specific name of the item
     * 
-    * @returns None
+    * @returns The id of the item
     */
-   async AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {
-      try {
-         // Call the add item function
-         const { data } = await firebase.functions().httpsCallable('cloudAddItemToList')({
-            listId: listId,
-            genName: genName,
-            specName: specName,
-            purchased: purchased,
-            quantity: quantity,
-            size: size,
-            notes: notes,
-         });
-
-         return true;
-      } catch (e) {
-         console.error(e);
-
-         return false;
-      }
+   async AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {  
+      // Retrieve the item from the database
+      var retVal = dataRegFuncs.getItem(database, genName, specificName = specName).then((itemInfo) => {
+          var item = itemInfo.item;
+  
+          if (item === null) {
+              // If the item has not been registered, then register it
+              var temp = dataRegFuncs.registerItem(database, genName, specificName = specName);
+          }
+  
+          return Promise.all([temp]);
+      }).then(result => {
+          var listPath = createListPath(listId);
+          // Get the id of the item
+          var itemId = (new dataRegFuncs.ItemObj(genName, specificName = specName)).getId();
+  
+          // Add the item to the list
+          firebase.database().ref(listPath + "/items/" + itemId).update({
+              genName: genName,
+              specName: specName,
+              purchased: purchased,
+              quantity: quantity,
+              size: size,
+              notes: notes
+          });
+  
+          return itemId;
+      });
+  
+      return retVal;
    }
 
    /**
     * DeleteItemInList
     * 
-    * Delete the given item from the given list
+    * Delete the given item from the given list.
     * 
     * @param {String} listId: id of the list the item is in
     * @param {String} itemId: id of the item to remove
     * 
     * @returns None
     */
-   async DeleteItemInList(listId, itemId) {
-      try {
-         // Call the delete item function
-         const { data } = await firebase.functions().httpsCallable('cloudDeleteItemInList')({
-            listId: listId,
-            itemId: itemId,
-         });
-
-         return true;
-      } catch (e) {
-         console.error(e);
-
-         return false;
-      }
+   async DeleteItemInList(listId, itemId) {  
+      // Get the path to the list
+      var listPath = createListPath(listId);
+  
+      // Remove the item
+      var ref = firebase.database().ref(listPath + "/items/" + itemId);
+      ref.remove();
    }
 
    /**
     * UpdatePurchasedBoolOfAnItemInAList
     * 
-    * Toggles the purchased boolean of the given item in the
-    * given list
+    * Toggles the purchased boolean of the given item
+    * in the given list.
     * 
     * @param {String} listId: id of the list the item is in
     * @param {String} itemId: id of the item in the list
     * 
-    * @returns None
+    * @returns The new purchased state
     */
-   async UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
-      try {
-         // Call the toggle purchased function
-         const { data } = await firebase.functions().httpsCallable('cloudUpdatePurchasedBoolOfAnItemInAList')({
-            listId: listId,
-            itemId: itemId,
-         });
-
-         return true;
-      } catch (e) {
-         console.error(e);
-
-         return false;
-      }
+   async UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {  
+      // Get the path to the list
+      var listPath = createListPath(listId);
+  
+      // Get the current state of the item
+      var ref = firebase.database().ref(listPath + "/items/" + itemId);
+      var retVal = ref.once("value").then((snapshot) => {
+          var currentBool = snapshot.val().purchased;
+  
+          // Update the item with the new purchased state
+          var newRef = firebase.database().ref(listPath + "/items/" + itemId);
+          newRef.update({
+              purchased: !currentBool,
+          });
+  
+          return !currentBool;
+      });
+  
+      return retVal;
    }
 
    /**
     * DeleteList
     * 
-    * Delete the given list from the user created/shared section.
-    * If nobody else has the list then the list will be removed
-    * from the list table.
+    * Removes the given list from the given users array
+    * of lists that they have access to. If that user was
+    * the only user that had access to the list, then the
+    * list is also deleted from the database. If there are
+    * other users with access to the list, then the user count
+    * on the list is decremeneted.
     * 
     * @param {String} listId: id of the list being removed
     * 
-    * @returns An object containg 
+    * @returns None
     */
-   async DeleteList(listId) {
-      // Get the user id of the current user
-      var uid = firebase.auth().currentUser.uid;
-
-      try {
-         // Call the function to delete the list
-         const { data } = await firebase.functions().httpsCallable('cloudDeleteList')({
-            listId: listId,
-            uid: uid,
-         });
-
-         return;
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   async DeleteList(listId) {  
+      // Get the path to the user
+      var userPath = createUserPath(uid);
+      var ref = firebase.database().ref(userPath + "/lists");
+      var retVal = ref.once("value").then((snapshot) => {
+          var cList = null;
+          var sList = null;
+  
+          // Get the current state of the user's lists
+          if (snapshot.val()) {
+              var createdLists = [];
+              var sharedLists = [];
+  
+              // Get all of the user's created lists
+              var temp = snapshot.val().created;
+              for (var id in temp) {
+                  createdLists.push(id);
+              }
+  
+              // Get all of the user's shared lists
+              temp = snapshot.val().shared;
+              for (id in temp) {
+                  sharedLists.push(id);
+              }
+  
+              // If the user's created lists contains the target list,
+              // then remove the list from the user's created lists
+              if (createdLists.includes(listId)) {
+                  var i = createdLists.findIndex(x => x === listId);
+  
+                  // Save the id of the list
+                  cList = createdLists[i];
+  
+                  var rmvRef = firebase.database().ref(userPath + "/lists/created/" + cList);
+                  rmvRef.remove();
+              }
+  
+              // Do the same as above for the user's shared lists
+              if (sharedLists.includes(listId)){
+                  i = sharedLists.findIndex(x => x === listId);
+  
+                  // Save the id of the list
+                  sList = createdLists[i];
+  
+                  rmvRef = firebase.database().ref(userPath + "/lists/shared/" + sList);
+                  rmvRef.remove();
+              }
+          }
+  
+          // Return the created and shared list ids
+          return Promise.all([cList, sList]);
+      }).then(result => {
+          var cList = String(result[0]);
+          var sList = String(result[1]);
+  
+          var cListRetVal = null;
+          var sListRetVal = null;
+  
+          // Get the created list from the lists table
+          if (cList !== null) {
+              cListRetVal = firebase.database().ref("/lists/" + cList).once("value");
+          }
+  
+          // Get the shared list from the lists table
+          if (sList !== null) {
+              sListRetVal = firebase.database().ref("/lists/" + sList).once("value");
+          }
+  
+          // Return the retrieved lists and their ids
+          return Promise.all([cList, cListRetVal, sList, sListRetVal]);
+      }).then(result => {
+          var cList = result[0];
+          var cListRetVal = result[1];
+          var sList = result[2];
+          var sListRetVal = result[3];
+  
+          // If the created list was found, then
+          // handle its changes
+          if (cListRetVal !== null) {
+              cListRetVal = cListRetVal.val();
+              if (cListRetVal) {
+                  // If the user was the only one with access to
+                  // the list, then delete it, otherwise,
+                  // just decrement the user count
+                  if (cListRetVal.user_count === 1) {
+                      var childRmvRef = firebase.database().ref("/lists/" + cList);
+                      childRmvRef.remove();
+                  } else {
+                      var newCount = cList.user_count - 1;
+                      childRmvRef = firebase.database().ref("/lists/" + cList);
+                      childRmvRef.update({
+                          user_count: newCount
+                      });
+                  }
+              }
+          }
+  
+          // If the shared list was found, then
+          // handle its changes
+          if (sListRetVal !== null) {
+              sListRetVal = sListRetVal.val();
+              if (sListRetVal) {
+                  // If the user was the only one with access to
+                  // the list, then delete it, otherwise,
+                  // just decrement the user count
+                  if (sListRetVal.user_count === 1) {
+                      childRmvRef = firebase.database().ref("/lists/" + sList);
+                      childRmvRef.remove();
+                  } else {
+                      newCount = sList.user_count - 1;
+                      childRmvRef = firebase.database().ref("/lists/" + sList);
+                      childRmvRef.update({
+                          user_count: newCount
+                      });
+                  }
+              }
+          }
+  
+          return true;
+      });
+  
+      return retVal;
    }
 
    /**
     * CreateNewList
     * 
-    * Creates a new list and adds it to the user's list
-    * of lists.
+    * Creates a new list and adds it to the given
+    * user's array of lists.
     * 
     * @param {String} listName: name of the list to create
     * 
-    * @returns An object containing the contents of the list
-    *          and the id of the list
+    * @returns None
     */
-   async CreateNewList(listName) {
-      // Get the user id of the current user
-      var uid = firebase.auth().currentUser.uid;
-
-      try {
-         // Call the function to create the list
-         const { data } = await firebase.functions().httpsCallable('cloudCreateNewList')({
-            uid: uid,
-            listName: listName,
-            items: {},
-            userCount: 1
-         });
-
-         // Get the returned data
-         var items = data.items;
-         var ids = data.ids;
-
-         return {
-            items: items,
-            ids: ids
-         };
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   async CreateNewList(listName, items = {}, userCount = 1) {  
+      // Add the list to the lists table
+      var ref = firebase.database().ref("/lists");
+      var push = ref.push({
+          name: listName,
+          items: items,
+          user_count: userCount,
+      });
+  
+      // Add the list to the user table
+      var key = push.key;
+      var userPath = createUserPath(uid);
+      ref = firebase.database().ref(userPath + "/lists/created/" + key)
+      var retVal = ref.set(0).then((snapshot) => {
+          return 0;
+      }).catch(error => {
+          console.log("Failed to create list: " + error);
+      });
+  
+      return retVal;
    }
 
    /**
     * GetListsKeyAndName
     * 
-    * Get the list keys and names belonging to the user
-    * to populate the YourLists.js page
+    * Returns the keys and names of all of the
+    * lists that the given user has access to.
     * 
     * @param {Component} that: context for caller
     * 
-    * @returns None
+    * @returns An object containing the api data
+    *          and names of all the lists the user has access to
     */
-   async GetListsKeyAndName() {
-      // Get the user id of the current user
-      var uid = firebase.auth().currentUser.uid;
-
-      try {
-         // Call the function to get the lists keys and names
-         const { data } = await firebase.functions().httpsCallable('cloudGetListsKeyAndName')({
-            uid: uid,
-         });
-
-         return data;
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   async GetListsKeyAndName() {  
+      // Get the user path in the database
+      var userPath = createUserPath(uid);
+  
+      var ref = firebase.database().ref(userPath + "/lists")
+      var retVal = ref.once("value").then((snapshot) => {        
+          var ssv = snapshot.val();
+          var childVals = [];
+          var listIds = [];
+  
+          // Parse the users current state to get their lists
+          if (ssv) {
+              // Get the user's created lists
+              for (var created in ssv.created) {
+                  listIds.push(created);
+              }
+  
+              // Get the user's shared lists
+              for (var shared in ssv.shared) {
+                  listIds.push(shared);
+              }          
+  
+              // Get the states if the lists the user has access to
+              for (var idKey in listIds) {
+                  var currentListId = listIds[idKey];
+  
+                  var childRef = firebase.database().ref("/lists/" + currentListId).once("value");
+  
+                  childVals.push(childRef);
+              }
+          }
+  
+          // Return the states of the lists
+          return Promise.all(childVals);
+         }).then(result => {
+            var listIdLength = result.length;
+  
+            var apiData = [];
+            var listTitles = [];
+  
+            // Parse all of the list states
+            for (var i = 0; i < result.length; i++){
+                var ssv = result[i];
+  
+                if (ssv) {
+                    // Get the list's api data
+                    apiData.push({
+                        key: ssv.key,
+                        name: ssv.val().name
+                    });
+  
+                    // Get the list's title
+                    listTitles.push(ssv.val().name);
+  
+                    if ((i - 1) === listIdLength) {
+                        break;
+                    }
+                } else {
+                    console.log("ERROR: List does not exist.");    
+                    break;
+                }
+            }
+  
+            // Sort the list titles
+            listTitles.sort((a, b) => a.localeCompare(b))
+  
+            // Return the data
+            return {
+               apiData: apiData,
+               listTitles: listTitles,
+            };
+          }); 
+  
+      return retVal;
    }
 
    /**
@@ -339,26 +542,50 @@ class ListFunctions {
    /**
     * reorgListAdded
     * 
-    * Returns the given list in the order that the items
-    * were added to the list.
+    * Returns the list of items, list of ids,
+    * and the userCount of the given list.
     * 
     * @param {String} listId: id of the list to reorganize
     * 
-    * @returns The sorted list
+    * @returns An object containing the list of items in the list,
+    *          the ids of the items in the list, and the user cound
+    *          of the list
     */
-   async reorgListAdded(listId) {
-      try {
-         // Call the function to get the sorted list
-         const { data } = await firebase.functions().httpsCallable('cloudGetItemsInAList')({
-            listId: listId,
-         });
-
-         return data;
-      } catch (e) {
-         console.error(e);
-
-         return(null);
-      }
+   async reorgListAdded(listId) {  
+      // Get the path to the list
+      var listPath = createListPath(listId);
+  
+      var ref = firebase.database().ref(listPath);
+      var retItems = ref.once('value').then((snapshot) => {
+          var items = [];
+          var ids = [];
+  
+          var ssv = snapshot.val();
+          var userCount = 0;
+  
+          // Parse the list, getting all of the items and ids
+          if (ssv && ssv.items) {
+              var listItems = ssv.items;
+              for (var itemId in listItems) {
+                  items.push(listItems[itemId]);
+                  ids.push(itemId);
+             }
+          }
+  
+          // Get the user count if it has been set
+          if (ssv.user_count) {
+             userCount = ssv.user_count;
+          }
+  
+          // return the data
+          return {
+              items: items,
+              ids: ids,
+              userCount: userCount
+          };
+      });
+  
+      return retItems;
    }
 
    /**

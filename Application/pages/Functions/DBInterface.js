@@ -1,3 +1,5 @@
+import * as firebase from "firebase";
+
 /**
  * compArrays
  * 
@@ -50,7 +52,7 @@ function compArrays(array1, array2) {
  *          Null if no item found
  */
 const getItem = function(database, genericName, specificName = null){
-    var itemInfo = database.ref("/items").once("value").then((snapshot) => {
+    var itemInfo = firebase.database().ref("/items").once("value").then((snapshot) => {
         var ssv = snapshot.val();
         var item = null;
 
@@ -91,7 +93,7 @@ const getItem = function(database, genericName, specificName = null){
  * @returns The store object, null if not found
  */
 const getStore = function(database, storeName, address) {
-    var storeInfo = database.ref("/stores").once("value").then((snapshot) => {
+    var storeInfo = firebase.database().ref("/stores").once("value").then((snapshot) => {
         var ssv = snapshot.val();
         var store = null;
 
@@ -318,16 +320,19 @@ class StoreObj {
  * it has not been saved then the whole description is saved, otherwise
  * only the price is saved.
  * 
- * @param {Database} database The database to save the item to
- * @param {String} genericName The generic name of the item
+ * @param {String} genericName   The generic name of the item
  * @param {String} specificName The specific name of the item
- * @param {Integer} size The size of the item in the given units
- * @param {String} sizeUnit The unit corresponding to the given size
+ *                              Default is null
+ * @param {Integer} size The size of the item in the given unit of measurement
+ *                       Default is null
+ * @param {String} sizeUnit The unit of measurement corresponding to the given size
+ *                          Default is null
  * @param {Integer} price The price of the item
+ *                        Default is null
  * 
- * @returns The key of the item
+ * @returns None
  */
-const registerItem = function(database, genericName, specificName = null, size = null, sizeUnit = null, price = null) {  
+export async function registerItem(genericName, specificName = null, size = null, sizeUnit = null, price = null) {
     // Get the path to the item
     var itemPath = (new ItemObj(genericName, specificName)).getPath();
 
@@ -352,7 +357,7 @@ const registerItem = function(database, genericName, specificName = null, size =
             }
 
             // Push the dictionary to the table
-            item = database.ref(itemPath + "descs").push(initialDesc);
+            item = firebase.database().ref(itemPath + "descs").push(initialDesc);
         } else {
             // Item has already been registered
             var descId = null;
@@ -391,10 +396,10 @@ const registerItem = function(database, genericName, specificName = null, size =
                     toAdd.prices = [price];
                 }
 
-                item = database.ref(itemPath + "descs").push(toAdd);
+                item = firebase.database().ref(itemPath + "descs").push(toAdd);
             } else if ((descId !== null) && (!priceExists) && (price !== null)) {
                 // Only the price has not been saved, so save the price
-                item = database.ref(itemPath + "descs/" + descId + "/prices").push(
+                item = firebase.database().ref(itemPath + "descs/" + descId + "/prices").push(
                     price
                 );
             }
@@ -416,15 +421,15 @@ const registerItem = function(database, genericName, specificName = null, size =
  * given database. If the store has not been previously saved,
  * the save the whole store, otheriwse only save the franchise name
  * 
- * @param {Database} database The database to save the information to
- * @param {String} storeName The name of the store to save
- * @param {String} address  The address of the store to save
- * @param {Array} map The array containing the map of the store
- * @param {String} franchiseName The name of the franchise
+ * @param {String} storeName The name of the store
+ * @param {String} address The address of the store
+ * @param {Array} map The map of the store
+ * @param {String} franchiseName The franchise name of the store
+ *                               Default is  null
  * 
- * @returns The store id
+ * @returns None
  */
-const registerStore = function(database, storeName, address, map, franchiseName = null) {
+export async function registerStore(storeName, address, map, franchiseName = null) {
     // Get the path of the store
     var storePath = (new StoreObj(address, storeName)).getPath();
 
@@ -450,7 +455,7 @@ const registerStore = function(database, storeName, address, map, franchiseName 
             }
 
             // Push the data to the database
-            store = database.ref(storePath).update(toAdd);
+            store = firebase.database().ref(storePath).update(toAdd);
         } else {
             var maps = store.maps;
             var mapExists = false;                
@@ -486,12 +491,12 @@ const registerStore = function(database, storeName, address, map, franchiseName 
 
                 // Update the franchise name and count
                 if (fNameId === null) {
-                    store = database.ref(storePath + "candFranchiseName/").push({
+                    store = firebase.database().ref(storePath + "candFranchiseName/").push({
                         franchiseName: franchiseName,
                         count: franchiseNameCount
                     });
                 } else {
-                    store = database.ref(storePath + "candFranchiseName/" + fNameId).update({
+                    store = firebase.database().ref(storePath + "candFranchiseName/" + fNameId).update({
                         count: franchiseNameCount
                     });
                 }
@@ -499,7 +504,7 @@ const registerStore = function(database, storeName, address, map, franchiseName 
 
             if (!mapExists) {
                 // Push the list to the database, if it has not been registered
-                store = database.ref(storePath + "maps").push({
+                store = firebase.database().ref(storePath + "maps").push({
                     map: map,
                     weight: 1,
                 });
@@ -512,54 +517,6 @@ const registerStore = function(database, storeName, address, map, franchiseName 
     });
 
     return storeInfo;
-
-}
-
-/**
- * registerItemWrapper
- * 
- * Wrapper for the registerItem method. Parses
- * the data object and calls registerItem.
- * 
- * @param {Object}  data    The object containing the inputted data
- * @param {Component} context   The context of the caller
- * @param {Database}    database    The database to save the data to
- * 
- * @returns None
- */
-exports.registerItemWrapper = function(data, context, database) {
-    // Parse the data object
-    var genericName = data.genericName;
-    var specificName = data.specificName;
-    var size = data.size;
-    var sizeUnit = data.sizeUnit;
-    var price = data.price;
-
-    // Save the item
-    registerItem(database, genericName, specificName, size, sizeUnit, price);
-}
-
-/**
- * registerStoreWrapper
- * 
- * Wrapper for the registerStore method. Parses
- * the data object and calls registerStore.
- * 
- * @param {Object}  data    The object containing the inputted data
- * @param {Component} context   The context of the caller
- * @param {Database}    database    The database to save the data to
- * 
- * @returns None
- */
-exports.registerStoreWrapper = function(data, context, database) {
-    // Parse the data object
-    var storeName = data.storeName;
-    var address = data.address;
-    var map = data.map;
-    var franchiseName = data.franchiseName;
-
-    // Save the store
-    registerStore(database, storeName, address, map, franchiseName);
 }
 
 /**
@@ -570,21 +527,16 @@ exports.registerStoreWrapper = function(data, context, database) {
  * not already been created. Adds the location if
  * if has not already been created.
  * 
- * @param {Object}  data    The object containing the inputted data
- * @param {Component} context   The context of the caller
- * @param {Database}    database    The database to save the data to
+ * @param {String} genericName The generic name of the item
+ * @param {String} specificName The specific name of the item
+ * @param {String} storeName The name of the store
+ * @param {String} address The address of the store
+ * @param {Integer} aisleNum The aisle number of the item
+ * @param {String} itemDepartment The department name of the item
  * 
  * @returns None
  */
-exports.addItemLoc = function(data, context, database) {
-    // Parse the data object
-    var genericName = data.genericName;
-    var specificName = data.specificName;
-    var storeName = data.storeName;
-    var address = data.address;
-    var aisleNum = data.aisleNum;
-    var itemDepartment = data.itemDepartment;
-
+export async function addItemLoc(genericName, specificName, storeName, address, aisleNum, itemDepartment) {
     // Get the store object
     var storeInfo = getStore(database, storeName, address).then((storeInfo) => {
         var store = storeInfo.store;
@@ -659,7 +611,7 @@ exports.addItemLoc = function(data, context, database) {
             if (locId !== null) {
                 count = item.locs[storeId][locId].count + 1;
 
-                database.ref(itemPath + "/locs/" + storeId + "/" + locId).update({
+                firebase.database().ref(itemPath + "/locs/" + storeId + "/" + locId).update({
                     count: count
                 });
 
@@ -669,7 +621,7 @@ exports.addItemLoc = function(data, context, database) {
 
         // If the location has not already been saved, then add it
         if (!added) {
-            database.ref(itemPath + "/locs/" + storeId).push({
+            firebase.database().ref(itemPath + "/locs/" + storeId).push({
                 department: itemDepartment,
                 aisleNum: aisleNum,
                 aisleTags: [],
@@ -699,7 +651,7 @@ exports.addItemLoc = function(data, context, database) {
             // If the location has already been saved, iterate the cound
             if (locId !== null) {
                 count = store.items[itemId][locId].count + 1;
-                database.ref(storePath + "/items/" + itemId + "/" + locId).update({
+                firebase.database().ref(storePath + "/items/" + itemId + "/" + locId).update({
                     count: count
                 });
                 added = true;
@@ -708,7 +660,7 @@ exports.addItemLoc = function(data, context, database) {
 
         // If the location has not already been saved, then add it
         if (!added) {
-            database.ref(storePath + "/items/" + itemId).push({
+            firebase.database().ref(storePath + "/items/" + itemId).push({
                 department: itemDepartment,
                 aisleTags: [],
                 aisleNum: aisleNum,
@@ -722,12 +674,3 @@ exports.addItemLoc = function(data, context, database) {
 
     });
 }
-
-// Export all functions
-exports.ItemObj = ItemObj;
-exports.getItem = getItem;
-exports.getStore = getStore;
-exports.ItemObj = ItemObj;
-exports.StoreObj = StoreObj;
-exports.registerItem = registerItem;
-exports.registerStore = registerStore; 
