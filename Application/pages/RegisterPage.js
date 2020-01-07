@@ -29,18 +29,20 @@ class RegisterPage extends Component {
     }
   };
 
-  updateRegisterInfo() {
+  async updateRegisterInfo() {
     if (this.checkInputs()) {
       this.setState({ registering: true });
       var firstName = this.state.firstname.replace(/^\w/, c => c.toUpperCase());
       var lastName = this.state.lastname.replace(/^\w/, c => c.toUpperCase());
       var displayName = firstName + " " + lastName;
       displayName = displayName.replace(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/g, '');
-      firebaseUser = new FirebaseUser();
-      if (firebaseUser.register(this.state.email, this.state.password, displayName)) {
-        this.props.navigation.navigate(VERIFICATIONPAGE);
-        this.setState({ registering: false });
-      }
+      var firebaseUser = new FirebaseUser();
+      var register = await firebaseUser.register(this.state.email, this.state.password, displayName).then(() => {
+        if (register) {
+          this.props.navigation.navigate(VERIFICATIONPAGE);
+        }
+      });
+      this.setState({ registering: false });
     } else {
       Alert.alert("Invalid Inputs", "Please Confirm the inputs and try again.");
     }
