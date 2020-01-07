@@ -14,9 +14,9 @@ export default class FirebaseUser {
         }
     }
 
-    register(email, password, displayName) {
+    async register(email, password, displayName) {
         this.auth = Firebase.auth();
-        return this.auth.createUserWithEmailAndPassword(email, password).then(() => {
+        return await this.auth.createUserWithEmailAndPassword(email, password).then(() => {
             if (Firebase.auth().currentUser) {
                 Firebase.auth().currentUser.sendEmailVerification().then(() => {
                     Alert.alert("Verification Email Send..", "For full functionality please confirm your email-address by opening the link that was send to the provided email-address.");

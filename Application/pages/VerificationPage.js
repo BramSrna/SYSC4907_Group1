@@ -32,53 +32,39 @@ class VerificationPage extends Component {
   render() {
     return (
       <Layout style={globalStyles.defaultContainer}>
-        <Text style={styles.textPadding}>Please confirm your email address by clicking the verification link that was send to the email address that was provided during registration.</Text>
-        <Text style={styles.textPadding}>Check your junk folder if you cannot find the email or you can request a new confirmation email.</Text>
-        <ButtonGroup appearance='outline' status='primary'>
-          <Button onPress={() => this.buttonListener(VERIFY)} >{VERIFY}</Button>
-          <Button onPress={() => this.buttonListener(RESEND)} >{RESEND}</Button>
-        </ButtonGroup>
+        <Layout style={styles.formOuterContainer} level='3'>
+          <Layout style={styles.formInnerContainer}>
+            <Text style={styles.textPadding} category='h6'>Please confirm your email address by clicking the verification link that was send to the email address that was provided during registration.</Text>
+            <Text style={styles.textPadding} appearance='hint'>** Check your junk folder if you cannot find the email or you can request a new confirmation email.</Text>
+            <Button style={styles.button} appearance='outline' status='success' onPress={() => this.buttonListener(VERIFY)} >{VERIFY}</Button>
+            <Button style={styles.button} appearance='outline' status='warning' onPress={() => this.buttonListener(RESEND)} >{RESEND}</Button>
+          </Layout>
+        </Layout>
       </Layout>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rowContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
-  columnContainer: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
   button: {
-    marginVertical: 4,
-    marginHorizontal: 4,
-    borderRadius: 30,
-    width: 250,
-  },
-  input: {
-    flexDirection: 'row',
-    borderRadius: 30,
-    width: 250,
+    width: '100%',
+    marginVertical: 8,
+    justifyContent: 'center',
   },
   textPadding: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    textAlign: 'center'
+    paddingBottom: 4,
+    textAlign: 'auto'
+  },
+  formOuterContainer: {
+    margin: 8,
+    padding: 8,
+    borderRadius: 10,
+  },
+  formInnerContainer: {
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
   },
 });
 
