@@ -18,7 +18,7 @@ class VerificationPage extends Component {
     if (buttonId === VERIFY) {
       firebaseUser.reloadUserInfo();
       if (firebaseUser.isUserEmailVerified()) {
-        console.log('VerificationPage: navigate to VerificationPage');
+        console.log('VerificationPage: navigate to HomePage');
         this.props.navigation.navigate(HOMEPAGE);
       } else {
         Alert.alert("Email Not Verified", "Check email for verification link.");
