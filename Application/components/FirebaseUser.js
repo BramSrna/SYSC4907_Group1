@@ -78,7 +78,7 @@ export default class FirebaseUser {
         }
     }
 
-    isUserEmailVerified() {
+    isUserEmailVerified = () => {
         return this.emailVerified;
     }
 

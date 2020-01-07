@@ -3,6 +3,7 @@ import { Alert, StyleSheet } from "react-native";
 import { Text, Layout, Button, ButtonGroup } from 'react-native-ui-kitten';
 import globalStyles from "./pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
+import * as firebase from 'firebase';
 
 const VERIFY = "Verify";
 const RESEND = "Resend confirmation link";
@@ -16,12 +17,9 @@ class VerificationPage extends Component {
   buttonListener = buttonId => {
     var firebaseUser = new FirebaseUser();
     if (buttonId === VERIFY) {
-      setTimeout(function () {
-        firebaseUser.reloadUserInfo();
-      }, 1000);
-      firebaseUser.getIdToken();
-      if (firebaseUser.isUserEmailVerified()) {
+      if (firebase.auth().currentUser.reload().then(() => { return firebase.auth().currentUser.emailVerified; })) {
         console.log('VerificationPage: navigate to HomePage');
+        firebaseUser.getIdToken();
       } else {
         Alert.alert("Email Not Verified", "Check email for verification link.");
         console.log("VerificationPage: Email Verification Check Failed!");
