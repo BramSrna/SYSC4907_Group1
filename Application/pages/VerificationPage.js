@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   textPadding: {
     paddingBottom: 4,
-    textAlign: 'auto'
+    textAlign: 'center'
   },
   formOuterContainer: {
     margin: 8,
