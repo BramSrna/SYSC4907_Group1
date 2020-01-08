@@ -55,7 +55,7 @@ export default class App extends Component {
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     SplashScreen.preventAutoHide();
   }
 

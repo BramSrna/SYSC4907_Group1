@@ -1,14 +1,14 @@
 import React, { Component } from "react";
-import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
-import globalStyles from "../pages/pageStyles/GlobalStyle";
-import * as firebase from "firebase";
 import { units } from "../UnitList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import * as dbi from "./Functions/DBInterface";
+import styles from "./pageStyles/RegisterItemPageStyle";
 
 const PAGE_TITLE = "Register Item";
 
@@ -17,6 +17,7 @@ const DEFAULT_GENERIC_NAME = ""
 const DEFAULT_SPECIFIC_NAME = ""
 const DEFAULT_SIZE = ""
 const DEFAULT_SIZE_UNIT = ""
+const DEFAULT_PRICE = ""
 
 class RegisterItemPage extends Component {
   constructor(props) {
@@ -26,19 +27,40 @@ class RegisterItemPage extends Component {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
       size: DEFAULT_SIZE,
-      sizeUnit: DEFAULT_SIZE_UNIT,
+      sizeUnit: units[0],
+      price: DEFAULT_PRICE
     };
   }
 
-  componentDidMount() {
-    nm.setThat(this)
+  /**
+   * componentWillMount
+   * 
+   * Function called when the component has mounted.
+   * Sets the context of the notification manager.
+   * 
+   * @param None
+   * 
+   * @returns None
+   */
+  componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMount = true;
+        nm.setThat(this)
+      }
+    );
 
   }
-
+  componentWillUnmount() {
+    this.focusListener.remove()
+    this._isMount = false;
+  }
   /**
    * handleRegister
    * 
    * Handler for the register item button.
+   * Checks that all necessary data has been given.
    * Saves all of the information to the database.
    * 
    * @param None
@@ -46,19 +68,30 @@ class RegisterItemPage extends Component {
    * @returns None
   */
   handleRegister = () => {
-    // Check the required fields
-    var retVal = this.checkReqFields();
+    // Check that all required information has been given
+    if (!this.checkReqFields()) {
+      return;
+    }
 
-    // Saves the data if all required fields have values
-    if (retVal) {
-      firebase.database().ref("/items").push({
-        genericName: this.state.genericName,
-        specificName: this.state.specificName,
-        size: this.state.size,
-        sizeUnit: this.state.sizeUnit,
+    // Set all of the optional data
+    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
+    var tempSize = this.state.size === DEFAULT_SIZE ? null : this.state.size;
+    var tempSizeUnit = this.state.sizeUnit.value;
+    var tempPrice = this.state.price === DEFAULT_PRICE ? null : this.state.price;
+
+    // Register the item
+    dbi.registerItem(this.state.genericName,
+      tempSpecificName,
+      tempSize,
+      tempSizeUnit,
+      tempPrice);
+
+    Alert.alert("Item saved successfully");
+    if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
+      this.props.navigation.navigate("CurrentListPage", {
+        name: this.props.navigation.getParam("listName", "(Invalid Name)"),
+        listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
       });
-
-      Alert.alert("Item saved successfully");
     }
   };
 
@@ -84,36 +117,7 @@ class RegisterItemPage extends Component {
       return (false);
     }
 
-    // Check the specific name field
-    if (this.state.specificName == DEFAULT_SPECIFIC_NAME) {
-      Alert.alert("Please enter a value for the specific name.");
-      return (false);
-    }
-
     return (true);
-  }
-  /**
-   * 
-   * renderRequiredText
-   * 
-   * Renders a required text Text fields.
-   * Prints the body of the text field with
-   * the required text marker.
-   * 
-   * @param {String}  bodyText  The text of the Text field
-   * @param {String}  reqText   The text to signify it is required text (Default = (*))
-   * 
-   * @returns None
-   */
-  renderRequiredText(bodyText, reqText = "(*)") {
-    return (
-      <Text style={globalStyles.whiteText}>
-        {bodyText}
-        <Text style={globalStyles.requiredHighlight}>
-          {reqText}
-        </Text>
-      </Text>
-    );
   }
 
   renderMenuAction = () => (
@@ -136,13 +140,20 @@ class RegisterItemPage extends Component {
                   label='Generic Name'
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
-                  onChangeText={(genericName) => this.setState({ genericName })}
+                  onChangeText={(genericName) => this._isMount && this.setState({ genericName })}
                 />
                 <Input style={styles.inputRow}
                   label='Specific Name'
                   placeholder='Specific Name'
                   value={this.state.specificName}
-                  onChangeText={(specificName) => this.setState({ specificName })}
+                  onChangeText={(specificName) => this._isMount && this.setState({ specificName })}
+                />
+                <Input style={styles.inputRow}
+                  label='Price'
+                  placeholder='Price'
+                  keyboardType='numeric'
+                  value={this.state.price}
+                  onChangeText={(price) => this._isMount && this.setState({ price })}
                 />
                 <Layout style={styles.horizontalInnerContainer}>
                   <Input style={styles.inputLeftColumn}
@@ -150,13 +161,13 @@ class RegisterItemPage extends Component {
                     placeholder='Size'
                     keyboardType='numeric'
                     value={this.state.size}
-                    onChangeText={(size) => this.setState({ size })}
+                    onChangeText={(size) => this._isMount && this.setState({ size })}
                   />
                   <Select style={styles.inputRightColumn}
                     data={units}
                     placeholder='Unit'
                     selectedOption={this.state.sizeUnit}
-                    onSelect={(sizeUnit) => this.setState({ sizeUnit })}
+                    onSelect={(sizeUnit) => this._isMount && this.setState({ sizeUnit })}
                   />
                 </Layout>
                 <Button style={styles.button} onPress={this.handleRegister} >Register Item</Button>
@@ -169,63 +180,5 @@ class RegisterItemPage extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  avoidingView: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  overflowMenu: {
-    padding: 4,
-    shadowColor: 'black',
-    shadowOpacity: .5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
-  },
-  formOuterContainer: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 10,
-  },
-  formInnerContainer: {
-    flex: 1,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  inputRow: {
-    paddingVertical: 4,
-  },
-  horizontalInnerContainer: {
-    flexDirection: 'row',
-  },
-  inputLeftColumn: {
-    flex: 4,
-    paddingVertical: 4,
-  },
-  inputRightColumn: {
-    flex: 1,
-    paddingTop: 21,
-    paddingLeft: 8,
-    paddingVertical: 4,
-    minWidth: 60,
-  },
-  button: {
-    flex: 1,
-    marginTop: 8,
-    width: '100%',
-  },
-});
 
 export default RegisterItemPage;

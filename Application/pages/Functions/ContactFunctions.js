@@ -27,6 +27,12 @@ class ContactFunctions {
       });
    }
 
+   RemoveYourContactsPageListeners() {
+      firebase
+         .database()
+         .ref("/contacts/" + firebase.auth().currentUser.uid).off()
+   }
+
    EditContact(props, contactEmail, contactName, contactGroup, callback) {
       var currentUser = firebase.auth().currentUser
       firebase
@@ -322,7 +328,7 @@ class ContactFunctions {
          text: groupName
       };
       listOfGroups.push(obj);
-      that.setState({
+      if (that._isMounted) that.setState({
          isDialogVisible: false,
          group: obj,
          allGroups: listOfGroups
@@ -504,7 +510,7 @@ class ContactFunctions {
                title: "All Contacts",
                data: allContacts
             });
-            that.setState({
+            if (that._isMounted) that.setState({
                sections: sections,
                groups: groups,
                sectionsWoPending: sectionsWithoutPending,

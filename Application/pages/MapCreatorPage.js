@@ -11,8 +11,15 @@ import { MoveUpIcon, MoveDownIcon, Trash2Icon, FlipIcon } from '../assets/icons/
 import RNPickerSelect from 'react-native-picker-select';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import * as dbi from "./Functions/DBInterface";
+import styles from "../pages/pageStyles/MapCreatorPageStyle";
 
 const PAGE_TITLE = "Map Creator";
+
+// The default value for all input fields
+const DEFAULT_STORE_NAME = "";
+const DEFAULT_FRANCHISE_NAME = "";
+const DEFAULT_ADDRESS = "";
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -26,96 +33,177 @@ class MapCreatorPage extends Component {
 
         this.state = {
             arrayHolder: [], // The departments added so far
-            storeName: "", // The name of the store
-            storeAddress: "", // The address of the store
+            storeName: DEFAULT_STORE_NAME, // The name of the store
+            franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
+            address: DEFAULT_ADDRESS, // The address of the store
         };
     }
 
-    /*
-    componentDidMount
-    Set mounted to True
-    @input  None
-    @return void
+    /**
+    * componentWillMount
+    * 
+    * Function called after component was mounted.
+    * Sets the context of the notification manager.
+    * Sets the mounted boolean and the arrayHolder value.
+    * 
+    * @params  None
+    * 
+    * @return None
     */
-    componentDidMount() {
-        nm.setThat(this);
-        this._mounted = true;
-        this.setState({ arrayHolder: [...this.currDepartments] });
+    componentWillMount() {
+        this.focusListener = this.props.navigation.addListener(
+            "willFocus",
+            () => {
+                nm.setThat(this);
+
+                this._mounted = true;
+
+                this.setState({
+                    arrayHolder: [...this.currDepartments]
+                });
+            }
+        );
+
     }
 
-    /*
-    componentWillUnmount
-    Set mounted to False
-    
-    @input  None
-    @return void
+    /**
+    * componentWillUnmount
+    * 
+    * Set mounted to False
+    *
+    * @params  None
+    * 
+    * @return void
     */
     componentWillUnmount() {
+        this.focusListener.remove()
         this._mounted = false;
     }
 
-    /*
-    addDepartment
-    Adds a department to the list of departments and
-    intializes it to the first item in the list.
-    Rerenders the screen + state.
-    @input  None
-    @return void
+    /**
+    * addDepartment
+    *
+    * Adds a department to the list of departments and
+    * intializes it to the first item in the list.
+    * Rerenders the screen + state.
+    * 
+    * @params  None
+    * 
+    * @return void
     */
     addDepartment = () => {
         // Add a department to the list
         this.currDepartments.push({});
 
         // Rerender the screen
-        this.setState({ arrayHolder: [...this.currDepartments] })
+        if (this._mounted) this.setState({ arrayHolder: [...this.currDepartments] })
     }
 
-    /*
-    handleSaveMap
-    Handles the Save Map button being clicked.
-    Copies the current department setting list and
-    pushes it to the database.
-    @input  None
-    @return void
+    /**
+    * handleSaveMap
+    * 
+    * Handles the Save Map button being clicked.
+    * Checks that all required information has been given.
+    * Copies the current department setting list and
+    * pushes it to the database.
+    * 
+    * @params  None
+    * 
+    * @return void
     */
     handleSaveMap = () => {
-        var deps = []
+        // Check that all required information was given
+        if (!this.checkReqFields()) {
+            return;
+        }
 
         // Copy the current list of departments
+        var deps = [];
         for (var i = 0; i < this.currDepartments.length; i++) {
             deps.push(this.currDepartments[i]["department"])
         }
 
-        // Push the list to the database
-        firebase.database().ref("/stores").push({
-            name: this.state.storeName,
-            map: deps
-        });
+        // Get the franchise name
+        var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
+
+        // Save the store to the database
+        dbi.registerStore(this.state.storeName,
+            this.state.address,
+            deps,
+            tempFranchiseName);
 
         Alert.alert("Map Saved! Thank you!")
+        if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
+            this.props.navigation.navigate("CurrentListPage", {
+                name: this.props.navigation.getParam("listName", "(Invalid Name)"),
+                listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
+            });
+        }
     }
 
-    /*
-    updateDepartment
-    Updates the current index in the list, setting
-    it to the given value.
-    @input  ind     The index to update
-    @input  newVal  The new value for the index
-    @return void
+    /**
+     * checkReqFields
+     * 
+     * Checks that the user has inputted values for
+     * all mandatory fields. Determines if the user
+     * has inputted a value by comparing the default
+     * to the current value to see if they match. If
+     * the current value matches the default value,
+     * then the user has not entered a value.
+     * 
+     * @param None
+     * 
+     * @returns Boolean True if the user has inputted a value for all valid fields
+     *                  False otherwise
+     */
+    checkReqFields() {
+        // Check the generic name field
+        if (this.state.storeName == DEFAULT_STORE_NAME) {
+            Alert.alert("Please enter a value for the store name.");
+            return (false);
+        }
+
+        // Check the specific name field
+        if (this.state.address == DEFAULT_ADDRESS) {
+            Alert.alert("Please enter a value for the address.");
+            return (false);
+        }
+
+        return (true);
+    }
+
+    /**
+    * updateDepartment
+    *
+    * Updates the current index in the list, setting
+    * it to the given value.
+    * 
+    * @param {Integer}  ind     The index to update
+    * @param {String}  newVal  The new value for the index
+    * 
+    * @returns void
     */
     updateDepartment = (ind, newVal) => {
+        // Set the new value in the current departments array
         this.currDepartments[ind]["department"] = newVal;
-        this.setState({ arrayHolder: [...this.currDepartments] });
+
+        // Update the state
+        if (this._mounted) this.setState({
+            arrayHolder: [...this.currDepartments]
+        });
     }
 
-    /*
-    upButtonPressed
-    Handler for the up button. Swaps the department at
-    the given index with the department above it. If
-    the department is at the top of the list, nothing
-    happens.
-    @input  ind     The index to move
-    @return void
+    /**
+    * upButtonPressed
+    * 
+    * Handler for the up button. Swaps the department at
+    * the given index with the department above it. If
+    * the department is at the top of the list, nothing
+    * happens.
+    * 
+    * @param {Integer}  ind     The index to move
+    * 
+    * @returns void
     */
     upButtonPressed = (ind) => {
         // Check if the index is at the top of the list
@@ -126,33 +214,43 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = aboveItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] });
+            if (this._mounted) this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
         }
     }
 
-    /*
-    delButtonPressed
-    Handler for the delete button. Deletes the button
-    at the given index from the list. Updates the state.
-    @input  ind     The index to delete
-    @return void
+    /**
+    * delButtonPressed
+    * 
+    * Handler for the delete button. Deletes the button
+    * at the given index from the list. Updates the state.
+    * 
+    * @param {Integer}  ind     The index to delete
+    * 
+    * @returns void
     */
     delButtonPressed = (ind) => {
         // Remove the department from the list
         this.currDepartments.splice(ind, 1);
 
         // Update the state
-        this.setState({ arrayHolder: [...this.currDepartments] });
+        if (this._mounted) this.setState({
+            arrayHolder: [...this.currDepartments]
+        });
     }
 
-    /*
-    downButtonPressed
-    Handler for the down button. Swaps the department at
-    the given index with the department below it. If
-    the department is at the bottom of the list, nothing
-    happens.
-    @input  ind     The index to move
-    @return void
+    /**
+    * downButtonPressed
+    * 
+    * Handler for the down button. Swaps the department at
+    * the given index with the department below it. If
+    * the department is at the bottom of the list, nothing
+    * happens.
+    * 
+    * @param {Integer}  ind     The index to move
+    * 
+    * @return void
     */
     downButtonPressed = (ind) => {
         // Check if the index is at the bottom of the list
@@ -163,19 +261,24 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = belowItem;
 
             // Update the state
-            this.setState({ arrayHolder: [...this.currDepartments] });
+            if (this._mounted) this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
         }
     }
 
-    /*
-            renderListElem
-            Renders the items in the department list. Each
-            item has an up button, delete button, down button,
-            picker for selecting the department, and a blank spot
-            to allow for scrolling.
-            @input  index   The index of the element being rendered
-            @return void
-            */
+    /**
+    * renderListElem
+    * 
+    * Renders the items in the department list. Each
+    * item has an up button, delete button, down button,
+    * picker for selecting the department, and a blank spot
+    * to allow for scrolling.
+    * 
+    * @param {Integer}  index   The index of the element being rendered
+    * 
+    * @return void
+    */
     renderListElem = (index) => {
         const placeholder = {
             label: 'Select a department...',
@@ -247,16 +350,23 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter store name...'
                                 returnKeyType='next'
                                 value={this.state.storeName}
-                                onChangeText={(storeName) => this.setState({ storeName })}
-                                onSubmitEditing={() => this.refs.storeaddress.focus()}
+                                onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
+                                onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
                             />
                             <Input style={styles.inputRow}
                                 label='Store Address'
-                                ref="storeaddress"
+                                ref="address"
                                 placeholder='Enter store address...'
-                                value={this.state.storeAddress}
-                                onChangeText={(storeAddress) => this.setState({ storeAddress })}
+                                value={this.state.address}
+                                onChangeText={(address) => this._mounted && this.setState({ address })}
+                            />
+                            <Input style={styles.inputRow}
+                                label='Franchise Name'
+                                ref="fName"
+                                placeholder='Enter franchise name...'
+                                value={this.state.franchiseName}
+                                onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
                             />
                         </Layout>
                     </Layout>
@@ -282,98 +392,5 @@ class MapCreatorPage extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    list: {
-        flex: 1,
-    },
-    container: {
-        flex: 1,
-        height: '100%',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-    },
-    scrollContainer: {
-        flex: 1,
-    },
-    avoidingView: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    overflowMenu: {
-        padding: 4,
-        shadowColor: 'black',
-        shadowOpacity: .5,
-        shadowOffset: { width: 0, height: 0 },
-        elevation: 8,
-    },
-    formOuterContainer: {
-        margin: 8,
-        padding: 8,
-        borderRadius: 10,
-    },
-    formInnerContainer: {
-        flex: 1,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    listItem: {
-        flex: 1,
-        marginVertical: 8,
-        padding: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        borderRadius: 10,
-    },
-    selectMenu: {
-        flex: 1,
-        paddingHorizontal: 8,
-        minWidth: 60,
-    },
-    flatList: {
-        flex: 1
-    },
-    inputRow: {
-        paddingVertical: 4,
-    },
-    selectBox: {
-        width: '100%',
-    },
-    button: {
-        flex: 1,
-        marginTop: 8,
-        width: '100%',
-    },
-    placeholderStyle: {
-        color: 'gray',
-    },
-    mainButtonGroup: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 10,
-    },
-    mainPageButton: {
-        flex: 1,
-        padding: 8,
-        marginVertical: 8,
-        marginHorizontal: 2,
-    },
-    pickerIOS: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-    },
-    pickerAndroid: {
-        marginHorizontal: 4,
-        borderRadius: 10,
-        borderWidth: 1,
-
-    },
-});
 
 export default MapCreatorPage;  

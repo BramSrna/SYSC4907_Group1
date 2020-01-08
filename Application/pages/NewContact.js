@@ -30,10 +30,9 @@ class NewContact extends Component {
          fromPending: false, fromEdit: false
       };
    }
-
-   componentDidMount() {
+   load() {
       nm.setThat(this)
-
+      this._isMounted = true;
       if (this.props.navigation.getParam("edit", false)) {
          var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
          var name = this.props.navigation.getParam("name", DEFAULT_NAME);
@@ -76,14 +75,29 @@ class NewContact extends Component {
       }
    }
 
+   componentWillMount() {
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
+
+   }
+
+   componentWillUnmount() {
+      this.focusListener.remove()
+      this._isMounted = false;
+   }
+
    handleChangeGroup(val) {
       if (val != DEFAULT_GROUP) {
-         this.setState({ group: val });
+         if (this._isMounted) this.setState({ group: val });
       }
    }
 
    handleCancel = () => {
-      this.setState({ isDialogVisible: false, group: DEFAULT_GROUP });
+      if (this._isMounted) this.setState({ isDialogVisible: false, group: DEFAULT_GROUP });
    };
 
    handleCreate = () => {
@@ -104,13 +118,13 @@ class NewContact extends Component {
          cf.AcceptContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
-         this.setState({ fromPending: false })
+         if (this._isMounted) this.setState({ fromPending: false })
 
       } else if (this.state.fromEdit) {
          cf.EditContact(this.props, this.state.email, this.state.name, aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
-         this.setState({ fromEdit: false })
+         if (this._isMounted) this.setState({ fromEdit: false })
 
       } else {
          cf.SendContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
@@ -121,17 +135,6 @@ class NewContact extends Component {
 
    };
 
-   // renderRequiredText(bodyText, reqText = "(*)") {
-   //    return (
-   //       <Text style={globalStyles.whiteText}>
-   //          {bodyText}
-   //          <Text style={globalStyles.requiredHighlight}>
-   //             {reqText}
-   //          </Text>
-   //       </Text>
-   //    );
-   // }
-
    renderModalElement = () => {
       return (
          <Layout
@@ -141,7 +144,7 @@ class NewContact extends Component {
             <Input
                style={styles.input}
                placeholder='Enter a group name'
-               onChangeText={(group) => this.setState({ group })}
+               onChangeText={(group) => this._isMounted && this.setState({ group })}
                autoFocus={this.state.isDialogVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
@@ -166,7 +169,7 @@ class NewContact extends Component {
             <Modal style={styles.modal}
                allowBackdrop={true}
                backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-               onBackdropPress={() => { this.setState({ isDialogVisible: !this.state.isDialogVisible }) }}
+               onBackdropPress={() => { this._isMounted && this.setState({ isDialogVisible: !this.state.isDialogVisible }) }}
                visible={this.state.isDialogVisible}>
                {this.renderModalElement()}
             </Modal>
@@ -178,23 +181,29 @@ class NewContact extends Component {
                            label='Email'
                            placeholder='Enter an email'
                            value={this.state.email}
-                           onChangeText={(email) => this.setState({ email })}
+                           autoCapitalize="none"
+                           keyboardType="email-address"
+                           autoCompleteType="email"
+                           returnKeyType='next'
+                           onChangeText={(email) => this._isMounted && this.setState({ email })}
                            disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
                         />
                         <Input style={styles.inputRow}
                            label='Name'
+                           autoCapitalize="words"
+                           keyboardType="default"
                            placeholder='Enter a name'
                            value={this.state.name}
-                           onChangeText={(name) => this.setState({ name })}
+                           onChangeText={(name) => this._isMounted && this.setState({ name })}
                         />
                         <Select style={styles.selectBox}
                            label='Group'
                            data={this.state.allGroups}
                            placeholder='Select a group...'
-                           selectedOption={this.state.group}
+                           selectedOption={this.state.allGroups[0]}
                            onSelect={(group) => this.handleChangeGroup(group)}
                         />
-                        <Button style={styles.groupButton} onPress={() => this.setState({ isDialogVisible: true })} >New Group</Button>
+                        <Button style={styles.groupButton} onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >New Group</Button>
                         <Button style={styles.button} onPress={() => this.handleAdd()} >Add Contact</Button>
                      </Layout>
                   </Layout>
@@ -205,6 +214,7 @@ class NewContact extends Component {
       );
    }
 }
+
 
 const styles = StyleSheet.create({
    container: {

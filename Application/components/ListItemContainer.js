@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, BackHandler } from 'react-native';
+import { StyleSheet, BackHandler, TouchableOpacity, Image } from 'react-native';
 import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
 
@@ -24,7 +24,7 @@ export default class ListItemContainer extends Component {
         };
     }
 
-    componentDidMount() {
+    componentWillMount() {
     }
 
     componentWillUnmount() {
@@ -70,8 +70,12 @@ export default class ListItemContainer extends Component {
             }
         } else {
             if (index == 0) {
-                // Alert.alert("Share the list " + this.props.listID)
-                this.props.navigate()
+                if (this.props.fromContactView) {
+                    this.props.onDelete()
+                } else {
+                    // Alert.alert("Share the list " + this.props.listID)
+                    this.props.navigate()
+                }
             }
             else if (index == 1) {
                 // Delete
@@ -82,7 +86,7 @@ export default class ListItemContainer extends Component {
     }
 
     render() {
-        const { share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
+        const { fromContactView = false, share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
@@ -107,13 +111,13 @@ export default class ListItemContainer extends Component {
                                 placement='left'
                                 onSelect={this.onSelectMenuItem}
                                 onBackdropPress={this.onMenuActionPress}>
-                                <View style={styles.pending}>
+                                <Layout style={styles.pending}>
                                     <TouchableOpacity style={styles.acceptDeny}
                                         onPress={() => this.props.acceptFunction()}>
                                         <Image source={require("../assets/icons/accept.png")} /></TouchableOpacity>
                                     <TouchableOpacity style={styles.acceptDeny}
                                         onPress={() => this.props.rejectFunction()}>
-                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></View>
+                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></Layout>
                             </OverflowMenu>
                         </Layout>
                     </Layout >
@@ -138,7 +142,7 @@ export default class ListItemContainer extends Component {
                                 <OverflowMenu
                                     style={styles.overflowMenu}
                                     visible={this.state.menuVisible}
-                                    data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
+                                    data={fromItemView ? this.listViewMenuData : this.itemViewMenuData}
                                     placement='left'
                                     onSelect={this.onSelectMenuItem}
                                     onBackdropPress={this.onMenuActionPress}>

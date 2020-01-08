@@ -1,9 +1,11 @@
 import yaml
-from StoreObj import Store 
-from DepartmentObj import Department
-from AisleObj import Aisle
-from ItemObj import Item
-from ItemLocObj import ItemLoc
+
+import StoreObj
+import DepartmentObj
+import AisleObj
+import ItemObj
+import ItemLocObj
+import DataCreator
 
 # The weight of the department when calculating store similarities
 DEP_WEIGHT = 0.8
@@ -13,29 +15,23 @@ N_CLOSEST = 3
 
 """
 calcSimilarity
-
 Calculates the similarity between the two given stores.
 Does this by comparing the location between each identical item
 in the store. The higher the number of items that the two
 stores have in common, the higher the similarity.
-
 @input  store1  The first StoreObj to compare
 @input  store2  The second StoreObj to compare
-
 @return Double  The similarity between the two stores
 """
 def calcSimilarity(store1, store2):
     """
     calcDistFull
-
     Calculates the distance between the two given location
     by checking if the departments and aisles match. The more
     that match, the higher the distance value. Uses the DEP_WEIGHT
     global variable for weighing the department versus the aisle.
-
     @input  loc1    The first location to compare
     @input  loc2    The second location to compare
-
     @return Double  The distance between the two locations
     """
     def calcDistFull(loc1, loc2):
@@ -73,61 +69,15 @@ def calcSimilarity(store1, store2):
         totDist += calcDistFull(items1[i].getLoc(), items2[i].getLoc())
 
     # Perform the similarity calculation
-    similarity = totDist / len(itemIntersect)
+    similarity = totDist / len(items1)
 
     return(similarity)
 
 """
-loadInfo
-
-Loads the yaml file at the given path and
-places the data in a dictionary in the
-format that the algorithm needs.
-
-@input  pathToYaml  The path to the yaml file to parse
-
-@return A list of the stores parsed from the yaml file
-"""
-def loadInfo(pathToYaml):
-    data = {}
-
-    # Write the generated data to a yaml file
-    with open(pathToYaml, "r") as f:
-        data = yaml.load(f, yaml.SafeLoader)
-
-    stores = []
-
-    for storeName in data:
-        store = Store(storeName)
-
-        for departmentName in data[storeName]["DEPARTMENTS"]:
-            department = Department(departmentName, (0, 0), (0, 0))
-
-            for aisleNum in data[storeName]["DEPARTMENTS"][departmentName]:
-                aisle = Aisle(aisleNum, [])
-
-                for itemName in data[storeName]["DEPARTMENTS"][departmentName][aisleNum]:
-                    loc = ItemLoc(store, department, aisle)
-                    item = Item(itemName, loc)
-
-                    aisle.addItem(item)
-
-                department.addAisle(aisle)
-
-            store.addDepartment(department)
-
-        stores.append(store)
-
-    return(stores)
-
-"""
 checkStoreForItem
-
 Checks if the given store has the given item.
-
 @input  store   The StoreObj to check
 @input  itemName    The name of the item to look for
-
 @return Boolean True if the store has the item
                 False otherwise
 """
@@ -144,14 +94,11 @@ def checkStoreForItem(store, itemName):
 
 """
 getLoc
-
 Gets the location of the given item in the
 given store. If the item is not in the store,
 returns None.
-
 @input  store   The StoreObj to check
 @input  itemName    The name of the item to get the location of
-
 @return The location of the item in the store. None if the item is not in the store.
 """
 def getLoc(store, itemName):
@@ -165,64 +112,79 @@ def getLoc(store, itemName):
 
 """
 predictLoc
-
 Predicts the location of the given item in the given store using
 the list of known stores to determine the prediction. Uses a KNN
 based algorithm for the estimation:
     First calculates the N_CLOSEST stores
     Gets the location of the item in those stores
     Determines the most likely location using the gathered locations
-
 @input  knownStores The list of known StoreObjs
 @input  store       The store to estimate the location in
 @input  itemName    The name of the item to calculate the location of
-
 @return The most likely location of the item
 """
 def predictLoc(knownStores, store, itemName):
-    # Get the known stores that contain the item
-    knownStores = [tempStore for tempStore in knownStores if checkStoreForItem(tempStore, itemName)]
+    depName = None
+    aisleNum = None
+    aisleTags = None
 
-    # Calculate the similarity between each store that has the item and the given store
-    similarities = [[tempStore, calcSimilarity(store, tempStore)] for tempStore in knownStores if tempStore != store]
-    similarities.sort(key=lambda x: x[1], reverse=True)
-    stores, similarities = list(zip(*(similarities)))
+    item = store.getItem(itemName)
+    if item != None:
+        loc = item.getLoc()
 
-    # Get the N_CLOSEST stores
-    stores = stores[:N_CLOSEST]
+        depName = loc.getDepartment().getName()
+        aisleNum = loc.getAisle().getNumber()
+        aisleTags = loc.getAisle().getTags()
+    else:
+        # Get the known stores that contain the item
+        knownStores = [tempStore for tempStore in knownStores if checkStoreForItem(tempStore, itemName)]
 
-    # Get all of the location in the closest stores
-    locs = [getLoc(tempStore, itemName) for tempStore in stores]
+        # Calculate the similarity between each store that has the item and the given store
+        similarities = [[tempStore, calcSimilarity(store, tempStore)] for tempStore in knownStores if tempStore != store]
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        stores, similarities = list(zip(*(similarities)))
 
-    # Determine how much each department and aisle occurs
-    # in the closest stores
-    depCount = {}
-    aisleCount = {}
-    for loc in locs:
-        dep = loc.getDepartment().getName()
-        aisle = str(loc.getAisle().getNumber())
+        # Get the N_CLOSEST stores
+        stores = stores[:N_CLOSEST]
 
-        if dep not in depCount:
-            depCount[dep] = 0
+        # Get all of the location in the closest stores
+        locs = [getLoc(tempStore, itemName) for tempStore in stores]
 
-        if aisle not in aisleCount:
-            aisleCount[aisle] = 0
+        # Determine how much each department and aisle occurs
+        # in the closest stores
+        depCount = {}
+        aisleCount = {}
+        for loc in locs:
+            dep = loc.getDepartment().getName()
+            aisle = str(loc.getAisle().getNumber())
 
-        depCount[dep] += 1
-        aisleCount[aisle] += 1
+            if dep not in depCount:
+                depCount[dep] = 0
 
-    # Get the most likely departmant and aisle
-    dep = max(depCount, key=depCount.get)
-    aisle = max(aisleCount, key=aisleCount.get)
+            if aisle not in aisleCount:
+                aisleCount[aisle] = 0
+
+            depCount[dep] += 1
+            aisleCount[aisle] += 1
+
+        # Get the most likely departmant and aisle
+        depName = max(depCount, key=depCount.get)
+        aisleNum = int(max(aisleCount, key=aisleCount.get))
+        aisleTags = []
+
+    dep = DepartmentObj.Department(depName)
+    aisle = AisleObj.Aisle(aisleNum, aisleTags)
 
     # Create the location object
-    loc = ItemLoc(None, dep, aisle)
+    loc = ItemLocObj.ItemLoc(store, dep, aisle)
 
     return(loc)
 
 
 if __name__ == "__main__":
-    stores = loadInfo("temp.yaml")
+    stores = DataCreator.loadInfo("GeneratedData.yaml")
 
     # STORE_1, ITEM_10
-    predictLoc(stores, stores[1], "ITEM_10")
+    loc = predictLoc(stores, stores[0], "ITEM_100")
+
+    print(loc)

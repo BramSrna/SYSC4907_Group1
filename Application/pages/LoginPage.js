@@ -38,7 +38,7 @@ class LoginPage extends Component {
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
       console.log("LoginPage: Email and password required!");
     }
-    this.setState({ authenticating: true });
+    if (this._isMounted) this.setState({ authenticating: true });
 
     if (this.authenticateUser(this.state.email, this.state.password)) {
       user = new FirebaseUser();
@@ -53,7 +53,7 @@ class LoginPage extends Component {
         }
       }
     }
-    this.setState({ authenticating: false });
+    if (this._isMounted) this.setState({ authenticating: false });
 
   }
 
@@ -79,11 +79,23 @@ class LoginPage extends Component {
     return false;
   }
 
+  componentWillUnmount() {
+    this.focusListener.remove()
+    this._isMounted = false;
+  }
+
   componentWillMount() {
-    this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
-    if (this.userAlreadyLoggedIn) {
-      this.props.navigation.navigate(HOMEPAGE);
-    }
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMounted = true;
+        this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
+        if (this.userAlreadyLoggedIn) {
+          this.props.navigation.navigate(HOMEPAGE);
+        }
+      }
+    );
+
   }
 
   renderPasswordEyeIcon = (style) => {
@@ -95,7 +107,7 @@ class LoginPage extends Component {
 
   onPasswordEyeIconPress = () => {
     const secureTextEntry = !this.state.secureTextEntry;
-    this.setState({ secureTextEntry });
+    if (this._isMounted) this.setState({ secureTextEntry });
   };
 
   renderCurrentState() {
@@ -119,7 +131,7 @@ class LoginPage extends Component {
               autoCapitalize="none"
               autoCompleteType="email"
               returnKeyType='next'
-              onChangeText={email => this.setState({ email })}
+              onChangeText={email => this._isMounted && this.setState({ email })}
               onSubmitEditing={() => this.refs.password.focus()}
               blurOnSubmit={false}
               value={this.state.email} />
@@ -134,7 +146,7 @@ class LoginPage extends Component {
               icon={this.renderPasswordEyeIcon}
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
-              onChangeText={password => this.setState({ password })}
+              onChangeText={password => this._isMounted && this.setState({ password })}
               onSubmitEditing={() => this.refs.login.scrollTo}
               value={this.state.password} />
           </Layout>

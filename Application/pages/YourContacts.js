@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-   View,
    SectionList,
    StyleSheet,
    Alert,
@@ -19,7 +18,8 @@ class YourContacts extends Component {
       this.state = { listName: '', listID: '', sections: [], groups: [], share: false, selected: [], sectionsWoPending: [], groupsWoPending: [], sectionsSelected: [] };
    }
 
-   componentDidMount() {
+   load() {
+      this._isMounted = true;
       nm.setThat(this)
 
       this.setState({
@@ -28,7 +28,20 @@ class YourContacts extends Component {
          listName: this.props.navigation.getParam("listName", '')
       });
       cf.GetContactInfo(this);
+   }
+   componentWillMount() {
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
 
+   }
+   componentWillUnmount() {
+      cf.RemoveYourContactsPageListeners()
+      this.focusListener.remove()
+      this._isMounted = false;
    }
 
    GetSectionListItem = item => {
@@ -38,7 +51,7 @@ class YourContacts extends Component {
    FlatListItemSeparator = () => {
       return (
          //Item Separator
-         <View
+         <Layout
             style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }}
          />
       );
@@ -53,10 +66,10 @@ class YourContacts extends Component {
                a--;
             }
          }
-         this.setState({ selected: newSelected });
+         if (this._isMounted) this.setState({ selected: newSelected });
       } else {
          newSelected.push(email)
-         this.setState({ selected: newSelected });
+         if (this._isMounted) this.setState({ selected: newSelected });
       }
    }
 
@@ -97,7 +110,7 @@ class YourContacts extends Component {
             }
          }
       }
-      this.setState({ selected: newSelected, sectionsSelected: sectionsSelected });
+      if (this._isMounted) this.setState({ selected: newSelected, sectionsSelected: sectionsSelected });
    }
 
    render() {
@@ -136,7 +149,7 @@ class YourContacts extends Component {
                         return <ListItemContainer share={true} contact={true} title={item.name} purchased={this.CheckIfSelected(item.email)} fromItemView={false} onPress={() => { this.ShareContactPress(item.email) }} />;
                      } else {
                         if (item.status == "contact") {
-                           return <ListItemContainer contact={true} title={item.name} fromItemView={false} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
+                           return <ListItemContainer contact={true} title={item.name} fromContactView={true} fromItemView={false} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
                         } else if (item.status == "pending") {
                            return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
                         }

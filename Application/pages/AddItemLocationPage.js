@@ -1,23 +1,24 @@
 import React, { Component } from "react";
-import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView } from "react-native";
 import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';
-import globalStyles from "./pageStyles/GlobalStyle";
-import * as firebase from "firebase";
 import { departments } from "../DepartmentList";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import * as dbi from "./Functions/DBInterface";
+import styles from "./pageStyles/AddItemLocationPageStyle"
 
 const PAGE_TITLE = "Add Item Location";
 
 // These are the default values for all of the input boxes
-const DEFAULT_GENERIC_NAME = ""
-const DEFAULT_SPECIFIC_NAME = ""
-const DEFAULT_ITEM_DEPARTMENT = ""
-const DEFAULT_STORE_NAME = ""
-const DEFAULT_AISLE_NUM = ""
+const DEFAULT_GENERIC_NAME = "";
+const DEFAULT_SPECIFIC_NAME = "";
+const DEFAULT_ITEM_DEPARTMENT = "Please select the department...";
+const DEFAULT_STORE_NAME = "";
+const DEFAULT_AISLE_NUM = "";
+const DEFAULT_ADDRESS = "";
 
 class AddItemLocationPage extends Component {
   constructor(props) {
@@ -26,16 +27,38 @@ class AddItemLocationPage extends Component {
     this.state = {
       genericName: DEFAULT_GENERIC_NAME,
       specificName: DEFAULT_SPECIFIC_NAME,
-      itemDepartment: DEFAULT_ITEM_DEPARTMENT,
+      itemDepartment: departments[0],
       storeName: DEFAULT_STORE_NAME,
       aisleNum: DEFAULT_AISLE_NUM,
+      address: DEFAULT_ADDRESS
     };
 
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
   }
 
-  componentDidMount() {
-    nm.setThat(this)
+  componentWillUnmount() {
+    this.focusListener.remove();
+    this._isMounted = false;
+  }
+
+  /**
+   * componentWillMount
+   * 
+   * Function to call when the page is mounted. Sets
+   * the value of "that" for the notification manager.
+   * 
+   * @param None
+   * 
+   * @returns None
+   */
+  componentWillMount() {
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this._isMounted = true;
+        nm.setThat(this)
+      }
+    );
   }
 
   /**
@@ -51,7 +74,7 @@ class AddItemLocationPage extends Component {
    */
   handleChangeDepartment(val) {
     if (val != DEFAULT_ITEM_DEPARTMENT) {
-      this.setState({ itemDepartment: val });
+      if (this._isMounted) this.setState({ itemDepartment: val });
     }
   }
 
@@ -77,15 +100,21 @@ class AddItemLocationPage extends Component {
       return (false);
     }
 
-    // Check the department field
-    if (this.state.itemDepartment == DEFAULT_ITEM_DEPARTMENT) {
-      Alert.alert("Please enter a value for the item department.");
-      return (false);
-    }
-
     // Check the store name field
     if (this.state.storeName == DEFAULT_STORE_NAME) {
       Alert.alert("Please enter a value for the store name.");
+      return (false);
+    }
+
+    // Check the address field
+    if (this.state.address == DEFAULT_ADDRESS) {
+      Alert.alert("Please enter a value for the address.");
+      return (false);
+    }
+
+    // Check the department field
+    if (this.state.itemDepartment == DEFAULT_ITEM_DEPARTMENT) {
+      Alert.alert("Please enter a value for the department.");
       return (false);
     }
 
@@ -102,53 +131,48 @@ class AddItemLocationPage extends Component {
    * handleAdd
    * 
    * Handler for the add item location button.
-   * Saves all of the information to the database.
+   * Checks if all required data has been given and if so,
+   * saves all of the information to the database.
    * 
    * @param None
    * 
    * @returns None
    */
   handleAdd = () => {
-    var retVal = this.checkReqFields();
-
-    if (retVal == true) {
-      firebase.database().ref("/itemLocs").push({
-        genericName: this.state.genericName,
-        specificName: this.state.specificName,
-        department: this.state.itemDepartment,
-        store: this.state.storeName,
-        aisleNum: this.state.aisleNum,
-      });
-
-      Alert.alert("Item saved successfully");
+    // Check the required fields
+    if (!this.checkReqFields()) {
+      return;
     }
+
+    // Set the specific name
+    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
+
+    // Add the value to the database
+    dbi.addItemLoc(this.state.genericName,
+      tempSpecificName,
+      this.state.storeName,
+      this.state.address,
+      this.state.aisleNum,
+      this.state.itemDepartment.value);
+
+    Alert.alert("Item saved successfully");
   };
 
   /**
-   * renderRequiredText
+   * renderMenuAction
    * 
-   * Renders a required text Text fields.
-   * Prints the body of the text field with
-   * the required text marker.
+   * Handles the menu toggle being pressed.
+   * Displays the menu to the user.
    * 
-   * @param {String}  bodyText  The text of the Text field
-   * @param {String}  reqText   The text to signify it is required text (Default = (*))
+   * @param None
    * 
    * @returns None
    */
-  renderRequiredText(bodyText, reqText = "(*)") {
-    return (
-      <Text style={globalStyles.whiteText}>
-        {bodyText}
-        <Text style={globalStyles.requiredHighlight}>
-          {reqText}
-        </Text>
-      </Text>
-    );
-  }
-
   renderMenuAction = () => (
-    <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+    <TopNavigationAction
+      icon={MenuOutline}
+      onPress={() => this.props.navigation.toggleDrawer()}
+    />
   );
 
   render() {
@@ -167,33 +191,39 @@ class AddItemLocationPage extends Component {
                   label='Generic Name'
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
-                  onChangeText={(genericName) => this.setState({ genericName })}
+                  onChangeText={(genericName) => this._isMounted && this.setState({ genericName })}
                 />
                 <Input style={styles.inputRow}
                   label='Specific Name'
                   placeholder='Enter a specific name'
                   value={this.state.specificName}
-                  onChangeText={(specificName) => this.setState({ specificName })}
+                  onChangeText={(specificName) => this._isMounted && this.setState({ specificName })}
+                />
+                <Input style={styles.inputRow}
+                  label='Store Name'
+                  placeholder='Enter the store name'
+                  value={this.state.storeName}
+                  onChangeText={(storeName) => this._isMounted && this.setState({ storeName })}
+                />
+                <Input style={styles.inputRow}
+                  label='Address'
+                  placeholder='Enter the address'
+                  value={this.state.address}
+                  onChangeText={(address) => this._isMounted && this.setState({ address })}
                 />
                 <Select style={styles.selectBox}
                   label='Item Department'
                   data={departments}
                   placeholder='Select a department'
                   selectedOption={this.state.itemDepartment}
-                  onSelect={(itemDepartment) => this.setState({ itemDepartment })}
-                />
-                <Input style={styles.inputRow}
-                  label='Store Name'
-                  placeholder='Enter the store name'
-                  value={this.state.storeName}
-                  onChangeText={(storeName) => this.setState({ storeName })}
+                  onSelect={(itemDepartment) => this._isMounted && this.setState({ itemDepartment })}
                 />
                 <Input style={styles.inputRow}
                   label='Aisle Number'
                   placeholder='Enter the aisle number'
                   keyboardType="numeric"
                   value={this.state.aisleNum}
-                  onChangeText={(aisleNum) => this.setState({ aisleNum })}
+                  onChangeText={(aisleNum) => this._isMounted && this.setState({ aisleNum })}
                 />
                 <Button style={styles.button} onPress={this.handleAdd} >Add Item Location</Button>
               </Layout>
@@ -205,52 +235,5 @@ class AddItemLocationPage extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  scrollContainer: {
-    flex: 1,
-  },
-  avoidingView: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  overflowMenu: {
-    padding: 4,
-    shadowColor: 'black',
-    shadowOpacity: .5,
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 8,
-  },
-  formOuterContainer: {
-    margin: 8,
-    padding: 8,
-    borderRadius: 10,
-  },
-  formInnerContainer: {
-    flex: 1,
-    padding: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-  },
-  inputRow: {
-    paddingVertical: 4,
-  },
-  selectBox: {
-    width: '100%',
-  },
-  button: {
-    flex: 1,
-    marginTop: 8,
-    width: '100%',
-  },
-});
 
 export default AddItemLocationPage;

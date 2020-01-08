@@ -1,11 +1,59 @@
 import * as firebase from "firebase";
 
+const globalComps = require('./GlobalComps');
+const dbInterface = require('./DBInterface');
+const autocomplete = require('./AutocompleteFuncs');
+
 /**
- * This class contains all the functions that the UI uses to manipulate the database.
+ * createListPath
+ * 
+ * Creates the expected path to the given list
+ * in the database.
+ * 
+ * Path is:
+ *  /lists/${listId}
+ * 
+ * @param {String} listId The id of the list
+ */
+function createListPath(listId) {
+   var listPath = "/lists/" + listId;
+   return (listPath);
+}
+
+/**
+ * createUserPath
+ * 
+ * Creates the expected path to the given user
+ * in the database
+ * 
+ * Path is:
+ *  /users/${userId}
+ * 
+ * @param {String} userId The id of the user
+ */
+function createUserPath(userId) {
+   var userPath = "/users/" + userId;
+   return (userPath);
+}
+
+/**
+ * This class contains all the functions that the UI uses
+ * to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
 
+   /**
+    * sendNotification
+    * 
+    * Sends the fiven notification to the user given by
+    * the token
+    * 
+    * @param   {String} token The user to send the message to
+    * @param   {String} title The title of the notification
+    * @param   {String} body  The contents of the notification
+    * @param   {Object} data  The extra data to send with the notification
+    */
    sendNotification = (token, title, body, data) => {
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
@@ -23,383 +71,554 @@ class ListFunctions {
       });
    }
 
+   /**
+    * sendNotificationToSharedUsers
+    * 
+    * Sends the given notification to all users that
+    * the given list has been shared with.
+    * 
+    * @param {String} listID  The ID of the corresponding list
+    * @param {String} listName   The name of the list
+    * @param {String} message    the message to send
+    * 
+    * @returns None
+    */
    sendNotificationToSharedUsers(listID, listName, message) {
       var uids = [];
       var tokens = [];
-      var that = this
-      firebase
-         .database()
-         .ref("/users/")
-         .once("value", function (snapshot) {
-
-            if (snapshot.val()) {
-               for (var user in snapshot.val()) {
-                  if (user != firebase.auth().currentUser.uid) {
-                     if (snapshot.val()[user].lists.shared) {
-                        var lists = snapshot.val()[user].lists.shared
-                        for (var shared in lists) {
-                           if (shared == listID) {
-                              uids.push(user);
-
-                           }
-                        }
-                     }
-                     if (snapshot.val()[user].lists.created) {
-
-                        var otherLists = snapshot.val()[user].lists.created
-                        for (var created in otherLists) {
-                           if (created == listID) {
-                              uids.push(user);
-
-                           }
-                        }
-                     }
-
-
-                  }
-
-               }
-
-            } else {
-               console.log("Something went wrong!")
-            }
-         }).then(
-            firebase
-               .database()
-               .ref("/userInfo/")
-               .once("value", function (snapshot) {
-                  if (snapshot.val()) {
-                     for (user in snapshot.val()) {
-                        if (uids.includes(snapshot.val()[user].uid)) {
-                           if (snapshot.val()[user].notificationToken) {
-                              tokens.push(snapshot.val()[user].notificationToken)
-                           } else {
-                              console.log("User did not give notification access " + snapshot.val()[user])
-                           }
-                        } else {
-                           // console.log("User did not log in correctly")
-                        }
-                     }
-                  } else {
-                     console.log("Users not configured properly!")
-                  }
-               })
-         ).finally(
-            that.tokensToNotifications(uids, tokens, listID, listName, message)
-         )
-   }
-
-   tokensToNotifications(uids, tokens, listID, listName, message) {
       var that = this;
-      firebase
-         .database()
-         .ref("/contacts/")
-         .once("value", function (snapshot) {
-            for (var pos in tokens) {
-               if (snapshot.val()) {
-                  if (snapshot.val()[uids[pos]]) {
-                     var name = firebase.auth().currentUser.email;
-                     for (contact in snapshot.val()[uids[pos]]) {
-                        if (snapshot.val()[uids[pos]][contact].email == firebase.auth().currentUser.email) {
-                           name = snapshot.val()[uids[pos]][contact].name
-                           break
+      firebase.database().ref("/users/").once("value", function (snapshot) {
+         // Get the id of all users to send the notification to
+         if (snapshot.val()) {
+            for (var user in snapshot.val()) {
+               if (user != firebase.auth().currentUser.uid) {
+                  if (snapshot.val()[user].lists.shared) {
+                     var lists = snapshot.val()[user].lists.shared
+                     for (var shared in lists) {
+                        if (shared == listID) {
+                           uids.push(user);
                         }
                      }
-                     var title = name + ' to ' + listName;
-                     that.sendNotification(tokens[pos], title, message, {
-                        "page": "CurrentListPage",
-                        "name": listName,
-                        "listID": listID,
-                        "message": message,
-                        "title": title
-
-                     });
-                  } else {
-                     console.log("There are no contacts for that person")
                   }
-               } else {
-                  console.log("tokensToNotifications messed up")
+                  if (snapshot.val()[user].lists.created) {
+                     var otherLists = snapshot.val()[user].lists.created
+                     for (var created in otherLists) {
+                        if (created == listID) {
+                           uids.push(user);
+
+                        }
+                     }
+                  }
                }
+            }
+         } else {
+            console.log("Something went wrong!")
+         }
+      }).then(
+         // Get the tokens of all users to receive the notification
+         firebase.database().ref("/userInfo/").once("value", function (snapshot) {
+            if (snapshot.val()) {
+               for (user in snapshot.val()) {
+                  if (uids.includes(snapshot.val()[user].uid)) {
+                     if (snapshot.val()[user].notificationToken) {
+                        tokens.push(snapshot.val()[user].notificationToken)
+                     } else {
+                        console.log("User did not give notification access " + snapshot.val()[user])
+                     }
+                  } else {
+                     // console.log("User did not log in correctly")
+                  }
+               }
+            } else {
+               console.log("Users not configured properly!")
             }
          })
+      ).finally(
+         // Send the notification to all users
+         that.tokensToNotifications(uids, tokens, listID, listName, message)
+      )
+   }
 
+   RemoveYourListsPageListeners() {
+      firebase.database().ref("/users/" + firebase.auth().currentUser.uid + "/lists").off()
    }
 
    /**
-    * This function is used to add items to a list.
-    * @param {*} listId: id of the list we are adding items to
-    * @param {*} name: name of the item
-    * @param {*} quantity: quantity of the item
-    * @param {*} size: size of the item
-    * @param {*} notes: additional notes regarding the item
+    * AddItemToList
+    * 
+    * Adds the given item to the given list.
+    * If the item has not previously been registered,
+    * it is registered to the database.
+    * 
+    * @param {String} listId: id of the list we are adding items to
+    * @param {String} genName: name of the item
+    * @param {Integer} quantity: quantity of the item
+    * @param {Integer} size: size of the item
+    * @param {String} notes: additional notes regarding the item
+    * @param {String}   specName: The specific name of the item
+    * 
+    * @returns The id of the item
     */
-   AddItemToList(listId, name, quantity, size, notes) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/")
-         .push({
-            name: name,
-            purchased: false,
+   AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {
+      // Retrieve the item from the database
+      var retVal = globalComps.getItem(genName, specificName = specName).then((itemInfo) => {
+         var item = itemInfo.item;
+
+         if (item === null) {
+            // If the item has not been registered, then register it
+            var temp = dbInterface.registerItem(genName, specificName = specName);
+         }
+
+         return Promise.all([temp]);
+      }).then(result => {
+         var listPath = createListPath(listId);
+         // Get the id of the item
+         var itemId = (new globalComps.ItemObj(genName, specificName = specName)).getId();
+
+         var date = (new Date()).toString();
+
+         // Add the item to the list
+         firebase.database().ref(listPath + "/items/" + itemId).update({
+            genName: genName,
+            specName: specName,
+            purchased: purchased,
             quantity: quantity,
             size: size,
-            notes: notes
+            notes: notes,
+            dateAdded: date
          });
+
+         // Update date modified of list
+         firebase.database().ref(listPath).update({
+            lastMod: date
+         });
+
+         return itemId;
+      });
+
+      return retVal;
    }
 
    /**
-    * This function is used to remove an item from a list
-    * @param {*} listId: id of the list the item is in
-    * @param {*} itemId: id of the item of the list
+    * DeleteItemInList
+    * 
+    * Delete the given item from the given list.
+    * 
+    * @param {String} listId: id of the list the item is in
+    * @param {String} itemId: id of the item to remove
+    * 
+    * @returns None
     */
    DeleteItemInList(listId, itemId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/")
-         .child(itemId)
-         .remove();
+      // Get the path to the list
+      var listPath = createListPath(listId);
+
+      // Remove the item
+      var ref = firebase.database().ref(listPath + "/items/" + itemId);
+      ref.remove();
+
+      // Update date modified of list
+
+      firebase.database().ref(listPath).update({
+         lastMod: (new Date()).toString()
+      });
    }
 
    /**
-    * This function is used to change the purchased boolean in the database
-    * @param {*} listId: id of the list the item is in
-    * @param {*} itemId: id of the item in the list
+    * UpdatePurchasedBoolOfAnItemInAList
+    * 
+    * Toggles the purchased boolean of the given item
+    * in the given list.
+    * 
+    * @param {String} listId: id of the list the item is in
+    * @param {String} itemId: id of the item in the list
+    * 
+    * @returns The new purchased state
     */
    UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId + "/items/" + itemId)
-         .once("value", function (snapshot) {
-            var currentBool = snapshot.val().purchased;
-            firebase
-               .database()
-               .ref("/lists/" + listId + "/items/" + itemId)
-               .update({
-                  purchased: !currentBool
-               });
+      // Get the path to the list
+      var listPath = createListPath(listId);
+
+      // Get the current state of the item
+      var ref = firebase.database().ref(listPath + "/items/" + itemId);
+      var retVal = ref.once("value").then((snapshot) => {
+         var currentBool = snapshot.val().purchased;
+
+         // Update the item with the new purchased state
+         var newRef = firebase.database().ref(listPath + "/items/" + itemId);
+         newRef.update({
+            purchased: !currentBool,
          });
+
+         return !currentBool;
+      });
+
+      return retVal;
    }
 
    /**
-    * Get all the items in the current list
-    * @param {*} that: this for calling function
-    * @param {*} listId: id of the list we are currently viewing
-    */
-   GetItemsInAList(that, listId) {
-      firebase
-         .database()
-         .ref("/lists/" + listId)
-         .on("value", function (snapshot) {
-            var items = [];
-            var ids = [];
-            var ssv = snapshot.val();
-            var userCount = 0;
-            if (ssv && ssv.items) {
-               for (var item in ssv.items) {
-                  items.push(ssv.items[item]);
-                  ids.push(item);
-               }
-
-            }
-            if (ssv.user_count) {
-               userCount = ssv.user_count;
-            }
-            that.setState({
-               listItems: items,
-               listItemIds: ids,
-               userCount: userCount
-            });
-         });
-   }
-
-   /**
-    * Delete the list from the user created/shared section. If nobody selse has the list then the list will be removed from the list table.
-    * @param {*} listId: id of the list being removed
+    * DeleteList
+    * 
+    * Removes the given list from the given users array
+    * of lists that they have access to. If that user was
+    * the only user that had access to the list, then the
+    * list is also deleted from the database. If there are
+    * other users with access to the list, then the user count
+    * on the list is decremeneted.
+    * 
+    * @param {String} listId: id of the list being removed
+    * 
+    * @returns None
     */
    DeleteList(listId) {
       var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists")
-         .once("value", function (snapshot) {
-            if (snapshot.val()) {
-               // Remove from the user created section if exists
-               var createdLists = snapshot.val().created;
-               for (var cList in createdLists) {
-                  if (cList === listId) {
-                     firebase
-                        .database()
-                        .ref("/users/" + uid + "/lists/created/")
-                        .child(cList)
-                        .remove();
-                     firebase
-                        .database()
-                        .ref("/lists/" + cList)
-                        .once("value", function (snapshot) {
-                           if (snapshot.val()) {
-                              if (snapshot.val().user_count == 1) {
-                                 firebase
-                                    .database()
-                                    .ref("/lists/")
-                                    .child(cList)
-                                    .remove();
-                              } else {
-                                 var newCount = snapshot.val().user_count - 1;
-                                 firebase
-                                    .database()
-                                    .ref("/lists/" + cList)
-                                    .update({
-                                       user_count: newCount
-                                    });
-                              }
-                           }
-                        });
-                     break;
-                  }
-               }
 
-               // Remove from the user shared section if exists
-               var sharedLists = snapshot.val().shared;
-               for (sList in sharedLists) {
-                  if (sList === listId) {
-                     firebase
-                        .database()
-                        .ref("/users/" + uid + "/lists/shared/")
-                        .child(sList)
-                        .remove();
-                     firebase
-                        .database()
-                        .ref("/lists/" + sList)
-                        .once("value", function (snapshot) {
-                           if (snapshot.val()) {
-                              if (snapshot.val().user_count == 1) {
-                                 firebase
-                                    .database()
-                                    .ref("/lists/")
-                                    .child(sList)
-                                    .remove();
-                              } else {
-                                 var newCount = snapshot.val().user_count - 1;
-                                 firebase
-                                    .database()
-                                    .ref("/lists/" + cList)
-                                    .update({
-                                       user_count: newCount
-                                    });
-                              }
-                           }
-                        });
-                     break;
-                  }
-               }
-            }
-         });
+      // Get the path to the user
+      var userPath = createUserPath(uid);
+      var ref = firebase.database().ref(userPath + "/lists");
+      var retVal = ref.once("value").then((snapshot) => {  
+         // Get the current state of the user's lists
+         if (snapshot.val()) {
+             var createdLists = [];
+             var sharedLists = [];
+ 
+             // Get all of the user's created lists
+             var temp = snapshot.val().created;
+             for (var id in temp) {
+                 createdLists.push(id);
+             }
+ 
+             // Get all of the user's shared lists
+             temp = snapshot.val().shared;
+             for (id in temp) {
+                 sharedLists.push(id);
+             }
+ 
+             // If the user's created lists contains the target list,
+             // then remove the list from the user's created lists
+             if (createdLists.includes(listId)) {  
+                 var rmvRef = firebase.database().ref(userPath + "/lists/created/" + listId);
+                 rmvRef.remove();
+             }
+ 
+             // Do the same as above for the user's shared lists
+             if (sharedLists.includes(listId)){  
+                 rmvRef = firebase.database().ref(userPath + "/lists/shared/" + listId);
+                 rmvRef.remove();
+             }
+         }
+ 
+         // Return the created and shared list ids
+         return Promise.all([listId]);
+     }).then(result => {
+         var listId = result[0];
+ 
+         // Get the created list from the lists table
+         if (listId !== null) {
+           listRetVal = firebase.database().ref("/lists/" + listId).once("value");
+         }
+ 
+         // Return the retrieved lists and their ids
+         return Promise.all([listId, listRetVal]);
+     }).then(result => {
+         var listId = result[0];
+         var listRetVal = result[1];
+ 
+         // If the created list was found, then
+         // handle its changes
+         if (listRetVal !== null) {
+             listRetVal = listRetVal.val();
+             if (listRetVal) {
+                 // If the user was the only one with access to
+                 // the list, then delete it, otherwise,
+                 // just decrement the user count
+                 if (listRetVal.user_count === 1) {
+                     var childRmvRef = firebase.database().ref("/lists/" + listId);
+                     childRmvRef.remove();
+                 } else {
+                     var newCount = listId.user_count - 1;
+                     childRmvRef = firebase.database().ref("/lists/" + listId);
+                     childRmvRef.update({
+                         user_count: newCount
+                     });
+                 }
+             }
+         }
+
+         return true;
+      });
+
+      return retVal;
    }
 
    /**
-    * Create a new list
-    * @param {*} listName: name of the list
+    * CreateNewList
+    * 
+    * Creates a new list and adds it to the given
+    * user's array of lists.
+    * 
+    * @param {String} listName: name of the list to create
+    * 
+    * @returns None
     */
-   CreateNewList(listName) {
+   CreateNewList(listName, items = {}, userCount = 1) {
+      var uid = firebase.auth().currentUser.uid;
+
+      var date = (new Date()).toString();
+
       // Add the list to the lists table
-      var push = firebase
-         .database()
-         .ref("/lists")
-         .push({
-            name: listName,
-            items: {},
-            user_count: 1
-         });
+      var ref = firebase.database().ref("/lists");
+      var push = ref.push({
+         name: listName,
+         items: items,
+         user_count: userCount,
+         lastMod: date
+      });
 
       // Add the list to the user table
       var key = push.key;
-      var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists/created")
-         .child(key)
-         .set(0)
-         .then(data => { })
-         .catch(error => {
-            console.log("Failed to create list: " + error);
-         });
+      var userPath = createUserPath(uid);
+      ref = firebase.database().ref(userPath + "/lists/created/" + key)
+      var retVal = ref.set(0).then((snapshot) => {
+         return 0;
+      }).catch(error => {
+         console.log("Failed to create list: " + error);
+      });
+
+      return retVal;
    }
 
    /**
-    * Get the list keys and names to populate the YourLists.js page
-    * @param {*} that: this for caller
+    * GetListsKeyAndName
+    * 
+    * Returns the keys and names of all of the
+    * lists that the given user has access to.
+    * 
+    * @param {Component} that: context for caller
+    * 
+    * @returns An object containing the api data
+    *          and names of all the lists the user has access to
     */
-   GetListsKeyAndName(that) {
+   GetListsKeyAndName() {
       var uid = firebase.auth().currentUser.uid;
-      firebase
-         .database()
-         .ref("/users/" + uid + "/lists")
-         .on("value", function (snapshot) {
-            listIds = [];
-            var ssv = snapshot.val();
+
+      // Get the user path in the database
+      var userPath = createUserPath(uid);
+
+      var ref = firebase.database().ref(userPath + "/lists")
+      var retVal = ref.once("value").then((snapshot) => {
+         var ssv = snapshot.val();
+         var childVals = [];
+         var listIds = [];
+
+         // Parse the users current state to get their lists
+         if (ssv) {
+            // Get the user's created lists
+            for (var created in ssv.created) {
+               listIds.push(created);
+            }
+
+            // Get the user's shared lists
+            for (var shared in ssv.shared) {
+               listIds.push(shared);
+            }
+
+            // Get the states if the lists the user has access to
+            for (var idKey in listIds) {
+               var currentListId = listIds[idKey];
+
+               var childRef = firebase.database().ref("/lists/" + currentListId).once("value");
+
+               childVals.push(childRef);
+            }
+         }
+
+         // Return the states of the lists
+         return Promise.all(childVals);
+      }).then(result => {
+         var listIdLength = result.length;
+
+         var apiData = [];
+         var listTitles = [];
+
+         // Parse all of the list states
+         for (var i = 0; i < result.length; i++) {
+            var ssv = result[i];
+
             if (ssv) {
-               for (var created in ssv.created) {
-                  listIds.push(created);
-               }
-               for (var shared in ssv.shared) {
-                  listIds.push(shared);
-               }
+               // Get the list's api data
+               apiData.push({
+                  key: ssv.key,
+                  name: ssv.val().name
+               });
 
-               var curApiData = [];
-               var listTitles = [];
-               var listIdLength = listIds.length;
-               var counter = 1;
-               var bool = true;
-               for (var idKey in listIds) {
-                  bool = false;
-                  var currentListId = listIds[idKey];
-                  firebase
-                     .database()
-                     .ref("/lists/" + currentListId)
-                     .once("value", function (snapshot) {
-                        var ssv = snapshot.val();
-                        if (ssv) {
-                           curApiData.push({
-                              key: snapshot.key,
-                              name: ssv.name
-                           });
-                           listTitles.push(ssv.name);
-                           listTitles.sort((a, b) => a.localeCompare(b))
-                           if (counter == listIdLength) {
-                              that.setState({
-                                 apiData: curApiData,
-                                 listTitles: listTitles
-                              });
-                           }
-                           counter++;
-                        } else {
-                           console.log("ERROR: List does not exist.");
+               // Get the list's title
+               listTitles.push(ssv.val().name);
 
-                           that.setState({
-                              apiData: curApiData,
-                              listTitles: listTitles
-                           });
-                        }
-                     });
-               }
-               if (bool) {
-                  that.setState({
-                     apiData: [],
-                     listTitles: []
-                  });
+               if ((i - 1) === listIdLength) {
+                  break;
                }
             } else {
-               console.log("No API data...");
-               that.setState({
-                  apiData: [],
-                  listTitles: []
-               });
+               console.log("ERROR: List does not exist.");
+               break;
             }
-         });
+         }
+
+         // Sort the list titles
+         listTitles.sort((a, b) => a.localeCompare(b))
+
+         // Return the data
+         return {
+            apiData: apiData,
+            listTitles: listTitles,
+         };
+      });
+
+      return retVal;
    }
 
    /**
+    * getAvailableStores
+    * 
+    * Loads the available stores from the database.
+    * The available stores are all known stores.
+    * 
+    * @param   None
+    * 
+    * @returns The available stores
+    */
+   getAvailableStores() {
+      // Call the function to load all available stores
+      var data = autocomplete.cloudLoadAvailableStores();
+      return data;
+   }
+
+   /**
+    * getAvailableItems
+    * 
+    * Loads the available items from the database.
+    * The available items are all known items.
+    * 
+    * @param   None
+    * 
+    * @returns The available items
+    */
+   getAvailableItems() {
+      // Call the function to load all available items
+      var data = autocomplete.cloudLoadAvailableItems();
+      return data;
+   }
+
+   /**
+    * reorgListLoc
+    * 
+    * Returns the given list grouped based on the locations
+    * of the items in the given store.
+    * 
+    * @param {String} storeId The ID of the store the user is in
+    * @param {String} listId  The ID of the list to rearrange
+    * 
+    * @returns The sorted list
+    */
+   async reorgListLoc(storeId, listId) {
+      try {
+         // Call the function to get the sorted list
+         const {
+            data
+         } = await firebase.functions().httpsCallable('cloudReorgListLoc')({
+            storeId: storeId,
+            listId: listId
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   }
+
+   /**
+    * reorgListFastest
+    * 
+    * Returns the given list sorted in the order that
+    * the items would appear in the store.
+    * 
+    * @param {String} storeId The ID of the store the user is in
+    * @param {String} listId The ID of the list to rearrange
+    */
+   async reorgListFastest(storeId, listId) {
+      try {
+         // Call the function to get the sorted list
+         const {
+            data
+         } = await firebase.functions().httpsCallable('cloudReorgListFastest')({
+            storeId: storeId,
+            listId: listId
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   };
+
+   /**
+    * tokensToNotifications
+    * 
+    * Finds the users to send the notification to and
+    * formulates the notification message to send.
+    * 
+    * @param {String} uids The uids of the users
+    * @param {Array} tokens The Array of tokens
+    * @param {String} listID The ID of the list
+    * @param {String} listName The name of the message the notification is related to
+    * @param {String} message The message text to send
+    */
+   tokensToNotifications(uids, tokens, listID, listName, message) {
+      var that = this;
+      firebase.database().ref("/contacts/").once("value", function (snapshot) {
+         for (var pos in tokens) {
+            if (snapshot.val()) {
+               if (snapshot.val()[uids[pos]]) {
+                  var name = firebase.auth().currentUser.email;
+                  for (contact in snapshot.val()[uids[pos]]) {
+                     if (snapshot.val()[uids[pos]][contact].email == firebase.auth().currentUser.email) {
+                        name = snapshot.val()[uids[pos]][contact].name
+                        break;
+                     }
+                  }
+
+                  var title = name + ' to ' + listName;
+
+                  that.sendNotification(tokens[pos], title, message, {
+                     "page": "CurrentListPage",
+                     "name": listName,
+                     "listID": listID,
+                     "message": message,
+                     "title": title
+
+                  });
+               } else {
+                  console.log("There are no contacts for that person")
+               }
+            } else {
+               console.log("tokensToNotifications messed up")
+            }
+         }
+      });
+   }
+
+   /**
+    * GetTheme
+    * 
     * Get the current theme of the user
-    * @param {*} that: this for caller
+    * 
+    * @param {Component} that: context for caller
+    * 
+    * @returns None
     */
    GetTheme(that) {
       if (firebase.auth().currentUser != null) {
@@ -419,19 +638,21 @@ class ListFunctions {
    }
 
    /**
+    * ToggleTheme
+    * 
     * Toggle the current theme of the user
-    * @param {*} that: this for caller
+    * 
+    * @param {Component} that: context for caller
+    * 
+    * @returns None
     */
    ToggleTheme() {
       var uid = firebase.auth().currentUser.uid;
       var ssv;
       if (uid) {
-         firebase
-            .database()
-            .ref("/users/" + uid + "/preferences/theme")
-            .once("value", function (snapshot) {
-               ssv = snapshot.val();
-            });
+         firebase.database().ref("/users/" + uid + "/preferences/theme").once("value", function (snapshot) {
+            ssv = snapshot.val();
+         });
          return firebase.database().ref("/users/" + uid + "/preferences/theme").set(ssv == 'light' ? 'dark' : 'light');
       } else null;
    }

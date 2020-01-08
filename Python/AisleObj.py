@@ -1,3 +1,11 @@
+import os
+import sys
+
+import ItemObj
+
+file_dir = os.path.dirname(__file__)
+sys.path.append(file_dir)
+
 """
 Aisle object used to simulate Aisles from grocery stores.
 Aisles are identified using a number and list of tags.
@@ -9,38 +17,39 @@ inside of the aisle.
 class Aisle(object):
 	"""
 	init
-
 	Initialize a new Aisle object.
-
 	@input	aisleNum	The number of this aisle
 	@input	tags		The list of tags for this aisle
-
 	@return	None
 	"""					
 	def __init__(self, aisleNum, tags):
-		self.aisleNum = aisleNum
-		self.aisleTags = tags
+		if type(tags) != list:
+			raise ValueError("Error in AisleObj: tags parameter must be a list")
+
+		self.setNumber(aisleNum)
+
+		self.aisleTags = []
+		for tag in tags:
+			self.addTag(tag)
+
 		self.items = []
 	
 	"""
 	addTag
-
 	Adds the given tag to this aisle's list of tags.
-
 	@input	newTag	The tag to add to the list
-
 	@return	None
 	"""
 	def addTag(self, newTag):
+		if type(aisleNum) != str:
+			raise ValueError("Error in AisleObj: tags must be Strings")
+
 		self.aisleTags.append(newTag)
 		
 	"""
 	getTags
-
 	Returns this aisle's list of tags.
-
 	@input	None
-
 	@return	The list of tags
 	"""
 	def getTags(self):
@@ -48,65 +57,35 @@ class Aisle(object):
 
 	"""
 	addItem
-
 	Adds the given item to this aisle's list of items
-
 	@input	newItem	The item to add to the list
-
 	@return	None
 	"""
 	def addItem(self, newItem):
+		if type(newItem) != ItemObj.Item:
+			raise ValueError("Error in AisleObj: items must be Item objects")
+
 		self.items.append(newItem)
 
 	"""
 	getNumber
-
 	Returns this aisle's number
-
 	@input	None
-
 	@return	This aisle's number
 	"""
 	def getNumber(self):
 		return(self.aisleNum)
-		
-	"""
-	compDist
 
-	Computes the distance (similarity) between this aisle
-	and the given aisle. Performs this comparison by
-	comparing the percentage of tags and items that the two aisles
-	have in common. A value of 0 means the aisles are identical,
-	while a value of 1 means they are completely different.
+	def setNumber(self, newNum):
+		if type(newNum) != int:
+			raise ValueError("Error in AisleObj: aisleNum parameter must be an integer")
 
-	@input	aisleObj	The aisle to compare with this aisle
-
-	@return	The similary between the two aisles (0 = identical, 1 = Completely different)
-	"""
-	def compDist(self, aisleObj):
-		# Check the percentage of tags the two aisles have in common
-		similarTags = set(self.aisleTags).intersection(aisleObj.getTags())
-		percentSimilarTags = len(similarTags) / len(self.aisleTags)
-
-		# Check the percentage of items the two aisles have in common
-		similarCount = 0
-		for item in aisleObj.getAllItems():
-			if any(item.getName() == item2.getName() for item2 in self.items):
-				similarCount += 1
-		percentSimilarItems = similarCount / len(self.items)
-
-		# Get the average of the two percentages
-		percentSimilar = (percentSimilarItems + percentSimilarTags) / 2
-		
-		return(1 - percentSimilar)
+		self.aisleNum = newNum
 
 	"""
 	str
-
 	Returns a string describing this aisle
-
 	@input	None
-
 	@return	String describing this aisle
 	"""
 	def __str__(self):
@@ -120,11 +99,8 @@ class Aisle(object):
 
 	"""
 	getAllItems
-
 	Returns the list of items inside of this aisle
-
 	@input	None
-
 	@return	List of items in this aisle
 	"""
 	def getAllItems(self):
