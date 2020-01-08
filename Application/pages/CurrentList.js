@@ -1113,13 +1113,15 @@ class CurrentList extends Component {
                   // TODO add a dashboard with quick details such as total count, shared with and price etc..
                   // this.state.listItems.length
                }
-               <Select style={styles.selectBox}
-                  label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
-                  data={organizationOptions}
-                  placeholder='Select an organization method'
-                  selectedOption={this.state.orgMethod}
-                  onSelect={(selection) => this.handleReorg(selection)}
-               />
+               <Layout style={styles.selectContainer}>
+                  <Select style={styles.selectBox}
+                     label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
+                     data={organizationOptions}
+                     placeholder='Select an organization method'
+                     selectedOption={this.state.orgMethod}
+                     onSelect={(selection) => this.handleReorg(selection)}
+                  />
+               </Layout>
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}

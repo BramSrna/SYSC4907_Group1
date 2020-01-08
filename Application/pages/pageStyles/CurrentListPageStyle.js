@@ -103,8 +103,12 @@ export const styles = StyleSheet.create({
       width: 250,
       margin: 4,
    },
+   selectContainer:{
+      flexDirection:"row",
+      marginHorizontal: 8,
+   },
    selectBox: {
-      width: '100%',
+      flex: 1,
    },
    buttonContainer: {
       flexDirection: 'row',
