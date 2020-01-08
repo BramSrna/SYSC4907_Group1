@@ -174,6 +174,7 @@ class LoginPage extends Component {
               {REGISTER}
             </Button>
           </Layout>
+          <Layout style={styles.rowContainer}></Layout>
         </Layout>
       );
     }
