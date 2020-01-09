@@ -15,6 +15,9 @@ const ADD_ITEM_LOCATION = "Add Item Location";
 const MAP_A_STORE = "Map a Store";
 const REGISTER_AN_ITEM = "Register an Item";
 const SIGNOUT = "Sign Out";
+const EXCEL_PARSER = "Parse Excel File";
+
+const DEV_MODE_ENABLED = true;
 
 class SideMenu extends Component {
     constructor(props) {
@@ -39,6 +42,17 @@ class SideMenu extends Component {
         } catch (e) {
             console.log(e);
         }
+    }
+
+    devModeRender(){
+        return(            
+            <Text
+                style={styles.navItemStyle}
+                onPress={this.navigateToScreen('ExcelParserPage')}
+            >
+                {EXCEL_PARSER}
+            </Text>
+        );
     }
 
     render() {
@@ -80,6 +94,7 @@ class SideMenu extends Component {
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('RegisterItemPage')}>
                                 {REGISTER_AN_ITEM}
                             </Text>
+                            {DEV_MODE_ENABLED && this.devModeRender()}
                         </Layout>
                     </Layout>
                 </ScrollView>

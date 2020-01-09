@@ -9,6 +9,7 @@ import CrowdSourcePage from '../pages/CrowdSourcePage';
 import AddItemLocationPage from '../pages/AddItemLocationPage';
 import YourContacts from '../pages/YourContacts';
 import NewContact from '../pages/NewContact';
+import ExcelParserPage from '../pages/ExcelParserPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -37,6 +38,9 @@ const StackNavigator = createStackNavigator({
     },
     NewContact: {
         screen: NewContact
+    },
+    ExcelParserPage: {
+        screen: ExcelParserPage
     }
 }, {
     initialRouteName: "Home",
@@ -97,8 +101,13 @@ const MainDrawerNavigator = createDrawerNavigator({
         navigationOptions: {
             drawerLabel: () => null
         }
+    },
+    ExcelParserPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Excel Parser"
+        }
     }
-
 }, {
     gesturesEnabled: false,
     contentComponent: SideMenu,
