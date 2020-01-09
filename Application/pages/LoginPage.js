@@ -5,14 +5,11 @@ import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
+import * as ng from "../navigation/NavigationGlobals";
 
 const LOGIN = "Login";
 const REGISTER = "Register";
 const FORGOT_PASSWORD = "Forgot your password?";
-const HOMEPAGE = "Home";
-const REGISTERPAGE = "Registration";
-const FORGOTPASSWORDPAGE = "ForgotPassword";
-const VERIFICATIONPAGE = "Verification";
 
 class LoginPage extends Component {
   userAlreadyLoggedIn = false;
@@ -27,9 +24,9 @@ class LoginPage extends Component {
     if (buttonId == LOGIN) {
       this.onPressLoginIn();
     } else if (buttonId == REGISTER) {
-      this.props.navigation.navigate(REGISTERPAGE);
+      this.props.navigation.navigate(ng.REGISTERPAGE);
     } else if (buttonId == FORGOT_PASSWORD) {
-      this.props.navigation.navigate(FORGOTPASSWORDPAGE);
+      this.props.navigation.navigate(ng.FORGOTPASSWORDPAGE);
     }
   };
 
@@ -45,10 +42,10 @@ class LoginPage extends Component {
       if (user != null && user.email == this.state.email) {
         if (!user.emailVerified) {
           console.log("LoginPage: navigate to VerificationPage");
-          this.props.navigation.navigate(VERIFICATIONPAGE);
+          this.props.navigation.navigate(ng.VERIFICATIONPAGE);
         }
         else {
-          this.props.navigation.navigate(HOMEPAGE);
+          this.props.navigation.navigate(ng.HOMEPAGE);
           console.log("LoginPage: navigate to HomePage");
         }
       }
@@ -91,7 +88,7 @@ class LoginPage extends Component {
         this._isMounted = true;
         this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
         if (this.userAlreadyLoggedIn) {
-          this.props.navigation.navigate(HOMEPAGE);
+          this.props.navigation.navigate(ng.HOMEPAGE);
         }
       }
     );
