@@ -4,8 +4,10 @@ import { Layout, Button, Input } from 'react-native-ui-kitten';
 import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import * as ng from "../navigation/NavigationGlobals";
 
 const RESETPASS = "Reset Password";
+const BACK_TO_LOGIN = "Back To Login";
 
 class ForgotPasswordPage extends Component {
     constructor(props) {
@@ -27,7 +29,7 @@ class ForgotPasswordPage extends Component {
     }
 
     onBackToLoginPress = () => {
-        this.props.navigation.navigate(LOGINPAGE);
+        this.props.navigation.navigate(ng.LOGINPAGE);
     }
 
     render() {
@@ -54,6 +56,14 @@ class ForgotPasswordPage extends Component {
                                     ref="reset"
                                     onPress={this.resetPassword}>
                                     {RESETPASS}
+                                </Button>
+                            </Layout>
+                            <Layout style={styles.rowContainer}>
+                                <Button
+                                    style={styles.button}
+                                    ref="backToLogin"
+                                    onPress={this.onBackToLoginPress}>
+                                    {BACK_TO_LOGIN}
                                 </Button>
                             </Layout>
                         </Layout>

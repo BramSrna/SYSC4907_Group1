@@ -4,11 +4,11 @@ import { Layout, Button, Input, Icon } from 'react-native-ui-kitten';
 import { ScrollView } from "react-native-gesture-handler";
 import FirebaseUser from "../components/FirebaseUser";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import * as ng from "../navigation/NavigationGlobals";
 
 const REGISTER = "Register";
 const LOGIN = "Already Registered/Login";
-const LOGINPAGE = "Login";
-const VERIFICATIONPAGE = "Verification";
+const BACK_TO_LOGIN = "Back To Login";
 
 class RegisterPage extends Component {
   userAlreadyLoggedIn = false;
@@ -21,11 +21,14 @@ class RegisterPage extends Component {
     secureTextEntry: true,
     registering: false
   }
+
   buttonListener = buttonId => {
     if (buttonId === REGISTER) {
       this.updateRegisterInfo();
     } else if (buttonId === LOGIN) {
-      this.props.navigation.navigate(LOGINPAGE);
+      this.props.navigation.navigate(ng.LOGINPAGE);
+    } else if (buttonId === BACK_TO_LOGIN) {
+      this.props.navigation.navigate(ng.LOGINPAGE);
     }
   };
 
@@ -39,7 +42,7 @@ class RegisterPage extends Component {
       var firebaseUser = new FirebaseUser();
       var register = firebaseUser.register(this.state.email, this.state.password, displayName).then(() => {
         if (register) {
-          this.props.navigation.navigate(VERIFICATIONPAGE);
+          this.props.navigation.navigate(ng.VERIFICATIONPAGE);
         }
         this.setState({ registering: false });
       });
@@ -175,6 +178,14 @@ class RegisterPage extends Component {
               ref="register"
               onPress={() => this.buttonListener(REGISTER)}>
               {REGISTER}
+            </Button>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
+              ref="backToLogin"
+              onPress={() => this.buttonListener(BACK_TO_LOGIN)}>
+              {BACK_TO_LOGIN}
             </Button>
           </Layout>
         </Layout>

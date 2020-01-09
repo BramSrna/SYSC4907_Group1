@@ -209,16 +209,11 @@ class CurrentList extends Component {
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
 
-      console.log(reorg);
-
       if (reorg) {
-         console.log("HERE1");
-         console.trace();
          // If reorg is true, then just rearrange the current arrays
          localIds = newIds;
          localItems = newItems;
       } else {
-         console.log("HERE2");
          // Get the list of items added and removed
          var itemsAdded = newIds.filter(x => !localIds.includes(x));
          var itemsRemoved = localIds.filter(x => !newIds.includes(x));
@@ -290,9 +285,9 @@ class CurrentList extends Component {
       var retStr = item.genName;
 
       // If the specific name is given add it to the string
-      if ((item.spec !== undefined) &&
-         (item.specName !== null) &&
-         (item.specName !== "null")) {
+      if ((item.specName !== undefined) &&
+          (item.specName !== null) &&
+          (item.specName !== "null")) {
          retStr += " (" + item.specName + ")";
       }
 
@@ -785,6 +780,7 @@ class CurrentList extends Component {
                id = availableItems[i].id;
                genName = availableItems[i].genName;
                specName = availableItems[i].specName;
+               break;
             }
          }
 
@@ -878,23 +874,29 @@ class CurrentList extends Component {
       if (query === '') {
          return [];
       }
+
       var list = null;
       var items = [];
       if (type == 'items') {
-         list = availableItems
+         list = availableItems;
       } else if (type == 'stores') {
-         list = availableStores
+         list = availableStores;
       }
+
       for (var a = 0; a < list.length; a++) {
-         items.push(list[a].name)
+         items.push(list[a].name);
       }
-      const regex = new RegExp(`${query.trim()}`, 'i');
-      var items = items.filter(item => item.search(regex) >= 0);
+
+      query = query.trim().toLowerCase();
+      //const regex = new RegExp(`${query.trim()}`, 'i');
+      //var items = items.filter(item => item.search(regex) >= 0);
+      var items = items.filter(item => item.trim().toLowerCase().indexOf(query) != -1);
       if (type == 'items') {
-         items.push(NEW_ITEM)
+         items.push(NEW_ITEM);
       } else if (type == 'stores') {
-         items.push(NEW_STORE)
+         items.push(NEW_STORE);
       }
+
       return items;
    }
 
