@@ -2,6 +2,19 @@ import * as firebase from "firebase";
 
 const globalComps = require('./GlobalComps');
 
+function replaceInvalidPathChars(stringToMod) {
+    if (stringToMod !== null) {
+        stringToMod = stringToMod.
+                      replace(".", "").
+                      replace("#", "").
+                      replace("$", "").
+                      replace("[", "").
+                      replace("]", "");
+    }
+
+    return(stringToMod);
+}
+
 /**
  * compArrays
  * 
@@ -62,6 +75,9 @@ function compArrays(array1, array2) {
  * @returns None
  */
 export function registerItem(genericName, specificName = null, size = null, sizeUnit = null, price = null) {
+    genericName = replaceInvalidPathChars(genericName);
+    specificName = replaceInvalidPathChars(specificName);
+
     // Get the path to the item
     var itemPath = (new globalComps.ItemObj(genericName, specificName)).getPath();
 
@@ -159,6 +175,9 @@ export function registerItem(genericName, specificName = null, size = null, size
  * @returns None
  */
 export function registerStore(storeName, address, map, franchiseName = null) {
+    storeName = replaceInvalidPathChars(storeName);
+    address = replaceInvalidPathChars(address);
+    
     // Get the path of the store
     var storePath = (new globalComps.StoreObj(address, storeName)).getPath();
 
@@ -266,6 +285,11 @@ export function registerStore(storeName, address, map, franchiseName = null) {
  * @returns None
  */
 export function addItemLoc(genericName, specificName, storeName, address, aisleNum, itemDepartment) {
+    genericName = replaceInvalidPathChars(genericName);
+    specificName = replaceInvalidPathChars(specificName);
+    storeName = replaceInvalidPathChars(storeName);
+    address = replaceInvalidPathChars(address);
+
     var database = firebase.database();
 
     // Get the store object

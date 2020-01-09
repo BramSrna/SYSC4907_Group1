@@ -41,6 +41,7 @@ class HomePage extends Component {
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
     emailId = emailId.replace(/\./g, ",");
+    console.log(emailId);
     firebase
       .database()
       .ref("/userInfo/" + emailId)

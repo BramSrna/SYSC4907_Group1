@@ -5,13 +5,28 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import copy
+import json
 
-path = "C:\\Users\\brams\\Downloads\\grocerylist-dd21a-firebase-adminsdk-6uwbb-494a5986eb.json"
-
-cred = credentials.Certificate(path)
-defaultApp = firebase_admin.initialize_app(cred, {
-    'databaseURL' : "https://grocerylist-dd21a.firebaseio.com"
-})
+"""
+Item Needs:
+    - Generic Name *
+    - Specific Name
+    - Size
+    - Size Unit
+    - Price
+Store Needs:
+    - Store Name *
+    - Address *
+    - Map *
+    - Franchise Name
+Location Needs:
+    - Generic Name
+    - Specific Name
+    - Store Name
+    - Address
+    - Aisle Number
+    - Item Department
+"""
 
 filename = "../Item Information (Manual Data Collection).xlsx"
 storeInfoPage = "Store Information"
@@ -83,7 +98,12 @@ def parseStrForTags(strToParse):
         tags.insert(0, tempTags)
 
     return(tags)
-        
+
+
+STORE_NAME_TAG = "storeName"
+ADDRESS_TAG = "address"
+MAP_TAG = "map"
+AISLE_TAGS_TAG = "aisleTags"
 
 rowStart = 2
 rowEnd = 9
@@ -92,35 +112,29 @@ stores = []
 
 while (rowStart <= rowEnd):
     vals = {
-        "name" : getVal(storeSheet, rowStart, 0),
-        "address" : getVal(storeSheet, rowStart, 1),
+        STORE_NAME_TAG : getVal(storeSheet, rowStart, 0),
+        ADDRESS_TAG : getVal(storeSheet, rowStart, 1),
         "franchiseName" : getVal(storeSheet, rowStart, 2),
-        "map" : getVal(storeSheet, rowStart, 3),
-        "aisleTags" : getVal(storeSheet, rowStart, 4),
-        "items" : []
+        MAP_TAG : getVal(storeSheet, rowStart, 3),
+        AISLE_TAGS_TAG : getVal(storeSheet, rowStart, 4)
     }
 
-    vals["map"] = parseStrForDeps(vals["map"])
-    vals["aisleTags"] = parseStrForTags(vals["aisleTags"])
+    vals[MAP_TAG] = parseStrForDeps(vals[MAP_TAG])
+    vals[AISLE_TAGS_TAG] = parseStrForTags(vals[AISLE_TAGS_TAG])
 
     stores.append(vals)
 
     rowStart += 1
 
-storeIds = []
+GENERIC_NAME_TAG = "genericName"
+SPECIFIC_NAME_TAG = "specificName"
+DEPARTMENT_TAG = "department"
+AISLE_NUM_TAG = "aisleNum"
+SIZE_TAG = "size"
+SIZE_UNIT_TAG = "sizeUnit"
 
-for store in stores:
-    ref = db.reference('stores')
-    storeId = ref.push(store)
-    storeIds.append(storeId.key)
-
-sheetNames = ["Item Information (Independent 2",
-              "Sheet6",
-              "Item Information (Food Basic 16",
-              "Item Information (South Keys Wa",
-              "Item Information (Bank Metro)",
-              "Item Information (South Keys Lo",
-              "Item Information (Walmart - 227"]
+items = []
+locs = []
 
 for i in range(len(sheetNames)):
     sheetName = sheetNames[i]
@@ -129,98 +143,93 @@ for i in range(len(sheetNames)):
     rowStart = 2
     rowEnd = 51
 
-    items = []
-
     while ((rowStart <= rowEnd) and (rowStart < currSheet.nrows)):
-        vals = {
-            "genericName" : getVal(currSheet, rowStart, 0),
-            "specificName" : getVal(currSheet, rowStart, 1),
-            "price" : getVal(currSheet, rowStart, 5),
-            "size" : getVal(currSheet, rowStart, 6),
-            "locs" : {
-                "aisleNum" : getVal(currSheet, rowStart, 4),
-                "department" : getVal(currSheet, rowStart, 3),
-                "store" : storeIds[i]
-            }
+        item = {
+            GENERIC_NAME_TAG : getVal(currSheet, rowStart, 0),
+            SPECIFIC_NAME_TAG : getVal(currSheet, rowStart, 1),
+            "price" : getVal(currSheet, rowStart, 6),
+            SIZE_TAG : getVal(currSheet, rowStart, 7),
+            SIZE_UNIT_TAG : None
         }
 
-        size, unit = parseSize(vals["size"])
-        vals["size"] = size
-        vals["sizeUnit"] = unit
+        loc = {
+            GENERIC_NAME_TAG : getVal(currSheet, rowStart, 0),
+            SPECIFIC_NAME_TAG : getVal(currSheet, rowStart, 1),
+            STORE_NAME_TAG : getVal(currSheet, rowStart, 2),
+            ADDRESS_TAG : getVal(currSheet, rowStart, 3),
+            DEPARTMENT_TAG : getVal(currSheet, rowStart, 4),
+            AISLE_NUM_TAG : getVal(currSheet, rowStart, 5)
+        }
 
-        for key in vals:
-            val = str(vals[key])
+        size, unit = parseSize(item[SIZE_TAG])
+        item[SIZE_TAG] = size
+        item[SIZE_UNIT_TAG] = unit
+
+        for key in item:
+            val = str(item[key])
             if ((val == "N/A") or (val.strip() == "")):
-                vals[key] = None
+                item[key] = None
 
-        for key in vals["locs"]:
-            val = str(vals["locs"][key])
+        for key in loc:
+            val = str(loc[key])
             if ((val == "N/A") or (val.strip() == "")):
-                vals["locs"][key] = None
+                loc[key] = None
 
-        items.append(vals)
+        items.append(item)
+        locs.append(loc)
 
         rowStart += 1
 
-    stores[i]["items"] = items
+for locNum in range(len(locs)):
+    loc = locs[locNum]    
 
-itemIds = []
+    itemCheck = False
+    storeCheck = False
 
-for store in stores:
-    tempIds = []
-    items = store["items"]
-    for item in items:
-        ref = db.reference('items')
-        currItems = ref.get()
-        itemId = None
-        if (currItems != None):
-            for item2 in currItems:
-                tempId = item2
-                item2 = currItems[item2]
-                if (("genericName" in item2) and
-                    ("specificName" in item2) and
-                    (item2["genericName"] == item["genericName"]) and
-                    (item2["specificName"] == item["specificName"])):
-                    itemId = tempId
-                elif (("genericName" in item2) and
-                      ("specificName" not in item2) and
-                      (item2["genericName"] == item["genericName"])):
-                    itemId = tempId
+    keepStore = None
 
-        if (itemId == None):
-            itemCopy = copy.copy(item)
-            itemCopy.pop("locs", None)
+    for itemNum in range(len(items)):
+        item = items[itemNum]
+        
+        if ((item[GENERIC_NAME_TAG] == loc[GENERIC_NAME_TAG]) and
+            (item[SPECIFIC_NAME_TAG] == loc[SPECIFIC_NAME_TAG])):
+            itemCheck = True
+            break
 
-            ref = db.reference("items")
-            itemId = ref.push(itemCopy)
-            itemId = itemId.key
+    if (not itemCheck):
+        print("Invalid item in item check")
+        break
 
-        ref = db.reference('items/' + itemId + "/locs/")
-        tempDict = {}
-        neededKeys = ["store", "department", "aisleNum"]
-        item = item["locs"]
-        for key in neededKeys:
-            if key in item:
-                tempDict[key] = item[key]
-        ref.push(tempDict)
+    for storeNum in range(len(stores)):
+        store = stores[storeNum]
 
-        tempIds.append(itemId)
-    itemIds.append(tempIds)
+        #print(store[STORE_NAME_TAG], store[ADDRESS_TAG])
+        
+        if ((store[STORE_NAME_TAG] == loc[STORE_NAME_TAG]) and
+            (store[ADDRESS_TAG] == loc[ADDRESS_TAG])):
+            keepStore = store
+        
+        if ((store[STORE_NAME_TAG] == loc[STORE_NAME_TAG]) and
+            (store[ADDRESS_TAG] == loc[ADDRESS_TAG]) and
+            ((loc[DEPARTMENT_TAG] == None) or (loc[DEPARTMENT_TAG] in store[MAP_TAG])) and
+            ((loc[AISLE_NUM_TAG] == None) or (loc[AISLE_NUM_TAG] <= len(store[AISLE_TAGS_TAG])))):
+            storeCheck = True
+            break
 
-for i in range(len(storeIds)):
-    storeId = storeIds[i]
-    tempItemIds = itemIds[i]
-    for j in range(len(tempItemIds)):
-        itemId = tempItemIds[j]
-        print(storeId, itemId)
-        path = 'stores/' + storeId + "/items/" + itemId
-        ref = db.reference(path)
+    if (not storeCheck):
+        print("Invalid store in store check")
+        #print(loc)
+        #print(keepStore)
+        break
 
-        temp = stores[i]["items"][j]["locs"]
-        tempDict = {}
-        neededKeys = ["department", "aisleNum"]
-        for key in neededKeys:
-            if key in temp:
-                tempDict[key] = temp[key]
+data = {
+    "ITEMS" : items,
+    "STORES" : stores,
+    "LOCS" : locs
+}
 
-        ref.update(tempDict)
+filePath = "../Application/collectedInfo.json"
+with open(filePath, 'w') as f:
+    json.dump(data, f)
+
+
