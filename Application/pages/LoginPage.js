@@ -38,6 +38,7 @@ class LoginPage extends Component {
     if (this._isMounted) this.setState({ authenticating: true });
 
     if (this.authenticateUser(this.state.email, this.state.password)) {
+      console.log("Authenticated");
       user = new FirebaseUser();
       if (user != null && user.email == this.state.email) {
         if (!user.emailVerified) {
@@ -55,9 +56,10 @@ class LoginPage extends Component {
   }
 
   authenticateUser = (email, password) => {
-    Firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+    console.log(email, password);
+    Firebase.auth().signInWithEmailAndPassword(email, password).then(function(firebaseUser) {
       return true;
-    }, (error) => {
+    }).catch(function(error) {
       var errorCode = error.code;
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
