@@ -41,7 +41,7 @@ function createUserPath(userId) {
  * to manipulate the database.
  */
 class ListFunctions {
-   constructor() {}
+   constructor() { }
 
    /**
     * sendNotification
@@ -276,73 +276,73 @@ class ListFunctions {
       // Get the path to the user
       var userPath = createUserPath(uid);
       var ref = firebase.database().ref(userPath + "/lists");
-      var retVal = ref.once("value").then((snapshot) => {  
+      var retVal = ref.once("value").then((snapshot) => {
          // Get the current state of the user's lists
          if (snapshot.val()) {
-             var createdLists = [];
-             var sharedLists = [];
- 
-             // Get all of the user's created lists
-             var temp = snapshot.val().created;
-             for (var id in temp) {
-                 createdLists.push(id);
-             }
- 
-             // Get all of the user's shared lists
-             temp = snapshot.val().shared;
-             for (id in temp) {
-                 sharedLists.push(id);
-             }
- 
-             // If the user's created lists contains the target list,
-             // then remove the list from the user's created lists
-             if (createdLists.includes(listId)) {  
-                 var rmvRef = firebase.database().ref(userPath + "/lists/created/" + listId);
-                 rmvRef.remove();
-             }
- 
-             // Do the same as above for the user's shared lists
-             if (sharedLists.includes(listId)){  
-                 rmvRef = firebase.database().ref(userPath + "/lists/shared/" + listId);
-                 rmvRef.remove();
-             }
+            var createdLists = [];
+            var sharedLists = [];
+
+            // Get all of the user's created lists
+            var temp = snapshot.val().created;
+            for (var id in temp) {
+               createdLists.push(id);
+            }
+
+            // Get all of the user's shared lists
+            temp = snapshot.val().shared;
+            for (id in temp) {
+               sharedLists.push(id);
+            }
+
+            // If the user's created lists contains the target list,
+            // then remove the list from the user's created lists
+            if (createdLists.includes(listId)) {
+               var rmvRef = firebase.database().ref(userPath + "/lists/created/" + listId);
+               rmvRef.remove();
+            }
+
+            // Do the same as above for the user's shared lists
+            if (sharedLists.includes(listId)) {
+               rmvRef = firebase.database().ref(userPath + "/lists/shared/" + listId);
+               rmvRef.remove();
+            }
          }
- 
+
          // Return the created and shared list ids
          return Promise.all([listId]);
-     }).then(result => {
+      }).then(result => {
          var listId = result[0];
- 
+
          // Get the created list from the lists table
          if (listId !== null) {
-           listRetVal = firebase.database().ref("/lists/" + listId).once("value");
+            listRetVal = firebase.database().ref("/lists/" + listId).once("value");
          }
- 
+
          // Return the retrieved lists and their ids
          return Promise.all([listId, listRetVal]);
-     }).then(result => {
+      }).then(result => {
          var listId = result[0];
          var listRetVal = result[1];
- 
+
          // If the created list was found, then
          // handle its changes
          if (listRetVal !== null) {
-             listRetVal = listRetVal.val();
-             if (listRetVal) {
-                 // If the user was the only one with access to
-                 // the list, then delete it, otherwise,
-                 // just decrement the user count
-                 if (listRetVal.user_count === 1) {
-                     var childRmvRef = firebase.database().ref("/lists/" + listId);
-                     childRmvRef.remove();
-                 } else {
-                     var newCount = listId.user_count - 1;
-                     childRmvRef = firebase.database().ref("/lists/" + listId);
-                     childRmvRef.update({
-                         user_count: newCount
-                     });
-                 }
-             }
+            listRetVal = listRetVal.val();
+            if (listRetVal) {
+               // If the user was the only one with access to
+               // the list, then delete it, otherwise,
+               // just decrement the user count
+               if (listRetVal.user_count === 1) {
+                  var childRmvRef = firebase.database().ref("/lists/" + listId);
+                  childRmvRef.remove();
+               } else {
+                  var newCount = (listId.user_count) - 1;
+                  childRmvRef = firebase.database().ref("/lists/" + listId);
+                  childRmvRef.update({
+                     user_count: newCount
+                  });
+               }
+            }
          }
 
          return true;

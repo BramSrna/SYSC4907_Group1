@@ -85,7 +85,7 @@ class ContactFunctions {
                               .ref("/lists/" + listID)
                               .once("value", function (snapshot) {
                                  if (snapshot.val()) {
-                                    var newCount = snapshot.val().user_count + 1;
+                                    var newCount = (snapshot.val().user_count) + 1;
                                     firebase
                                        .database()
                                        .ref("/lists/" + listID)
