@@ -16,7 +16,8 @@ import {
    TopNavigation,
    TopNavigationAction,
    Select,
-   Text
+   Text,
+   CheckBox
 } from 'react-native-ui-kitten';
 import { Modal as RNModal } from "react-native";
 import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
@@ -68,7 +69,9 @@ class CurrentList extends Component {
          modalMode: 'item',
          message: '',
          userCount: 0,
-         hr: false
+         hr: false,
+
+         hidePurchased: false
       };
    }
 
@@ -252,7 +255,9 @@ class CurrentList extends Component {
       }
 
       if (!this.state.firstLoadComplete) {
-         var temp = this.reorganizeListAdded(localItems, localIds);
+         var temp = this.localSort(this.state.orgMethod.value,
+                                   localItems,
+                                   localIds);
 
          localItems = temp.items;
          localIds = temp.ids;
@@ -306,16 +311,18 @@ class CurrentList extends Component {
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
-         return (
-            <ListItemContainer
-               title={this.getDispName(item)}
-               fromItemView={true}
-               purchased={true}
-               listID={this.state.listId}
-               itemID={this.state.listItemIds[index]}
-               onDelete={this.deleteItem}
-            />
-         );
+         if (!this.state.hidePurchased) {
+            return (
+               <ListItemContainer
+                  title={this.getDispName(item)}
+                  fromItemView={true}
+                  purchased={true}
+                  listID={this.state.listId}
+                  itemID={this.state.listItemIds[index]}
+                  onDelete={this.deleteItem}
+               />
+            );
+         }
       } else {
          return (
             <ListItemContainer
@@ -428,10 +435,13 @@ class CurrentList extends Component {
       // Call the corresponding selection function
       switch (selectionVal) {
          case "ORDER_ADDED":
-            this.reorganizeListAdded();
+            this.localSort(selectionVal);
             break;
          case "ALPHABETICALLY":
-            this.reorganizeListAlphabetically();
+            this.localSort(selectionVal);
+            break;
+         case "PURCHASED":
+            this.localSort(selectionVal);
             break;
          case "BY_LOCATION":
             this.setModalDetails(true, this.reorganizeListLoc);
@@ -505,20 +515,56 @@ class CurrentList extends Component {
       }
    }
 
-   /**
-    * reorganizeListAlphabetically
-    * 
-    * Reorganizes the list to put the items in alphabetical
-    * order based on the item's names.
-    * 
-    * @params  None
-    * 
-    * @returns None
-    */
-   reorganizeListAlphabetically() {
+   localSort(selectionVal, initItems = null, initIds = null){
+      function alphSort(a, b) {
+         var itemA = that.getDispName(a.item).toUpperCase();
+         var itemB = that.getDispName(b.item).toUpperCase();
+         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
+      };
+      
+      function purchasedSort(a, b) {
+         var itemA = a.item.purchased ? 1 : 0;
+         var itemB = b.item.purchased ? 1 : 0;
+         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
+      };
+
+      function addedSort(a, b) {
+         var itemA = new Date(a.item.dateAdded);
+         var itemB = new Date(b.item.dateAdded);
+
+         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
+      }
+
+      sortFunction = null;
+      
+      // Call the corresponding selection function
+      switch (selectionVal) {
+         case "ORDER_ADDED":
+            sortFunction = addedSort;
+            break;
+         case "ALPHABETICALLY":
+            sortFunction = alphSort;
+            break;
+         case "PURCHASED":
+            sortFunction = purchasedSort;
+            break;
+         default:
+            break;
+      }
+
       // Get the items and ids
-      var items = this.state.listItems;
-      var ids = this.state.listItemIds;
+      var items = [];
+      var ids = [];
+
+      if (initItems === null) {
+         // Get the items and ids
+         items = this.state.listItems;
+         ids = this.state.listItemIds;
+      } else {
+         // Get the items and ids
+         items = initItems;
+         ids = initIds;
+      }
 
       // Put the items and their ids in a nested list
       var temp = [];
@@ -528,11 +574,7 @@ class CurrentList extends Component {
 
       // Rearrage the nested list to put it in alphabetical order
       var that = this;
-      temp.sort(function (a, b) {
-         var itemA = that.getDispName(a.item).toUpperCase();
-         var itemB = that.getDispName(b.item).toUpperCase();
-         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
-      });
+      temp.sort(sortFunction);
 
       // Retrieve the organized items and ids
       for (var k = 0; k < temp.length; k++) {
@@ -540,8 +582,16 @@ class CurrentList extends Component {
          ids[k] = temp[k].id;
       }
 
-      // Update the list state to the reorganized values
-      this.updateListState(items, ids, reorg = true);
+      if (initItems === null) {
+         // Update the list state to the reorganized values
+         this.updateListState(items, ids, reorg = true);
+      }
+
+      return {
+         items: items,
+         ids: ids
+      }
+
    }
 
    /**
@@ -1046,7 +1096,8 @@ class CurrentList extends Component {
    render() {
       const AddAction = (props) => (
          <TopNavigationAction
-            {...props} icon={AddIcon}
+            {...props}
+            icon={AddIcon}
             onPress={() => {
                this._isMounted && this.setState({
                   itemModalVisible: true,
@@ -1065,14 +1116,30 @@ class CurrentList extends Component {
          />
       );
 
-      const renderRightControls = () => [
-         <NotificationAction />,
-         <AddAction />,
-      ];
+      const HidePurchasedAction = (props) => (
+         <CheckBox
+            {...props}
+            checked={this.state.hidePurchased}
+            onChange={(isChecked) => {
+               this._isMounted && this.setState({
+                  hidePurchased : isChecked
+               })
+            }}
+         />
+      )
 
-      const renderRightControl = () => [
-         <AddAction />,
-      ];
+      const renderRightControls = (showBell = false) => {
+         var rightControls = [];
+
+         if (showBell) {
+            rightControls.push(<NotificationAction />);
+         }
+
+         rightControls.push(<HidePurchasedAction />);
+         rightControls.push(<AddAction />);
+
+         return(rightControls);
+      }
 
       renderMenuAction = () => (
          <TopNavigationAction
@@ -1087,7 +1154,7 @@ class CurrentList extends Component {
                title={(this.state.listName != "") ? this.state.listName : PAGE_TITLE}
                alignment="center"
                leftControl={renderMenuAction()}
-               rightControls={this.state.userCount > 1 ? renderRightControls() : renderRightControl()}
+               rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
             <Layout style={styles.ListContainer}>
                <RNModal
