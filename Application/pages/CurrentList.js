@@ -165,6 +165,7 @@ class CurrentList extends Component {
          var ids = [];
 
          var ssv = snapshot.val();
+
          var userCount = 0;
          var minPrice = 0;
          var maxPrice = 0;
@@ -177,11 +178,14 @@ class CurrentList extends Component {
             for (var itemId in listItems) {
                var item = listItems[itemId];
 
+               // Get the price of the item
                var priceRange = item.price;
                if (priceRange !== undefined) {
+                  // Price range known
                   minPrice += priceRange.minPrice === undefined ? 0 : priceRange.minPrice;
                   maxPrice += priceRange.maxPrice === undefined ? 0 : priceRange.maxPrice;
                } else {
+                  // Price unknown
                   numUnknownPrice += 1;
                }
 
@@ -189,9 +193,6 @@ class CurrentList extends Component {
                ids.push(itemId);
             }
          }
-
-         console.log("MIN: ", minPrice);
-         console.log("MAX: ", maxPrice);
 
          // Get the user count of the list
          if (ssv && ('user_count' in ssv)) {
@@ -229,6 +230,11 @@ class CurrentList extends Component {
     *                            Default is false
     * @param {Integer} userCount If non-null, the userCount is set to this value
     *                            Default is null
+    * @param {Double} minPrice   The minimum price of the entire list
+    * @param {Double} maxPrice   The maximum price of the entire list
+    * @param {Integer} numUnknownPrice The number of items in the list with unknown prices
+    * 
+    * @returns None
     */
    updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null) {
       // Get the current Arrays

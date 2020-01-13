@@ -179,6 +179,7 @@ class ListFunctions {
 
          var date = (new Date()).toString();
 
+         // Get the price range from the item if it was preexisting
          var priceRange = null;
          if (item !== null) {
             priceRange = item.finalPrice;   
@@ -370,7 +371,7 @@ class ListFunctions {
     * 
     * @returns None
     */
-   CreateNewList(listName, items = {}, userCount = 1, startPrice = 0) {
+   CreateNewList(listName, items = {}, userCount = 1) {
       var uid = firebase.auth().currentUser.uid;
 
       var date = (new Date()).toString();
