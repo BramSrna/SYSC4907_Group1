@@ -37,8 +37,9 @@ var availableStores = [];
 var availableItems = [];
 
 const PAGE_TITLE = "Current List";
-const NEW_ITEM = "Register an item..."
-const NEW_STORE = "Register a store..."
+const NEW_ITEM = "Register an item...";
+const NEW_STORE = "Register a store...";
+
 class CurrentList extends Component {
    constructor(props) {
       super(props);
@@ -312,6 +313,7 @@ class CurrentList extends Component {
    GenerateListItem(item, index) {// Pass more paremeters here...
       if (item.purchased) {
          if (!this.state.hidePurchased) {
+            // Only render purchased items when the variable is false
             return (
                <ListItemContainer
                   title={this.getDispName(item)}
@@ -460,74 +462,48 @@ class CurrentList extends Component {
    }
 
    /**
-    * reorganizeListAdded
+    * localSort
     * 
-    * Reorganizes the list to match the order that
-    * the items were added to the list.
+    * Reorganizes the list saved in the state locally,
+    * without needing any external firebase calls.
+    * Uses the sort function designated through selectionVal
+    * to sort the list. Additional parameters can be given
+    * through initItems and initIds to prevent a change of
+    * state.
     * 
-    * @param   None
+    * @param   {String} selectionVal   The type of sort to use
+    * @param   {Array}  initItems   The array of items to sort, if none
+    *                               is given, the list in the state is used
+    * @param   {Array}  initIds The array of ids to sort, if none
+    *                           is given, the list in the state is used
     * 
-    * @returns None
+    * @returns An object containing the sorted items and ids
     */
-   reorganizeListAdded(initItems = null, initIds = null) {
-      var items = [];
-      var ids = [];
-
-      if (initItems === null) {
-         // Get the items and ids
-         items = this.state.listItems;
-         ids = this.state.listItemIds;
-      } else {
-         // Get the items and ids
-         items = initItems;
-         ids = initIds;
-      }
-
-      // Put the items and their ids in a nested list
-      var temp = [];
-      for (var j = 0; j < items.length; j++) {
-         temp.push({ "item": items[j], "id": ids[j] });
-      }
-
-      // Rearrage the nested list to put it in alphabetical order
-      var that = this;
-      temp.sort(function (a, b) {
-         var itemA = new Date(a.item.dateAdded);
-         var itemB = new Date(b.item.dateAdded);
-
-         return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
-      });
-
-      // Retrieve the organized items and ids
-      for (var k = 0; k < temp.length; k++) {
-         items[k] = temp[k].item;
-         ids[k] = temp[k].id;
-      }
-
-      if (initItems === null) {
-         // Update the list state to the reorganized values
-         this.updateListState(items, ids, reorg = true);
-      }
-
-      return {
-         items: items,
-         ids: ids
-      }
-   }
-
    localSort(selectionVal, initItems = null, initIds = null){
+      /**
+       * Reorganizes the list to put the items in alphabetical
+       * order based on the item's names.
+       */      
       function alphSort(a, b) {
          var itemA = that.getDispName(a.item).toUpperCase();
          var itemB = that.getDispName(b.item).toUpperCase();
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
       };
       
+      /**
+       * Reorganizes the list to put the unpurchased items first
+       * and the purchased items last
+       */     
       function purchasedSort(a, b) {
          var itemA = a.item.purchased ? 1 : 0;
          var itemB = b.item.purchased ? 1 : 0;
          return (itemA < itemB) ? -1 : (itemA > itemB) ? 1 : 0;
       };
 
+      /**
+       * Reorganizes the list to put it in the order that the
+       * items were added to the list.
+       */   
       function addedSort(a, b) {
          var itemA = new Date(a.item.dateAdded);
          var itemB = new Date(b.item.dateAdded);
@@ -537,7 +513,7 @@ class CurrentList extends Component {
 
       sortFunction = null;
       
-      // Call the corresponding selection function
+      // Retrieve the corresponding selection function
       switch (selectionVal) {
          case "ORDER_ADDED":
             sortFunction = addedSort;
@@ -919,28 +895,47 @@ class CurrentList extends Component {
       }
    };
 
-
+   /**
+    * find
+    * 
+    * Retrieves a subset of the autocomplete lists
+    * based on the query and type given. A type
+    * of "items" uses the availableItems list to limit,
+    * while a type of "stores" uses the availableStores
+    * list to limit
+    * 
+    * @param {String} query The query string entered so far
+    * @param {String} type The type of list being limited
+    * 
+    * @returns The subset of the list 
+    */
    find(query, type) {
+      // Return an empty list for an empty query
       if (query === '') {
          return [];
       }
 
+      // Get the list to limit based on the type
       var list = null;
-      var items = [];
       if (type == 'items') {
          list = availableItems;
       } else if (type == 'stores') {
          list = availableStores;
       }
 
+      // Get the items in the list to limit
+      var items = [];
       for (var a = 0; a < list.length; a++) {
          items.push(list[a].name);
       }
 
+      // Remove all spaces from the query and convert to lower case
       query = query.trim().toLowerCase();
-      //const regex = new RegExp(`${query.trim()}`, 'i');
-      //var items = items.filter(item => item.search(regex) >= 0);
+
+      // Get all items containing the query
       var items = items.filter(item => item.trim().toLowerCase().indexOf(query) != -1);
+      
+      // Add the new type string to the list
       if (type == 'items') {
          items.push(NEW_ITEM);
       } else if (type == 'stores') {
