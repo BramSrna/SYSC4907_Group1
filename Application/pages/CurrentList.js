@@ -162,16 +162,29 @@ class CurrentList extends Component {
 
          var ssv = snapshot.val();
          var userCount = 0;
+         var minPrice = 0;
+         var maxPrice = 0;
 
          // Parse the item objects and their
          // corresponding ids
          if (ssv && ssv.items) {
             var listItems = ssv.items;
             for (var itemId in listItems) {
-               items.push(listItems[itemId]);
+               var item = listItems[itemId];
+
+               var priceRange = item.price;
+               if (priceRange !== undefined) {
+                  minPrice += priceRange.minPrice === undefined ? 0 : priceRange.minPrice;
+                  maxPrice += priceRange.maxPrice === undefined ? 0 : priceRange.maxPrice;
+               }
+
+               items.push(item);
                ids.push(itemId);
             }
          }
+
+         console.log("MIN: ", minPrice);
+         console.log("MAX: ", maxPrice);
 
          // Get the user count of the list
          if (ssv && ('user_count' in ssv)) {
