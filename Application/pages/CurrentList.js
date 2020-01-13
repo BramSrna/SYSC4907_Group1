@@ -68,7 +68,11 @@ class CurrentList extends Component {
          modalMode: 'item',
          message: '',
          userCount: 0,
-         hr: false
+         hr: false,
+
+         minPrice: 0,
+         maxPrice: 0,
+         numUnknownPrice: 0
       };
    }
 
@@ -164,6 +168,7 @@ class CurrentList extends Component {
          var userCount = 0;
          var minPrice = 0;
          var maxPrice = 0;
+         var numUnknownPrice = 0;
 
          // Parse the item objects and their
          // corresponding ids
@@ -176,6 +181,8 @@ class CurrentList extends Component {
                if (priceRange !== undefined) {
                   minPrice += priceRange.minPrice === undefined ? 0 : priceRange.minPrice;
                   maxPrice += priceRange.maxPrice === undefined ? 0 : priceRange.maxPrice;
+               } else {
+                  numUnknownPrice += 1;
                }
 
                items.push(item);
@@ -192,7 +199,13 @@ class CurrentList extends Component {
          }
 
          // Update the state of the context
-         that.updateListState(items, ids, reorg = false, userCount = userCount);
+         that.updateListState(items,
+                              ids,
+                              reorg = false,
+                              userCount = userCount,
+                              minPrice = minPrice,
+                              maxPrice = maxPrice,
+                              numUnknownPrice = numUnknownPrice);
       });
    }
 
@@ -217,7 +230,7 @@ class CurrentList extends Component {
     * @param {Integer} userCount If non-null, the userCount is set to this value
     *                            Default is null
     */
-   updateListState(newItems, newIds, reorg = false, userCount = null) {
+   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null) {
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
@@ -276,7 +289,10 @@ class CurrentList extends Component {
          firstLoadComplete: true,
          listItems: localItems,
          listItemIds: localIds,
-         userCount: userCount === null ? this.state.userCount : userCount
+         userCount: userCount === null ? this.state.userCount : userCount,
+         minPrice: minPrice === null ? this.state.minPrice : minPrice,
+         maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
+         numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
       });
    }
 
@@ -318,28 +334,17 @@ class CurrentList extends Component {
     * @returns None
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
-      if (item.purchased) {
-         return (
-            <ListItemContainer
-               title={this.getDispName(item)}
-               fromItemView={true}
-               purchased={true}
-               listID={this.state.listId}
-               itemID={this.state.listItemIds[index]}
-               onDelete={this.deleteItem}
-            />
-         );
-      } else {
-         return (
-            <ListItemContainer
-               title={this.getDispName(item)}
-               fromItemView={true}
-               listID={this.state.listId}
-               itemID={this.state.listItemIds[index]}
-               onDelete={this.deleteItem}
-            />
-         );
-      }
+      return (
+         <ListItemContainer
+            title={this.getDispName(item)}
+            fromItemView={true}
+            description={item.price === undefined ? "" : "Price: " + item.price.minPrice + " - " + item.price.maxPrice}
+            purchased={item.purchased}
+            listID={this.state.listId}
+            itemID={this.state.listItemIds[index]}
+            onDelete={this.deleteItem}
+         />
+      );
    }
 
    /**
@@ -1128,6 +1133,9 @@ class CurrentList extends Component {
                   // TODO add a dashboard with quick details such as total count, shared with and price etc..
                   // this.state.listItems.length
                }
+               <Text>
+                  {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
+               </Text>
                <Layout style={styles.selectContainer}>
                   <Select style={styles.selectBox}
                      label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
