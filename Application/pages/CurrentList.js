@@ -1126,7 +1126,8 @@ class CurrentList extends Component {
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
                         <Text style={styles.dashboardText}>Number of Items: {this.state.listItems.length}</Text>
-                        <Text style={styles.dashboardText}>Shared with {this.state.userCount} others</Text>
+                        <Text style={styles.dashboardText}>List shared with {this.state.userCount - 1} others</Text>
+                        {/* -1 here to make sure we dont include the current user */}
                      </Layout>
                   </Layout>
                </Layout>
