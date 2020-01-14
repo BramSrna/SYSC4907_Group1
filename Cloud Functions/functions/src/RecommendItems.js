@@ -19,11 +19,37 @@ class Node {
     constructor(item) {
         this.item = item;
         this.count = 1;
+        this.children = [];
+    }
+
+    addChild(childItem) {
+        var newChild = new Node(childItem);
+        this.children.push(newChild);
+        return(newChild);
     }
 }
 
 class FPTree {
+    constructor(){
+        this.root = null;
+    }
 
+    addPath(listOfItems){
+        var currNode = this.root;
+        while (listOfItems.length > 0) {
+            var currVal = listOfItems[0];
+
+            var ind = currNode.children.indexOf(currVal)
+            if (ind === -1) {
+                currNode = currNode.addChild(currVal);
+            } else {
+                currNode.incCount();
+                currNode = currNode.children[ind];
+            }
+            
+            listOfItems.splice(0, 1);
+        }
+    }
 }
 
 function calcSupport(itemSubset, allTransactions) {
