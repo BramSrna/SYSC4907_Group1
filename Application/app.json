@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Grocery List Application Test",
-    "slug": "GroceryStoreApplicationTest",
+    "name": "Grocery List Application v3",
+    "slug": "GroceryStoreApplicationV3",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": [
