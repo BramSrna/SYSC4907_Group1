@@ -103,8 +103,8 @@ export const styles = StyleSheet.create({
       width: 250,
       margin: 4,
    },
-   selectContainer:{
-      flexDirection:"row",
+   selectContainer: {
+      flexDirection: "row",
       marginHorizontal: 8,
    },
    selectBox: {
@@ -120,5 +120,24 @@ export const styles = StyleSheet.create({
       flex: 1,
       margin: 4,
       borderRadius: 30,
+   },
+   dashboard: {
+      width: '100%',
+      paddingHorizontal: 8,
+      paddingVertical: 8,
+   },
+   dashboardOuterContainer: {
+      padding: 8,
+      borderRadius: 10,
+   },
+   dashboardInnerContainer: {
+      padding: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+   },
+   dashboardText: {
+      marginHorizontal: 4,
    },
 });

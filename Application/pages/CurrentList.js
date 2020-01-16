@@ -286,8 +286,8 @@ class CurrentList extends Component {
 
       // If the specific name is given add it to the string
       if ((item.specName !== undefined) &&
-          (item.specName !== null) &&
-          (item.specName !== "null")) {
+         (item.specName !== null) &&
+         (item.specName !== "null")) {
          retStr += " (" + item.specName + ")";
       }
 
@@ -1111,10 +1111,6 @@ class CurrentList extends Component {
                      {this.renderModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
-               {
-                  // TODO add a dashboard with quick details such as total count, shared with and price etc..
-                  // this.state.listItems.length
-               }
                <Layout style={styles.selectContainer}>
                   <Select style={styles.selectBox}
                      label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
@@ -1123,6 +1119,17 @@ class CurrentList extends Component {
                      selectedOption={this.state.orgMethod}
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
+               </Layout>
+               {/* // TODO add a dashboard with quick details such as total count, shared with and price etc..
+                  // this.state.listItems.length */}
+               <Layout style={styles.dashboard} >
+                  <Layout style={styles.dashboardOuterContainer} level='3' >
+                     <Layout style={styles.dashboardInnerContainer}>
+                        <Text style={styles.dashboardText}>Number of Items: {this.state.listItems.length}</Text>
+                        <Text style={styles.dashboardText}>List shared with {this.state.userCount - 1} others</Text>
+                        {/* -1 here to make sure we dont include the current user */}
+                     </Layout>
+                  </Layout>
                </Layout>
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
@@ -1139,7 +1146,7 @@ class CurrentList extends Component {
                />
             </Layout>
             <NotificationPopup ref={ref => this.popup = ref} />
-         </React.Fragment>
+         </React.Fragment >
       );
    }
 }
