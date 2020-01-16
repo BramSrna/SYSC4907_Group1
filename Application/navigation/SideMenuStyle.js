@@ -34,4 +34,7 @@ export default {
         padding: 10,
         alignSelf: 'flex-start',
     },
+    signedInText: {
+        marginHorizontal: 8,
+    },
 };

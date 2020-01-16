@@ -44,8 +44,8 @@ class SideMenu extends Component {
         }
     }
 
-    devModeRender(){
-        return(            
+    devModeRender() {
+        return (
             <Text
                 style={styles.navItemStyle}
                 onPress={this.navigateToScreen('ExcelParserPage')}
@@ -53,6 +53,14 @@ class SideMenu extends Component {
                 {EXCEL_PARSER}
             </Text>
         );
+    }
+
+    returnDispalyName(){
+        if (firebase.auth().currentUser != null && firebase.auth().currentUser.displayName != null) {
+            return (
+                <Text style={styles.signedInText} appearance='hint'>Signed in as {firebase.auth().currentUser.displayName}</Text>
+            );
+        }
     }
 
     render() {
@@ -99,6 +107,9 @@ class SideMenu extends Component {
                     </Layout>
                 </ScrollView>
                 <Layout style={styles.footerContainer} level='3'>
+                    <Layout level='3'>
+                        {this.returnDispalyName()}
+                    </Layout>
                     <Layout level='3'>
                         <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
                     </Layout>
