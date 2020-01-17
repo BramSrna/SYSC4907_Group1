@@ -27,6 +27,14 @@ class Node {
         this.children.push(newChild);
         return(newChild);
     }
+
+    getChildren() {
+        return(this.children);
+    }
+
+    incCount() {
+        this.count += 1;
+    }
 }
 
 class FPTree {
@@ -39,14 +47,15 @@ class FPTree {
         while (listOfItems.length > 0) {
             var currVal = listOfItems[0];
 
-            var ind = currNode.children.indexOf(currVal)
+            var children = currNode.getChildren();
+            var ind = children.indexOf(currVal);
             if (ind === -1) {
                 currNode = currNode.addChild(currVal);
             } else {
                 currNode.incCount();
-                currNode = currNode.children[ind];
+                currNode = children[ind];
             }
-            
+
             listOfItems.splice(0, 1);
         }
     }
@@ -112,6 +121,8 @@ function constructFPTree(allTransactions) {
         finalOrder.push(descOrder[i]);
     }
 
+    var tree = new FPTree();
+
     for (var i = 0; i < allTransactions.length; i++) {
         var currTransaction = allTransactions[i];
         
@@ -121,5 +132,7 @@ function constructFPTree(allTransactions) {
 
             return (indA < indB) ? -1 : (indA > indB) ? 1 : 0;
         });
+
+        tree.addPath(currTransaction);
     }
 }
