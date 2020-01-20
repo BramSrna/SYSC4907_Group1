@@ -75,3 +75,7 @@ export const BellIcon = (style) => (
 export const BellFilledIcon = (style) => (
     <Icon {...style} name='bell' />
 );
+
+export const ArrowBackIcon = (style) => (
+    <Icon {...style} name='arrow-back-outline' />
+);

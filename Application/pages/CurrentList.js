@@ -1052,7 +1052,10 @@ class CurrentList extends Component {
       const AddAction = () => (
          <TopNavigationAction
             icon={AddIcon}
-            onPress={() => this._isMounted && this.setItemModalVisible()} />
+            onPress={() => this.props.navigation.navigate("AddItemPage", {
+               name: this.state.listName,
+               listID: this.state.listId
+            })} />
       );
 
       const NotificationAction = () => (

@@ -44,9 +44,8 @@ export default class AutoCompleteInput extends Component {
                 placeholder={placeholder}
                 value={this.state.value}
                 data={this.state.data}
-                onChangeText={(onChangeText)}
+                onChangeText={onChangeText}
                 onSelect={onSelect}
-                //autoFocus={autoFocus}
             />
         );
     }
