@@ -870,7 +870,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   renderEnterItemModal() {
+   renderEnterItemModal = () => {
       return (
          <Layout
             level='3'
@@ -905,7 +905,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   renderEnterStoreModal() {
+   renderEnterStoreModal = () => {
       // Load the stores and current store for the Autocomplete box
       return (
          <Layout
@@ -1049,15 +1049,14 @@ class CurrentList extends Component {
    };
 
    render() {
-      const AddAction = (props) => (
+      const AddAction = () => (
          <TopNavigationAction
-            {...props} icon={AddIcon}
+            icon={AddIcon}
             onPress={() => this._isMounted && this.setItemModalVisible()} />
       );
 
-      const NotificationAction = (props) => (
+      const NotificationAction = () => (
          <TopNavigationAction
-            {...props}
             icon={BellIcon}
             onPress={() => this._isMounted && this.setNotificationModalVisible()}
          />
