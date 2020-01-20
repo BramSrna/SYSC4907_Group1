@@ -384,13 +384,6 @@ class CurrentList extends Component {
       });
    };
 
-   cancelItemModal = () => {
-      this._isMounted && this.setState({
-         itemModalVisible: false,
-         itemName: ''
-      });
-   }
-
    /**
     * notificationMessage
     * 
@@ -716,7 +709,7 @@ class CurrentList extends Component {
     */
    updateCurrStore(newStore) {
       if (newStore.toString() == NEW_STORE) {
-         this.setModalDetails(false, this.state.closeFunc)
+         this.setStoreModalVisible();
          this.props.navigation.navigate("MapCreatorPage", {
             page: "CurrentListPage",
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
@@ -756,7 +749,7 @@ class CurrentList extends Component {
     */
    updateCurrItem(newItem) {
       if (newItem.toString() == NEW_ITEM) {
-         this.cancelItemModal()
+         this.setItemModalVisible();
          this.props.navigation.navigate("RegisterItemPage", {
             page: "CurrentListPage",
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
@@ -1059,18 +1052,14 @@ class CurrentList extends Component {
       const AddAction = (props) => (
          <TopNavigationAction
             {...props} icon={AddIcon}
-            onPress={() => {
-               this._isMounted && this.setItemModalVisible()
-            }
-            }
-         />
+            onPress={() => this._isMounted && this.setItemModalVisible()} />
       );
 
       const NotificationAction = (props) => (
          <TopNavigationAction
             {...props}
             icon={BellIcon}
-            onPress={() => { this.setNotificationModalVisible() }}
+            onPress={() => this._isMounted && this.setNotificationModalVisible()}
          />
       );
 
@@ -1083,7 +1072,7 @@ class CurrentList extends Component {
          <AddAction />,
       ];
 
-      renderMenuAction = () => (
+      const renderMenuAction = () => (
          <TopNavigationAction
             icon={MenuOutline}
             onPress={() => this.props.navigation.toggleDrawer()}
@@ -1103,16 +1092,16 @@ class CurrentList extends Component {
                   <Modal style={styles.modal}
                      allowBackdrop={true}
                      backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setStoreModalVisible}
-                     visible={this.state.storeModalVisible}>
-                     {this.renderEnterStoreModal()}
+                     onBackdropPress={this.setItemModalVisible}
+                     visible={this.state.itemModalVisible}>
+                     {this.renderEnterItemModal()}
                   </Modal>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
                      backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setItemModalVisible}
-                     visible={this.state.itemModalVisible}>
-                     {this.renderEnterItemModal()}
+                     onBackdropPress={this.setStoreModalVisible}
+                     visible={this.state.storeModalVisible}>
+                     {this.renderEnterStoreModal()}
                   </Modal>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
@@ -1131,8 +1120,6 @@ class CurrentList extends Component {
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
                </Layout>
-               {/* // TODO add a dashboard with quick details such as total count, shared with and price etc..
-                  // this.state.listItems.length */}
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
