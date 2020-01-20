@@ -127,10 +127,19 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
+      console.log('SetNameAndCurrentItems');
+
       this._isMounted && this.setState({
          listName: this.props.navigation.getParam("name", "(Invalid Name)"),
          listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
       });
+      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.closeFunc) {
+         console.log('got extra navigation params');
+         this._isMounted && this.setState({
+            currStoreId: this.props.navigation.getParam("currStoreId", "(Invalid Store ID)"),
+         });
+         this.state.closeFunc;
+      }
 
       // Load the current contents of the list
       this.loadCurrList(this,
@@ -423,10 +432,18 @@ class CurrentList extends Component {
             this.reorganizeListAlphabetically();
             break;
          case "BY_LOCATION":
-            this.setModalDetails(true, this.reorganizeListLoc);
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               submitStore: () => this.reorganizeListLoc()
+            })
             break;
          case "FASTEST_PATH":
-            this.setModalDetails(true, this.reorganizeListFastest);
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               submitStore: () => this.reorganizeListFastest()
+            })
             break;
          default:
             break;
@@ -545,6 +562,7 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListLoc(context = this) {
+      console.log('reorganizeListLoc');
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list
@@ -574,6 +592,7 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListFastest(context = this) {
+      console.log('reorganizeListFastest');
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list

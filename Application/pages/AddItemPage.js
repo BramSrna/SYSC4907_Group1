@@ -14,7 +14,6 @@ import {
 import { ArrowBackIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
-import AutoCompleteInput from '../components/AutoCompleteInput.js';
 import lf from "./Functions/ListFunctions";
 
 const PAGE_TITLE = "Add Item";
