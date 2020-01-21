@@ -29,11 +29,9 @@ import { styles } from './pageStyles/CurrentListPageStyle'
 
 // The Arrays for populating that autocomplete fields
 var availableStores = [];
-var availableItems = [];
 
 const PAGE_TITLE = "Current List";
-const NEW_ITEM = "Register an item..."
-const NEW_STORE = "Register a store..."
+const NEW_STORE = "Register a store...";
 
 const FASTEST_PATH = "FASTEST_PATH";
 const BY_LOCATION = "BY_LOCATION";
@@ -118,7 +116,6 @@ class CurrentList extends Component {
 
       // Populate the Arrays for the autocomplete fields
       this.loadAvailableStores();
-      this.loadAvailableItems();
    }
 
    /**
@@ -166,6 +163,38 @@ class CurrentList extends Component {
          this.props.navigation.getParam("listID", "(Invalid List ID)"));
 
    }
+
+   /**
+    * loadAvailableStores
+    * 
+    * Loads the known store names and their
+    * corresponding ids from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
+   loadAvailableStores() {
+      // Load the available stores and parses the data
+      var tempList = lf.getAvailableStores();
+      tempList.then((value) => {
+          // Get the stores and ids
+          var stores = value.stores;
+          var ids = value.ids;
+
+          // Save the names and ids to the state
+          var temp = [];
+          for (var i = 0; i < ids.length; i++) {
+              temp.push({
+                  name: stores[i],
+                  title: stores[i],
+                  id: ids[i]
+              });
+          }
+          temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
+          availableStores = temp;
+      });
+  }
 
    /**
     * loadCurrList
