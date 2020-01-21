@@ -51,7 +51,7 @@ class AddItemPage extends Component {
 
         this.setState({
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-            listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+            listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
         });
 
         // Populate the Arrays for the autocomplete fields

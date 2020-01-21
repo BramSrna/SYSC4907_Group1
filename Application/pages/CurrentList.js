@@ -34,6 +34,12 @@ var availableItems = [];
 const PAGE_TITLE = "Current List";
 const NEW_ITEM = "Register an item..."
 const NEW_STORE = "Register a store..."
+
+const FASTEST_PATH = "FASTEST_PATH";
+const BY_LOCATION = "BY_LOCATION";
+const ORDER_ADDED = "ORDER_ADDED";
+const ALPHABETICALLY = "ALPHABETICALLY";
+
 class CurrentList extends Component {
    constructor(props) {
       super(props);
@@ -133,12 +139,26 @@ class CurrentList extends Component {
          listName: this.props.navigation.getParam("name", "(Invalid Name)"),
          listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
       });
-      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.closeFunc) {
-         console.log('got extra navigation params');
+      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
+         console.log('got extra navigation params: ' + this.props.navigation.getParam("sort", ALPHABETICALLY));
          this._isMounted && this.setState({
             currStoreId: this.props.navigation.getParam("currStoreId", "(Invalid Store ID)"),
          });
-         this.state.closeFunc;
+         if (this.props.navigation.getParam("sort", ALPHABETICALLY) == FASTEST_PATH) {
+            this.reorganizeListFastest(this);
+            console.log('reorganize based on fastest path');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == FASTEST_PATH) });
+         }
+         else if (this.props.navigation.getParam("sort", ALPHABETICALLY) == BY_LOCATION) {
+            this.reorganizeListLoc(this);
+            console.log('reorganize based on location');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == BY_LOCATION) });
+         }
+         else {
+            this.reorganizeListAlphabetically(this);
+            console.log('reorganize alphabetically');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == ALPHABETICALLY) });
+         }
       }
 
       // Load the current contents of the list
@@ -425,24 +445,24 @@ class CurrentList extends Component {
 
       // Call the corresponding selection function
       switch (selectionVal) {
-         case "ORDER_ADDED":
+         case ORDER_ADDED:
             this.reorganizeListAdded();
             break;
-         case "ALPHABETICALLY":
+         case ALPHABETICALLY:
             this.reorganizeListAlphabetically();
             break;
-         case "BY_LOCATION":
+         case BY_LOCATION:
             this.props.navigation.navigate("SelectStorePage", {
                name: this.state.listName,
                listID: this.state.listId,
-               submitStore: () => this.reorganizeListLoc()
+               sort: BY_LOCATION
             })
             break;
-         case "FASTEST_PATH":
+         case FASTEST_PATH:
             this.props.navigation.navigate("SelectStorePage", {
                name: this.state.listName,
                listID: this.state.listId,
-               submitStore: () => this.reorganizeListFastest()
+               sort: FASTEST_PATH
             })
             break;
          default:
@@ -522,6 +542,8 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListAlphabetically() {
+      console.log('reorganizeListAlphabetically');
+
       // Get the items and ids
       var items = this.state.listItems;
       var ids = this.state.listItemIds;
@@ -620,7 +642,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   checkIfCurrStoreValid() {
+   checkIfCurrStoreValid(context = this) {
       // Check if the given id matches a known id
       for (var i = 0; i < availableStores.length; i++) {
          if (availableStores[i].id === context.state.currStoreId) {

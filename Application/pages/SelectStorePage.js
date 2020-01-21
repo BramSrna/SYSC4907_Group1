@@ -27,6 +27,7 @@ class SelectStorePage extends Component {
         this.state = {
             listId: "",
             listName: "",
+            sort: "",
             currStore: "",
             currStoreId: "",
             value: '',
@@ -50,7 +51,7 @@ class SelectStorePage extends Component {
         this.setState({
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
-            closeFunc: this.props.navigation.getParam("submitStore", "(Invalid Submit Function)")
+            sort: this.props.navigation.getParam("sort", "(Invalid Sort Method)"),
         });
 
         // Populate the Arrays for the autocomplete fields
@@ -154,11 +155,11 @@ class SelectStorePage extends Component {
     */
     submitStore = () => {
         this.props.navigation.navigate("CurrentListPage", {
-            page: "CurrentListPage",
+            fromPage: "SelectStorePage",
             name: this.state.listName,
             listId: this.state.listId,
             currStoreId: this.state.currStoreId,
-            closeFunc:this.state.closeFunc
+            sort: this.state.sort
         });
     };
 
