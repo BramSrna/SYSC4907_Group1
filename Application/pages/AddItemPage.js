@@ -219,8 +219,8 @@ class AddItemPage extends Component {
                                     onSelect={onSelect}
                                 />
                                 <Layout style={styles.mainButtonGroup} >
-                                    <Button style={styles.mainPageButton} status='primary' onPress={this.addItem}>{'Add Item'}</Button>
                                     <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
+                                    <Button style={styles.mainPageButton} status='primary' onPress={this.addItem}>{'Add Item'}</Button>
                                 </Layout>
                             </Layout>
                         </Layout>
