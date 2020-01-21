@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import {
    FlatList,
-   StyleSheet,
    KeyboardAvoidingView,
-   TouchableHighlight,
-   View,
    Alert,
    BackHandler
 } from "react-native";
@@ -16,9 +13,8 @@ import {
    TopNavigation,
    TopNavigationAction,
    Select,
-   Text
+   Text,
 } from 'react-native-ui-kitten';
-import { Modal as RNModal } from "react-native";
 import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
@@ -28,16 +24,20 @@ import nm from '../pages/Functions/NotificationManager.js';
 import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import { organizationOptions } from "../OrgMethods";
-import Autocomplete from 'react-native-autocomplete-input';
-import { styles, enterStoreModalStyles } from './pageStyles/CurrentListPageStyle'
+import AutoCompleteInput from '../components/AutoCompleteInput.js';
+import { styles } from './pageStyles/CurrentListPageStyle'
 
 // The Arrays for populating that autocomplete fields
 var availableStores = [];
-var availableItems = [];
 
 const PAGE_TITLE = "Current List";
-const NEW_ITEM = "Register an item..."
-const NEW_STORE = "Register a store..."
+const NEW_STORE = "Register a store...";
+
+const FASTEST_PATH = "FASTEST_PATH";
+const BY_LOCATION = "BY_LOCATION";
+const ORDER_ADDED = "ORDER_ADDED";
+const ALPHABETICALLY = "ALPHABETICALLY";
+
 class CurrentList extends Component {
    constructor(props) {
       super(props);
@@ -64,11 +64,11 @@ class CurrentList extends Component {
          currItemId: "",
          itemModalVisible: false,
 
+         notificationModalVisible: false,
          modalVisible: false,
          modalMode: 'item',
          message: '',
          userCount: 0,
-         hr: false
       };
    }
 
@@ -116,7 +116,6 @@ class CurrentList extends Component {
 
       // Populate the Arrays for the autocomplete fields
       this.loadAvailableStores();
-      this.loadAvailableItems();
    }
 
    /**
@@ -131,16 +130,71 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
+      console.log('SetNameAndCurrentItems');
+
       this._isMounted && this.setState({
          listName: this.props.navigation.getParam("name", "(Invalid Name)"),
          listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
       });
+      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
+         console.log('got extra navigation params: ' + this.props.navigation.getParam("sort", ALPHABETICALLY));
+         this._isMounted && this.setState({
+            currStoreId: this.props.navigation.getParam("currStoreId", "(Invalid Store ID)"),
+         });
+         if (this.props.navigation.getParam("sort", ALPHABETICALLY) == FASTEST_PATH) {
+            this.reorganizeListFastest(this);
+            console.log('reorganize based on fastest path');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == FASTEST_PATH) });
+         }
+         else if (this.props.navigation.getParam("sort", ALPHABETICALLY) == BY_LOCATION) {
+            this.reorganizeListLoc(this);
+            console.log('reorganize based on location');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == BY_LOCATION) });
+         }
+         else {
+            this.reorganizeListAlphabetically(this);
+            console.log('reorganize alphabetically');
+            this.setState({ orgMethod: organizationOptions.find(element => element.value == ALPHABETICALLY) });
+         }
+      }
 
       // Load the current contents of the list
       this.loadCurrList(this,
          this.props.navigation.getParam("listID", "(Invalid List ID)"));
 
    }
+
+   /**
+    * loadAvailableStores
+    * 
+    * Loads the known store names and their
+    * corresponding ids from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
+   loadAvailableStores() {
+      // Load the available stores and parses the data
+      var tempList = lf.getAvailableStores();
+      tempList.then((value) => {
+          // Get the stores and ids
+          var stores = value.stores;
+          var ids = value.ids;
+
+          // Save the names and ids to the state
+          var temp = [];
+          for (var i = 0; i < ids.length; i++) {
+              temp.push({
+                  name: stores[i],
+                  title: stores[i],
+                  id: ids[i]
+              });
+          }
+          temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
+          availableStores = temp;
+      });
+  }
 
    /**
     * loadCurrList
@@ -364,38 +418,6 @@ class CurrentList extends Component {
    }
 
    /**
-    * addItem
-    * 
-    * Adds the current item saved in the state
-    * to the current list. Toggles the add item
-    * modal visibility and clears the item name.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   addItem = () => {
-      // Add the item to the list
-      lf.AddItemToList(this.state.listId,
-         this.state.genName,
-         1,
-         "aSize mL",
-         "aNote",
-         specName = this.state.specName);
-      this._isMounted && this.setState({
-         itemModalVisible: false,
-         itemName: ''
-      });
-   };
-
-   cancelItemModal = () => {
-      this._isMounted && this.setState({
-         itemModalVisible: false,
-         itemName: ''
-      });
-   }
-
-   /**
     * notificationMessage
     * 
     * Sets the message to the given input.
@@ -427,17 +449,25 @@ class CurrentList extends Component {
 
       // Call the corresponding selection function
       switch (selectionVal) {
-         case "ORDER_ADDED":
+         case ORDER_ADDED:
             this.reorganizeListAdded();
             break;
-         case "ALPHABETICALLY":
+         case ALPHABETICALLY:
             this.reorganizeListAlphabetically();
             break;
-         case "BY_LOCATION":
-            this.setModalDetails(true, this.reorganizeListLoc);
+         case BY_LOCATION:
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               sort: BY_LOCATION
+            })
             break;
-         case "FASTEST_PATH":
-            this.setModalDetails(true, this.reorganizeListFastest);
+         case FASTEST_PATH:
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               sort: FASTEST_PATH
+            })
             break;
          default:
             break;
@@ -516,6 +546,8 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListAlphabetically() {
+      console.log('reorganizeListAlphabetically');
+
       // Get the items and ids
       var items = this.state.listItems;
       var ids = this.state.listItemIds;
@@ -556,6 +588,7 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListLoc(context = this) {
+      console.log('reorganizeListLoc');
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list
@@ -585,6 +618,7 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListFastest(context = this) {
+      console.log('reorganizeListFastest');
       // Check the current store in the state
       if (context.checkIfCurrStoreValid()) {
          // Reorganize the list
@@ -612,7 +646,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   checkIfCurrStoreValid() {
+   checkIfCurrStoreValid(context = this) {
       // Check if the given id matches a known id
       for (var i = 0; i < availableStores.length; i++) {
          if (availableStores[i].id === context.state.currStoreId) {
@@ -621,178 +655,6 @@ class CurrentList extends Component {
       }
 
       return (false);
-   }
-
-   /**
-    * loadAvailableStores
-    * 
-    * Loads the known store names and their
-    * corresponding ids from the database.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   loadAvailableStores() {
-      // Load the available stores and parses the data
-      var tempList = lf.getAvailableStores();
-      tempList.then((value) => {
-         // Get the stores and ids
-         var stores = value.stores;
-         var ids = value.ids;
-
-         // Save the names and ids to the state
-         var temp = [];
-         for (var i = 0; i < ids.length; i++) {
-            temp.push({
-               name: stores[i],
-               id: ids[i]
-            });
-         }
-
-         availableStores = temp;
-      });
-   }
-
-   /**
-    * loadAvailableItems
-    * 
-    * Loads the known item names and their
-    * corresponding ids from the database.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   loadAvailableItems() {
-      // Load the available items and parses the data
-      var tempList = lf.getAvailableItems();
-      tempList.then((value) => {
-         // Get the items, their ids, and data
-         var items = value.items;
-         var ids = value.ids;
-         var genNames = value.genNames;
-         var specNames = value.specNames;
-
-         // Save the item information
-         var temp = [];
-         for (var i = 0; i < ids.length; i++) {
-            temp.push({
-               name: items[i],
-               id: ids[i],
-               genName: genNames[i],
-               specName: specNames[i]
-            });
-         }
-
-         availableItems = temp;
-      });
-   }
-
-   /**
-    * setModalDetails
-    * 
-    * Sets the store input modal details to the given information
-    * 
-    * @param {Boolean} visible Whether or not the modal is visible
-    * @param {Function} closeFunc The function to call when the modal is closed
-    * 
-    * @returns None
-    */
-   setModalDetails(visible, closeFunc) {
-      this._isMounted && this.setState({
-         storeModalVisible: visible,
-         closeFunc: closeFunc
-      });
-   }
-
-   /**
-    * updateCurrStore
-    * 
-    * Updates the current store name and id in
-    * the state based on the given information.
-    * 
-    * @param {String} newStore The name of the store given by the user
-    * 
-    * @returns None
-    */
-   updateCurrStore(newStore, hideResults) {
-      if (newStore.toString() == NEW_STORE) {
-         this.setModalDetails(false, this.state.closeFunc)
-         this.props.navigation.navigate("MapCreatorPage", {
-            page: "CurrentListPage",
-            listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-            listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
-         })
-      } else {
-         var id = ""; // Empty id to handle unknown stores
-
-         newStore = newStore.toString();
-
-         // Find the name of the store in the list of available stores
-         for (var i = 0; i < availableStores.length; i++) {
-            var name = availableStores[i].name;
-            if (name === newStore) {
-               // Set the id of the store if known
-               id = availableStores[i].id;
-            }
-         }
-
-         // Update the state
-         this._isMounted && this.setState({
-            currStore: newStore,
-            currStoreId: id,
-            hr: hideResults
-         });
-      }
-   }
-
-   /**
-    * updateCurrItem
-    * 
-    * Updates the current item name and id in
-    * the state based on the given information.
-    * 
-    * @param {String} newStore The name of the store given by the user
-    * 
-    * @returns None
-    */
-   updateCurrItem(newItem, hideResults) {
-      if (newItem.toString() == NEW_ITEM) {
-         this.cancelItemModal()
-         this.props.navigation.navigate("RegisterItemPage", {
-            page: "CurrentListPage",
-            listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-            listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
-         })
-      } else {
-         var id = ""; // Assume an empty id
-         var genName = newItem; // Assume the given name is the generic name
-         var specName = null; // Assume no specific name has been given
-
-         newItem = newItem.toString();
-
-         // Check if the item is a known item
-         for (var i = 0; i < availableItems.length; i++) {
-            var name = availableItems[i].name;
-            if (name === newItem) {
-               // Set the data for the item if known
-               id = availableItems[i].id;
-               genName = availableItems[i].genName;
-               specName = availableItems[i].specName;
-               break;
-            }
-         }
-
-         // Update the state
-         this._isMounted && this.setState({
-            itemName: newItem,
-            genName: genName,
-            specName: specName,
-            currItemId: id,
-            hr: hideResults
-         });
-      }
    }
 
    /**
@@ -838,7 +700,7 @@ class CurrentList extends Component {
    }
 
    /**
-    * renderModalElement
+    * renderNotificationModalElement
     * 
     * Renders the notificaiton modal so that the user
     * can enter a notificaiton message.
@@ -847,186 +709,41 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   renderModalElement = () => {
-      if (this.state.modalMode == 'notify') {
-         return (
-            <Layout
-               level='3'
-               style={styles.modalContainer}>
-               <Text category='h6' >Enter Notification Message</Text>
-               <Input
-                  style={styles.input}
-                  placeholder='Optional message...'
-                  onChangeText={message => this.notificationMessage(message)}
-                  autoFocus={this.state.modalVisible ? true : false}
-               />
-               <Layout style={styles.buttonContainer}>
-                  <Button style={styles.modalButton} onPress={this.setModalVisible}>Cancel</Button>
-                  <Button style={styles.modalButton} onPress={() => { this.sendNotification() }}>Send</Button>
-               </Layout>
+   renderNotificationModalElement = () => {
+      return (
+         <Layout
+            level='3'
+            style={styles.modalContainer}>
+            <Text category='h6' >Enter Notification Message</Text>
+            <Input
+               style={styles.input}
+               placeholder='Optional message...'
+               onChangeText={message => this.notificationMessage(message)}
+               autoFocus={this.state.notificationModalVisible ? true : false}
+            />
+            <Layout style={styles.buttonContainer}>
+               <Button style={styles.modalButton} onPress={this.setNotificationModalVisible}>Cancel</Button>
+               <Button style={styles.modalButton} onPress={() => { this.sendNotification() }}>Send</Button>
             </Layout>
-         );
-      }
+         </Layout>
+      );
    };
 
-
-   find(query, type) {
-      if (query === '') {
-         return [];
-      }
-
-      var list = null;
-      var items = [];
-      if (type == 'items') {
-         list = availableItems;
-      } else if (type == 'stores') {
-         list = availableStores;
-      }
-
-      for (var a = 0; a < list.length; a++) {
-         items.push(list[a].name);
-      }
-
-      query = query.trim().toLowerCase();
-      //const regex = new RegExp(`${query.trim()}`, 'i');
-      //var items = items.filter(item => item.search(regex) >= 0);
-      var items = items.filter(item => item.trim().toLowerCase().indexOf(query) != -1);
-      if (type == 'items') {
-         items.push(NEW_ITEM);
-      } else if (type == 'stores') {
-         items.push(NEW_STORE);
-      }
-
-      return items;
-   }
-
    /**
-    * renderEnterItemModal
-    * 
-    * Renders the enter item modal so that the user
-    * can enter an item to add to the list.
-    * 
-    * NOTE: This uses the default React Native modal
-    * because absolute positioning is needed for the
-    * autocomplete box.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   renderEnterItemModal() {
-      // Load the items and current item for the Autocomplete box
-
-      const currItemIn = this.state.itemName;
-      const itemList = this.find(currItemIn, 'items');
-      const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
-      return (
-         <View style={enterStoreModalStyles.modalContainer}>
-            <View style={enterStoreModalStyles.modalSubContainer}>
-               <Text style={enterStoreModalStyles.modalTitle}>
-                  Add New Item
-               </Text>
-               <View style={enterStoreModalStyles.modalAutocompleteContainer}>
-                  <Autocomplete
-                     placeholder="Enter an item"
-                     listStyle={enterStoreModalStyles.result}
-                     data={itemList.length === 1 && comp(currItemIn, itemList[0]) ? [] : itemList}
-                     defaultValue={currItemIn}
-                     hideResults={this.state.hr}
-                     onChangeText={text => this.updateCurrItem(text, false)}
-                     keyExtractor={(item, index) => index.toString()}
-                     renderItem={({ item, i }) => (
-                        <TouchableHighlight
-                           style={{ zIndex: 10 }}
-                           onPress={() => this.updateCurrItem(item, true)}>
-                           <Text>{item}</Text>
-                        </TouchableHighlight>
-                     )}
-                  />
-               </View>
-               <Layout style={enterStoreModalStyles.modalDoneButton}>
-                  <Button style={styles.modalButton} onPress={this.cancelItemModal}>Cancel</Button>
-                  <Button style={styles.modalButton} onPress={this.addItem}>Add</Button>
-               </Layout>
-            </View>
-         </View>
-      );
-   }
-
-   /**
-    * renderEnterStoreModal
-    * 
-    * Renders the enter store modal so that the user
-    * can enter the store name for sorting the list
-    * 
-    * NOTE: This uses the default React Native modal
-    * because absolute positioning is needed for the
-    * autocomplete box.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   renderEnterStoreModal() {
-      // Load the stores and current store for the Autocomplete box
-      const currStoreIn = this.state.currStore;
-      const itemList = this.find(currStoreIn, 'stores');
-      const comp = (a, b) => a.toLowerCase().trim() === b.toLowerCase().trim();
-      return (
-         <View style={enterStoreModalStyles.modalContainer}>
-            <View style={enterStoreModalStyles.modalSubContainer}>
-               <Text style={enterStoreModalStyles.modalTitle}>
-                  Store Name:
-               </Text>
-               <View style={enterStoreModalStyles.modalAutocompleteContainer}>
-                  <Autocomplete
-                     placeholder="Enter a store name"
-                     listStyle={enterStoreModalStyles.result}
-                     data={itemList.length === 1 && comp(currStoreIn, itemList[0]) ? [] : itemList}
-                     defaultValue={currStoreIn}
-                     hideResults={this.state.hr}
-                     onChangeText={text => this.updateCurrStore(text, false)}
-                     keyExtractor={(item, index) => index.toString()}
-                     renderItem={({ item, i }) => (
-                        <TouchableHighlight
-                           style={{ zIndex: 10 }}
-                           onPress={() => this.updateCurrStore(item, true)}>
-                           <Text>{item}</Text>
-                        </TouchableHighlight>
-                     )}
-                  />
-               </View>
-
-               <Layout style={enterStoreModalStyles.modalDoneButton}>
-                  <Button style={styles.modalButton} onPress={() => { this.setModalDetails(false, this.state.closeFunc) }}>Cancel</Button>
-                  <Button style={styles.modalButton} onPress={() => {
-                     this.setModalDetails(false, this.state.closeFunc);
-                     this.state.closeFunc(context = this);
-                  }}>Submit</Button>
-               </Layout>
-            </View>
-         </View>
-      );
-   }
-
-   /**
-    * setModalVisible
+    * setNotificationModalVisible
     * 
     * Toggles the visibility of the notification modal.
-    * Also clears the message and itemName in the state.
-    * 
-    * @param {String} mode The mode for the modal
-    *                      Default is "item"
+    * Also clears the message in the state.
     * 
     * @returns None
     */
-   setModalVisible = (mode = 'item') => {
-      const modalVisible = !this.state.modalVisible;
-      if (modalVisible) {
+   setNotificationModalVisible = () => {
+      const notificationModalVisible = !this.state.notificationModalVisible;
+      if (notificationModalVisible) {
          this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (this.state.modalVisible) {
-               const modalVisible = false;
-               this._isMounted && this.setState({ modalVisible });
+            if (this.state.notificationModalVisible) {
+               const notificationModalVisible = false;
+               this._isMounted && this.setState({ notificationModalVisible });
             }
             this.backHandler.remove();
             return true;
@@ -1036,32 +753,25 @@ class CurrentList extends Component {
          this.backHandler.remove();
       }
       this._isMounted && this.setState({
-         modalMode: mode,
-         modalVisible,
-         itemName: '',
+         notificationModalVisible,
          message: ''
       });
    };
 
    render() {
-      const AddAction = (props) => (
+      const AddAction = () => (
          <TopNavigationAction
-            {...props} icon={AddIcon}
-            onPress={() => {
-               this._isMounted && this.setState({
-                  itemModalVisible: true,
-                  itemName: ""
-               })
-            }
-            }
-         />
+            icon={AddIcon}
+            onPress={() => this.props.navigation.navigate("AddItemPage", {
+               name: this.state.listName,
+               listID: this.state.listId
+            })} />
       );
 
-      const NotificationAction = (props) => (
+      const NotificationAction = () => (
          <TopNavigationAction
-            {...props}
             icon={BellIcon}
-            onPress={() => { this.setModalVisible('notify') }}
+            onPress={() => this._isMounted && this.setNotificationModalVisible()}
          />
       );
 
@@ -1074,7 +784,7 @@ class CurrentList extends Component {
          <AddAction />,
       ];
 
-      renderMenuAction = () => (
+      const renderMenuAction = () => (
          <TopNavigationAction
             icon={MenuOutline}
             onPress={() => this.props.navigation.toggleDrawer()}
@@ -1090,25 +800,13 @@ class CurrentList extends Component {
                rightControls={this.state.userCount > 1 ? renderRightControls() : renderRightControl()}
             />
             <Layout style={styles.ListContainer}>
-               <RNModal
-                  transparent={true}
-                  visible={this.state.storeModalVisible}
-               >
-                  {this.renderEnterStoreModal()}
-               </RNModal>
-               <RNModal
-                  transparent={true}
-                  visible={this.state.itemModalVisible}
-               >
-                  {this.renderEnterItemModal()}
-               </RNModal>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
                      allowBackdrop={true}
                      backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setModalVisible}
-                     visible={this.state.modalVisible}>
-                     {this.renderModalElement()}
+                     onBackdropPress={this.setNotificationModalVisible}
+                     visible={this.state.notificationModalVisible}>
+                     {this.renderNotificationModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
                <Layout style={styles.selectContainer}>
@@ -1120,8 +818,6 @@ class CurrentList extends Component {
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
                </Layout>
-               {/* // TODO add a dashboard with quick details such as total count, shared with and price etc..
-                  // this.state.listItems.length */}
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>

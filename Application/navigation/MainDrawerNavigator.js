@@ -1,15 +1,17 @@
 import { createDrawerNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
 import HomePage from '../pages/HomePage';
-import YourLists from '../pages/YourLists'
-import CurrentList from '../pages/CurrentList'
-import MapCreatorPage from '../pages/MapCreatorPage'
+import YourLists from '../pages/YourLists';
+import CurrentList from '../pages/CurrentList';
+import MapCreatorPage from '../pages/MapCreatorPage';
 import SideMenu from './SideMenu';
-import RegisterItemPage from '../pages/RegisterItemPage'
+import RegisterItemPage from '../pages/RegisterItemPage';
 import CrowdSourcePage from '../pages/CrowdSourcePage';
 import AddItemLocationPage from '../pages/AddItemLocationPage';
 import YourContacts from '../pages/YourContacts';
 import NewContact from '../pages/NewContact';
 import ExcelParserPage from '../pages/ExcelParserPage';
+import AddItemPage from '../pages/AddItemPage';
+import SelectStorePage from '../pages/SelectStorePage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -41,7 +43,13 @@ const StackNavigator = createStackNavigator({
     },
     ExcelParserPage: {
         screen: ExcelParserPage
-    }
+    },
+    AddItemPage: {
+        screen: AddItemPage
+    },
+    SelectStorePage: {
+        screen: SelectStorePage
+    },
 }, {
     initialRouteName: "Home",
     headerMode: "none"

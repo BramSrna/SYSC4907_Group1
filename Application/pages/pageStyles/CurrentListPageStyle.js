@@ -12,22 +12,13 @@ export const enterStoreModalStyles = StyleSheet.create({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: "rgba(0, 0, 0, 0.7)",
    },
    modalSubContainer: {
       width: Dimensions.get("window").width * 0.75,
       height: Dimensions.get("window").height * 0.5,
-      backgroundColor: "black",
-      position: "absolute",
       top: Dimensions.get("window").height * 0.1,
       alignItems: "center",
       borderRadius: 20,
-   },
-   modalTitle: {
-      position: 'absolute',
-      top: Dimensions.get("window").height * 0.1,
-      color: "white",
-      fontSize: 20
    },
    modalAutocompleteContainer: {
       flex: 1,
