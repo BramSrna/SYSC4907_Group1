@@ -204,8 +204,8 @@ class SelectStorePage extends Component {
                                     onSelect={onSelect}
                                 />
                                 <Layout style={styles.mainButtonGroup} >
-                                    <Button style={styles.mainPageButton} status='primary' onPress={() => { this.submitStore() }}>{'Submit'}</Button>
                                     <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
+                                    <Button style={styles.mainPageButton} status='primary' onPress={() => { this.submitStore() }}>{'Submit'}</Button>
                                 </Layout>
                             </Layout>
                         </Layout>
