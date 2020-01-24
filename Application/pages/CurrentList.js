@@ -24,7 +24,6 @@ import nm from '../pages/Functions/NotificationManager.js';
 import * as firebase from 'firebase/app';
 import 'firebase/functions';
 import { organizationOptions } from "../OrgMethods";
-import AutoCompleteInput from '../components/AutoCompleteInput.js';
 import { styles } from './pageStyles/CurrentListPageStyle'
 
 // The Arrays for populating that autocomplete fields
