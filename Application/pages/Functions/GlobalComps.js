@@ -215,6 +215,37 @@ const getItem = function(genericName, specificName = null){
                     if (((tempSpecName === "null") && (specificName === null)) || (tempSpecName === specificName)) {
                         // Item found
                         item = ssv[tempGenName][tempSpecName];
+
+                        // Get the final price of the item by
+                        // parsing all of the known prices from teh descriptions
+                        var minPrice = Number.MAX_SAFE_INTEGER;
+                        var maxPrice = -1;
+                        if (item !== null) {
+                            var descs = item.descs;
+                            for (var currDescId in descs) {
+                                // Parse each description
+                                var currDesc = descs[currDescId];
+                                var prices = currDesc.prices;
+                                for (var i = 0; i < prices.length; i++) {
+                                    // Update the price range with the new information
+                                    var currPrice = prices[i];
+                                    if (currPrice < minPrice) {
+                                        minPrice = currPrice;
+                                    }
+
+                                    if (currPrice > maxPrice) {
+                                        maxPrice = currPrice;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Add the final price range to the item
+                        item.finalPrice = {
+                            minPrice: minPrice,
+                            maxPrice: maxPrice
+                        }
+                        
                         break;
                     }
                 }

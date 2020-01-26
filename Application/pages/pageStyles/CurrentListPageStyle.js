@@ -123,7 +123,7 @@ export const styles = StyleSheet.create({
    },
    dashboardInnerContainer: {
       padding: 8,
-      flexDirection: 'row',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: 10,

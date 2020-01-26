@@ -169,13 +169,21 @@ class ListFunctions {
             var temp = dbInterface.registerItem(genName, specificName = specName);
          }
 
-         return Promise.all([temp]);
+         return Promise.all([item]);
       }).then(result => {
+         var item = result[0];
+
          var listPath = createListPath(listId);
          // Get the id of the item
          var itemId = (new globalComps.ItemObj(genName, specificName = specName)).getId();
 
          var date = (new Date()).toString();
+
+         // Get the price range from the item if it was preexisting
+         var priceRange = null;
+         if (item !== null) {
+            priceRange = item.finalPrice;   
+         } 
 
          // Add the item to the list
          firebase.database().ref(listPath + "/items/" + itemId).update({
@@ -185,7 +193,8 @@ class ListFunctions {
             quantity: quantity,
             size: size,
             notes: notes,
-            dateAdded: date
+            dateAdded: date,
+            price: priceRange
          });
 
          // Update date modified of list
