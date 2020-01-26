@@ -1,5 +1,3 @@
-from NodeObj import Node
-
 class FPTree(object):
     START_COUNT = 1
 
@@ -41,8 +39,7 @@ class FPTree(object):
                 child.incCount()
             else:
                 child = self.addChild(currVal)
-            child.addPath(listOfItems[1:])
-        
+            child.addPath(listOfItems[1:])        
 
     def __str__(self, level = 1):
         retStr = ""

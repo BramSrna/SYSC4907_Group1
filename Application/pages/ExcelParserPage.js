@@ -31,6 +31,19 @@ class ExcelParserPage extends Component {
         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
     );
 
+    async testRecommend() {
+        try {
+           // Call the function to get the sorted list
+           await firebase.functions().httpsCallable('genRules');
+  
+           return null;
+        } catch (e) {
+           console.error(e);
+  
+           return (null);
+        }
+    }
+
     async parseFile() {
         var items = excelData["ITEMS"];
         var stores = excelData["STORES"];
@@ -117,7 +130,8 @@ class ExcelParserPage extends Component {
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
-                            <Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>
+                                <Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>
+                                <Button style={styles.button} onPress={this.testRecommend} >Test Recommend</Button>
                             </Layout>
                         </Layout>
                     </ScrollView>

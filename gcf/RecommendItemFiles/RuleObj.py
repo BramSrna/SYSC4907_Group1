@@ -8,3 +8,10 @@ class Rule(object):
 
     def getAntecedent(self):
         return self.antecedent
+
+    def __str__(self):
+        retStr = ""
+        retStr += self.prior
+        retStr += " -> "
+        retStr += self.antecedent
+        return(retStr)

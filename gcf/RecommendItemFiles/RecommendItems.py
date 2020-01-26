@@ -1,7 +1,12 @@
 from FPTreeObj import FPTree
+from RuleObj import Rule
 from copy import copy
 
 from itertools import chain, combinations
+
+from collections import Counter
+
+MIN_SUPPORT = 3
 
 def calcSupport(itemSubset, allTransactions):
     numIncludes = 0
@@ -38,8 +43,6 @@ def constructFPtree(allTransactions):
 
     descOrder = list(reversed(sorted(supportMap, key=lambda item: supportMap[item])))
 
-    descOrder = ["B", "E", "A", "C", "D"]
-
     tree = FPTree()
 
     for currTransaction in allTransactions:
@@ -57,6 +60,7 @@ def mineTree(tree, root = True, currPath = None):
     paths = {}
 
     item = tree.getItem()
+    count = tree.getCount()
 
     if (currPath == None):
         currPath = []
@@ -83,22 +87,32 @@ def mineTree(tree, root = True, currPath = None):
     if (root == False):
         return(paths)
     else:
-        rules = set()
+        rules = {}
         for item in paths:
+            rules[item] = {}
             for currList in paths[item]:
-                currPowerset = list(powerset(currList[1]))
-                currPowerset = [list(x) for x in currPowerset]
-                currRuleSet = [[item] + x for x in currPowerset]
-                rules.update(set(tuple(i) for i in currRuleSet))
-        for rule in rules:
-            print(rule)
+                for subItem in currList[1]:
+                    if subItem not in rules[item]:
+                        rules[item][subItem] = 0
 
+                    rules[item][subItem] += currList[0]
+
+        for item in rules:
+            rules[item] = [Rule(item, k) for k, v in rules[item].items() if v >= MIN_SUPPORT]
+
+        return(rules)
 
 def formatTransactions(allTransactions):
     newTransactions = []
     for transaction in allTransactions:
         newTransactions.append(set(transaction))
     return(newTransactions)
+
+def getRules(allTransactions):
+    transactions = formatTransactions(allTransactions)
+    tree = constructFPtree(transactions)
+    rules = mineTree(tree)
+    return rules
 
 if __name__ == "__main__":
     transactions = [["B", "E", "A", "D"],
@@ -108,8 +122,8 @@ if __name__ == "__main__":
                     ["A", "B", "C", "D", "E"],
                     ["B", "C", "D"]]
 
-    transactions = formatTransactions(transactions)
+    rules = getRules(transactions)
 
-    tree = constructFPtree(transactions)
-
-    mineTree(tree)
+    for item in rules:
+        for rule in rules[item]:
+            print(item, rule.__str__())
