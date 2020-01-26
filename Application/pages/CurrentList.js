@@ -68,6 +68,10 @@ class CurrentList extends Component {
          modalMode: 'item',
          message: '',
          userCount: 0,
+
+         minPrice: 0,
+         maxPrice: 0,
+         numUnknownPrice: 0
       };
    }
 
@@ -214,14 +218,31 @@ class CurrentList extends Component {
          var ids = [];
 
          var ssv = snapshot.val();
+
          var userCount = 0;
+         var minPrice = 0;
+         var maxPrice = 0;
+         var numUnknownPrice = 0;
 
          // Parse the item objects and their
          // corresponding ids
          if (ssv && ssv.items) {
             var listItems = ssv.items;
             for (var itemId in listItems) {
-               items.push(listItems[itemId]);
+               var item = listItems[itemId];
+
+               // Get the price of the item
+               var priceRange = item.price;
+               if (priceRange !== undefined) {
+                  // Price range known
+                  minPrice += priceRange.minPrice === undefined ? 0 : priceRange.minPrice;
+                  maxPrice += priceRange.maxPrice === undefined ? 0 : priceRange.maxPrice;
+               } else {
+                  // Price unknown
+                  numUnknownPrice += 1;
+               }
+
+               items.push(item);
                ids.push(itemId);
             }
          }
@@ -232,7 +253,13 @@ class CurrentList extends Component {
          }
 
          // Update the state of the context
-         that.updateListState(items, ids, reorg = false, userCount = userCount);
+         that.updateListState(items,
+                              ids,
+                              reorg = false,
+                              userCount = userCount,
+                              minPrice = minPrice,
+                              maxPrice = maxPrice,
+                              numUnknownPrice = numUnknownPrice);
       });
    }
 
@@ -256,8 +283,13 @@ class CurrentList extends Component {
     *                            Default is false
     * @param {Integer} userCount If non-null, the userCount is set to this value
     *                            Default is null
+    * @param {Double} minPrice   The minimum price of the entire list
+    * @param {Double} maxPrice   The maximum price of the entire list
+    * @param {Integer} numUnknownPrice The number of items in the list with unknown prices
+    * 
+    * @returns None
     */
-   updateListState(newItems, newIds, reorg = false, userCount = null) {
+   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null) {
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
@@ -316,7 +348,10 @@ class CurrentList extends Component {
          firstLoadComplete: true,
          listItems: localItems,
          listItemIds: localIds,
-         userCount: userCount === null ? this.state.userCount : userCount
+         userCount: userCount === null ? this.state.userCount : userCount,
+         minPrice: minPrice === null ? this.state.minPrice : minPrice,
+         maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
+         numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
       });
    }
 
@@ -358,28 +393,17 @@ class CurrentList extends Component {
     * @returns None
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
-      if (item.purchased) {
-         return (
-            <ListItemContainer
-               title={this.getDispName(item)}
-               fromItemView={true}
-               purchased={true}
-               listID={this.state.listId}
-               itemID={this.state.listItemIds[index]}
-               onDelete={this.deleteItem}
-            />
-         );
-      } else {
-         return (
-            <ListItemContainer
-               title={this.getDispName(item)}
-               fromItemView={true}
-               listID={this.state.listId}
-               itemID={this.state.listItemIds[index]}
-               onDelete={this.deleteItem}
-            />
-         );
-      }
+      return (
+         <ListItemContainer
+            title={this.getDispName(item)}
+            fromItemView={true}
+            description={item.price === undefined ? "" : "Price: " + item.price.minPrice + " - " + item.price.maxPrice}
+            purchased={item.purchased}
+            listID={this.state.listId}
+            itemID={this.state.listItemIds[index]}
+            onDelete={this.deleteItem}
+         />
+      );
    }
 
    /**
@@ -820,8 +844,15 @@ class CurrentList extends Component {
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
-                        <Text style={styles.dashboardText}>Number of Items: {this.state.listItems.length}</Text>
-                        <Text style={styles.dashboardText}>List shared with {this.state.userCount - 1} others</Text>
+                        <Text style={styles.dashboardText}>
+                           Number of Items: {this.state.listItems.length}
+                        </Text>
+                        <Text style={styles.dashboardText}>
+                           List shared with {this.state.userCount - 1} others
+                           </Text>
+                        <Text style={styles.dashboardText}>
+                           {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
+                        </Text>
                         {/* -1 here to make sure we dont include the current user */}
                      </Layout>
                   </Layout>
