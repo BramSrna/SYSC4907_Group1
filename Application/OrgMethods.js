@@ -14,6 +14,7 @@ const options = [
     {text: "Alphabetically", label: "Alphabetically", value: "ALPHABETICALLY"},
     {text: "By Location", label: "By Location", value: "BY_LOCATION"},
     {text: "Fastest Path", label: "Fastest Path", value: "FASTEST_PATH"},
+    {text: "Purchased", label: "Purchased", value: "PURCHASED"}
 ];
 
 export const organizationOptions = options; 
