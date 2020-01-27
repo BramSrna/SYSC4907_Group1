@@ -169,16 +169,20 @@ class AddItemPage extends Component {
             var topItems = this.sortObjectByKeys(ssv.topItems);
     
             var finalItems = [];
+            var ids = [];
             for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
                 var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
                 var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
-                
+                var id = recItems[i][0];
+
                 finalItems.push({
                     genName: info.genericName,
                     specName: info.specificName,
                     name: name,
-                    id: recItems[i][0]
+                    id: id
                 });
+
+                ids.push(id)
             }
 
             for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
@@ -187,12 +191,14 @@ class AddItemPage extends Component {
                     var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
                     var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
                     
-                    finalItems.push({
-                        genName: info.genericName,
-                        specName: info.specificName,
-                        name: name,
-                        id: id
-                    });
+                    if (!ids.includes(id)){
+                        finalItems.push({
+                            genName: info.genericName,
+                            specName: info.specificName,
+                            name: name,
+                            id: id
+                        });                        
+                    }
                 }
             }
 

@@ -240,10 +240,14 @@ const getItem = function(genericName, specificName = null){
                             }
                         }
 
-                        // Add the final price range to the item
-                        item.finalPrice = {
-                            minPrice: minPrice,
-                            maxPrice: maxPrice
+                        if (maxPrice != -1) {
+                            // Add the final price range to the item
+                            item.finalPrice = {
+                                minPrice: minPrice,
+                                maxPrice: maxPrice
+                            }
+                        } else {
+                            item.finalPrice = {}
                         }
                         
                         break;
