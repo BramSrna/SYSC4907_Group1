@@ -31,16 +31,18 @@ def genRules(request):
                 currItems.append(itemId)
             listItems.append(currItems)
 
-    print("UPDATE")
+    print("TRANSACTIONS", listItems)
 
-    rules = getRules(listItems)
+    rules, supportMap = getRules(listItems)
     finalRules = []
 
-    print("RULES", rules)
+    print("HERE")
 
     for item in rules:
         for rule in rules[item]:
             db.reference("/recommendations/" + rule.getPrior()).push(rule.getAntecedent())
             finalRules.append((rule.getPrior(), rule.getAntecedent()))
+
+    db.reference("/recommendations/topItems/").update(supportMap)
 
     return flask.jsonify(finalRules)

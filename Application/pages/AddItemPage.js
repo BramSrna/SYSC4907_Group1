@@ -28,6 +28,8 @@ const globalComps = require('./Functions/GlobalComps');
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
 
+const NUM_REC_ITEMS = 10;
+
 var availableItems = [];
 
 class AddItemPage extends Component {
@@ -123,6 +125,19 @@ class AddItemPage extends Component {
         });
     }
 
+    sortObjectByKeys(toSort) {
+        var sortable = [];
+        for (var item in toSort) {
+            sortable.push([item, toSort[item]]);
+        }
+
+        sortable.sort(function(a, b) {
+            return b[1] - a[1];
+        });
+
+        return sortable;
+    }
+
     loadRecommendedItems() {
         var currItemIds = this.state.listItemIds;
         console.log(currItemIds);
@@ -150,29 +165,37 @@ class AddItemPage extends Component {
                 }
             }
 
-            var sortable = [];
-            for (var item in newItems) {
-                sortable.push([item, newItems[item]]);
-            }
-    
-            sortable.sort(function(a, b) {
-                return a[1] - b[1];
-            });
+            var recItems = this.sortObjectByKeys(newItems);
+            var topItems = this.sortObjectByKeys(ssv.topItems);
     
             var finalItems = [];
-            for (var i = 0; i < sortable.length; i++){
-                var item = {}
-
-                var info = globalComps.ItemObj.getInfoFromId(sortable[i][0]);
+            for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
+                var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
                 var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
                 
                 finalItems.push({
                     genName: info.genericName,
                     specName: info.specificName,
                     name: name,
-                    id: sortable[i][0]
+                    id: recItems[i][0]
                 });
             }
+
+            for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
+                var id = topItems[i][0];
+                if (!currItemIds.includes(id)) {
+                    var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
+                    var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
+                    
+                    finalItems.push({
+                        genName: info.genericName,
+                        specName: info.specificName,
+                        name: name,
+                        id: id
+                    });
+                }
+            }
+
     
             that.setState({
                 recommendedItems: finalItems
