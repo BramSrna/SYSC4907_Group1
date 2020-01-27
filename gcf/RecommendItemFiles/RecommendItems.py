@@ -6,7 +6,7 @@ from itertools import chain, combinations
 
 from collections import Counter
 
-MIN_SUPPORT = 3
+MIN_SUPPORT = 2
 
 def calcSupport(itemSubset, allTransactions):
     numIncludes = 0

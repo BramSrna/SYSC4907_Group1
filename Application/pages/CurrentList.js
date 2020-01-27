@@ -261,8 +261,8 @@ class CurrentList extends Component {
                               ids,
                               reorg = false,
                               userCount = userCount,
-                              minPrice = minPrice,
-                              maxPrice = maxPrice,
+                              minPrice = minPrice.toFixed(2),
+                              maxPrice = maxPrice.toFixed(2),
                               numUnknownPrice = numUnknownPrice);
       });
    }
@@ -404,7 +404,7 @@ class CurrentList extends Component {
             <ListItemContainer
                title={this.getDispName(item)}
                fromItemView={true}
-               description={item.price === undefined ? "" : "Price: " + item.price.minPrice + " - " + item.price.maxPrice}
+               description={item.price === undefined ? "" : "Price: " + item.price.minPrice.toFixed(2) + " - " + item.price.maxPrice.toFixed(2)}
                purchased={item.purchased}
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
@@ -810,7 +810,8 @@ class CurrentList extends Component {
             icon={AddIcon}
             onPress={() => this.props.navigation.navigate("AddItemPage", {
                name: this.state.listName,
-               listID: this.state.listId
+               listID: this.state.listId,
+               listItemIds: this.state.listItemIds
             })} />
       );
 

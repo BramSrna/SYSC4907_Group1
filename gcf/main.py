@@ -28,7 +28,7 @@ def genRules(request):
         if ITEMS_KEY in currList:
             items = lists[listId][ITEMS_KEY]
             for itemId in items:
-                currItems.append(items[itemId][GEN_NAME_KEY])
+                currItems.append(itemId)
             listItems.append(currItems)
 
     print("UPDATE")

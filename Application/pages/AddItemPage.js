@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     KeyboardAvoidingView,
-    ScrollView
+    FlatList,
+    ScrollView,
+    TouchableOpacity
 } from "react-native";
 import {
     Layout,
@@ -10,11 +12,18 @@ import {
     TopNavigation,
     TopNavigationAction,
     Autocomplete,
+    Text,
 } from 'react-native-ui-kitten';
 import { ArrowBackIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import ListItemContainer from "../components/ListItemContainer.js";
+import DoubleClick from "react-native-double-tap";
+import { AddIcon } from '../assets/icons/icons.js';
+import * as firebase from 'firebase/app';
+
+const globalComps = require('./Functions/GlobalComps');
 
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
@@ -33,6 +42,8 @@ class AddItemPage extends Component {
             currItemId: "",
             value: '',
             data: [],
+            recommendedItems: [],
+            listItemIds: []
         };
     }
 
@@ -52,10 +63,15 @@ class AddItemPage extends Component {
         this.setState({
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
+            listItemIds: this.props.navigation.getParam("listItemIds", "(Invalid List Item IDs")
         });
 
         // Populate the Arrays for the autocomplete fields
-        this.loadAvailableItems();
+        this.loadAvailableItems();       
+    }
+
+    componentDidMount() {
+        this.loadRecommendedItems();
     }
 
     /**
@@ -107,6 +123,63 @@ class AddItemPage extends Component {
         });
     }
 
+    loadRecommendedItems() {
+        var currItemIds = this.state.listItemIds;
+        console.log(currItemIds);
+
+        var that = this;
+
+        var ref = firebase.database().ref('/recommendations');
+        var retItems = ref.once('value').then((snapshot) => {
+            var newItems = {};
+            var ssv = snapshot.val();
+            for (var i = 0; i < currItemIds.length; i++) {
+                var itemId = currItemIds[i];
+                if (itemId in ssv) {
+                    var items = ssv[itemId];
+                    for (var newItemId in items) {
+                        var newItem = items[newItemId];
+                        console.log(newItem);
+                        if (!currItemIds.includes(newItem)) {
+                            if (!(newItem in newItems)){
+                                newItems[newItem] = 0;
+                            }
+                            newItems[newItem] += 1;
+                        }
+                    }
+                }
+            }
+
+            var sortable = [];
+            for (var item in newItems) {
+                sortable.push([item, newItems[item]]);
+            }
+    
+            sortable.sort(function(a, b) {
+                return a[1] - b[1];
+            });
+    
+            var finalItems = [];
+            for (var i = 0; i < sortable.length; i++){
+                var item = {}
+
+                var info = globalComps.ItemObj.getInfoFromId(sortable[i][0]);
+                var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
+                
+                finalItems.push({
+                    genName: info.genericName,
+                    specName: info.specificName,
+                    name: name,
+                    id: sortable[i][0]
+                });
+            }
+    
+            that.setState({
+                recommendedItems: finalItems
+            });
+        });
+    }
+
     /**
     * updateCurrItem
     * 
@@ -153,6 +226,16 @@ class AddItemPage extends Component {
         }
     }
 
+    handleAddButton = () => {
+        // Add the item to the list
+        this.addItem(this.state.listId,
+                     this.state.genName,
+                     specName = this.state.specName);
+        if (this._isMounted) {
+            this.props.navigation.goBack();
+        }
+    }
+
     /**
     * addItem
     * 
@@ -164,19 +247,50 @@ class AddItemPage extends Component {
     * 
     * @returns None
     */
-    addItem = () => {
+    addItem(listId, genName, specName) {
         // Add the item to the list
         lf.AddItemToList(
-            this.state.listId,
-            this.state.genName,
+            listId,
+            genName,
             1,
             "aSize mL",
             "aNote",
-            specName = this.state.specName);
-        if (this._isMounted) {
-            this.props.navigation.goBack();
-        }
+            specName = specName);
     };
+
+    addItemFromRecommended(ind) {
+        var temp = this.state.recommendedItems;
+
+        var item = temp[ind];
+        this.addItem(this.state.listId,
+                     item.genName,
+                     item.specName);
+
+        temp = this.state.listItemIds;
+        temp.push(item.id);
+        this.setState({
+            listItemIds: temp
+        });
+        
+        this.loadRecommendedItems();
+    }
+
+    renderListElem = (item, index) => {
+        return (
+            <Layout style={styles.listItem} level='2'>
+                <Text>
+                    {item.name}
+                </Text>
+
+                <Button
+                    icon={AddIcon}
+                    appearance='outline'
+                    status='danger'
+                    onPress={() => this.addItemFromRecommended(index)}
+                />
+            </Layout>
+        );
+    }
 
     render() {
         const renderMenuAction = () => (
@@ -218,10 +332,42 @@ class AddItemPage extends Component {
                                     onChangeText={onChangeText}
                                     onSelect={onSelect}
                                 />
+
                                 <Layout style={styles.mainButtonGroup} >
-                                    <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
-                                    <Button style={styles.mainPageButton} status='primary' onPress={this.addItem}>{'Add Item'}</Button>
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='danger'
+                                        onPress={() => this.props.navigation.goBack()}
+                                    >
+                                        {'Cancel'}
+                                    </Button>
+                                    
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='primary'
+                                        onPress={this.handleAddButton}
+                                    >
+                                        {'Add Item'}
+                                    </Button>
                                 </Layout>
+
+                            </Layout>
+                        </Layout>
+                
+                        <Layout style={styles.formOuterContainer} level='3'>
+                            <Layout style={styles.formInnerContainer}>
+                                <Text>
+                                    Recommended Items:
+                                </Text>
+
+                                <FlatList
+                                    contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                                    style={styles.flatList}
+                                    data={this.state.recommendedItems}
+                                    width="100%"
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item, index }) => this.renderListElem(item, index)}
+                                />
                             </Layout>
                         </Layout>
                     </ScrollView>
@@ -241,6 +387,10 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
     },
+    flatList: {
+       paddingTop: 8,
+       paddingHorizontal: 4,
+    },
     mainButtonGroup: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -250,6 +400,15 @@ const styles = StyleSheet.create({
     formOuterContainer: {
         margin: 8,
         padding: 8,
+        borderRadius: 10,
+    },
+    listItem: {
+        flex: 1,
+        marginVertical: 8,
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
         borderRadius: 10,
     },
     formInnerContainer: {
@@ -269,6 +428,11 @@ const styles = StyleSheet.create({
         width: '100%',
         margin: 4,
         borderRadius: 20,
+    },
+    ListContainer: {
+       //justifyContent: "center",
+       //alignItems: "center",
+       flex: 1,
     },
 });
 
