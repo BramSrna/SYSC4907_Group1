@@ -12,6 +12,7 @@ import NewContact from '../pages/NewContact';
 import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
+import MapsPage from '../pages/MapsPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -50,6 +51,9 @@ const StackNavigator = createStackNavigator({
     SelectStorePage: {
         screen: SelectStorePage
     },
+    MapsPage:{
+        screen: MapsPage
+    }
 }, {
     initialRouteName: "Home",
     headerMode: "none"

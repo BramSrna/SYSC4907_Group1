@@ -839,7 +839,7 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@eva-design/dss@^1.3.2":
+"@eva-design/dss@^1.3.1", "@eva-design/dss@^1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@eva-design/dss/-/dss-1.3.2.tgz#e7a7307d5cbffcb18a394774ecf921b85241e7a7"
   integrity sha512-/hGt5X7Pd7KuwqJ6x/BE9yVZl/n75ncNTORSMn325LwvlEcPIajMCBNjca4HiFIKSfV9iWV7+VWR2+mWuA62og==
@@ -849,7 +849,7 @@
   resolved "https://registry.yarnpkg.com/@eva-design/eva/-/eva-1.3.2.tgz#050b7509cacce79755733ddd859aaa3d2a9bfd44"
   integrity sha512-2sMIWwab9ettFxD3qOjZpVg13Lu17MjDiT/c34FbadwNL9sTxYry75JuSSruuf1qNH6xzYuvlDTZc0W1KASLdQ==
 
-"@eva-design/processor@^1.3.2":
+"@eva-design/processor@^1.3.1", "@eva-design/processor@^1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@eva-design/processor/-/processor-1.3.2.tgz#a373d355b12bbabc2f4f3eaf3c5f41850f2f8c8e"
   integrity sha512-xavMBcI63j2bHFU6Xl1y8K+e87Xy7gINMrURhQY2K/K09naaMERRbUFL9OgV9mOxBwkf5Xh9xePbAHB1mGY+lA==
@@ -1307,7 +1307,18 @@
   resolved "https://registry.yarnpkg.com/@types/websql/-/websql-0.0.27.tgz#621a666a7f02018e7cbb4abab956a25736c27d71"
   integrity sha1-Yhpman8CAY58u0q6uVaiVzbCfXE=
 
-"@ui-kitten/eva-icons@^4.2.0":
+"@ui-kitten/components@^4.3.2":
+  version "4.3.2"
+  resolved "https://registry.yarnpkg.com/@ui-kitten/components/-/components-4.3.2.tgz#58da1df3af9c20c280f061fcc0bb6a4e0d013e9c"
+  integrity sha512-j47NHAzUX1CFdwx8yg+4+pWDuFPFjZIWjSAsCBxJb8ch3v84iFMgBZ7MqNujEW8u90eRlDOI2Yp9TSNQh2aXmg==
+  dependencies:
+    "@eva-design/dss" "^1.3.1"
+    "@eva-design/processor" "^1.3.1"
+    fecha "3.0.3"
+    hoist-non-react-statics "^3.2.1"
+    lodash.merge "^4.6.1"
+
+"@ui-kitten/eva-icons@^4.3.2":
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/@ui-kitten/eva-icons/-/eva-icons-4.3.2.tgz#2c6810c9649903b529acf96a3c9c377f7373cf15"
   integrity sha512-QWTcpN8J6mfHh0sSrvgElG0T3fSO+ijVinxMC57ILLjJ0HUzcTW6TQ6l/V2vgC7gxLDgcO3/hIY5Tryyd0Iz0A==
@@ -5566,11 +5577,6 @@ react-native-maps@0.24.2:
   version "0.24.2"
   resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.24.2.tgz#19974f967cb0c2e24dab74ca879118e0932571b2"
   integrity sha512-1iNIDikp2dkCG+8DguaEviYZiMSYyvwqYT7pO2YTZvuFRDSc/P9jXMhTUnSh4wNDlEeQ47OJ09l0pwWVBZ7wxg==
-
-react-native-maps@^0.26.1:
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-0.26.1.tgz#6ec316259b38d259c8974448d894bd7a23101da4"
-  integrity sha512-p4VTB8YB5ZmOmDRCUpoHZkm05amZwhIo04AJMBbB9+JAR2PNNfpo0vceoWX0Mag4wnePkdzPomeWMplr/wimTg==
 
 react-native-modal@^9.0.0:
   version "9.0.0"
