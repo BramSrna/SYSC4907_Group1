@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import {
     Layout,
     Button,
@@ -15,21 +15,38 @@ import { ArrowBackIcon } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
-import { MapView } from 'expo';
+import { Permissions, Location, } from 'expo';
+import MapView, { Marker, } from 'react-native-maps';
 // import axios from 'axios';
 
 const PAGE_TITLE = 'Select Location';
+const NO_LOCATION_PERMISSION = 'Please enable location permissions to view your current location.';
+const ANDROID_EMULATOR_ERROR = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!';
 
 class MapsPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentLocation: {
-                latitude: '00.0',
-                longitude: '00.0',
-            },
+            currentLocation: { coords: { latitude: 0.0, longitude: 0.0 } },
+            statusMessage: null,
         }
     }
+
+    componentWillMount() {
+        this._getLocationAsync();
+    }
+
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: NO_LOCATION_PERMISSION,
+            });
+        }
+
+        let currentLocation = await Location.getCurrentPositionAsync({});
+        this.setState({ currentLocation });
+    };
 
     render() {
         const renderMenuAction = () => (
@@ -38,7 +55,7 @@ class MapsPage extends Component {
                 onPress={() => this.props.navigation.goBack()}
             />
         );
-
+        console.log(this.state.currentLocation);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -47,7 +64,15 @@ class MapsPage extends Component {
                     leftControl={renderMenuAction()}
                 />
                 <Layout style={styles.container}>
-                    <MapView style={styles.container}/>
+                    <MapView style={styles.container}
+                        region={{ latitude: this.state.currentLocation.coords.latitude, longitude: this.state.currentLocation.coords.longitude, latitudeDelta: 0.0090, longitudeDelta: 0.0090 }}
+                    >
+                        <Marker
+                            coordinate={this.state.currentLocation.coords}
+                            title="My Marker"
+                            description="Some description"
+                        />
+                    </MapView>
                 </Layout>
                 <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
