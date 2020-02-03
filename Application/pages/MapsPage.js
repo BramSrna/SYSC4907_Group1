@@ -97,6 +97,16 @@ class MapsPage extends Component {
         }
     }
 
+    handleMapRegionChange = currentCursorLocation => {
+        console.log(currentCursorLocation);
+        this.setState({ currentCursorLocation: { coords: { latitude: currentCursorLocation.latitude, longitude: currentCursorLocation.longitude } } });
+    };
+
+    selectStore = (location) => {
+        this.props.navigation.state.params.selectStore(location);
+        this.props.navigation.goBack();
+    }
+
     render() {
         const renderMenuAction = () => (
             <TopNavigationAction
@@ -112,6 +122,7 @@ class MapsPage extends Component {
                 title={title}
                 description={description}
                 pinColor={'green'}
+                onCalloutPress={() => this.selectStore(description)}
             />
         );
 
@@ -129,8 +140,9 @@ class MapsPage extends Component {
                             latitude: this.state.currentLocation.coords.latitude,
                             longitude: this.state.currentLocation.coords.longitude,
                             latitudeDelta: DEFAULT_LATITUDE_DELTA,
-                            longitudeDelta: DEFAULT_LONGITUDE_DELTA
+                            longitudeDelta: DEFAULT_LONGITUDE_DELTA,
                         }}
+                    // onRegionChange={this.handleMapRegionChange}
                     >
                         <Marker
                             coordinate={this.state.currentLocation.coords}
