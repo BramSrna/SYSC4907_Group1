@@ -23,11 +23,16 @@ const PAGE_TITLE = 'Select Location';
 const NO_LOCATION_PERMISSION = 'Please enable location permissions to view your current location.';
 const ANDROID_EMULATOR_ERROR = 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!';
 
+const DEFAULT_LATITUDE = 56.1304;
+const DEFAULT_LONGITUDE = 106.3468;
+const DEFAULT_LATITUDE_DELTA = 0.0090;
+const DEFAULT_LONGITUDE_DELTA = 0.0090;
+
 class MapsPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentLocation: { coords: { latitude: 0.0, longitude: 0.0 } },
+            currentLocation: { coords: { latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE } },
             statusMessage: null,
         }
     }
@@ -65,7 +70,7 @@ class MapsPage extends Component {
                 />
                 <Layout style={styles.container}>
                     <MapView style={styles.container}
-                        region={{ latitude: this.state.currentLocation.coords.latitude, longitude: this.state.currentLocation.coords.longitude, latitudeDelta: 0.0090, longitudeDelta: 0.0090 }}
+                        region={{ latitude: this.state.currentLocation.coords.latitude, longitude: this.state.currentLocation.coords.longitude, latitudeDelta: DEFAULT_LATITUDE_DELTA, longitudeDelta: DEFAULT_LONGITUDE_DELTA }}
                     >
                         <Marker
                             coordinate={this.state.currentLocation.coords}
