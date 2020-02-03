@@ -35,6 +35,7 @@ const DEFAULT_MAX_LOCATIONS = 20;
 
 const HERE_REQUEST_HEADER_1 = 'https://places.sit.ls.hereapi.com/places/v1/browse';
 const HERE_REQUEST_HEADER_2 = '&q=grocery+store';
+const HERE_REQUEST_HEADER_3 = '&tf=plain';
 
 // SMAPLE API REQUEST
 // https://places.sit.ls.hereapi.com/places/v1/discover/explore
@@ -72,23 +73,27 @@ class MapsPage extends Component {
                 errorMessage: NO_LOCATION_PERMISSION,
             });
         }
-
         let currentLocation = await Location.getCurrentPositionAsync();
-        this.setState({ currentLocation });
         this.getNearbyStores(currentLocation);
+        this.setState({ currentLocation });
     };
 
-    getNearbyStores = async (currentLocation) => {
+    getNearbyStores = (currentLocation) => {
         if (this.state.apiKey != null) {
-            const request = HERE_REQUEST_HEADER_1 + '?at=' + currentLocation.coords.latitude + ',' + currentLocation.coords.longitude + HERE_REQUEST_HEADER_2 + '&apiKey=' + this.state.apiKey;
+            const request = HERE_REQUEST_HEADER_1 +
+                '?at=' + currentLocation.coords.latitude +
+                ',' + currentLocation.coords.longitude +
+                HERE_REQUEST_HEADER_2 + HERE_REQUEST_HEADER_3 +
+                '&apiKey=' + this.state.apiKey;
             console.log('REQUEST STRING: ' + request);
-            this.state.storesApiRequestResult = await axios.get(request).then(result => {
+            axios.get(request).then(result => {
                 console.log(result);
+                this.setState({ storesApiRequestResult: result });
             }).catch(error => {
                 console.log(error);
             });
-        }else{
-         console.log('MapsPage: apiKey is null')   
+        } else {
+            console.log('MapsPage: apiKey is null')
         }
     }
 
@@ -99,6 +104,17 @@ class MapsPage extends Component {
                 onPress={() => this.props.navigation.goBack()}
             />
         );
+
+        const createStoreMarker = (coords, title, description, key) => (
+            <Marker
+                key={key}
+                coordinate={{ latitude: coords[0], longitude: coords[1] }}
+                title={title}
+                description={description}
+                pinColor={'green'}
+            />
+        );
+
         console.log(this.state.currentLocation);
         return (
             <React.Fragment>
@@ -121,6 +137,9 @@ class MapsPage extends Component {
                             title={CURRENT_LOCATION_MARKER_TITLE}
                             description={CURRENT_LOCATION_MARKER_DESCRIPTION}
                         />
+                        {this.state.storesApiRequestResult != null ? this.state.storesApiRequestResult.data.results.items.map((item, key) => {
+                            return createStoreMarker(item.position, item.title, item.vicinity, key);
+                        }) : null}
                     </MapView>
                 </Layout>
                 <NotificationPopup ref={ref => this.popup = ref} />
