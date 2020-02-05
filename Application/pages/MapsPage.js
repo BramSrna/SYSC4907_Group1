@@ -27,8 +27,8 @@ const ANDROID_EMULATOR_ERROR = 'Oops, this will not work on Sketch in an Android
 
 const DEFAULT_LATITUDE = 45.4210;
 const DEFAULT_LONGITUDE = -75.6907;
-const DEFAULT_LATITUDE_DELTA = 0.0090;
-const DEFAULT_LONGITUDE_DELTA = 0.0090;
+const DEFAULT_LATITUDE_DELTA = 0.0900;
+const DEFAULT_LONGITUDE_DELTA = 0.0900;
 const CURRENT_LOCATION_MARKER_TITLE = 'Your Current Location';
 const CURRENT_LOCATION_MARKER_DESCRIPTION = '';
 const DEFAULT_MAX_LOCATIONS = 20;
@@ -50,6 +50,7 @@ class MapsPage extends Component {
         this.state = {
             currentLocation: { coords: { latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE } },
             currentCursorLocation: { coords: { latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE } },
+            currentLocationMarkerOpacity: 0,
             statusMessage: null,
             apiKey: null,
             storesApiRequestResult: null,
@@ -76,6 +77,7 @@ class MapsPage extends Component {
         let currentLocation = await Location.getCurrentPositionAsync();
         this.getNearbyStores(currentLocation);
         this.setState({ currentLocation });
+        this.setState({ currentLocationMarkerOpacity: 1 });
     };
 
     getNearbyStores = (currentLocation) => {
@@ -87,7 +89,7 @@ class MapsPage extends Component {
                 '&apiKey=' + this.state.apiKey;
             console.log('REQUEST STRING: ' + request);
             axios.get(request).then(result => {
-                console.log(result);
+                // console.log(result);
                 this.setState({ storesApiRequestResult: result });
             }).catch(error => {
                 console.log(error);
@@ -101,6 +103,28 @@ class MapsPage extends Component {
         console.log(currentCursorLocation);
         this.setState({ currentCursorLocation: { coords: { latitude: currentCursorLocation.latitude, longitude: currentCursorLocation.longitude } } });
     };
+
+    calculateLatitudeDelta() {
+        if (this.state.storesApiRequestResult != null) {
+            var delta = 0.0000;
+            this.state.storesApiRequestResult.data.results.items.map((item, key) => {
+                delta = Math.max(delta, Math.abs(this.state.currentLocation.coords.latitude - item.position[0]));
+            });
+            return delta*2;
+        }
+        else return DEFAULT_LATITUDE_DELTA;
+    }
+
+    calculateLongitudeDelta() {
+        if (this.state.storesApiRequestResult != null) {
+            var delta = 0.0000;
+            this.state.storesApiRequestResult.data.results.items.map((item, key) => {
+                delta = Math.max(delta, Math.abs(this.state.currentLocation.coords.longitude - item.position[1]));
+            });
+            return delta*2;
+        }
+        else return DEFAULT_LONGITUDE_DELTA;
+    }
 
     selectStore = (location) => {
         this.props.navigation.state.params.selectStore(location);
@@ -122,7 +146,7 @@ class MapsPage extends Component {
                 title={title}
                 description={description}
                 pinColor={'green'}
-                onCalloutPress={() => this.selectStore(description)}
+                onCalloutPress={() => this.selectStore(title + ' - ' + description)}
             />
         );
 
@@ -139,8 +163,8 @@ class MapsPage extends Component {
                         region={{
                             latitude: this.state.currentLocation.coords.latitude,
                             longitude: this.state.currentLocation.coords.longitude,
-                            latitudeDelta: DEFAULT_LATITUDE_DELTA,
-                            longitudeDelta: DEFAULT_LONGITUDE_DELTA,
+                            latitudeDelta: this.state.storesApiRequestResult != null ? this.calculateLatitudeDelta() : DEFAULT_LATITUDE_DELTA,
+                            longitudeDelta: this.state.storesApiRequestResult != null ? this.calculateLongitudeDelta() : DEFAULT_LONGITUDE_DELTA,
                         }}
                     // onRegionChange={this.handleMapRegionChange}
                     >
@@ -148,6 +172,7 @@ class MapsPage extends Component {
                             coordinate={this.state.currentLocation.coords}
                             title={CURRENT_LOCATION_MARKER_TITLE}
                             description={CURRENT_LOCATION_MARKER_DESCRIPTION}
+                            opacity={this.state.currentLocationMarkerOpacity}
                         />
                         {this.state.storesApiRequestResult != null ? this.state.storesApiRequestResult.data.results.items.map((item, key) => {
                             return createStoreMarker(item.position, item.title, item.vicinity, key);
