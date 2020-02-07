@@ -1,4 +1,8 @@
-import { createDrawerNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
+import {
+    createDrawerNavigator,
+    createAppContainer,
+    createStackNavigator
+} from 'react-navigation';
 import HomePage from '../pages/HomePage';
 import YourLists from '../pages/YourLists';
 import CurrentList from '../pages/CurrentList';
@@ -12,6 +16,7 @@ import NewContact from '../pages/NewContact';
 import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
+import SearchRecipePage from '../pages/SearchRecipePage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -49,6 +54,9 @@ const StackNavigator = createStackNavigator({
     },
     SelectStorePage: {
         screen: SelectStorePage
+    },
+    SearchRecipePage: {
+        screen: SearchRecipePage
     },
 }, {
     initialRouteName: "Home",
@@ -114,6 +122,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Excel Parser"
+        }
+    },
+    SearchRecipePage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Search for a Recipe"
         }
     }
 }, {

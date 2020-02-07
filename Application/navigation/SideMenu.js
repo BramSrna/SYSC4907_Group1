@@ -10,6 +10,7 @@ const YOUR_DATA = "Your Data";
 const HOME = "Home";
 const CONTACTS = "Contacts";
 const YOUR_LISTS = "Your Lists";
+const SEARCH_RECIPE = "Search for a Recipe";
 const FEEDBACK = "Feedback";
 const ADD_ITEM_LOCATION = "Add Item Location";
 const MAP_A_STORE = "Map a Store";
@@ -55,7 +56,7 @@ class SideMenu extends Component {
         );
     }
 
-    returnDispalyName(){
+    returnDispalyName() {
         if (firebase.auth().currentUser != null && firebase.auth().currentUser.displayName != null) {
             return (
                 <Text style={styles.signedInText} appearance='hint'>Signed in as {firebase.auth().currentUser.displayName}</Text>
@@ -83,6 +84,9 @@ class SideMenu extends Component {
                             </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourListsPage')}>
                                 {YOUR_LISTS}
+                            </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('SearchRecipePage')}>
+                                {SEARCH_RECIPE}
                             </Text>
                         </Layout>
                     </Layout>
