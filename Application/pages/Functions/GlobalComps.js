@@ -226,15 +226,17 @@ const getItem = function(genericName, specificName = null){
                                 // Parse each description
                                 var currDesc = descs[currDescId];
                                 var prices = currDesc.prices;
-                                for (var i = 0; i < prices.length; i++) {
-                                    // Update the price range with the new information
-                                    var currPrice = prices[i];
-                                    if (currPrice < minPrice) {
-                                        minPrice = currPrice;
-                                    }
+                                if (prices){
+                                    for (var i = 0; i < prices.length; i++) {
+                                        // Update the price range with the new information
+                                        var currPrice = prices[i];
+                                        if (currPrice < minPrice) {
+                                            minPrice = currPrice;
+                                        }
 
-                                    if (currPrice > maxPrice) {
-                                        maxPrice = currPrice;
+                                        if (currPrice > maxPrice) {
+                                            maxPrice = currPrice;
+                                        }
                                     }
                                 }
                             }
