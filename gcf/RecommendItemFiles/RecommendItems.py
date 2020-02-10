@@ -6,7 +6,7 @@ from itertools import chain, combinations
 
 from collections import Counter
 
-MIN_SUPPORT = 3
+MIN_SUPPORT = 2
 
 def calcSupport(itemSubset, allTransactions):
     numIncludes = 0
@@ -14,6 +14,8 @@ def calcSupport(itemSubset, allTransactions):
     for currTransaction in allTransactions:
         if (itemSubset.issubset(currTransaction)):
             numIncludes += 1
+
+    print("CALC SUPPORT", itemSubset, numIncludes, len(allTransactions))
 
     support = float(numIncludes) / len(allTransactions)
 
@@ -32,14 +34,21 @@ def calcConfidence(ruleToCheck, allTransactions):
 
     return confidence
 
-def constructFPtree(allTransactions):
+def getSupportMap(allTransactions):
     supportMap = {}
 
     for currTransaction in allTransactions:
         for item in currTransaction:
             if item not in supportMap:
-                supp = calcSupport(set(item), allTransactions)
-                supportMap[item] = supp
+                supp = calcSupport(set([item]), allTransactions)
+                supportMap[item] = supp   
+                print("SUPPORT", item, supp) 
+
+    return(supportMap)
+
+def constructFPtree(allTransactions, supportMap = None):
+    if (supportMap == None):
+        supportMap = getSupportMap(allTransactions)
 
     descOrder = list(reversed(sorted(supportMap, key=lambda item: supportMap[item])))
 
@@ -110,9 +119,10 @@ def formatTransactions(allTransactions):
 
 def getRules(allTransactions):
     transactions = formatTransactions(allTransactions)
-    tree = constructFPtree(transactions)
+    supportMap = getSupportMap(transactions)
+    tree = constructFPtree(transactions, supportMap = supportMap)
     rules = mineTree(tree)
-    return rules
+    return (rules, supportMap)
 
 if __name__ == "__main__":
     transactions = [["B", "E", "A", "D"],
@@ -122,8 +132,13 @@ if __name__ == "__main__":
                     ["A", "B", "C", "D", "E"],
                     ["B", "C", "D"]]
 
-    rules = getRules(transactions)
+    #transactions = [["one", "two", "four"],
+    #                ["one", "two", "three"]]
+
+    rules, supportMap = getRules(transactions)
 
     for item in rules:
         for rule in rules[item]:
             print(item, rule.__str__())
+
+    print(supportMap)

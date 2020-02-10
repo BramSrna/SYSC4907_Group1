@@ -1,6 +1,12 @@
+"""
+FPTree
+
+Tree object where each node has a count for its
+occurance count
+"""
 class FPTree(object):
     START_COUNT = 1
-
+    
     def __init__(self, item = None):
         self.item = item
 
