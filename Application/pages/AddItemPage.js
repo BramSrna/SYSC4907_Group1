@@ -307,16 +307,24 @@ class AddItemPage extends Component {
     renderListElem = (item, index) => {
         return (
             <Layout style={styles.listItem} level='2'>
-                <Text>
-                    {item.name}
-                </Text>
+                <Layout style={styles.listTextContainer}>
+                    <Text>
+                        {item.name}
+                    </Text>
+                </Layout>
+                
+                <Layout style={styles.listSpacerContainer}>
+                    
+                </Layout>
 
-                <Button
-                    icon={AddIcon}
-                    appearance='outline'
-                    status='danger'
-                    onPress={() => this.addItemFromRecommended(index)}
-                />
+                <Layout style={styles.listButtonContainer}>
+                    <Button
+                        icon={AddIcon}
+                        appearance='outline'
+                        status='danger'
+                        onPress={() => this.addItemFromRecommended(index)}
+                    />
+                </Layout>
             </Layout>
         );
     }
@@ -463,6 +471,15 @@ const styles = StyleSheet.create({
        //alignItems: "center",
        flex: 1,
     },
+    listTextContainer: {
+        flex: 0.65
+    },
+    listSpacerContainer: {
+        flex: 0.1
+    },
+    listButtonContainer: {
+        flex: 0.25
+    }
 });
 
 export default AddItemPage;
