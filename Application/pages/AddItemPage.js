@@ -71,7 +71,7 @@ class AddItemPage extends Component {
         });
 
         // Populate the Arrays for the autocomplete fields
-        this.loadAvailableItems();       
+        this.loadAvailableItems();
     }
 
     /**
@@ -160,7 +160,7 @@ class AddItemPage extends Component {
         }
 
         // Sort the list
-        sortable.sort(function(a, b) {
+        sortable.sort(function (a, b) {
             return b[1] - a[1];
         });
 
@@ -204,7 +204,7 @@ class AddItemPage extends Component {
                     for (var newItemId in items) {
                         var newItem = items[newItemId];
                         if (!currItemIds.includes(newItem)) {
-                            if (!(newItem in newItems)){
+                            if (!(newItem in newItems)) {
                                 newItems[newItem] = 0;
                             }
                             newItems[newItem] += 1;
@@ -217,13 +217,13 @@ class AddItemPage extends Component {
             // the list of top items
             var recItems = this.sortObjectByKeys(newItems);
             var topItems = this.sortObjectByKeys(ssv.topItems);
-    
+
             var finalItems = [];
             var ids = [];
 
             // Copy the top recommended items to the final list to recommend
             // as well as their ids, upto the maximum length
-            for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
+            for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
                 var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
                 var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
                 var id = recItems[i][0];
@@ -240,20 +240,20 @@ class AddItemPage extends Component {
 
             // Fill the remaining space in the list of recommend items
             // with the most popular items
-            for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++){
+            for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
                 var id = topItems[i][0];
                 if (!currItemIds.includes(id)) {
                     var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
                     var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
-                    
+
                     // Check that the item is not already in the list
-                    if (!ids.includes(id)){
+                    if (!ids.includes(id)) {
                         finalItems.push({
                             genName: info.genericName,
                             specName: info.specificName,
                             name: name,
                             id: id
-                        });                        
+                        });
                     }
                 }
             }
@@ -320,8 +320,8 @@ class AddItemPage extends Component {
     handleAddButton = () => {
         // Add the item to the list
         this.addItem(this.state.listId,
-                     this.state.genName,
-                     specName = this.state.specName);
+            this.state.genName,
+            specName = this.state.specName);
 
         // Return to the list
         if (this._isMounted) {
@@ -368,8 +368,8 @@ class AddItemPage extends Component {
         // Add the selected item to the list
         var item = temp[ind];
         this.addItem(this.state.listId,
-                     item.genName,
-                     item.specName);
+            item.genName,
+            item.specName);
 
         // Update the state of the user's list with the item they added
         temp = this.state.listItemIds;
@@ -377,7 +377,7 @@ class AddItemPage extends Component {
         this.setState({
             listItemIds: temp
         });
-        
+
         // Reload the recommended items
         this.loadRecommendedItems();
     }
@@ -395,23 +395,21 @@ class AddItemPage extends Component {
     renderListElem = (item, index) => {
         return (
             <Layout style={styles.listItem} level='2'>
-                <Layout style={styles.listTextContainer}>
-                    <Text>
-                        {item.name}
-                    </Text>
-                </Layout>
-                
-                <Layout style={styles.listSpacerContainer}>
+                <Layout style={styles.listTextContainer} level='1'>
+                    <Layout style={styles.itemTextContainer} level='1'>
+                        <Text style={styles.itemText}>
+                            {item.name}
+                        </Text>
+                    </Layout>
+                    <Layout style={styles.itemButtonContainer} level='1'>
+                        <Button
+                            icon={AddIcon}
+                            appearance='outline'
+                            status='danger'
+                            onPress={() => this.addItemFromRecommended(index)}
+                        />
+                    </Layout>
 
-                </Layout>
-
-                <Layout style={styles.listButtonContainer}>
-                    <Button
-                        icon={AddIcon}
-                        appearance='outline'
-                        status='danger'
-                        onPress={() => this.addItemFromRecommended(index)}
-                    />
                 </Layout>
             </Layout>
         );
@@ -466,7 +464,7 @@ class AddItemPage extends Component {
                                     >
                                         {'Cancel'}
                                     </Button>
-                                    
+
                                     <Button
                                         style={styles.mainPageButton}
                                         status='primary'
@@ -478,11 +476,11 @@ class AddItemPage extends Component {
 
                             </Layout>
                         </Layout>
-                
+
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
                                 <Text>
-                                    Recommended Items:
+                                    {'Recommended Items:'}
                                 </Text>
 
                                 <FlatList
@@ -513,8 +511,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     flatList: {
-       paddingTop: 8,
-       paddingHorizontal: 4,
+        paddingTop: 8,
+        paddingHorizontal: 4,
     },
     mainButtonGroup: {
         flexDirection: 'row',
@@ -555,19 +553,34 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     ListContainer: {
-       //justifyContent: "center",
-       //alignItems: "center",
-       flex: 1,
+        //justifyContent: "center",
+        //alignItems: "center",
+        flex: 1,
     },
     listTextContainer: {
-        flex: 0.65
+        flexDirection: 'row',
+        width: '100%'
     },
     listSpacerContainer: {
         flex: 0.1
     },
     listButtonContainer: {
         flex: 0.25
-    }
+    },
+    itemTextContainer: {
+        flex: 1,
+        padding: 4,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    itemButtonContainer: {
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    },
+    itemText: {
+        flexWrap: 'wrap',
+        width: '100%'
+    },
 });
 
 export default AddItemPage;
