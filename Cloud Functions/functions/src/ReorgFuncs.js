@@ -103,7 +103,7 @@ class StoreObj {
  */
 function getStoreFromId(knownStores, storeId) {
     // Get the store's info from the given id
-    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
+    var info = StoreObj.getInfoFromId(storeId);
 
     var address = info.address;
     var storeName = info.storeName;
@@ -136,12 +136,12 @@ function getStoreFromId(knownStores, storeId) {
  */
 function getStoreMap(database, storeId) {
     // Get the store's info from the id
-    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
+    var info = StoreObj.getInfoFromId(storeId);
     var address = info.address;
     var storeName = info.storeName;
 
     // Get the path to the store
-    var storePath = (new dataRegFuncs.StoreObj(address, storeName)).getPath();
+    var storePath = (new StoreObj(address, storeName)).getPath();
 
     // Get the current state of the store's maps
     var map = database.ref(storePath + "maps").once("value").then((snapshot) => {
@@ -377,7 +377,7 @@ function predictItemLoc(database, storeId, itemId) {
             for (var tempAddress in knownStores){
                 for (var tempStoreName in knownStores[tempAddress]){
                     // Get the id of the current store
-                    var tempStoreId = (new dataRegFuncs.StoreObj(tempAddress, tempStoreName)).getId();
+                    var tempStoreId = (new StoreObj(tempAddress, tempStoreName)).getId();
 
                     // Check if the current store contains the item
                     var tempLoc = getItemLocInStore(knownStores, tempStoreId, itemId);
@@ -467,6 +467,23 @@ function predictItemLoc(database, storeId, itemId) {
     });
 
     return retItems;
+}
+
+exports.getOptimizerMap = function(data, context, database) {
+    var address = data.address;
+    var storeName = data.storeName;
+
+    var store = new StoreObj(address, storeName);
+
+    var storeId = store.getId();
+
+    // Get the store map
+    var map = getStoreMap(database, storeId).then((value) => {
+        console.log(value);
+        return value;
+    });
+
+    return map;
 }
 
 /**

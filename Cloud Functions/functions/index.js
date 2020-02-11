@@ -56,3 +56,7 @@ exports.cloudReorgListLoc = functions.https.onCall((data, context) => {
 exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
    return reorgFuncs.cloudReorgListFastest(data, context, database);
 });
+
+exports.getOptimizedMap = functions.https.onCall((data, context) => {
+    return reorgFuncs.getOptimizerMap(data, context, database);
+});

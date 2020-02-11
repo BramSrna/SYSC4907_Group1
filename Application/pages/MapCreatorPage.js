@@ -22,8 +22,8 @@ const DEFAULT_FRANCHISE_NAME = "";
 const DEFAULT_ADDRESS = "";
 
 const templates = [
-    {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
     {text: "New Map", label: "New Map", value: "NEW_MAP"},
+    {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
     {text: "Most Popular", label: "Most Popular", value: "MOST_POPULAR"},
     {text: "Used By Optimizer", label: "Used By Optimizer", value: "USED_BY_OPTIMIZER"},
 ];
@@ -218,7 +218,11 @@ class MapCreatorPage extends Component {
                 this.loadMostPopularMap();
                 break;
             case "USED_BY_OPTIMIZER":
-                this.loadOptimizerMap();
+                var map = this.loadOptimizerMap();
+                console.log(map);
+                map.then((value) => {
+                    console.log(value);
+                });
                 break;
             case "NEW_MAP":
                 this.clearMap();
@@ -234,7 +238,20 @@ class MapCreatorPage extends Component {
     loadMostPopularMap() {
     }
 
-    loadOptimizerMap() {
+    async loadOptimizerMap() {
+        try {
+            // Call the function to get the sorted list
+            const {map} = await firebase.functions().httpsCallable('getOptimizedMap')({
+                storeName: this.state.storeName,
+                address: this.state.address,
+            });          
+  
+            return map;
+        } catch (e) {
+            console.error(e);
+  
+            return (null);
+        }
     }
 
     clearMap() {
