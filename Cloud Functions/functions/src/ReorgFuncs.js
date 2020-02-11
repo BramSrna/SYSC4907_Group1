@@ -478,12 +478,14 @@ exports.getOptimizerMap = function(data, context, database) {
     var storeId = store.getId();
 
     // Get the store map
-    var map = getStoreMap(database, storeId).then((value) => {
+    var temp = getStoreMap(database, storeId).then((value) => {
         console.log(value);
-        return value;
+        return {
+            map: value
+        };
     });
 
-    return map;
+    return temp;
 }
 
 /**

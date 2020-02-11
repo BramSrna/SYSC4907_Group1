@@ -43,7 +43,8 @@ class MapCreatorPage extends Component {
             storeName: DEFAULT_STORE_NAME, // The name of the store
             franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
             address: DEFAULT_ADDRESS, // The address of the store,
-            template: templates[0]
+            template: templates[0],
+            test: []
         };
     }
 
@@ -221,7 +222,9 @@ class MapCreatorPage extends Component {
                 var map = this.loadOptimizerMap();
                 console.log(map);
                 map.then((value) => {
-                    console.log(value);
+                    this.setState({
+                        test: value.map
+                    });
                 });
                 break;
             case "NEW_MAP":
