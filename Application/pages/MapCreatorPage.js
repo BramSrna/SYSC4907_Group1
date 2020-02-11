@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
-import { Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
@@ -21,6 +21,13 @@ const DEFAULT_STORE_NAME = "";
 const DEFAULT_FRANCHISE_NAME = "";
 const DEFAULT_ADDRESS = "";
 
+const templates = [
+    {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
+    {text: "New Map", label: "New Map", value: "NEW_MAP"},
+    {text: "Most Popular", label: "Most Popular", value: "MOST_POPULAR"},
+    {text: "Used By Optimizer", label: "Used By Optimizer", value: "USED_BY_OPTIMIZER"},
+];
+
 class MapCreatorPage extends Component {
     constructor(props) {
         super(props);
@@ -35,7 +42,8 @@ class MapCreatorPage extends Component {
             arrayHolder: [], // The departments added so far
             storeName: DEFAULT_STORE_NAME, // The name of the store
             franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
-            address: DEFAULT_ADDRESS, // The address of the store
+            address: DEFAULT_ADDRESS, // The address of the store,
+            template: templates[0]
         };
     }
 
@@ -96,7 +104,11 @@ class MapCreatorPage extends Component {
         this.currDepartments.push({});
 
         // Rerender the screen
-        if (this._mounted) this.setState({ arrayHolder: [...this.currDepartments] })
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        } 
     }
 
     /**
@@ -188,9 +200,47 @@ class MapCreatorPage extends Component {
         this.currDepartments[ind]["department"] = newVal;
 
         // Update the state
-        if (this._mounted) this.setState({
-            arrayHolder: [...this.currDepartments]
-        });
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        }
+    }
+
+    handleTemplateChange = (template) => {
+        template = template.template;
+        val = template.value;
+        switch (val) {
+            case "ONE_OF_EACH":
+                this.addOneOfEach();
+                break;
+            case "MOST_POPULAR":
+                this.loadMostPopularMap();
+                break;
+            case "USED_BY_OPTIMIZER":
+                this.loadOptimizerMap();
+                break;
+            case "NEW_MAP":
+                this.clearMap();
+                break;
+            default:
+                break;
+        }
+    }
+
+    addOneOfEach() {
+    }
+
+    loadMostPopularMap() {
+    }
+
+    loadOptimizerMap() {
+    }
+
+    clearMap() {
+        while (this.currDepartments.length > 0) {
+            this.delButtonPressed(0);
+        }
     }
 
     /**
@@ -214,9 +264,11 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = aboveItem;
 
             // Update the state
-            if (this._mounted) this.setState({
-                arrayHolder: [...this.currDepartments]
-            });
+            if (this._mounted) {
+                this.setState({
+                    arrayHolder: [...this.currDepartments]
+                });
+            }
         }
     }
 
@@ -235,9 +287,11 @@ class MapCreatorPage extends Component {
         this.currDepartments.splice(ind, 1);
 
         // Update the state
-        if (this._mounted) this.setState({
-            arrayHolder: [...this.currDepartments]
-        });
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        }
     }
 
     /**
@@ -333,7 +387,6 @@ class MapCreatorPage extends Component {
     );
 
     render() {
-        console.log('ArrayHolder', this.state.arrayHolder);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -354,6 +407,7 @@ class MapCreatorPage extends Component {
                                 onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
                             />
+
                             <Input style={styles.inputRow}
                                 label='Store Address'
                                 ref="address"
@@ -361,6 +415,7 @@ class MapCreatorPage extends Component {
                                 value={this.state.address}
                                 onChangeText={(address) => this._mounted && this.setState({ address })}
                             />
+
                             <Input style={styles.inputRow}
                                 label='Franchise Name'
                                 ref="fName"
@@ -370,6 +425,17 @@ class MapCreatorPage extends Component {
                             />
                         </Layout>
                     </Layout>
+
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Select style={styles.selectBox}
+                            label='Templates'
+                            data={templates}
+                            placeholder='Use a map template'
+                            selectedOption={this.state.template}
+                            onSelect={(template) => this.handleTemplateChange({ template })}
+                        />
+                    </Layout>
+
                     <Layout style={styles.formOuterContainer} level='3'>
                         <Layout style={styles.formInnerContainer}>
                             <FlatList

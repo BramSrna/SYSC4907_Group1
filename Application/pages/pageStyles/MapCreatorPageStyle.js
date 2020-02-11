@@ -21,6 +21,9 @@ export default StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
     },
+    selectBox: {
+      width: '100%',
+    },
     overflowMenu: {
         padding: 4,
         shadowColor: 'black',
