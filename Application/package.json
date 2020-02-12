@@ -18,6 +18,10 @@
     "expo-permissions": "~5.0.1",
     "fast-html-parser": "^1.0.1",
     "firebase": "^7.6.1",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "query-string": "^6.10.1",
+    "querystring": "^0.2.0",
     "react": "16.8.3",
     "react-dom": "^16.8.6",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
@@ -35,7 +39,11 @@
     "react-native-web": "^0.11.4",
     "react-navigation": "^3.11.0",
     "react-navigation-stack": "^1.7.3",
-    "util": "^0.12.1"
+    "stream": "0.0.2",
+    "unirest": "^0.6.0",
+    "url": "^0.11.0",
+    "util": "^0.12.1",
+    "zlib": "^1.0.5"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.1.1"
