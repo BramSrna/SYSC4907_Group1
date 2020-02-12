@@ -57,10 +57,34 @@ exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
    return reorgFuncs.cloudReorgListFastest(data, context, database);
 });
 
+/**
+ * getOptimizedMap
+ * 
+ * Loads the map used by the optimizer and
+ * returns that map.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map used by the optimizer
+ */
 exports.getOptimizedMap = functions.https.onCall((data, context) => {
     return reorgFuncs.getOptimizerMap(data, context, database);
 });
 
+/**
+ * getMostPopularMap
+ * 
+ * Loads the map with the highest weight
+ * and returns that value.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map with the highest weight
+ */
 exports.getMostPopularMap = functions.https.onCall((data, context) => {
     return reorgFuncs.getMostPopularMap(data, context, database);
 });

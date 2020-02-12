@@ -577,6 +577,15 @@ class ListFunctions {
       }
    };
 
+   /**
+    * loadOptimizerMap
+    * 
+    * Call the getOptimizedMap cloud function method and
+    * return the return value.
+    * 
+    * @param {String} storeName The name of the store
+    * @param {String} address The address of the store
+    */
    async loadOptimizerMap(storeName, address) {
       try {
          // Call the function to get the sorted list
@@ -593,6 +602,15 @@ class ListFunctions {
       }
    };
 
+   /**
+    * loadMostPopularList
+    * 
+    * Call the getMostPopularMap cloud function method and
+    * return the return value.
+    * 
+    * @param {String} storeName The name of the store
+    * @param {String} address The address of the store
+    */
    async loadMostPopularList(storeName, address) {
       try {
          // Call the function to get the sorted list

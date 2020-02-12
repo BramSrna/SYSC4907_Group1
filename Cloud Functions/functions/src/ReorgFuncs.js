@@ -469,13 +469,24 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
+/**
+ * getOptimizerMap
+ * 
+ * Loads the map used by the optimizer and
+ * returns that map.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map used by the optimizer
+ */
 exports.getOptimizerMap = function(data, context, database) {
     var address = data.address;
     var storeName = data.storeName;
 
     var store = new StoreObj(address, storeName);
 
-    // Get the path to the store
     var storeId = store.getId();
 
     var map = getStoreMap(database, storeId);
@@ -483,6 +494,18 @@ exports.getOptimizerMap = function(data, context, database) {
     return map;
 }
 
+/**
+ * getMostPopularMap
+ * 
+ * Loads the map with the highest weight
+ * and returns that value.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map with the highest weight
+ */
 exports.getMostPopularMap = function(data, context, database) {
     var address = data.address;
     var storeName = data.storeName;

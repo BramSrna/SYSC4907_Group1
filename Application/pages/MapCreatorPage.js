@@ -22,6 +22,7 @@ const DEFAULT_STORE_NAME = "";
 const DEFAULT_FRANCHISE_NAME = "";
 const DEFAULT_ADDRESS = "";
 
+// The templates available for making maps quickly
 const templates = [
     {text: "New Map", label: "New Map", value: "NEW_MAP"},
     {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
@@ -209,9 +210,23 @@ class MapCreatorPage extends Component {
         }
     }
 
+    /**
+     * handleTemplateChange
+     * 
+     * Handle the template select box changing
+     * its option. Also clears the map before changing
+     * the template.
+     * 
+     * @param {Object} template The new template selected
+     * 
+     * @returns void
+     */
     handleTemplateChange = (template) => {
         template = template.template;
         val = template.value;
+
+        this.clearMap();
+
         switch (val) {
             case "ONE_OF_EACH":
                 this.addOneOfEach();
@@ -230,14 +245,34 @@ class MapCreatorPage extends Component {
         }
     }
 
+    /**
+     * addOneOfEach
+     * 
+     * Handle the One Of Each template being selected.
+     * Adds one of each department type to the map.
+     * 
+     * @param None
+     * 
+     * @returns None
+     */
     addOneOfEach() {
-        this.clearMap();
         for(var i = 0; i < departments.length; i++) {
             this.addDepartment();
             this.updateDepartment(i, departments[i].value);
         }
     }
 
+    /**
+     * loadMostPopularMap
+     * 
+     * Handle the Most Popular template being selected.
+     * Loads the map with the highest weight and populates
+     * it with that map.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
     loadMostPopularMap() {
         var map = lf.loadMostPopularList(this.state.storeName, this.state.address);
         map.then((value) => {
@@ -254,6 +289,17 @@ class MapCreatorPage extends Component {
         });
     }
 
+    /**
+     * getOptimizerMap
+     * 
+     * Handle the Optimizer Map template being selected.
+     * Loads the map with the highest weight and populates
+     * it with that used by the optimizer to reorder lists.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
     getOptimizerMap() {
         var map = lf.loadOptimizerMap(this.state.storeName, this.state.address);
         map.then((value) => {
@@ -270,6 +316,15 @@ class MapCreatorPage extends Component {
         });
     }
 
+    /**
+     * clearMap
+     * 
+     * Clears the current map of all its departments.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
     clearMap() {
         while (this.currDepartments.length > 0) {
             this.delButtonPressed(0);
