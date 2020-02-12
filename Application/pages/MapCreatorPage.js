@@ -13,6 +13,7 @@ import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./Functions/DBInterface";
 import styles from "../pages/pageStyles/MapCreatorPageStyle";
+import lf from "./Functions/ListFunctions";
 
 const PAGE_TITLE = "Map Creator";
 
@@ -219,13 +220,7 @@ class MapCreatorPage extends Component {
                 this.loadMostPopularMap();
                 break;
             case "USED_BY_OPTIMIZER":
-                var map = this.loadOptimizerMap();
-                console.log(map);
-                map.then((value) => {
-                    this.setState({
-                        test: value.map
-                    });
-                });
+                this.getOptimizerMap();
                 break;
             case "NEW_MAP":
                 this.clearMap();
@@ -236,25 +231,43 @@ class MapCreatorPage extends Component {
     }
 
     addOneOfEach() {
+        this.clearMap();
+        for(var i = 0; i < departments.length; i++) {
+            this.addDepartment();
+            this.updateDepartment(i, departments[i].value);
+        }
     }
 
     loadMostPopularMap() {
+        var map = lf.loadMostPopularList(this.state.storeName, this.state.address);
+        map.then((value) => {
+            for(var i = 0; i < value.length; i++) {
+                this.addDepartment();
+
+                for(var j = 0; j < departments.length; j++) {
+                    if (departments[j].text.localeCompare(value[i]) == 0) {
+                        this.updateDepartment(i, departments[j].value);
+                        j = departments.length + 2;
+                    }
+                }                
+            }
+        });
     }
 
-    async loadOptimizerMap() {
-        try {
-            // Call the function to get the sorted list
-            const {map} = await firebase.functions().httpsCallable('getOptimizedMap')({
-                storeName: this.state.storeName,
-                address: this.state.address,
-            });          
-  
-            return map;
-        } catch (e) {
-            console.error(e);
-  
-            return (null);
-        }
+    getOptimizerMap() {
+        var map = lf.loadOptimizerMap(this.state.storeName, this.state.address);
+        map.then((value) => {
+            for(var i = 0; i < value.length; i++) {
+                this.addDepartment();
+
+                for(var j = 0; j < departments.length; j++) {
+                    if (departments[j].text.localeCompare(value[i]) == 0) {
+                        this.updateDepartment(i, departments[j].value);
+                        j = departments.length + 2;
+                    }
+                }                
+            }
+        });
     }
 
     clearMap() {

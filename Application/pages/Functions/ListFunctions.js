@@ -567,6 +567,40 @@ class ListFunctions {
             listId: listId
          });
 
+         console.log(data);
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   };
+
+   async loadOptimizerMap(storeName, address) {
+      try {
+         // Call the function to get the sorted list
+         const {data} = await firebase.functions().httpsCallable('getOptimizedMap')({
+            storeName: storeName,
+            address: address,
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   };
+
+   async loadMostPopularList(storeName, address) {
+      try {
+         // Call the function to get the sorted list
+         const {data} = await firebase.functions().httpsCallable('getMostPopularMap')({
+            storeName: storeName,
+            address: address,
+         });
+
          return data;
       } catch (e) {
          console.error(e);

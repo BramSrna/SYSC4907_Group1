@@ -60,3 +60,7 @@ exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
 exports.getOptimizedMap = functions.https.onCall((data, context) => {
     return reorgFuncs.getOptimizerMap(data, context, database);
 });
+
+exports.getMostPopularMap = functions.https.onCall((data, context) => {
+    return reorgFuncs.getMostPopularMap(data, context, database);
+});

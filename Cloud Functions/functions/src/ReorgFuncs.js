@@ -230,11 +230,11 @@ function getItemLocInStore(knownStores, storeId, itemId){
             // Loop through all of the candidate item infos to
             // find the location with the highest cound
             for (var tempCandItemInfoId in candItemInfo) {
-            var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
-            if (tempCandItemInfo.count > maxCount) {
-                info = tempCandItemInfo;
-                maxCount = tempCandItemInfo.count;
-            }
+                var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
+                if (tempCandItemInfo.count > maxCount) {
+                    info = tempCandItemInfo;
+                    maxCount = tempCandItemInfo.count;
+                }
             }
 
             // Get the location's information
@@ -304,7 +304,7 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
 
         for (var itemId2 in items2){
             if (itemId === itemId2) {
-            itemIntersect.push(itemId);
+                itemIntersect.push(itemId);
             }
         }
     }
@@ -316,8 +316,8 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
         itemId = itemIntersect[i];
 
         // Get the location of both items in their respective stores
-        var loc1 = getItemLocInStore(knownStores, storeId1, itemid);
-        var loc2 = getItemLocInStore(knownStores, storeId2, itemid);
+        var loc1 = getItemLocInStore(knownStores, storeId1, itemId);
+        var loc2 = getItemLocInStore(knownStores, storeId2, itemId);
 
         // Compare the departments and aisles
         var depComp = loc1.department === loc1.department ? 1 : 0;
@@ -475,17 +475,46 @@ exports.getOptimizerMap = function(data, context, database) {
 
     var store = new StoreObj(address, storeName);
 
+    // Get the path to the store
     var storeId = store.getId();
 
-    // Get the store map
-    var temp = getStoreMap(database, storeId).then((value) => {
-        console.log(value);
-        return {
-            map: value
-        };
+    var map = getStoreMap(database, storeId);
+
+    return map;
+}
+
+exports.getMostPopularMap = function(data, context, database) {
+    var address = data.address;
+    var storeName = data.storeName;
+
+    // Get the path to the store
+    var storePath = (new StoreObj(address, storeName)).getPath();
+
+    // Get the current state of the store's maps
+    var map = database.ref(storePath + "maps").once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var currMap = null;
+        var maxWeight = -1;
+
+        // Loop through all of the store's maps
+        for (var tempMapId in ssv) {
+            var tempMapObj = ssv[tempMapId];
+
+            // Get the weight and order of the current map
+            var weight = tempMapObj.weight;
+            var tempMap = tempMapObj.map;
+
+            if (weight > maxWeight) {
+                currMap = tempMap;
+            }
+        }
+
+        // Return the final map
+        return currMap;
     });
 
-    return temp;
+    return map;
 }
 
 /**
