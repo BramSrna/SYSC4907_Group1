@@ -85,7 +85,7 @@ class SideMenu extends Component {
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourListsPage')}>
                                 {YOUR_LISTS}
                             </Text>
-                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('SearchRecipePage')}>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('FindRecipePage')}>
                                 {SEARCH_RECIPE}
                             </Text>
                         </Layout>

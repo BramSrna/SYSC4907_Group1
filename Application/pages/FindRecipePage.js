@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import NotificationPopup from 'react-native-push-notification-popup';
-import nm from '../pages/Functions/NotificationManager.js';
+import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { ScrollView, StyleSheet } from 'react-native';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 
-export default class SearchRecipePage extends Component {
+const NUMBER_OF_RECIPE_CARDS_TO_SHOW = 20;
+export default class FindRecipePage extends Component {
 
   constructor(props) {
     super(props);
@@ -17,6 +18,7 @@ export default class SearchRecipePage extends Component {
       () => {
         nm.setThat(this)
         this._isMounted = true;
+        rf.AddRecipesToDatabase();
 
       }
     );
@@ -44,7 +46,7 @@ export default class SearchRecipePage extends Component {
               separator={true}
               inColumn={false}>
               <CardButton
-                onPress={() => { rf.AddRecipesToDatabase() }}
+                onPress={() => { }}
                 title="Share"
                 color="#FEB557"
               />

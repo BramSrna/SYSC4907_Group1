@@ -16,7 +16,7 @@ import NewContact from '../pages/NewContact';
 import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
-import SearchRecipePage from '../pages/SearchRecipePage';
+import FindRecipePage from '../pages/FindRecipePage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -55,8 +55,8 @@ const StackNavigator = createStackNavigator({
     SelectStorePage: {
         screen: SelectStorePage
     },
-    SearchRecipePage: {
-        screen: SearchRecipePage
+    FindRecipePage: {
+        screen: FindRecipePage
     },
 }, {
     initialRouteName: "Home",
@@ -124,7 +124,7 @@ const MainDrawerNavigator = createDrawerNavigator({
             drawerLabel: "Excel Parser"
         }
     },
-    SearchRecipePage: {
+    FindRecipePage: {
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Search for a Recipe"
