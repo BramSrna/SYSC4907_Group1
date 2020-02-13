@@ -1,7 +1,7 @@
 import * as firebase from "firebase";
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "2";
-const API_KEY = "5c39c2c2fa5e4183a1f9a3f799e49baa"; // 50/1.01 calls/day allowed
+const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 
 class RecipeFunctions {
    constructor() {}
