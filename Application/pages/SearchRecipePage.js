@@ -44,7 +44,7 @@ export default class SearchRecipePage extends Component {
               separator={true}
               inColumn={false}>
               <CardButton
-                onPress={() => { }}
+                onPress={() => { rf.AddRecipesToDatabase() }}
                 title="Share"
                 color="#FEB557"
               />
