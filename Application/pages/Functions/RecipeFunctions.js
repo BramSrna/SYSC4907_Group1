@@ -34,7 +34,6 @@ class RecipeFunctions {
                               title = title.replace(/\]/g, " ");
                               firebase.database().ref('/recipes/' + title).set(data).then(function (snapshot) {
                                  // console.log(snapshot);
-                                 console.log("Recipes just updated!")
                               });
                            }
                         });
