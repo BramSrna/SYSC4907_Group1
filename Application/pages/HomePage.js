@@ -15,7 +15,8 @@ import nm from '../pages/Functions/NotificationManager.js';
 var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
-const CONTACTS = "YourContacts"
+const CONTACTS = "YourContacts";
+const MAPS = "MapsPage";
 const MARGIN_RATIO = 30; // higher number = smaller margin
 
 class HomePage extends Component {
@@ -182,7 +183,7 @@ class HomePage extends Component {
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' onPress={() => this.props.navigation.navigate(CONTACTS)} />
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' onPress={() => this.props.navigation.navigate(MAPS)}/>
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Search Recipes' icon='search-outline' />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Recommendations' icon='bulb-outline' shape={2} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Shared With You' icon='share-outline' />

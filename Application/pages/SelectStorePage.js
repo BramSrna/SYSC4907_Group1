@@ -11,13 +11,15 @@ import {
     TopNavigationAction,
     Autocomplete,
 } from 'react-native-ui-kitten';
-import { ArrowBackIcon } from '../assets/icons/icons.js';
+import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
+const MAPS = "MapsPage";
+
 
 var availableStores = [];
 
@@ -53,7 +55,6 @@ class SelectStorePage extends Component {
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
             sort: this.props.navigation.getParam("sort", "(Invalid Sort Method)"),
         });
-
         // Populate the Arrays for the autocomplete fields
         this.loadAvailableStores();
     }
@@ -163,6 +164,11 @@ class SelectStorePage extends Component {
         });
     };
 
+    selectStore = location => {
+        console.log(location);
+        this.setState({ value: location });
+    }
+
     render() {
         const renderMenuAction = () => (
             <TopNavigationAction
@@ -193,16 +199,22 @@ class SelectStorePage extends Component {
                 <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
+
                             <Layout style={styles.formInnerContainer}>
-                                <Autocomplete
-                                    ref={(input) => { this.autoCompleteInput = input; }}
-                                    style={styles.autocomplete}
-                                    placeholder='Enter a store name'
-                                    value={this.state.value}
-                                    data={this.state.data}
-                                    onChangeText={onChangeText}
-                                    onSelect={onSelect}
-                                />
+                                <Layout style={styles.mainInputGroup}>
+                                    <Layout style={styles.autocompleteContainer}>
+                                        <Autocomplete
+                                            ref={(input) => { this.autoCompleteInput = input; }}
+                                            style={styles.autocomplete}
+                                            placeholder={'Enter a store name'}
+                                            value={this.state.value}
+                                            data={this.state.data}
+                                            onChangeText={onChangeText}
+                                            onSelect={onSelect}
+                                        />
+                                    </Layout>
+                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })}/>
+                                </Layout>
                                 <Layout style={styles.mainButtonGroup} >
                                     <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
                                     <Button style={styles.mainPageButton} status='primary' onPress={() => { this.submitStore() }}>{'Submit'}</Button>
@@ -244,14 +256,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
     },
+    mainInputGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
     mainPageButton: {
         flex: 1,
         padding: 8,
         marginVertical: 8,
         marginHorizontal: 2,
     },
+    mapButton: {
+        padding: 8,
+        marginVertical: 4,
+        marginHorizontal: 10,
+        borderRadius: 20,
+    },
+    autocompleteContainer: {
+        flex: 1,
+        borderRadius: 20,
+    },
     autocomplete: {
-        width: '100%',
+        marginTop: 9,
         margin: 4,
         borderRadius: 20,
     },
