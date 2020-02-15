@@ -225,8 +225,6 @@ class MapCreatorPage extends Component {
         template = template.template;
         val = template.value;
 
-        this.clearMap();
-
         switch (val) {
             case "ONE_OF_EACH":
                 this.addOneOfEach();
@@ -256,6 +254,8 @@ class MapCreatorPage extends Component {
      * @returns None
      */
     addOneOfEach() {
+        this.clearMap();
+
         for(var i = 0; i < departments.length; i++) {
             this.addDepartment();
             this.updateDepartment(i, departments[i].value);
@@ -276,15 +276,21 @@ class MapCreatorPage extends Component {
     loadMostPopularMap() {
         var map = lf.loadMostPopularList(this.state.storeName, this.state.address);
         map.then((value) => {
-            for(var i = 0; i < value.length; i++) {
-                this.addDepartment();
+            if ((value === null) || (value.length === 0)) {
+                Alert.alert("Sorry, we have no info about that store!", "Please use a different template!");
+            } else {
+                this.clearMap();
 
-                for(var j = 0; j < departments.length; j++) {
-                    if (departments[j].text.localeCompare(value[i]) == 0) {
-                        this.updateDepartment(i, departments[j].value);
-                        j = departments.length + 2;
-                    }
-                }                
+                for(var i = 0; i < value.length; i++) {
+                    this.addDepartment();
+
+                    for(var j = 0; j < departments.length; j++) {
+                        if (departments[j].text.localeCompare(value[i]) == 0) {
+                            this.updateDepartment(i, departments[j].value);
+                            j = departments.length + 2;
+                        }
+                    }                
+                }
             }
         });
     }
@@ -303,15 +309,21 @@ class MapCreatorPage extends Component {
     getOptimizerMap() {
         var map = lf.loadOptimizerMap(this.state.storeName, this.state.address);
         map.then((value) => {
-            for(var i = 0; i < value.length; i++) {
-                this.addDepartment();
+            if ((value === null) || (value.length === 0)) {
+                Alert.alert("Sorry, we have no info about that store!", "Please use a different template!");
+            } else {
+                this.clearMap();
 
-                for(var j = 0; j < departments.length; j++) {
-                    if (departments[j].text.localeCompare(value[i]) == 0) {
-                        this.updateDepartment(i, departments[j].value);
-                        j = departments.length + 2;
+                for(var i = 0; i < value.length; i++) {
+                    this.addDepartment();
+
+                    for(var j = 0; j < departments.length; j++) {
+                        if (departments[j].text.localeCompare(value[i]) == 0) {
+                            this.updateDepartment(i, departments[j].value);
+                            j = departments.length + 2;
+                        }
                     }
-                }                
+                }
             }
         });
     }
@@ -424,14 +436,22 @@ class MapCreatorPage extends Component {
     renderListElem = (index) => {
         const placeholder = {
             label: 'Select a department...',
-            value: null,
+            value: null
         };
 
         renderIosPicker = () => {
+            tempDepartments = [];
+            for (var i = 0; i < departments.length; i++) {
+                currDepartment = departments[i];
+                currDepartment.color = global.theme == light ? light["text-hint-color"] : dark["text-hint-color"];
+                tempDepartments.push(currDepartment);
+            }
+
             return (
-                <RNPickerSelect style={styles.pickerIOS}
+                <RNPickerSelect
+                    style={styles.pickerIOS}
                     key={index}
-                    items={departments}
+                    items={tempDepartments}
                     placeholder={placeholder}
                     value={this.state.arrayHolder[index]['department']}
                     onValueChange={(val) => this.updateDepartment(index, val)}
@@ -449,7 +469,14 @@ class MapCreatorPage extends Component {
                 >
                     {
                         departments.map((v) => {
-                            return <Picker.Item key={index} label={v.label} value={v.value} color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} />
+                            return (
+                                <Picker.Item
+                                    key={index}
+                                    label={v.label}
+                                    value={v.value}
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                />
+                            );
                         })
                     }
                 </Picker>
