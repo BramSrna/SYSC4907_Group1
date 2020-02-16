@@ -5,24 +5,31 @@ const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
-   constructor() { }
+   constructor() {}
 
 
 
-   GetRandomRecipesFromDatabase() {
+   GetRandomRecipesFromDatabase(that) {
       firebase.database().ref("/recipes/").once("value", function (snapshot) {
          var recipes = [];
          if (snapshot.val()) {
             var recipeNum = GetRecipePositions(snapshot.numChildren());
             var count = 1;
+            var total = 0;
             for (recipe in snapshot.val()) {
                if (recipeNum.includes(count)) {
                   recipes.push(snapshot.val()[recipe]);
+                  total++;
+                  if (total >= NUMBER_OF_RECIPES_TO_SHOW_USERS) {
+                     break;
+                  }
                }
                count++;
             }
-
-            return recipes;
+            that.setState({
+               recipes: recipes
+            });
+            // return recipes;
          } else {
             console.log("Error: Could not get any recipes")
          }

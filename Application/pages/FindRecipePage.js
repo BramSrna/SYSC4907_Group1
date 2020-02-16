@@ -5,11 +5,13 @@ import rf from "./Functions/RecipeFunctions";
 import { ScrollView, StyleSheet } from 'react-native';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 
-const NUMBER_OF_RECIPE_CARDS_TO_SHOW = 20;
 export default class FindRecipePage extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      recipes: []
+    };
   }
 
   componentWillMount() {
@@ -19,6 +21,7 @@ export default class FindRecipePage extends Component {
         nm.setThat(this)
         this._isMounted = true;
         rf.AddRecipesToDatabase();
+        rf.GetRandomRecipesFromDatabase(this);
 
       }
     );
@@ -33,78 +36,36 @@ export default class FindRecipePage extends Component {
     return (
       <React.Fragment>
         <ScrollView style={styles.card}>
-          <Card>
-            <CardImage
-              source={{ uri: 'http://bit.ly/2GfzooV' }}
-            // title="Top 10 South African beaches"
-            />
-            <CardTitle
-              subtitle="Number 6"
-            />
-            <CardContent text="Clifton, Western Cape" />
-            <CardAction
-              separator={true}
-              inColumn={false}>
-              <CardButton
-                onPress={() => { rf.GetRandomRecipesFromDatabase() }}
-                title="Share"
-                color="#FEB557"
-              />
-              <CardButton
-                onPress={() => { }}
-                title="Explore"
-                color="#FEB557"
-              />
-            </CardAction>
-          </Card>
-          <Card>
-            <CardImage
-              source={{ uri: 'http://bit.ly/2GfzooV' }}
-            // title="Top 10 South African beaches"
-            />
-            <CardTitle
-              subtitle="Number 6"
-            />
-            <CardContent text="Clifton, Western Cape" />
-            <CardAction
-              separator={true}
-              inColumn={false}>
-              <CardButton
-                onPress={() => { }}
-                title="Share"
-                color="#FEB557"
-              />
-              <CardButton
-                onPress={() => { }}
-                title="Explore"
-                color="#FEB557"
-              />
-            </CardAction>
-          </Card>
-          <Card>
-            <CardImage
-              source={{ uri: 'http://bit.ly/2GfzooV' }}
-            // title="Top 10 South African beaches"
-            />
-            <CardTitle
-              subtitle="Number 6"
-            />
-            <CardContent text="Clifton, Western Cape" />
-            <CardAction
-              separator={true}
-              inColumn={false}>
-              <CardButton
-                onPress={() => { }}
-                title="Share"
-                color="#FEB557"
-              />
-              <CardButton
-                onPress={() => { }}
-                title="Explore"
-                color="#FEB557"
-              />
-            </CardAction>
-          </Card>
+          {
+            this.state.recipes.map((aRecipe) => {
+              return (
+                <Card key={"Key: " + aRecipe.title}>
+                  <CardImage
+                    source={{ uri: aRecipe.image }}
+                  // title="Top 10 South African beaches"
+                  />
+                  <CardTitle
+                    subtitle={aRecipe.title}
+                  />
+                  <CardContent text={"Serves " + aRecipe.servings + "\t\t\tReady in  " + aRecipe.readyInMinutes + " minutes"} />
+                  <CardAction
+                    separator={true}
+                    inColumn={false}>
+                    <CardButton
+                      onPress={() => { }}
+                      title="Share"
+                      color="#FEB557"
+                    />
+                    <CardButton
+                      onPress={() => { }}
+                      title="Explore"
+                      color="#FEB557"
+                    />
+                  </CardAction>
+                </Card>
+              );
+            })
+          }
         </ScrollView>
         <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
@@ -114,6 +75,6 @@ export default class FindRecipePage extends Component {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'black'
+    backgroundColor: 'white'
   }
 });
