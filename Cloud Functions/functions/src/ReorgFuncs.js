@@ -103,7 +103,7 @@ class StoreObj {
  */
 function getStoreFromId(knownStores, storeId) {
     // Get the store's info from the given id
-    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
+    var info = StoreObj.getInfoFromId(storeId);
 
     var address = info.address;
     var storeName = info.storeName;
@@ -136,12 +136,12 @@ function getStoreFromId(knownStores, storeId) {
  */
 function getStoreMap(database, storeId) {
     // Get the store's info from the id
-    var info = dataRegFuncs.StoreObj.getInfoFromId(storeId);
+    var info = StoreObj.getInfoFromId(storeId);
     var address = info.address;
     var storeName = info.storeName;
 
     // Get the path to the store
-    var storePath = (new dataRegFuncs.StoreObj(address, storeName)).getPath();
+    var storePath = (new StoreObj(address, storeName)).getPath();
 
     // Get the current state of the store's maps
     var map = database.ref(storePath + "maps").once("value").then((snapshot) => {
@@ -230,11 +230,11 @@ function getItemLocInStore(knownStores, storeId, itemId){
             // Loop through all of the candidate item infos to
             // find the location with the highest cound
             for (var tempCandItemInfoId in candItemInfo) {
-            var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
-            if (tempCandItemInfo.count > maxCount) {
-                info = tempCandItemInfo;
-                maxCount = tempCandItemInfo.count;
-            }
+                var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
+                if (tempCandItemInfo.count > maxCount) {
+                    info = tempCandItemInfo;
+                    maxCount = tempCandItemInfo.count;
+                }
             }
 
             // Get the location's information
@@ -304,7 +304,7 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
 
         for (var itemId2 in items2){
             if (itemId === itemId2) {
-            itemIntersect.push(itemId);
+                itemIntersect.push(itemId);
             }
         }
     }
@@ -316,8 +316,8 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
         itemId = itemIntersect[i];
 
         // Get the location of both items in their respective stores
-        var loc1 = getItemLocInStore(knownStores, storeId1, itemid);
-        var loc2 = getItemLocInStore(knownStores, storeId2, itemid);
+        var loc1 = getItemLocInStore(knownStores, storeId1, itemId);
+        var loc2 = getItemLocInStore(knownStores, storeId2, itemId);
 
         // Compare the departments and aisles
         var depComp = loc1.department === loc1.department ? 1 : 0;
@@ -377,7 +377,7 @@ function predictItemLoc(database, storeId, itemId) {
             for (var tempAddress in knownStores){
                 for (var tempStoreName in knownStores[tempAddress]){
                     // Get the id of the current store
-                    var tempStoreId = (new dataRegFuncs.StoreObj(tempAddress, tempStoreName)).getId();
+                    var tempStoreId = (new StoreObj(tempAddress, tempStoreName)).getId();
 
                     // Check if the current store contains the item
                     var tempLoc = getItemLocInStore(knownStores, tempStoreId, itemId);
@@ -467,6 +467,77 @@ function predictItemLoc(database, storeId, itemId) {
     });
 
     return retItems;
+}
+
+/**
+ * getOptimizerMap
+ * 
+ * Loads the map used by the optimizer and
+ * returns that map.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map used by the optimizer
+ */
+exports.getOptimizerMap = function(data, context, database) {
+    var address = data.address;
+    var storeName = data.storeName;
+
+    var store = new StoreObj(address, storeName);
+
+    var storeId = store.getId();
+
+    var map = getStoreMap(database, storeId);
+
+    return map;
+}
+
+/**
+ * getMostPopularMap
+ * 
+ * Loads the map with the highest weight
+ * and returns that value.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns The map with the highest weight
+ */
+exports.getMostPopularMap = function(data, context, database) {
+    var address = data.address;
+    var storeName = data.storeName;
+
+    // Get the path to the store
+    var storePath = (new StoreObj(address, storeName)).getPath();
+
+    // Get the current state of the store's maps
+    var map = database.ref(storePath + "maps").once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var currMap = null;
+        var maxWeight = -1;
+
+        // Loop through all of the store's maps
+        for (var tempMapId in ssv) {
+            var tempMapObj = ssv[tempMapId];
+
+            // Get the weight and order of the current map
+            var weight = tempMapObj.weight;
+            var tempMap = tempMapObj.map;
+
+            if (weight > maxWeight) {
+                currMap = tempMap;
+            }
+        }
+
+        // Return the final map
+        return currMap;
+    });
+
+    return map;
 }
 
 /**

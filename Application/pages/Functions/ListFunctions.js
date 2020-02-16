@@ -567,6 +567,58 @@ class ListFunctions {
             listId: listId
          });
 
+         console.log(data);
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   };
+
+   /**
+    * loadOptimizerMap
+    * 
+    * Call the getOptimizedMap cloud function method and
+    * return the return value.
+    * 
+    * @param {String} storeName The name of the store
+    * @param {String} address The address of the store
+    */
+   async loadOptimizerMap(storeName, address) {
+      try {
+         // Call the function to get the sorted list
+         const {data} = await firebase.functions().httpsCallable('getOptimizedMap')({
+            storeName: storeName,
+            address: address,
+         });
+
+         return data;
+      } catch (e) {
+         console.error(e);
+
+         return (null);
+      }
+   };
+
+   /**
+    * loadMostPopularList
+    * 
+    * Call the getMostPopularMap cloud function method and
+    * return the return value.
+    * 
+    * @param {String} storeName The name of the store
+    * @param {String} address The address of the store
+    */
+   async loadMostPopularList(storeName, address) {
+      try {
+         // Call the function to get the sorted list
+         const {data} = await firebase.functions().httpsCallable('getMostPopularMap')({
+            storeName: storeName,
+            address: address,
+         });
+
          return data;
       } catch (e) {
          console.error(e);
