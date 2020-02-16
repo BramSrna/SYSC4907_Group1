@@ -11,6 +11,7 @@ import { Notifications } from 'expo'
 import * as Permissions from 'expo-permissions'
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import rf from "./Functions/RecipeFunctions";
 
 var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
@@ -39,6 +40,7 @@ class HomePage extends Component {
   async load() {
     this._isMounted = true;
     nm.setThat(this)
+    rf.AddRecipesToDatabase();
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
