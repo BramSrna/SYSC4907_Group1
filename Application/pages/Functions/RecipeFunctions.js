@@ -2,9 +2,32 @@ import * as firebase from "firebase";
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "30";
 const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
+const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
-   constructor() {}
+   constructor() { }
+
+
+
+   GetRandomRecipesFromDatabase() {
+      firebase.database().ref("/recipes/").once("value", function (snapshot) {
+         var recipes = [];
+         if (snapshot.val()) {
+            var recipeNum = GetRecipePositions(snapshot.numChildren());
+            var count = 1;
+            for (recipe in snapshot.val()) {
+               if (recipeNum.includes(count)) {
+                  recipes.push(snapshot.val()[recipe]);
+               }
+               count++;
+            }
+
+            return recipes;
+         } else {
+            console.log("Error: Could not get any recipes")
+         }
+      })
+   }
 
    // Call this method once a day
    AddRecipesToDatabase() {
@@ -52,6 +75,17 @@ class RecipeFunctions {
          }
       })
    }
+}
+
+function GetRecipePositions(numberOfRecipes) {
+   var pos = [];
+   while (pos.length < NUMBER_OF_RECIPES_TO_SHOW_USERS) {
+      var curInd = Math.round(Math.random() * numberOfRecipes);
+      if (!pos.includes(curInd)) {
+         pos.push(curInd);
+      }
+   }
+   return pos;
 }
 
 const rf = new RecipeFunctions();

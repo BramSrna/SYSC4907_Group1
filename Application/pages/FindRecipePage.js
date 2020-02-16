@@ -46,7 +46,7 @@ export default class FindRecipePage extends Component {
               separator={true}
               inColumn={false}>
               <CardButton
-                onPress={() => { }}
+                onPress={() => { rf.GetRandomRecipesFromDatabase() }}
                 title="Share"
                 color="#FEB557"
               />
