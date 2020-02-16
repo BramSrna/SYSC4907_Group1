@@ -199,7 +199,6 @@ class SelectStorePage extends Component {
                 <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
-
                             <Layout style={styles.formInnerContainer}>
                                 <Layout style={styles.mainInputGroup}>
                                     <Layout style={styles.autocompleteContainer}>
@@ -213,7 +212,7 @@ class SelectStorePage extends Component {
                                             onSelect={onSelect}
                                         />
                                     </Layout>
-                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })}/>
+                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
                                 </Layout>
                                 <Layout style={styles.mainButtonGroup} >
                                     <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
