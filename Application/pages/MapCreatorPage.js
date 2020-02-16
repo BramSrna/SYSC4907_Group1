@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
-import { Layout, Button, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList"
 import { FlatList } from "react-native-gesture-handler";
@@ -13,6 +13,7 @@ import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import * as dbi from "./Functions/DBInterface";
 import styles from "../pages/pageStyles/MapCreatorPageStyle";
+import lf from "./Functions/ListFunctions";
 
 const PAGE_TITLE = "Map Creator";
 
@@ -20,6 +21,14 @@ const PAGE_TITLE = "Map Creator";
 const DEFAULT_STORE_NAME = "";
 const DEFAULT_FRANCHISE_NAME = "";
 const DEFAULT_ADDRESS = "";
+
+// The templates available for making maps quickly
+const templates = [
+    {text: "New Map", label: "New Map", value: "NEW_MAP"},
+    {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
+    {text: "Most Popular", label: "Most Popular", value: "MOST_POPULAR"},
+    {text: "Used By Optimizer", label: "Used By Optimizer", value: "USED_BY_OPTIMIZER"},
+];
 
 class MapCreatorPage extends Component {
     constructor(props) {
@@ -35,7 +44,9 @@ class MapCreatorPage extends Component {
             arrayHolder: [], // The departments added so far
             storeName: DEFAULT_STORE_NAME, // The name of the store
             franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
-            address: DEFAULT_ADDRESS, // The address of the store
+            address: DEFAULT_ADDRESS, // The address of the store,
+            template: templates[0],
+            test: []
         };
     }
 
@@ -96,7 +107,11 @@ class MapCreatorPage extends Component {
         this.currDepartments.push({});
 
         // Rerender the screen
-        if (this._mounted) this.setState({ arrayHolder: [...this.currDepartments] })
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        } 
     }
 
     /**
@@ -188,9 +203,144 @@ class MapCreatorPage extends Component {
         this.currDepartments[ind]["department"] = newVal;
 
         // Update the state
-        if (this._mounted) this.setState({
-            arrayHolder: [...this.currDepartments]
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        }
+    }
+
+    /**
+     * handleTemplateChange
+     * 
+     * Handle the template select box changing
+     * its option. Also clears the map before changing
+     * the template.
+     * 
+     * @param {Object} template The new template selected
+     * 
+     * @returns void
+     */
+    handleTemplateChange = (template) => {
+        template = template.template;
+        val = template.value;
+
+        switch (val) {
+            case "ONE_OF_EACH":
+                this.addOneOfEach();
+                break;
+            case "MOST_POPULAR":
+                this.loadMostPopularMap();
+                break;
+            case "USED_BY_OPTIMIZER":
+                this.getOptimizerMap();
+                break;
+            case "NEW_MAP":
+                this.clearMap();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * addOneOfEach
+     * 
+     * Handle the One Of Each template being selected.
+     * Adds one of each department type to the map.
+     * 
+     * @param None
+     * 
+     * @returns None
+     */
+    addOneOfEach() {
+        this.clearMap();
+
+        for(var i = 0; i < departments.length; i++) {
+            this.addDepartment();
+            this.updateDepartment(i, departments[i].value);
+        }
+    }
+
+    /**
+     * loadMostPopularMap
+     * 
+     * Handle the Most Popular template being selected.
+     * Loads the map with the highest weight and populates
+     * it with that map.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
+    loadMostPopularMap() {
+        var map = lf.loadMostPopularList(this.state.storeName, this.state.address);
+        map.then((value) => {
+            if ((value === null) || (value.length === 0)) {
+                Alert.alert("Sorry, we have no info about that store!", "Please use a different template!");
+            } else {
+                this.clearMap();
+
+                for(var i = 0; i < value.length; i++) {
+                    this.addDepartment();
+
+                    for(var j = 0; j < departments.length; j++) {
+                        if (departments[j].text.localeCompare(value[i]) == 0) {
+                            this.updateDepartment(i, departments[j].value);
+                            j = departments.length + 2;
+                        }
+                    }                
+                }
+            }
         });
+    }
+
+    /**
+     * getOptimizerMap
+     * 
+     * Handle the Optimizer Map template being selected.
+     * Loads the map with the highest weight and populates
+     * it with that used by the optimizer to reorder lists.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
+    getOptimizerMap() {
+        var map = lf.loadOptimizerMap(this.state.storeName, this.state.address);
+        map.then((value) => {
+            if ((value === null) || (value.length === 0)) {
+                Alert.alert("Sorry, we have no info about that store!", "Please use a different template!");
+            } else {
+                this.clearMap();
+
+                for(var i = 0; i < value.length; i++) {
+                    this.addDepartment();
+
+                    for(var j = 0; j < departments.length; j++) {
+                        if (departments[j].text.localeCompare(value[i]) == 0) {
+                            this.updateDepartment(i, departments[j].value);
+                            j = departments.length + 2;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * clearMap
+     * 
+     * Clears the current map of all its departments.
+     * 
+     * @param   None
+     * 
+     * @returns None
+     */
+    clearMap() {
+        while (this.currDepartments.length > 0) {
+            this.delButtonPressed(0);
+        }
     }
 
     /**
@@ -214,9 +364,11 @@ class MapCreatorPage extends Component {
             this.currDepartments[ind] = aboveItem;
 
             // Update the state
-            if (this._mounted) this.setState({
-                arrayHolder: [...this.currDepartments]
-            });
+            if (this._mounted) {
+                this.setState({
+                    arrayHolder: [...this.currDepartments]
+                });
+            }
         }
     }
 
@@ -235,9 +387,11 @@ class MapCreatorPage extends Component {
         this.currDepartments.splice(ind, 1);
 
         // Update the state
-        if (this._mounted) this.setState({
-            arrayHolder: [...this.currDepartments]
-        });
+        if (this._mounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        }
     }
 
     /**
@@ -282,14 +436,22 @@ class MapCreatorPage extends Component {
     renderListElem = (index) => {
         const placeholder = {
             label: 'Select a department...',
-            value: null,
+            value: null
         };
 
         renderIosPicker = () => {
+            tempDepartments = [];
+            for (var i = 0; i < departments.length; i++) {
+                currDepartment = departments[i];
+                currDepartment.color = global.theme == light ? light["text-hint-color"] : dark["text-hint-color"];
+                tempDepartments.push(currDepartment);
+            }
+
             return (
-                <RNPickerSelect style={styles.pickerIOS}
+                <RNPickerSelect
+                    style={styles.pickerIOS}
                     key={index}
-                    items={departments}
+                    items={tempDepartments}
                     placeholder={placeholder}
                     value={this.state.arrayHolder[index]['department']}
                     onValueChange={(val) => this.updateDepartment(index, val)}
@@ -307,7 +469,14 @@ class MapCreatorPage extends Component {
                 >
                     {
                         departments.map((v) => {
-                            return <Picker.Item key={index} label={v.label} value={v.value} color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} />
+                            return (
+                                <Picker.Item
+                                    key={index}
+                                    label={v.label}
+                                    value={v.value}
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                />
+                            );
                         })
                     }
                 </Picker>
@@ -333,7 +502,6 @@ class MapCreatorPage extends Component {
     );
 
     render() {
-        console.log('ArrayHolder', this.state.arrayHolder);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -354,6 +522,7 @@ class MapCreatorPage extends Component {
                                 onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
                             />
+
                             <Input style={styles.inputRow}
                                 label='Store Address'
                                 ref="address"
@@ -361,6 +530,7 @@ class MapCreatorPage extends Component {
                                 value={this.state.address}
                                 onChangeText={(address) => this._mounted && this.setState({ address })}
                             />
+
                             <Input style={styles.inputRow}
                                 label='Franchise Name'
                                 ref="fName"
@@ -370,6 +540,17 @@ class MapCreatorPage extends Component {
                             />
                         </Layout>
                     </Layout>
+
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Select style={styles.selectBox}
+                            label='Templates'
+                            data={templates}
+                            placeholder='Use a map template'
+                            selectedOption={this.state.template}
+                            onSelect={(template) => this.handleTemplateChange({ template })}
+                        />
+                    </Layout>
+
                     <Layout style={styles.formOuterContainer} level='3'>
                         <Layout style={styles.formInnerContainer}>
                             <FlatList
