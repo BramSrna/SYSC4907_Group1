@@ -17,6 +17,7 @@ import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
 import FindRecipePage from '../pages/FindRecipePage';
+import MapsPage from '../pages/MapsPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -58,6 +59,9 @@ const StackNavigator = createStackNavigator({
     FindRecipePage: {
         screen: FindRecipePage
     },
+    MapsPage: {
+        screen: MapsPage
+    }
 }, {
     initialRouteName: "Home",
     headerMode: "none"

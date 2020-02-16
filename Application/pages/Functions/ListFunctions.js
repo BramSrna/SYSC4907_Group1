@@ -182,8 +182,8 @@ class ListFunctions {
          // Get the price range from the item if it was preexisting
          var priceRange = null;
          if (item !== null) {
-            priceRange = item.finalPrice;   
-         } 
+            priceRange = item.finalPrice;
+         }
 
          // Add the item to the list
          firebase.database().ref(listPath + "/items/" + itemId).update({
@@ -618,6 +618,24 @@ class ListFunctions {
                console.log("tokensToNotifications messed up")
             }
          }
+      });
+   }
+
+   /**
+    * getMapsApiKey
+    * 
+    * Get the maps api key from the database
+    * 
+    * @returns ApiKey
+    */
+   getMapsApiKey() {
+      return new Promise(function (resolve, reject) {
+         firebase.database().ref("/globals/hkey/").once('value').then(function (dataSnapshot) {
+            resolve(dataSnapshot.val());
+         }).catch(error => {
+            console.log(error);
+            reject(error);
+         });
       });
    }
 
