@@ -645,6 +645,8 @@ exports.cloudReorgListFastest = function(data, context, database) {
         var items = result[2];
         var map = result[3];
 
+        console.log(map)
+
         // Retrieve the needed location information
         var locs = [];
         for (var i = 0; i < predictedLocs.length; i++) {
@@ -727,6 +729,7 @@ exports.cloudReorgListFastest = function(data, context, database) {
         return {
             items: items,
             ids: ids,
+            map: map
         };
     });
 
