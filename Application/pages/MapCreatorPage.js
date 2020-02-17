@@ -72,6 +72,23 @@ class MapCreatorPage extends Component {
                 this.setState({
                     arrayHolder: [...this.currDepartments]
                 });
+
+                currMap = this.props.navigation.getParam("currLayout", []);
+                currStoreName = this.props.navigation.getParam("storeName", DEFAULT_STORE_NAME);
+                currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
+
+                if (currMap.length !== 0) {
+                    this.clearMap();
+                } 
+
+                for (var i = 0; i < currMap.length; i++) {
+                    this.addDepWithName(currMap[i]);
+                }
+
+                this.setState({
+                    address: currStoreAddr,
+                    storeName: currStoreName
+                });
             }
         );
 
@@ -282,14 +299,7 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepartment();
-
-                    for(var j = 0; j < departments.length; j++) {
-                        if (departments[j].text.localeCompare(value[i]) == 0) {
-                            this.updateDepartment(i, departments[j].value);
-                            j = departments.length + 2;
-                        }
-                    }                
+                    this.addDepWithName(value[i]);             
                 }
             }
         });
@@ -315,17 +325,21 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepartment();
-
-                    for(var j = 0; j < departments.length; j++) {
-                        if (departments[j].text.localeCompare(value[i]) == 0) {
-                            this.updateDepartment(i, departments[j].value);
-                            j = departments.length + 2;
-                        }
-                    }
+                    this.addDepWithName(value[i]);
                 }
             }
         });
+    }
+
+    addDepWithName(name) {
+        this.addDepartment();
+
+        for(var j = 0; j < departments.length; j++) {
+            if (departments[j].text.localeCompare(name) == 0) {
+                this.updateDepartment(this.currDepartments.length - 1, departments[j].value);
+                j = departments.length + 2;
+            }
+        }
     }
 
     /**

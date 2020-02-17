@@ -26,12 +26,18 @@ var availableStores = [];
 class SelectStorePage extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             listId: "",
             listName: "",
+
             sort: "",
-            currStore: "",
+
+            currStoreTitle: "",
+            currStoreAddr: "",
             currStoreId: "",
+            currStoreName: "",
+
             value: '',
             data: [],
         };
@@ -84,23 +90,8 @@ class SelectStorePage extends Component {
     */
     loadAvailableStores() {
         // Load the available stores and parses the data
-        var tempList = lf.getAvailableStores();
-        tempList.then((value) => {
-            // Get the stores and ids
-            var stores = value.stores;
-            var ids = value.ids;
-
-            // Save the names and ids to the state
-            var temp = [];
-            for (var i = 0; i < ids.length; i++) {
-                temp.push({
-                    name: stores[i],
-                    title: stores[i],
-                    id: ids[i]
-                });
-            }
-            temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
-            availableStores = temp;
+        var tempList = lf.getAvailableStores().then((value) => {
+            availableStores = value;
         });
     }
 
@@ -123,22 +114,28 @@ class SelectStorePage extends Component {
             })
         } else {
             var id = ""; // Empty id to handle unknown stores
+            var addr = "";
+            var storeName = "";
 
             newStore = newStore.toString();
 
             // Find the name of the store in the list of available stores
             for (var i = 0; i < availableStores.length; i++) {
-                var name = availableStores[i].name;
-                if (name === newStore) {
+                var title = availableStores[i].title;
+                if (title === newStore) {
                     // Set the id of the store if known
                     id = availableStores[i].id;
+                    addr = availableStores[i].addr;
+                    storeName = availableStores[i].storeName;
                 }
             }
 
             // Update the state
             this._isMounted && this.setState({
-                currStore: newStore,
-                currStoreId: id
+                currStoreTitle: newStore,
+                currStoreId: id,
+                currStoreAddr: addr,
+                currStoreName: storeName
             });
         }
     }
@@ -157,10 +154,12 @@ class SelectStorePage extends Component {
     submitStore = () => {
         this.props.navigation.navigate("CurrentListPage", {
             fromPage: "SelectStorePage",
-            name: this.state.listName,
+            listName: this.state.listName,
             listId: this.state.listId,
-            currStore: this.state.currStore,
+            currStoreTitle: this.state.currStoreTitle,
             currStoreId: this.state.currStoreId,
+            currStoreAddr: this.state.currStoreAddr,
+            currStoreName: this.state.currStoreName,
             sort: this.state.sort
         });
     };
@@ -186,7 +185,7 @@ class SelectStorePage extends Component {
         const onChangeText = (value) => {
             this.setState({ value });
             this.setState({
-                data: [{ name: value, title: value }].concat(availableStores.filter(item => item.title.toLowerCase().includes(value.toLowerCase())).concat(availableStores[availableStores.length - 1]))
+                data: [{ title: value }].concat(availableStores.filter(item => item.title.toLowerCase().includes(value.toLowerCase())).concat(availableStores[availableStores.length - 1]))
             });
         };
 

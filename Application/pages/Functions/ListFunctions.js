@@ -499,7 +499,32 @@ class ListFunctions {
     */
    getAvailableStores() {
       // Call the function to load all available stores
-      var data = autocomplete.cloudLoadAvailableStores();
+      var data = autocomplete.cloudLoadAvailableStores().then((value) => {
+          // Get the stores and ids
+          var titles = value.titles;
+          var ids = value.ids;
+          var addrs = value.addrs;
+          var names = value.names;
+
+          // Save the names and ids to the state
+          var temp = [];
+          for (var i = 0; i < ids.length; i++) {
+              temp.push({
+                  title: titles[i],
+                  id: ids[i],
+                  addr: addrs[i],
+                  storeName: names[i]
+              });
+          }
+
+          temp.push({
+              title: "Register a store...",
+              id: -1
+          });
+
+          return temp;
+      });
+
       return data;
    }
 

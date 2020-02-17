@@ -19,8 +19,10 @@ export function cloudLoadAvailableStores() {
     // Parse the stores table
     var ref = firebase.database().ref('/stores');
     var retItems = ref.once('value').then((snapshot) => {
-       var stores = [];
+       var storeTitles = [];
        var storeIds = [];
+       var storeAddrs = [];
+       var storeNames = [];
  
        var ssv = snapshot.val();
        if (ssv) {
@@ -34,8 +36,10 @@ export function cloudLoadAvailableStores() {
                 var dispName = tempStore.getDispName();
  
                 // Save the name and id
-                stores.push(dispName);
+                storeTitles.push(dispName);
                 storeIds.push(storeId);
+                storeAddrs.push(tempAddress);
+                storeNames.push(tempStoreName);
              }
           }
        }
@@ -43,7 +47,9 @@ export function cloudLoadAvailableStores() {
        // Return the parsed data
        return {
           ids: storeIds,
-          stores: stores
+          titles: storeTitles,
+          addrs: storeAddrs,
+          names: storeNames
        };
     });
  

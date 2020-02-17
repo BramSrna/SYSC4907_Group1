@@ -16,7 +16,7 @@ import {
    Text,
    CheckBox
 } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
+import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -60,6 +60,8 @@ class CurrentList extends Component {
          orgMethod: organizationOptions[0],
          currStore: "",
          currStoreId: "",
+         currStoreAddr: "",
+         currStoreName: "",
          storeModalVisible: false,
          map: null,
 
@@ -138,7 +140,7 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
-      newListName = this.props.navigation.getParam("name", "(Invalid Name)");
+      newListName = this.props.navigation.getParam("listName", "(Invalid Name)");
       newListId = this.props.navigation.getParam("listID", "(Invalid List ID)");
 
       this._isMounted && this.setState({
@@ -149,12 +151,16 @@ class CurrentList extends Component {
       if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
          sortMethod = this.props.navigation.getParam("sort", ALPHABETICALLY);
 
-         newStore = this.props.navigation.getParam("currStore", "(Invalid Store)");
+         newStore = this.props.navigation.getParam("currStoreTitle", "(Invalid Store)");
          newStoreId = this.props.navigation.getParam("currStoreId", "(Invalid Store ID)");
+         newStoreAddr = this.props.navigation.getParam("currStoreAddr", "(Invalid Store Address)");
+         newStoreName = this.props.navigation.getParam("currStoreName", "(Invalid Store Name)");
 
          this._isMounted && this.setState({
             currStoreId: newStoreId,
-            currStore: newStore
+            currStore: newStore,
+            currStoreAddr: newStoreAddr,
+            currStoreName: newStoreName
          });
 
          if (sortMethod == FASTEST_PATH) {
@@ -185,24 +191,8 @@ class CurrentList extends Component {
     */
    loadAvailableStores() {
       // Load the available stores and parses the data
-      var tempList = lf.getAvailableStores();
-      tempList.then((value) => {
-          // Get the stores and ids
-          var stores = value.stores;
-          var ids = value.ids;
-
-          // Save the names and ids to the state
-          var temp = [];
-          for (var i = 0; i < ids.length; i++) {
-              temp.push({
-                  name: stores[i],
-                  title: stores[i],
-                  id: ids[i]
-              });
-          }
-
-          temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
-          availableStores = temp;
+      var tempList = lf.getAvailableStores().then((value) => {
+          availableStores = value;
       });
   }
 
@@ -262,11 +252,11 @@ class CurrentList extends Component {
          // Update the state of the context
          that.updateListState(items,
                               ids,
-                              reorg = false,
-                              userCount = userCount,
-                              minPrice = minPrice.toFixed(2),
-                              maxPrice = maxPrice.toFixed(2),
-                              numUnknownPrice = numUnknownPrice);
+                              {reorg: false,
+                              userCount: userCount,
+                              minPrice: minPrice.toFixed(2),
+                              maxPrice: maxPrice.toFixed(2),
+                              numUnknownPrice: numUnknownPrice});
       });
    }
 
@@ -296,7 +286,27 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null, map = null) {
+   updateListState(newItems, newIds, optionalParams) {
+      defaultParams = {
+         reorg: false,
+         userCount: null,
+         minPrice: null,
+         maxPrice: null,
+         numUnknownPrice: null,
+         map: null
+      }
+
+      for (key in optionalParams) {
+         defaultParams[key] = optionalParams[key];
+      }
+
+      reorg = defaultParams.reorg;
+      userCount = defaultParams.userCount;
+      minPrice = defaultParams.minPrice;
+      maxPrice = defaultParams.maxPrice;
+      numUnknownPrice = defaultParams.numUnknownPrice;
+      map = defaultParams.map;
+
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
@@ -361,7 +371,7 @@ class CurrentList extends Component {
          minPrice: minPrice === null ? this.state.minPrice : minPrice,
          maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
          numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
-         map: map,
+         map: map === null ? this.state.map : map === -1 ? null : map
       });
    }
 
@@ -616,7 +626,7 @@ class CurrentList extends Component {
 
       if (initItems === null) {
          // Update the list state to the reorganized values
-         this.updateListState(items, ids, reorg = true);
+         this.updateListState(items, ids, {reorg: true});
       }
 
       return {
@@ -644,7 +654,7 @@ class CurrentList extends Component {
          var tempList = lf.reorgListLoc(storeId, listId);
          tempList.then((value) => {
             // Update the local state of the list
-            context.updateListState(value.items, value.ids, reorg = true);
+            context.updateListState(value.items, value.ids, {reorg: true, map: -1});
          });
 
          return;
@@ -671,12 +681,10 @@ class CurrentList extends Component {
          // Reorganize the list
          var tempList = lf.reorgListFastest(storeId, listId);
          tempList.then((value) => {
-            console.log("HERE")
-            console.log(value.map)
             context.updateListState(value.items,
                                     value.ids,
-                                    reorg = true,
-                                    map = value.map);
+                                    {reorg: true,
+                                     map: value.map});
          });
 
          return;
@@ -781,9 +789,9 @@ class CurrentList extends Component {
 
    renderStoreMapDashboard = () => {
       currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
-
-      console.log(map);
 
       retVal = [];
 
@@ -791,14 +799,19 @@ class CurrentList extends Component {
          return (
             <Layout style={styles.dashboard} >
                <Layout style={styles.dashboardOuterContainer} level='3' >
-                  <Layout style={styles.dashboardInnerContainer}>
+                  <Layout style={[styles.dashboardInnerContainer, {flexDirection: 'row'}]}>
                      <Text style={styles.dashboardText}>
-                        Current Store: {currStore}
+                        {currStore}
                      </Text>
 
-                     <Text style={styles.dashboardText}>
-                        {map === null ? "No Map" : "View Map"}
-                     </Text>
+                     {map === null ?
+                        <Text></Text> :
+                        <Button
+                           style={styles.mapButton}
+                           icon={MapIcon}
+                           onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map, storeName: currStoreName, storeAddr: currStoreAddr })}
+                        />
+                     }
                   </Layout>
                </Layout>
             </Layout>
