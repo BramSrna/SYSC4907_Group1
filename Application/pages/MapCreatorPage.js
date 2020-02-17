@@ -42,11 +42,19 @@ class MapCreatorPage extends Component {
 
         this.state = {
             arrayHolder: [], // The departments added so far
+
             storeName: DEFAULT_STORE_NAME, // The name of the store
             franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
-            address: DEFAULT_ADDRESS, // The address of the store,
+            address: DEFAULT_ADDRESS, // The address of the store
+
             template: templates[0],
-            test: []
+            test: [],
+
+            modifyMode: false,
+            previousPage: null,
+            listName: null,
+            listId: null
+
         };
     }
 
@@ -72,23 +80,39 @@ class MapCreatorPage extends Component {
                 this.setState({
                     arrayHolder: [...this.currDepartments]
                 });
+                
+                previousPage = this.props.navigation.getParam("previousPage", null);
 
-                currMap = this.props.navigation.getParam("currLayout", []);
-                currStoreName = this.props.navigation.getParam("storeName", DEFAULT_STORE_NAME);
-                currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
+                if (previousPage !== null) {
+                    currMap = this.props.navigation.getParam("currLayout", []);
+                    currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
+                    currStoreName = this.props.navigation.getParam("storeName", DEFAULT_STORE_NAME);
+                    listName = this.props.navigation.getParam("listName", null);
+                    listId = this.props.navigation.getParam("listId", null);
 
-                if (currMap.length !== 0) {
-                    this.clearMap();
-                } 
+                    if (currMap.length !== 0) {
+                        this.clearMap();
+    
+                        for (var i = 0; i < currMap.length; i++) {
+                            this.addDepWithName(currMap[i]);
+                        }
+                    }
 
-                for (var i = 0; i < currMap.length; i++) {
-                    this.addDepWithName(currMap[i]);
+                    modifyMode = false;
+
+                    if (currStoreName !== DEFAULT_STORE_NAME) {
+                        modifyMode = true;
+                    }
+    
+                    this.setState({
+                        address: currStoreAddr,
+                        storeName: currStoreName,
+                        modifyMode: modifyMode,
+                        previousPage: previousPage,
+                        listName: listName,
+                        listId: listId
+                    });
                 }
-
-                this.setState({
-                    address: currStoreAddr,
-                    storeName: currStoreName
-                });
             }
         );
 
@@ -165,11 +189,15 @@ class MapCreatorPage extends Component {
             tempFranchiseName);
 
         Alert.alert("Map Saved! Thank you!")
-        if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
-            this.props.navigation.navigate("CurrentListPage", {
-                name: this.props.navigation.getParam("listName", "(Invalid Name)"),
-                listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
+
+        previousPage = this.state.previousPage;
+        if (previousPage == "CurrentListPage") {
+            this.props.navigation.navigate(previousPage, {
+                name: this.state.listName,
+                listID: this.state.listId
             });
+        } else if (previousPage !== null) {
+            this.props.navigation.navigate(previousPage);
         }
     }
 
@@ -535,6 +563,7 @@ class MapCreatorPage extends Component {
                                 onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
                                 onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
+                                disabled={this.state.modifyMode}
                             />
 
                             <Input style={styles.inputRow}
@@ -543,6 +572,7 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter store address...'
                                 value={this.state.address}
                                 onChangeText={(address) => this._mounted && this.setState({ address })}
+                                disabled={this.state.modifyMode}
                             />
 
                             <Input style={styles.inputRow}
@@ -551,6 +581,7 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter franchise name...'
                                 value={this.state.franchiseName}
                                 onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
+                                disabled={this.state.modifyMode}
                             />
                         </Layout>
                     </Layout>
@@ -576,8 +607,21 @@ class MapCreatorPage extends Component {
                                 extraData={this.state.arrayHolder}
                             />
                             <Layout style={styles.mainButtonGroup} >
-                                <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
-                                <Button style={styles.mainPageButton} status='success' onPress={this.handleSaveMap}>{'Save Map'}</Button>
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='primary'
+                                    onPress={this.addDepartment}
+                                >
+                                    {'Add Department'}
+                                </Button>
+
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='success'
+                                    onPress={this.handleSaveMap}
+                                >
+                                    {this.state.modifyMode ? 'Save Map And Go Back' : 'Save Map'}
+                                </Button>
                             </Layout>
                         </Layout>
                     </Layout>

@@ -108,7 +108,7 @@ class SelectStorePage extends Component {
     updateCurrStore(newStore) {
         if (newStore.toString() == NEW_STORE) {
             this.props.navigation.navigate("MapCreatorPage", {
-                page: "CurrentListPage",
+                previousPage: "CurrentListPage",
                 listName: this.props.navigation.getParam("name", "(Invalid Name)"),
                 listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
             })

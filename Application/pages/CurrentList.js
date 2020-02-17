@@ -809,7 +809,10 @@ class CurrentList extends Component {
                         <Button
                            style={styles.mapButton}
                            icon={MapIcon}
-                           onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map, storeName: currStoreName, storeAddr: currStoreAddr })}
+                           onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
+                                                                                             storeName: currStoreName,
+                                                                                             storeAddr: currStoreAddr,
+                                                                                             previousPage: "CurrentList" })}
                         />
                      }
                   </Layout>
