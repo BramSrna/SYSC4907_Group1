@@ -61,6 +61,7 @@ class CurrentList extends Component {
          currStore: "",
          currStoreId: "",
          storeModalVisible: false,
+         map: null,
 
          currItemId: "",
          itemModalVisible: false,
@@ -137,37 +138,38 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
-      console.log('SetNameAndCurrentItems');
+      newListName = this.props.navigation.getParam("name", "(Invalid Name)");
+      newListId = this.props.navigation.getParam("listID", "(Invalid List ID)");
 
       this._isMounted && this.setState({
-         listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-         listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+         listName: newListName,
+         listId: newListId
       });
+
       if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
-         console.log('got extra navigation params: ' + this.props.navigation.getParam("sort", ALPHABETICALLY));
+         sortMethod = this.props.navigation.getParam("sort", ALPHABETICALLY);
+
+         newStore = this.props.navigation.getParam("currStore", "(Invalid Store)");
+         newStoreId = this.props.navigation.getParam("currStoreId", "(Invalid Store ID)");
+
          this._isMounted && this.setState({
-            currStoreId: this.props.navigation.getParam("currStoreId", "(Invalid Store ID)"),
+            currStoreId: newStoreId,
+            currStore: newStore
          });
-         if (this.props.navigation.getParam("sort", ALPHABETICALLY) == FASTEST_PATH) {
-            this.reorganizeListFastest(this);
-            console.log('reorganize based on fastest path');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == FASTEST_PATH) });
+
+         if (sortMethod == FASTEST_PATH) {
+            this.reorganizeListFastest(newStoreId, newListId, this);
+         } else if (sortMethod == BY_LOCATION) {
+            this.reorganizeListLoc(newStoreId, newListId, this);
+         } else {
+            this.localSort(sortMethod);
          }
-         else if (this.props.navigation.getParam("sort", ALPHABETICALLY) == BY_LOCATION) {
-            this.reorganizeListLoc(this);
-            console.log('reorganize based on location');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == BY_LOCATION) });
-         }
-         else {
-            this.reorganizeListAlphabetically(this);
-            console.log('reorganize alphabetically');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == ALPHABETICALLY) });
-         }
+
+         this.setState({ orgMethod: organizationOptions.find(element => element.value == sortMethod) });
       }
 
       // Load the current contents of the list
-      this.loadCurrList(this,
-         this.props.navigation.getParam("listID", "(Invalid List ID)"));
+      this.loadCurrList(this, newListId);
 
    }
 
@@ -198,6 +200,7 @@ class CurrentList extends Component {
                   id: ids[i]
               });
           }
+
           temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
           availableStores = temp;
       });
@@ -293,7 +296,7 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null) {
+   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null, map = null) {
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
@@ -358,6 +361,7 @@ class CurrentList extends Component {
          minPrice: minPrice === null ? this.state.minPrice : minPrice,
          maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
          numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
+         map: map,
       });
    }
 
@@ -633,13 +637,11 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListLoc(context = this) {
-      console.log('reorganizeListLoc');
+   reorganizeListLoc(storeId, listId, context = this) {
       // Check the current store in the state
-      if (context.checkIfCurrStoreValid()) {
+      if (context.checkIfCurrStoreValid(storeId, context)) {
          // Reorganize the list
-         var tempList = lf.reorgListLoc(context.state.currStoreId,
-            context.props.navigation.getParam("listID", "(Invalid List ID)"));
+         var tempList = lf.reorgListLoc(storeId, listId);
          tempList.then((value) => {
             // Update the local state of the list
             context.updateListState(value.items, value.ids, reorg = true);
@@ -663,16 +665,18 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListFastest(context = this) {
-      console.log('reorganizeListFastest');
+   reorganizeListFastest(storeId, listId, context = this) {
       // Check the current store in the state
-      if (context.checkIfCurrStoreValid()) {
+      if (context.checkIfCurrStoreValid(storeId, context)) {
          // Reorganize the list
-         var tempList = lf.reorgListFastest(context.state.currStoreId,
-            context.props.navigation.getParam("listID", "(Invalid List ID)"));
+         var tempList = lf.reorgListFastest(storeId, listId);
          tempList.then((value) => {
-            // Update the local state of the list
-            context.updateListState(value.items, value.ids, reorg = true);
+            console.log("HERE")
+            console.log(value.map)
+            context.updateListState(value.items,
+                                    value.ids,
+                                    reorg = true,
+                                    map = value.map);
          });
 
          return;
@@ -692,10 +696,10 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   checkIfCurrStoreValid(context = this) {
+   checkIfCurrStoreValid(currStoreId) {
       // Check if the given id matches a known id
       for (var i = 0; i < availableStores.length; i++) {
-         if (availableStores[i].id === context.state.currStoreId) {
+         if (availableStores[i].id === currStoreId) {
             return (true);
          }
       }
@@ -774,6 +778,33 @@ class CurrentList extends Component {
          </Layout>
       );
    };
+
+   renderStoreMapDashboard = () => {
+      currStore = this.state.currStore;
+      map = this.state.map;
+
+      console.log(map);
+
+      retVal = [];
+
+      if (currStore !== "") {
+         return (
+            <Layout style={styles.dashboard} >
+               <Layout style={styles.dashboardOuterContainer} level='3' >
+                  <Layout style={styles.dashboardInnerContainer}>
+                     <Text style={styles.dashboardText}>
+                        Current Store: {currStore}
+                     </Text>
+
+                     <Text style={styles.dashboardText}>
+                        {map === null ? "No Map" : "View Map"}
+                     </Text>
+                  </Layout>
+               </Layout>
+            </Layout>
+         );
+      }
+   }
 
    /**
     * setNotificationModalVisible
@@ -862,6 +893,7 @@ class CurrentList extends Component {
                leftControl={renderMenuAction()}
                rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
+
             <Layout style={styles.ListContainer}>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
@@ -872,31 +904,37 @@ class CurrentList extends Component {
                      {this.renderNotificationModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
+
                <Layout style={styles.selectContainer}>
                   <Select style={styles.selectBox}
-                     label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
                      data={organizationOptions}
                      placeholder='Select an organization method'
                      selectedOption={this.state.orgMethod}
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
                </Layout>
+
+               {this.renderStoreMapDashboard()}
+
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
                         <Text style={styles.dashboardText}>
                            Number of Items: {this.state.listItems.length}
                         </Text>
+
                         <Text style={styles.dashboardText}>
                            List shared with {this.state.userCount - 1} others
-                           </Text>
+                        </Text>
+                        {/* -1 here to make sure we dont include the current user */}
+
                         <Text style={styles.dashboardText}>
                            {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
                         </Text>
-                        {/* -1 here to make sure we dont include the current user */}
                      </Layout>
                   </Layout>
                </Layout>
+
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}

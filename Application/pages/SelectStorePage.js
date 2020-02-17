@@ -159,6 +159,7 @@ class SelectStorePage extends Component {
             fromPage: "SelectStorePage",
             name: this.state.listName,
             listId: this.state.listId,
+            currStore: this.state.currStore,
             currStoreId: this.state.currStoreId,
             sort: this.state.sort
         });
