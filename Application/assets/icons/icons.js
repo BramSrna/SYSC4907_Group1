@@ -16,6 +16,14 @@ export const PasswordIcon = (style) => (
     />
 );
 
+export const RefreshIcon = (style) => (
+    <Icon {...style} name='refresh-outline' />
+);
+
+export const CheckmarkIcon = (style) => (
+    <Icon {...style} name='checkmark-outline' />
+);
+
 export const MenuOutline = (style) => (
     <Icon {...style} name='menu-outline' />
 );

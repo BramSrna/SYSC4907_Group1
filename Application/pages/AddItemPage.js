@@ -13,11 +13,10 @@ import {
     Autocomplete,
     Text,
 } from 'react-native-ui-kitten';
-import { ArrowBackIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
-import { AddIcon } from '../assets/icons/icons.js';
+import { ArrowBackIcon, AddIcon, RefreshIcon, CheckmarkIcon } from '../assets/icons/icons.js';
 import * as firebase from 'firebase/app';
 
 const globalComps = require('./Functions/GlobalComps');
@@ -44,8 +43,11 @@ class AddItemPage extends Component {
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
 
+            prevRecommended: [],
             recommendedItems: [], // The list of recommended items
-            listItemIds: [] // The ids of the recommended items
+            listItemIds: [], // The ids of the recommended items
+
+            toAdd: []
         };
     }
 
@@ -186,6 +188,9 @@ class AddItemPage extends Component {
     loadRecommendedItems() {
         // Get the ids of the current items in the list
         var currItemIds = this.state.listItemIds;
+        var currPrevRec = this.state.prevRecommended;
+
+        console.log(currPrevRec)
 
         var that = this;
 
@@ -220,6 +225,7 @@ class AddItemPage extends Component {
 
             var finalItems = [];
             var ids = [];
+            var backlog = [];
 
             // Copy the top recommended items to the final list to recommend
             // as well as their ids, upto the maximum length
@@ -228,12 +234,19 @@ class AddItemPage extends Component {
                 var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
                 var id = recItems[i][0];
 
-                finalItems.push({
+                var toAdd = {
                     genName: info.genericName,
                     specName: info.specificName,
                     name: name,
-                    id: id
-                });
+                    id: id,
+                    added: false
+                };
+
+                if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                    finalItems.push(toAdd);
+                } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                    backlog.push(toAdd);
+                }
 
                 ids.push(id)
             }
@@ -246,21 +259,31 @@ class AddItemPage extends Component {
                     var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
                     var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
 
-                    // Check that the item is not already in the list
-                    if (!ids.includes(id)) {
-                        finalItems.push({
-                            genName: info.genericName,
-                            specName: info.specificName,
-                            name: name,
-                            id: id
-                        });
+                    var toAdd = {
+                        genName: info.genericName,
+                        specName: info.specificName,
+                        name: name,
+                        id: id,
+                        added: false
+                    };
+
+                    if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                        finalItems.push(toAdd);
+                    } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                        backlog.push(toAdd);
                     }
                 }
             }
 
+            for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                finalItems.push(backlog[i]);
+                currPrevRec = [];
+            }
+
             // Save the list of recommended items
             that.setState({
-                recommendedItems: finalItems
+                recommendedItems: finalItems,
+                prevRecommended: currPrevRec
             });
         });
     }
@@ -329,6 +352,18 @@ class AddItemPage extends Component {
         }
     }
 
+    handleAddRecommendedButton = (ind) => {
+        // Get the list of recommended items
+        var temp = this.state.recommendedItems;
+
+        // Add the selected item to the list
+        temp[ind].added = true;
+
+        this.setState({
+            recommendedItems: temp
+        });
+    }
+
     /**
     * addItem
     * 
@@ -361,24 +396,36 @@ class AddItemPage extends Component {
      * 
      * @returns None
      */
-    addItemFromRecommended(ind) {
+    handleRefreshButton() {
         // Get the list of recommended items
-        var temp = this.state.recommendedItems;
+        var currRecItems = this.state.recommendedItems;
+        var currItemIds = this.state.listItemIds;
+        var currPrevRec = this.state.prevRecommended;
 
-        // Add the selected item to the list
-        var item = temp[ind];
-        this.addItem(this.state.listId,
-            item.genName,
-            item.specName);
+        console.log(currRecItems);
 
-        // Update the state of the user's list with the item they added
-        temp = this.state.listItemIds;
-        temp.push(item.id);
+        for (var i = 0; i < currRecItems.length; i++) {
+            // Add the selected item to the list
+            var item = currRecItems[i];
+            if (item.added){
+                this.addItem(this.state.listId,
+                    item.genName,
+                    item.specName);
+        
+                // Update the state of the user's list with the item they added
+                currItemIds.push(item.id);
+            } else {
+                currPrevRec.push(item.id);
+            }
+        }
+
         this.setState({
-            listItemIds: temp
+            listItemIds: currItemIds,
+            prevRecommended: currPrevRec
         });
 
-        // Reload the recommended items
+        console.log(currPrevRec);
+
         this.loadRecommendedItems();
     }
 
@@ -403,10 +450,10 @@ class AddItemPage extends Component {
                     </Layout>
                     <Layout style={styles.itemButtonContainer} level='1'>
                         <Button
-                            icon={AddIcon}
+                            icon={item.added ? CheckmarkIcon : AddIcon}
                             appearance='outline'
-                            status='danger'
-                            onPress={() => this.addItemFromRecommended(index)}
+                            status={item.added ? 'success' : 'danger'}
+                            onPress={() => this.handleAddRecommendedButton(index)}
                         />
                     </Layout>
 
@@ -479,9 +526,24 @@ class AddItemPage extends Component {
 
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
-                                <Text>
-                                    {'Recommended Items:'}
-                                </Text>
+                                <Layout style={styles.listItem} level='2'>
+                                    <Layout style={styles.listTextContainer} level='1'>
+                                        <Layout style={styles.itemTextContainer} level='1'>
+                                            <Text style={styles.itemText}>
+                                                Recommended Items:
+                                            </Text>
+                                        </Layout>
+                                        <Layout style={styles.itemButtonContainer} level='1'>
+                                            <Button
+                                                icon={RefreshIcon}
+                                                appearance='outline'
+                                                status='warning'
+                                                onPress={() => this.handleRefreshButton()}
+                                            />
+                                        </Layout>
+
+                                    </Layout>
+                                </Layout>
 
                                 <FlatList
                                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
