@@ -469,6 +469,21 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
+/**
+ * cloudModStoreWeights
+ * 
+ * Updates the weights of each map for the given store
+ * based on how similar the map is to the given map.
+ * Difference metric is based on the departments unique
+ * to the current map and given map. The metric is also
+ * based on the order of the common departments.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns None 
+ */
 exports.cloudModStoreWeights = function(data, context, database) {
     var address = data.address;
     var storeName = data.storeName;
@@ -481,6 +496,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
     var retVal = database.ref(storePath + "maps").once("value").then((snapshot) => {
         var ssv = snapshot.val();
 
+        // Calculate the max score
         var maxScore = 0;
         var start = refMap.length - 1;
         while (start >= 0) {
@@ -503,6 +519,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
 
             var score = 0;
 
+            // Get departments unique to each map
             var refMapUnique = refMap.filter((e1) => {
                 return compMap.indexOf(e1) < 0;
             });
@@ -510,6 +527,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
                 return refMap.indexOf(e1) < 0;
             });
     
+            // remove unique departments from each map
             var refMapRem = refMap.filter((e1) => {
                 return refMapUnique.indexOf(e1) < 0;
             });
@@ -517,6 +535,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
                 return compMapUnique.indexOf(e1) < 0;
             });
     
+            // Calculate the mean squared difference of each department location
             var meanDif = {};
     
             for (var i = 0; i < refMapRem.length; i++){
@@ -543,14 +562,17 @@ exports.cloudModStoreWeights = function(data, context, database) {
             //score += refMapUnique.length;
             //score += compMapUnique.length;
 
+            // Calculate the new value
             var newVal = 1 - (score / maxScore);
             if (newVal < 0) {
                 newVal = 0;
             }
 
+            // Calculte the new weight
             timesChecked += 1;
             var newWeight = (weight * (timesChecked - 1) + newVal) / timesChecked;
 
+            // Save the new data
             database.ref(storePath + "maps/" + tempMapId).update({
                 map: compMap,
                 weight: newWeight,

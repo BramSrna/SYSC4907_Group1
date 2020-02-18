@@ -159,6 +159,21 @@ export function registerItem(genericName, specificName = null, size = null, size
     return itemInfo;
 }
 
+/**
+ * modStoreWeights
+ * 
+ * Updates the weights of each map for the given store
+ * based on how similar the map is to the given map.
+ * Difference metric is based on the departments unique
+ * to the current map and given map. The metric is also
+ * based on the order of the common departments.
+ * 
+ * @param {String} storeName    Name of the store
+ * @param {String} address Address of teh store
+ * @param {Array} map   The map to compare against
+ * 
+ * @returns None 
+ */
 export async function modStoreWeights(storeName, address, map) {
     try {
        // Call the function to get the sorted list

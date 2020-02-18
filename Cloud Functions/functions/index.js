@@ -89,6 +89,21 @@ exports.getMostPopularMap = functions.https.onCall((data, context) => {
     return reorgFuncs.getMostPopularMap(data, context, database);
 });
 
+/**
+ * cloudModStoreWeights
+ * 
+ * Updates the weights of each map for the given store
+ * based on how similar the map is to the given map.
+ * Difference metric is based on the departments unique
+ * to the current map and given map. The metric is also
+ * based on the order of the common departments.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns None 
+ */
 exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
     return reorgFuncs.cloudModStoreWeights(data, context, database);
 });

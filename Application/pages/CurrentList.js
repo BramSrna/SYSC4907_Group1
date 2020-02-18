@@ -787,6 +787,16 @@ class CurrentList extends Component {
       );
    };
 
+   /**
+    * renderStoreMapDashboard
+    * 
+    * Renders the dashboard for allowing users to view
+    * and edit a mapt after reorganizing the list
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    renderStoreMapDashboard = () => {
       currStore = this.state.currStore;
       currStoreName = this.state.currStoreName;
@@ -795,6 +805,7 @@ class CurrentList extends Component {
 
       retVal = [];
 
+      // Only render if the store is chosen
       if (currStore !== "") {
          return (
             <Layout style={styles.dashboard} >
@@ -804,6 +815,7 @@ class CurrentList extends Component {
                         {currStore}
                      </Text>
 
+                     {/** Show the map icon if a map is known */}
                      {map === null ?
                         <Text></Text> :
                         <Button

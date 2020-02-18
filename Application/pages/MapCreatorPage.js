@@ -81,8 +81,8 @@ class MapCreatorPage extends Component {
                     arrayHolder: [...this.currDepartments]
                 });
                 
+                // Initialize the page if information is passed in
                 previousPage = this.props.navigation.getParam("previousPage", null);
-
                 if (previousPage !== null) {
                     currMap = this.props.navigation.getParam("currLayout", []);
                     currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
@@ -90,6 +90,7 @@ class MapCreatorPage extends Component {
                     listName = this.props.navigation.getParam("listName", null);
                     listId = this.props.navigation.getParam("listId", null);
 
+                    // Populate the map if one is given
                     if (currMap.length !== 0) {
                         this.clearMap();
     
@@ -184,6 +185,7 @@ class MapCreatorPage extends Component {
 
         Alert.alert("Map Saved! Thank you!");
 
+        // Register the map or modify weights depending on page
         previousPage = this.state.previousPage;
         if (previousPage !== null) {
             // Save the store to the database
@@ -362,6 +364,15 @@ class MapCreatorPage extends Component {
         });
     }
 
+    /**
+     * addDepWithValue
+     * 
+     * Add a new department with the given value.
+     * 
+     * @param {String} name The value of the new department
+     * 
+     * @returns None
+     */
     addDepWithValue(name) {
         this.addDepartment();
 

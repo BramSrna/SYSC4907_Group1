@@ -492,10 +492,12 @@ class ListFunctions {
     * 
     * Loads the available stores from the database.
     * The available stores are all known stores.
+    * Puts the information into an array of objects
+    * with one object for each store.
     * 
     * @param   None
     * 
-    * @returns The available stores
+    * @returns The information about available stores
     */
    getAvailableStores() {
       // Call the function to load all available stores
