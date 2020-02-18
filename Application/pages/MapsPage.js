@@ -20,6 +20,7 @@ import MapView, { Marker, } from 'react-native-maps';
 import axios from "axios";
 import lf from "./Functions/ListFunctions";
 // import axios from 'axios';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = 'Select Location';
 const NO_LOCATION_PERMISSION = 'Please enable location permissions to view your current location.';
@@ -60,6 +61,7 @@ class MapsPage extends Component {
     componentWillMount() {
         this._getApiKey();
         this._getLocationAsync();
+        nm.setThat(this)
     }
 
     async _getApiKey() {
@@ -110,7 +112,7 @@ class MapsPage extends Component {
             this.state.storesApiRequestResult.data.results.items.map((item, key) => {
                 delta = Math.max(delta, Math.abs(this.state.currentLocation.coords.latitude - item.position[0]));
             });
-            return delta*2;
+            return delta * 2;
         }
         else return DEFAULT_LATITUDE_DELTA;
     }
@@ -121,7 +123,7 @@ class MapsPage extends Component {
             this.state.storesApiRequestResult.data.results.items.map((item, key) => {
                 delta = Math.max(delta, Math.abs(this.state.currentLocation.coords.longitude - item.position[1]));
             });
-            return delta*2;
+            return delta * 2;
         }
         else return DEFAULT_LONGITUDE_DELTA;
     }

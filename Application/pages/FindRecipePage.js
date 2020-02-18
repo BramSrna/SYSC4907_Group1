@@ -52,7 +52,13 @@ export default class FindRecipePage extends Component {
                         separator={true}
                         inColumn={false}>
                         <CardButton
-                          onPress={() => { }}
+                          onPress={() => {
+                            this.props.navigation.navigate("YourContacts", {
+                              share: true,
+                              recipeName: aRecipe.title,
+                              recipeUrl: aRecipe.spoonacularSourceUrl
+                            })
+                          }}
                           title="Share"
                           color="#FEB557"
                         />

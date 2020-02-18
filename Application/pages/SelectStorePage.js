@@ -15,6 +15,7 @@ import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
@@ -49,7 +50,7 @@ class SelectStorePage extends Component {
     */
     componentWillMount() {
         this._isMounted = true;
-
+        nm.setThat(this)
         this.setState({
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
@@ -213,7 +214,7 @@ class SelectStorePage extends Component {
                                             onSelect={onSelect}
                                         />
                                     </Layout>
-                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })}/>
+                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
                                 </Layout>
                                 <Layout style={styles.mainButtonGroup} >
                                     <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>

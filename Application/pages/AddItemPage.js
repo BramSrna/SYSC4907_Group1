@@ -19,6 +19,7 @@ import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
 import { AddIcon } from '../assets/icons/icons.js';
 import * as firebase from 'firebase/app';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const globalComps = require('./Functions/GlobalComps');
 
@@ -60,6 +61,7 @@ class AddItemPage extends Component {
     * @returns None
     */
     componentWillMount() {
+        nm.setThat(this);
         // set the mounted var
         this._isMounted = true;
 

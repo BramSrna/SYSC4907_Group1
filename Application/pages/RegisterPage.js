@@ -5,6 +5,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import FirebaseUser from "../components/FirebaseUser";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import * as ng from "../navigation/NavigationGlobals";
+import nm from '../pages/Functions/NotificationManager.js';
 
 const REGISTER = "Register";
 const LOGIN = "Already Registered/Login";
@@ -66,6 +67,7 @@ class RegisterPage extends Component {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
+        nm.setThat(this)
         this._isMount = true;
         this.setState({ firstname: "", lastname: "", email: "", password: "" });
       }

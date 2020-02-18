@@ -25,7 +25,9 @@ class YourContacts extends Component {
       this.setState({
          share: this.props.navigation.getParam("share", false),
          listID: this.props.navigation.getParam("listID", ''),
-         listName: this.props.navigation.getParam("listName", '')
+         listName: this.props.navigation.getParam("listName", ''),
+         recipeName: this.props.navigation.getParam("recipeName", ''),
+         recipeUrl: this.props.navigation.getParam("recipeUrl", '')
       });
       cf.GetContactInfo(this);
    }
@@ -159,13 +161,24 @@ class YourContacts extends Component {
                   keyExtractor={(item, index) => index}
                />
             </Layout>
-            {this.state.share &&
+            {this.state.listID != '' &&
                <Layout>
                   <Button
                      title="SHARE"
                      color="#13FF00"
                      onPress={() => cf.ShareList(this.props, this.state.listName, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
+                     })}
+                  />
+               </Layout>
+            }
+            {this.state.recipeName != '' &&
+               <Layout>
+                  <Button
+                     title="SHARE"
+                     color="#13FF00"
+                     onPress={() => cf.ShareRecipe(this.props, this.state.recipeName, this.state.recipeUrl, this.state.selected, function (props) {
+                        props.navigation.goBack()
                      })}
                   />
                </Layout>
