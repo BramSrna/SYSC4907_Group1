@@ -159,6 +159,25 @@ export function registerItem(genericName, specificName = null, size = null, size
     return itemInfo;
 }
 
+export async function modStoreWeights(storeName, address, map) {
+    try {
+       // Call the function to get the sorted list
+       const {
+          data
+       } = await firebase.functions().httpsCallable('cloudModStoreWeights')({
+          storeName: storeName,
+          address: address,
+          map: map
+       });
+
+       return data;
+    } catch (e) {
+       console.error(e);
+
+       return (null);
+    }
+}
+
 /**
  * registerStore
  * 

@@ -469,6 +469,102 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
+exports.cloudModStoreWeights = function(data, context, database) {
+    var address = data.address;
+    var storeName = data.storeName;
+    var refMap = data.map;
+
+    // Get the path to the store
+    var storePath = (new StoreObj(address, storeName)).getPath();
+
+    // Get the current state of the store's maps
+    var retVal = database.ref(storePath + "maps").once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var maxScore = 0;
+        var start = refMap.length - 1;
+        while (start >= 0) {
+            maxScore += start * start;
+            start -= 2;
+        }
+
+        // Loop through all of the store's maps
+        for (var tempMapId in ssv) {
+            var tempMapObj = ssv[tempMapId];
+
+            // Get the weight and order of the current map
+            var weight = tempMapObj.weight;
+            var compMap = tempMapObj.map;
+            var timesChecked = tempMapObj.timesChecked;
+
+            if (timesChecked === undefined) {
+                timesChecked = 1;
+            }
+
+            var score = 0;
+
+            var refMapUnique = refMap.filter((e1) => {
+                return compMap.indexOf(e1) < 0;
+            });
+            var compMapUnique = compMap.filter((e1) => {
+                return refMap.indexOf(e1) < 0;
+            });
+    
+            var refMapRem = refMap.filter((e1) => {
+                return refMapUnique.indexOf(e1) < 0;
+            });
+            var compMapRem = compMap.filter((e1) => {
+                return compMapUnique.indexOf(e1) < 0;
+            });
+    
+            var meanDif = {};
+    
+            for (var i = 0; i < refMapRem.length; i++){
+                var dep = refMapRem[i];
+                if (!(dep in meanDif)) {
+                    meanDif[dep] = [i, -1];
+                }
+            }
+
+            for (i = 0; i < compMapRem.length; i++){
+                dep = compMapRem[i];
+                if (meanDif[dep][1] === -1) {
+                    meanDif[dep][1] = i;
+                }
+            }
+    
+            for (var key in meanDif){
+                var vals = meanDif[key];
+                score += (vals[0] - vals[1]) ** 2;
+            }
+    
+            score /= refMapRem.length;
+    
+            //score += refMapUnique.length;
+            //score += compMapUnique.length;
+
+            var newVal = 1 - (score / maxScore);
+            if (newVal < 0) {
+                newVal = 0;
+            }
+
+            timesChecked += 1;
+            var newWeight = (weight * (timesChecked - 1) + newVal) / timesChecked;
+
+            database.ref(storePath + "maps/" + tempMapId).update({
+                map: compMap,
+                weight: newWeight,
+                timesChecked: timesChecked
+            });
+        }
+        
+        // Return the final map
+        return true;
+    });
+
+    return retVal;
+}
+
 /**
  * getOptimizerMap
  * 

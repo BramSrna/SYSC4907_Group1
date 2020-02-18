@@ -94,7 +94,7 @@ class MapCreatorPage extends Component {
                         this.clearMap();
     
                         for (var i = 0; i < currMap.length; i++) {
-                            this.addDepWithName(currMap[i]);
+                            this.addDepWithValue(currMap[i]);
                         }
                     }
 
@@ -182,22 +182,25 @@ class MapCreatorPage extends Component {
         // Get the franchise name
         var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
 
-        // Save the store to the database
-        dbi.registerStore(this.state.storeName,
-            this.state.address,
-            deps,
-            tempFranchiseName);
-
-        Alert.alert("Map Saved! Thank you!")
+        Alert.alert("Map Saved! Thank you!");
 
         previousPage = this.state.previousPage;
-        if (previousPage == "CurrentListPage") {
+        if (previousPage !== null) {
+            // Save the store to the database
+            dbi.modStoreWeights(this.state.storeName,
+                                this.state.address,
+                                deps);
+
             this.props.navigation.navigate(previousPage, {
-                name: this.state.listName,
+                listName: this.state.listName,
                 listID: this.state.listId
             });
-        } else if (previousPage !== null) {
-            this.props.navigation.navigate(previousPage);
+        } else {
+            // Save the store to the database
+            dbi.registerStore(this.state.storeName,
+                              this.state.address,
+                              deps,
+                              tempFranchiseName);
         }
     }
 
@@ -303,7 +306,7 @@ class MapCreatorPage extends Component {
 
         for(var i = 0; i < departments.length; i++) {
             this.addDepartment();
-            this.updateDepartment(i, departments[i].value);
+            this.updateDepartment(i, departments[i].text);
         }
     }
 
@@ -327,7 +330,7 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepWithName(value[i]);             
+                    this.addDepWithValue(value[i]);             
                 }
             }
         });
@@ -353,18 +356,18 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepWithName(value[i]);
+                    this.addDepWithValue(value[i]);
                 }
             }
         });
     }
 
-    addDepWithName(name) {
+    addDepWithValue(name) {
         this.addDepartment();
 
         for(var j = 0; j < departments.length; j++) {
-            if (departments[j].text.localeCompare(name) == 0) {
-                this.updateDepartment(this.currDepartments.length - 1, departments[j].value);
+            if (departments[j].text === name) {
+                this.updateDepartment(this.currDepartments.length - 1, departments[j].text);
                 j = departments.length + 2;
             }
         }

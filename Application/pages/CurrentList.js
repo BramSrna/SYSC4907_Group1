@@ -812,7 +812,9 @@ class CurrentList extends Component {
                            onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
                                                                                              storeName: currStoreName,
                                                                                              storeAddr: currStoreAddr,
-                                                                                             previousPage: "CurrentList" })}
+                                                                                             listId: this.state.listId,
+                                                                                             listName: this.state.listName,
+                                                                                             previousPage: "CurrentListPage" })}
                         />
                      }
                   </Layout>

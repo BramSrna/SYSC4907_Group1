@@ -88,3 +88,7 @@ exports.getOptimizedMap = functions.https.onCall((data, context) => {
 exports.getMostPopularMap = functions.https.onCall((data, context) => {
     return reorgFuncs.getMostPopularMap(data, context, database);
 });
+
+exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
+    return reorgFuncs.cloudModStoreWeights(data, context, database);
+});

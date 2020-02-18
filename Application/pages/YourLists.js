@@ -245,7 +245,7 @@ class YourLists extends Component {
     */
    GoToList(listName) {
       this.props.navigation.navigate("CurrentListPage", {
-         name: listName,
+         listName: listName,
          listID: this.GetListID(listName)
       });
    }
