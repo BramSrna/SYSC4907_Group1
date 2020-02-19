@@ -34,6 +34,7 @@ const PAGE_TITLE = "Current List";
 const NEW_STORE = "Register a store...";
 
 const FASTEST_PATH = "FASTEST_PATH";
+const FASTEST_PATH_AUTO_UPDATE = "FASTEST_PATH_AUTO_UPDATE";
 const BY_LOCATION = "BY_LOCATION";
 const ORDER_ADDED = "ORDER_ADDED";
 const ALPHABETICALLY = "ALPHABETICALLY";
@@ -163,20 +164,26 @@ class CurrentList extends Component {
             currStoreName: newStoreName
          });
 
+         var autoState = false;
+
          if (sortMethod == FASTEST_PATH) {
             this.reorganizeListFastest(newStoreId, newListId, this);
+         } else if (sortMethod == FASTEST_PATH_AUTO_UPDATE) {
+            this.reorganizeListFastestAutoUpdate(newStoreId, newListId, this);
+   
+            autoState = true;
          } else if (sortMethod == BY_LOCATION) {
             this.reorganizeListLoc(newStoreId, newListId, this);
          } else {
             this.localSort(sortMethod);
          }
 
-         this.setState({ orgMethod: organizationOptions.find(element => element.value == sortMethod) });
+         this.setState({ orgMethod: organizationOptions.find(element => element.value == sortMethod),
+                         autoUpdate: autoState });
+      } else {
+         // Load the current contents of the list
+         this.loadCurrList(this, newListId);
       }
-
-      // Load the current contents of the list
-      this.loadCurrList(this, newListId);
-
    }
 
    /**
@@ -453,13 +460,105 @@ class CurrentList extends Component {
     * Handler for the user double-tapping on an items.
     * Toggles the purchased boolean on that item.
     * 
-    * @param {Integer} indexPosition   The index of the item that the user pressed on
+    * @param {Integer} ind   The index of the item that the user pressed on
     * 
     * @returns None
     */
-   HandleDoubleTapItem(indexPosition) {
-      lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId,
-         this.state.listItemIds[indexPosition])
+   HandleDoubleTapItem(ind) {
+      var listId = this.state.listId;
+      var itemIds = this.state.listItemIds;
+
+      console.log(ind);
+
+      var that = this;
+
+      lf.UpdatePurchasedBoolOfAnItemInAList(listId, itemIds[ind]).then((value) => {
+         if (that.state.autoUpdate) {
+            var items = that.state.listItems;
+   
+            var purchased = [];
+            var toReorg = [];
+            for (var i = 0; i < itemIds.length; i++) {
+               var currItem = items[i];
+               var currId = itemIds[i];
+   
+               var toAdd = {
+                  id: currId,
+                  item: currItem
+               };
+   
+               if ((!currItem.purchased) || (i === ind)){
+                  toReorg.push(toAdd);
+   
+                  if (i === ind) {
+                     ind = toReorg.length - 1;
+                  }
+               } else {
+                  purchased.push(toAdd);
+               }
+            }
+   
+            newOrder = that.reorderForAutoUpdate(toReorg, ind);
+   
+            if (newOrder[0].item.purchased){
+               purchased.push(newOrder[0]);
+               newOrder.splice(0, 1);
+            }
+            newOrder = newOrder.concat(purchased);
+   
+            var newIds = [];
+            var newItems = [];
+            for (var i = 0; i < newOrder.length; i++) {
+               newIds.push(newOrder[i].id);
+               newItems.push(newOrder[i].item);
+            }
+   
+            that.setState({
+               listItemIds: newIds,
+               listItems: newItems
+            });
+         }
+      });
+   }
+
+   reorderForAutoUpdate(info, ind) {
+      var len = info.length;
+      var midInd = len % 2 === 1 ? (len - 1) / 2 : len / 2;
+      console.log(ind, midInd, len);
+
+      var newInd = -1;
+
+      var newOrder = [];
+      if ((len % 2 === 1) && (ind === midInd)){
+         newOrder.push(info[ind]);
+
+         var firstHalf = info.slice(0, midInd);
+         var secondHalf = info.slice(midInd + 1);
+
+         firstHalf.reverse();
+
+         newOrder = newOrder.concat(firstHalf);
+         newOrder = newOrder.concat(secondHalf);
+
+         info = newOrder;
+
+         newInd = 0;
+      } else {
+         if (ind >= midInd) {
+            info.reverse();
+            newInd = info.length - ind - 1;
+         } else {
+            newInd = ind;
+         }
+      }
+
+      if (info.length <= 2) {
+         return(info);
+      } else {
+         var secondHalf = info.splice(midInd);
+
+         return(this.reorderForAutoUpdate(info, newInd).concat(secondHalf));
+      }      
    }
 
    /**
@@ -508,14 +607,21 @@ class CurrentList extends Component {
                name: this.state.listName,
                listID: this.state.listId,
                sort: BY_LOCATION
-            })
+            });
             break;
          case FASTEST_PATH:
             this.props.navigation.navigate("SelectStorePage", {
                name: this.state.listName,
                listID: this.state.listId,
                sort: FASTEST_PATH
-            })
+            });
+            break;
+         case FASTEST_PATH_AUTO_UPDATE:
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               sort: FASTEST_PATH_AUTO_UPDATE
+            });
             break;
          default:
             break;
@@ -523,7 +629,8 @@ class CurrentList extends Component {
 
       // Set the state
       this._isMounted && this.setState({
-         orgMethod: selection
+         orgMethod: selection,
+         autoUpdate: false
       });
    }
 
@@ -685,6 +792,29 @@ class CurrentList extends Component {
                                     value.ids,
                                     {reorg: true,
                                      map: value.map});
+         });
+
+         return;
+      } else {
+         // If the current store is invalid, print an alert to the user
+         Alert.alert("Sorry, we do not have information on that store!");
+      }
+   }
+
+   reorganizeListFastestAutoUpdate(storeId, listId, context = this) {
+      // Check the current store in the state
+      if (context.checkIfCurrStoreValid(storeId, context)) {
+         // Reorganize the list
+         var tempList = lf.reorgListFastest(storeId, listId);
+         tempList.then((value) => {
+            context.updateListState(value.items,
+                                    value.ids,
+                                    {reorg: true,
+                                     map: value.map});
+
+      
+
+            context.localSort(PURCHASED);
          });
 
          return;

@@ -345,7 +345,6 @@ class ListFunctions {
                   var childRmvRef = firebase.database().ref("/lists/" + listId);
                   childRmvRef.remove();
                } else {
-                  console.log(listRetVal.user_count);
                   var newCount = listRetVal.user_count - 1;
                   childRmvRef = firebase.database().ref("/lists/" + listId);
                   childRmvRef.update({
@@ -593,8 +592,6 @@ class ListFunctions {
             storeId: storeId,
             listId: listId
          });
-
-         console.log(data);
 
          return data;
       } catch (e) {

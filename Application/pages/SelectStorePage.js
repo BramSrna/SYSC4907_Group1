@@ -165,7 +165,6 @@ class SelectStorePage extends Component {
     };
 
     selectStore = location => {
-        console.log(location);
         this.setState({ value: location });
     }
 

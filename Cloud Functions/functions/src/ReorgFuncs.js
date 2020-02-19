@@ -744,9 +744,9 @@ exports.cloudReorgListLoc = function(data, context, database) {
             } else if (depA > depB) {
                     return 1;
             } else {
-                if (aisleA < aisleB) {
+                if (aisleA - aisleB < 0) {
                     return - 1;
-                } else if (aisleA > aisleB) {
+                } else if (aisleA - aisleB > 0) {
                     return 1;
                 } else {
                     return 0;
@@ -834,20 +834,20 @@ exports.cloudReorgListFastest = function(data, context, database) {
         var items = result[2];
         var map = result[3];
 
-        console.log(map)
-
         // Retrieve the needed location information
         var locs = [];
         for (var i = 0; i < predictedLocs.length; i++) {
             var loc = predictedLocs[i];
 
-            locs.push({
+            var toAdd = {
                 item: items[i],
                 id: ids[i],
                 department: loc.department,
                 aisleNum: loc.aisleNum,
                 aisleTags: loc.aisleTags
-            })
+            };
+
+            locs.push(toAdd);
         }
 
         // Group and sort the items based on their location in
@@ -879,21 +879,21 @@ exports.cloudReorgListFastest = function(data, context, database) {
                 depIndB = -1;
              }
 
-            if (depIndA < depIndB) {
+            if (depIndA - depIndB < 0) {
                 return -1;
-            } else if (depIndA > depIndB) {
+            } else if (depIndA - depIndB > 0) {
                 return 1;
             } else {
                 if (depIndA === -1) {
-                    if (depA < depB) {
+                    if (depIndA - depIndB < 0) {
                         return -1;
-                    } else if (depA > depB) {
+                    } else if (depIndA - depIndB > 0) {
                         return 1;
                     }
                 }
-                if (aisleA < aisleB) {
+                if (aisleA - aisleB < 0) {
                     return - 1;
-                } else if (aisleA > aisleB) {
+                } else if (aisleA - aisleB > 0) {
                     return 1;
                 } else {
                     if (nameA < nameB) {
