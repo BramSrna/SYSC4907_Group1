@@ -4,10 +4,10 @@ import { Layout, Autocomplete } from 'react-native-ui-kitten';
 import axios from "axios";
 
 /**
- * AutoCompleteAsync - An asyncronous autocomplete input box
+ * HereMapsSearchAsync - An asyncronous autocomplete input box
  * @property {string} title - Text to be displayed (default: 'Lorem Ipsum')
  */
-export default class AutoCompleteAsync extends Component {
+export default class HereMapsSearchAsync extends Component {
     constructor(props) {
         super(props);
         this.state = {

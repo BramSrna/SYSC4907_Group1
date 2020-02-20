@@ -19,7 +19,7 @@ import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
 import axios from "axios";
 import lf from "./Functions/ListFunctions";
-import AutoCompleteAsync from "../components/AutoCompleteAsync.js";
+import HereMapsSearchAsync from "../components/HereMapsSearchAsync.js";
 // import axios from 'axios';
 
 const PAGE_TITLE = "Select Location";
@@ -30,11 +30,13 @@ const ANDROID_EMULATOR_ERROR =
 
 const DEFAULT_LATITUDE = 45.421;
 const DEFAULT_LONGITUDE = -75.6907;
-const DEFAULT_LATITUDE_DELTA = 0.09;
-const DEFAULT_LONGITUDE_DELTA = 0.09;
+const DEFAULT_LATITUDE_DELTA = 0.01;
+const DEFAULT_LONGITUDE_DELTA = 0.01;
 const CURRENT_LOCATION_MARKER_TITLE = "Your Current Location";
 const CURRENT_LOCATION_MARKER_DESCRIPTION = "";
 const DEFAULT_MAX_LOCATIONS = 20;
+const MAP_ANIMATION_DURATION = 200;
+
 
 const HERE_REQUEST_HEADER_1 =
     "https://places.sit.ls.hereapi.com/places/v1/browse";
@@ -54,21 +56,31 @@ class MapsPage extends Component {
         super(props);
         this.state = {
             currentLocation: {
-                coords: { latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE }
+                latitude: DEFAULT_LATITUDE,
+                longitude: DEFAULT_LONGITUDE,
+                latitudeDelta: DEFAULT_LATITUDE_DELTA,
+                longitudeDelta: DEFAULT_LONGITUDE_DELTA,
             },
             currentCursorLocation: {
-                coords: { latitude: DEFAULT_LATITUDE, longitude: DEFAULT_LONGITUDE }
+                latitude: DEFAULT_LATITUDE,
+                longitude: DEFAULT_LONGITUDE,
+                latitudeDelta: DEFAULT_LATITUDE_DELTA,
+                longitudeDelta: DEFAULT_LONGITUDE_DELTA,
             },
-            currentLocationMarkerOpacity: 0,
+            markerOpacity: 0,
             statusMessage: null,
             apiKey: null,
             searchRequestParams: [],
-            storesApiRequestResult: null
+            storesApiRequestResult: null,
+            ready: false,
         };
     }
 
     componentWillMount() {
         this._getApiKey();
+    }
+
+    componentDidMount() {
         this._getLocationAsync();
     }
 
@@ -85,16 +97,29 @@ class MapsPage extends Component {
             });
         }
         let currentLocation = await Location.getCurrentPositionAsync();
-        this.getNearbyStores(currentLocation);
-        this.setSearchRequestParams(currentLocation);
-        this.setState({ currentLocation });
-        this.setState({ currentLocationMarkerOpacity: 1 });
-    };
+        let region = {
+            latitude: currentLocation.coords.latitude,
+            longitude: currentLocation.coords.longitude,
+            latitudeDelta: DEFAULT_LATITUDE_DELTA,
+            longitudeDelta: DEFAULT_LONGITUDE_DELTA,
+        };
+        this.setRegion(region);
+        this.setSearchRequestParams(region);
+        this.setState({ currentLocation: region });
+        this.setState({ markerOpacity: 1 });
+    }
 
-    setSearchRequestParams = currentLocation => {
+    setRegion(region) {
+        if (this.state.ready) {
+            this.map.animateToRegion(region, MAP_ANIMATION_DURATION);
+            this.setState({ currentCursorLocation: region });
+        }
+    }
+
+    setSearchRequestParams = location => {
         if (this.state.apiKey != null) {
             var request = [];
-            request[0] = HERE_REQUEST_HEADER_1 + "?at=" + currentLocation.coords.latitude + "," + currentLocation.coords.longitude;
+            request[0] = HERE_REQUEST_HEADER_1 + "?at=" + location.latitude + "," + location.longitude;
             request[1] = "&name=";
             request[2] = "";
             request[3] = HERE_REQUEST_HEADER_4 + HERE_REQUEST_HEADER_3;
@@ -106,14 +131,14 @@ class MapsPage extends Component {
         }
     }
 
-    getNearbyStores = currentLocation => {
+    getNearbyStores = region => {
         if (this.state.apiKey != null) {
             const request =
                 HERE_REQUEST_HEADER_1 +
                 "?at=" +
-                currentLocation.coords.latitude +
+                region.latitude +
                 "," +
-                currentLocation.coords.longitude +
+                region.longitude +
                 HERE_REQUEST_HEADER_2 +
                 HERE_REQUEST_HEADER_3 +
                 "&apiKey=" +
@@ -122,7 +147,6 @@ class MapsPage extends Component {
             axios
                 .get(request)
                 .then(result => {
-                    // console.log(result);
                     this.setState({ storesApiRequestResult: result });
                 })
                 .catch(error => {
@@ -131,28 +155,22 @@ class MapsPage extends Component {
         } else {
             console.log("MapsPage: apiKey is null, could not get nearby stores.");
         }
-    };
+    }
 
-    handleMapRegionChange = currentCursorLocation => {
-        console.log(currentCursorLocation);
-        this.setState({
-            currentCursorLocation: {
-                coords: {
-                    latitude: currentCursorLocation.latitude,
-                    longitude: currentCursorLocation.longitude
-                }
-            }
-        });
-    };
+    handleMapReady = () => {
+        if (!this.state.ready) {
+            this.setState({ ready: true });
+        }
+    }
 
-    calculateLatitudeDelta() {
+    calculateLatitudeDelta(latitude) {
         if (this.state.storesApiRequestResult != null) {
             var delta = 0.0;
             this.state.storesApiRequestResult.data.results.items.map((item, key) => {
                 delta = Math.max(
                     delta,
                     Math.abs(
-                        this.state.currentLocation.coords.latitude - item.position[0]
+                        latitude - item.position[0]
                     )
                 );
             });
@@ -160,20 +178,32 @@ class MapsPage extends Component {
         } else return DEFAULT_LATITUDE_DELTA;
     }
 
-    calculateLongitudeDelta() {
+    calculateLongitudeDelta(longitude) {
         if (this.state.storesApiRequestResult != null) {
             var delta = 0.0;
             this.state.storesApiRequestResult.data.results.items.map((item, key) => {
                 delta = Math.max(
                     delta,
                     Math.abs(
-                        this.state.currentLocation.coords.longitude - item.position[1]
+                        longitude - item.position[1]
                     )
                 );
             });
             return delta * 2;
         } else return DEFAULT_LONGITUDE_DELTA;
     }
+
+    handleMapRegionChange = newRegion => {
+        if (this.state.ready) {
+            this.getNearbyStores(newRegion);
+            // TODO: after getting nearby stores, 
+            // use delta calculations to make sure that api requests are only sent when out of current delta region.
+            this.setSearchRequestParams(newRegion);
+            this.setState({
+                currentCursorLocation: newRegion
+            });
+        }
+    };
 
     selectStore = location => {
         this.props.navigation.state.params.selectStore(location);
@@ -198,12 +228,12 @@ class MapsPage extends Component {
                 coordinate={{ latitude: coords[0], longitude: coords[1] }}
                 title={title}
                 description={description}
+                opacity={this.state.markerOpacity}
                 pinColor={"green"}
                 onCalloutPress={() => this.selectStore(title + " - " + description)}
             />
         );
 
-        console.log(this.state.currentLocation);
         return (
             <React.Fragment>
                 <TopNavigation
@@ -213,35 +243,32 @@ class MapsPage extends Component {
                 />
                 <Layout style={styles.container}>
                     <Layout style={styles.autoCompleteInputContainer}>
-                        <AutoCompleteAsync
+                        <HereMapsSearchAsync
                             placeholder={"Search for stores..."}
                             backgroundLevel='2'
                             requestArray={this.state.searchRequestParams}
-                            requestValueIndex={2} // the value here is based on the position of the value in the requestArray
+                            // the requestValueIndex value here is based on the position of the value in the requestArray
+                            requestValueIndex={2}
                             onValueSelected={this.autoCompleteSelected}
                         />
                     </Layout>
                     <MapView
+                        ref={map => (this.map = map)}
                         style={styles.mapView}
-                        region={{
-                            latitude: this.state.currentLocation.coords.latitude,
-                            longitude: this.state.currentLocation.coords.longitude,
-                            latitudeDelta:
-                                this.state.storesApiRequestResult != null
-                                    ? this.calculateLatitudeDelta()
-                                    : DEFAULT_LATITUDE_DELTA,
-                            longitudeDelta:
-                                this.state.storesApiRequestResult != null
-                                    ? this.calculateLongitudeDelta()
-                                    : DEFAULT_LONGITUDE_DELTA
+                        initialRegion={{
+                            latitude: DEFAULT_LATITUDE,
+                            longitude: DEFAULT_LONGITUDE,
+                            latitudeDelta: DEFAULT_LATITUDE_DELTA * 100,
+                            longitudeDelta: DEFAULT_LONGITUDE_DELTA * 100,
                         }}
-                    // onRegionChange={this.handleMapRegionChange}
+                        onMapReady={this.handleMapReady}
+                        onRegionChangeComplete={this.handleMapRegionChange}
                     >
                         <Marker
-                            coordinate={this.state.currentLocation.coords}
+                            coordinate={this.state.currentLocation}
                             title={CURRENT_LOCATION_MARKER_TITLE}
                             description={CURRENT_LOCATION_MARKER_DESCRIPTION}
-                            opacity={this.state.currentLocationMarkerOpacity}
+                            opacity={this.state.markerOpacity}
                         />
                         {this.state.storesApiRequestResult != null
                             ? this.state.storesApiRequestResult.data.results.items.map(
