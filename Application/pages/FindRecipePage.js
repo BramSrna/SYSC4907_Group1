@@ -4,6 +4,8 @@ import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { ScrollView, StyleSheet } from 'react-native';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
+import { TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { MenuOutline } from "../assets/icons/icons.js";
 
 export default class FindRecipePage extends Component {
 
@@ -31,8 +33,16 @@ export default class FindRecipePage extends Component {
   }
 
   render() {
+    const renderMenuAction = () => (
+      <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+    );
     return (
       <React.Fragment>
+        <TopNavigation
+          title="Find a Recipe"
+          alignment='center'
+          leftControl={renderMenuAction()}
+        />
         <ScrollView style={styles.card}>
           {
             this.state.recipes.map((aRecipe) => {
@@ -65,7 +75,8 @@ export default class FindRecipePage extends Component {
                         <CardButton
                           onPress={() => {
                             this.props.navigation.navigate("RecipeDetailsPage", {
-                              url: aRecipe.spoonacularSourceUrl
+                              url: aRecipe.spoonacularSourceUrl,
+                              ingredients: aRecipe.extendedIngredients
                             })
                           }}
                           title="Details"

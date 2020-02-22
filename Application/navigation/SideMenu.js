@@ -10,13 +10,14 @@ const YOUR_DATA = "Your Data";
 const HOME = "Home";
 const CONTACTS = "Contacts";
 const YOUR_LISTS = "Your Lists";
-const SEARCH_RECIPE = "Search for a Recipe";
+const SEARCH_RECIPE = "Find Recipes";
 const FEEDBACK = "Feedback";
 const ADD_ITEM_LOCATION = "Add Item Location";
 const MAP_A_STORE = "Map a Store";
 const REGISTER_AN_ITEM = "Register an Item";
 const SIGNOUT = "Sign Out";
 const EXCEL_PARSER = "Parse Excel File";
+const FAV_RECIPE_PAGE = "Your Favourite Recipes";
 
 const DEV_MODE_ENABLED = false;
 
@@ -87,6 +88,9 @@ class SideMenu extends Component {
                             </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('FindRecipePage')}>
                                 {SEARCH_RECIPE}
+                            </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('FavRecipesPage')}>
+                                {FAV_RECIPE_PAGE}
                             </Text>
                         </Layout>
                     </Layout>

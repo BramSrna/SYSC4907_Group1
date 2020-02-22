@@ -16,6 +16,20 @@ export const PasswordIcon = (style) => (
     />
 );
 
+export const HeartIcon = (style) => (
+    <Image
+        style={style}
+        source={require("./icons8-heart-64.png")}
+    />
+);
+
+export const ListIcon = (style) => (
+    <Image
+        style={style}
+        source={require("./icons8-list-64.png")}
+    />
+);
+
 export const MenuOutline = (style) => (
     <Icon {...style} name='menu-outline' />
 );

@@ -4,6 +4,8 @@ import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { TopNavigation, TopNavigationAction, Layout } from 'react-native-ui-kitten';
+import { MenuOutline, HeartIcon, ListIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
 
@@ -29,8 +31,29 @@ export default class RecipeDetailsPage extends Component {
 
   render() {
     const url = this.props.navigation.getParam("url", "http://www.google.ca");
+    const AddAction = (props) => (
+      <Layout style={{ flexDirection: "row" }}>
+        <TopNavigationAction {...props} icon={ListIcon} onPress={() => this.props.navigation.navigate("YourListsPage", {
+          ingredients: this.props.navigation.getParam("ingredients", false)
+        })} />
+        <TopNavigationAction {...props} icon={HeartIcon} onPress={() => console.log()} /></Layout>
+    );
+
+    const renderRightControls = () => [
+      <AddAction />
+    ];
+
+    const renderMenuAction = () => (
+      <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+    );
     return (
       <React.Fragment>
+        <TopNavigation
+          title="Recipe Details"
+          alignment='center'
+          leftControl={renderMenuAction()}
+          rightControls={renderRightControls()}
+        />
         <WebView
           source={{ uri: url }}
           style={{ marginTop: 20 }}

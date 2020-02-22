@@ -67,7 +67,7 @@ class RecipeFunctions {
                               });
                            }
                         });
-
+                        console.log("Recipes were just updated!")
                      } else {
                         console.log("API did not respond well.")
                      }

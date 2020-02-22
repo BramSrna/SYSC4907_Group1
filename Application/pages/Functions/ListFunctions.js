@@ -71,6 +71,21 @@ class ListFunctions {
       });
    }
 
+   AddIngredientsToList(lists, ingredients, props, callback) {
+      for (var list in lists) {
+         for (var ingredient in ingredients) {
+            this.AddItemToList(
+               list,
+               ingredient.name,
+               1,
+               "aSize mL",
+               "aNote",
+               null);
+         }
+      }
+      callback(props);
+   }
+
    /**
     * sendNotificationToSharedUsers
     * 
@@ -589,7 +604,7 @@ class ListFunctions {
    async loadOptimizerMap(storeName, address) {
       try {
          // Call the function to get the sorted list
-         const {data} = await firebase.functions().httpsCallable('getOptimizedMap')({
+         const { data } = await firebase.functions().httpsCallable('getOptimizedMap')({
             storeName: storeName,
             address: address,
          });
@@ -614,7 +629,7 @@ class ListFunctions {
    async loadMostPopularList(storeName, address) {
       try {
          // Call the function to get the sorted list
-         const {data} = await firebase.functions().httpsCallable('getMostPopularMap')({
+         const { data } = await firebase.functions().httpsCallable('getMostPopularMap')({
             storeName: storeName,
             address: address,
          });

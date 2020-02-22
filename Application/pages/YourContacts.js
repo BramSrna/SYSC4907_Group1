@@ -130,7 +130,7 @@ class YourContacts extends Component {
       return (
          <React.Fragment>
             <TopNavigation
-               title="Your Contacts"
+               title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
                alignment='center'
                leftControl={renderMenuAction()}
                rightControls={renderRightControls()}

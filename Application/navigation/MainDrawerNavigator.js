@@ -19,6 +19,7 @@ import SelectStorePage from '../pages/SelectStorePage';
 import FindRecipePage from '../pages/FindRecipePage';
 import MapsPage from '../pages/MapsPage';
 import RecipeDetailsPage from '../pages/RecipeDetailsPage';
+import FavRecipesPage from '../pages/FavRecipesPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -65,6 +66,9 @@ const StackNavigator = createStackNavigator({
     },
     RecipeDetailsPage: {
         screen: RecipeDetailsPage
+    },
+    FavRecipesPage: {
+        screen: FavRecipesPage
     }
 }, {
     initialRouteName: "Home",
@@ -144,6 +148,12 @@ const MainDrawerNavigator = createDrawerNavigator({
             drawerLabel: () => null
         }
     },
+    FavRecipesPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Your Favourite Recipes"
+        }
+    }
 }, {
     gesturesEnabled: false,
     contentComponent: SideMenu,
