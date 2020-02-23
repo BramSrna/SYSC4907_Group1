@@ -217,31 +217,35 @@ function getItemLocInStore(knownStores, storeId, itemId){
     var aisleTags = [];
 
     // Get the store's items
-    var itemList = getStoreFromId(knownStores, storeId).items;
+    var store = getStoreFromId(knownStores, storeId);
 
-    // Parse the store's items to find the target item
-    for (var tempItemId in itemList) {
-        if (tempItemId === itemId) {
-            // Item found
-            var candItemInfo = itemList[tempItemId];
-            var maxCount = -1;
-            var info = null;
+    if (store !== null) {        
+        var itemList = store.items;
 
-            // Loop through all of the candidate item infos to
-            // find the location with the highest cound
-            for (var tempCandItemInfoId in candItemInfo) {
-                var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
-                if (tempCandItemInfo.count > maxCount) {
-                    info = tempCandItemInfo;
-                    maxCount = tempCandItemInfo.count;
+        // Parse the store's items to find the target item
+        for (var tempItemId in itemList) {
+            if (tempItemId === itemId) {
+                // Item found
+                var candItemInfo = itemList[tempItemId];
+                var maxCount = -1;
+                var info = null;
+
+                // Loop through all of the candidate item infos to
+                // find the location with the highest cound
+                for (var tempCandItemInfoId in candItemInfo) {
+                    var tempCandItemInfo = candItemInfo[tempCandItemInfoId];
+                    if (tempCandItemInfo.count > maxCount) {
+                        info = tempCandItemInfo;
+                        maxCount = tempCandItemInfo.count;
+                    }
                 }
-            }
 
-            // Get the location's information
-            department = info.department;
-            aisleNum = info.aisleNum;
-            for (var tag in info.tags){
-                aisleTags.push(info.tags[tag]);
+                // Get the location's information
+                department = info.department;
+                aisleNum = info.aisleNum;
+                for (var tag in info.tags){
+                    aisleTags.push(info.tags[tag]);
+                }
             }
         }
     }
@@ -291,9 +295,19 @@ function loadAllStoreInfo(database) {
  * @returns The similarity with 1 being the highest and 0 being the lowest
  */
 function calcStoreSimilarity(knownStores, storeId1, storeId2){
+    var store1 = getStoreFromId(knownStores, storeId1);
+    var store2 = getStoreFromId(knownStores, storeId2);
+
     // Get the two stores' items
-    var items1 = getStoreFromId(knownStores, storeId1).items;
-    var items2 = getStoreFromId(knownStores, storeId2).items;
+    var items1 = [];
+    if (store1 !== null) {
+        items1 = store1.items;
+    }
+
+    var items2 = [];
+    if (store2 !== null) {
+        items2 = store2.items;
+    }
 
     var itemIntersect = [];
     var maxNumItems = 0;
@@ -469,6 +483,218 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
+function calcStoreDist(refMap, compMap) {
+    var score = 0;
+
+    // Get departments unique to each map
+    var refMapUnique = refMap.filter((e1) => {
+        return compMap.indexOf(e1) < 0;
+    });
+    var compMapUnique = compMap.filter((e1) => {
+        return refMap.indexOf(e1) < 0;
+    });
+
+    // remove unique departments from each map
+    var refMapRem = refMap.filter((e1) => {
+        return refMapUnique.indexOf(e1) < 0;
+    });
+    var compMapRem = compMap.filter((e1) => {
+        return compMapUnique.indexOf(e1) < 0;
+    });
+
+    // Calculate the mean squared difference of each department location
+    var meanDif = {};
+
+    for (var i = 0; i < refMapRem.length; i++){
+        var dep = refMapRem[i];
+        if (!(dep in meanDif)) {
+            meanDif[dep] = [i, -1];
+        }
+    }
+
+    for (i = 0; i < compMapRem.length; i++){
+        dep = compMapRem[i];
+        if (meanDif[dep][1] === -1) {
+            meanDif[dep][1] = i;
+        }
+    }
+
+    for (var key in meanDif){
+        var vals = meanDif[key];
+        score += (vals[0] - vals[1]) ** 2;
+    }
+
+    score /= refMapRem.length;
+    
+    //score += refMapUnique.length;
+    //score += compMapUnique.length;
+
+    return(score);
+
+}
+
+exports.cloudDetermineClusters = function(data, context, database) {
+    var retVal = database.ref("/stores/").once("value").then((snapshot) => {
+        var maps = [];
+        var names = [];
+
+        var ssv = snapshot.val();
+        for (var addr in ssv) {
+            var storesAtAddr = ssv[addr];
+            for (var storeName in storesAtAddr) {
+                var store = new StoreObj(addr, storeName)
+                var id = store.getId();
+
+                maps.push(getStoreMap(database, id));
+                names.push(store.getDispName());
+            }
+        }
+
+        return Promise.all([Promise.all(maps), names]);
+    }).then((value) => {
+        var maps = value[0];
+        var names = value[1];
+
+        var compDict = {};
+
+        for (var i = 0; i < maps.length; i++) {
+            var name1 = names[i];
+            compDict[name1] = {};
+
+            for (var j = 0; j < maps.length; j++) {
+                var name2 = names[j];
+                var score = calcStoreDist(maps[i], maps[j]);
+                compDict[name1][name2] = score;
+            }
+        }
+
+        const DESIRED_NUM_CLUSTERS = 5
+        const MAX_THRESHOLD = 20
+
+        var threshold = 0;
+        
+        var currNumClusters = Number.MAX_SAFE_INTEGER;
+        var clusters = [];
+        var mapClusters = [];
+        while ((threshold < MAX_THRESHOLD) && (currNumClusters > DESIRED_NUM_CLUSTERS)) {
+            clusters.length = 0;
+            mapClusters.length = 0;
+            for (i = 0; i < maps.length; i++) {
+                var refMap = maps[i];
+                var inCluster = false;
+                name1 = names[i];
+
+                for (j = 0; j < maps.length; j++) {
+                    var compMap = maps[j];
+                    name2 = names[j];
+                    score = compDict[name1][name2];
+
+                    if ((score !== 0) && (score < threshold)) {
+                        var found = false;
+                        var k = 0;
+                        while ((k < clusters.length) && (!found)){
+                            if ((clusters[k].includes(name1)) && (!clusters[k].includes(name2))){
+                                clusters[k].push(name2);
+                                mapClusters[k].push(compMap);
+                                found = true;
+                            } else if ((!clusters[k].includes(name1)) && (clusters[k].includes(name2))){
+                                clusters[k].push(name1);
+                                mapClusters[k].push(refMap);
+                                found = true;
+                            } else if ((clusters[k].includes(name1)) && (clusters[k].includes(name2))){
+                                found = true;
+                            }
+                            k += 1;
+                        }
+
+                        if (!found) {
+                            var newCluster = [name1, name2];
+                            clusters.push(newCluster);
+                            mapClusters.push([refMap, compMap]);
+                        }
+
+                        inCluster = true;
+                    }
+                }
+
+                if (!inCluster) {
+                    clusters.push([name1]);
+                    mapClusters.push(refMap);
+                }
+            }
+
+            //console.log(threshold, clusters.length);
+            //console.log(clusters);
+
+            currNumClusters = clusters.length;
+            threshold += 1;
+        }
+
+        console.log(clusters);
+
+        if (threshold < MAX_THRESHOLD) {
+            threshold -= 1;
+        }
+
+        var clusterMaps = [];
+
+        for (var clusterInd = 0; clusterInd < clusters.length; clusterInd++) {
+            var mapCount = {};
+
+            var currCluster = clusters[clusterInd];
+    
+            for (var mapInd = 0; mapInd < currCluster.length; mapInd++) {
+                var tempMap = currCluster[mapInd];
+
+                var nameInd = names.indexOf(tempMap);
+                tempMap = maps[nameInd];
+    
+                // Loop through all of the departments in the current map
+                for (var depInd = 0; depInd < tempMap.length; depInd++) {
+                    var dep = tempMap[depInd];
+    
+                    // Add the department to the map count object if
+                    // it has not already been added
+                    if (!(dep in mapCount)) {
+                        mapCount[dep] = 0;
+                    }
+    
+                    // Update the current departments count
+                    mapCount[dep] = mapCount[dep] + depInd;
+                }
+            }
+    
+            // Copy the map count data to a list
+            var sortMap = [];
+            for (dep in mapCount) {
+                sortMap.push([dep, mapCount[dep]]);
+            }
+    
+            // Sort the list based on the department's counts
+            sortMap.sort((a, b) => {
+                return a[1] - b[1];
+            });
+    
+            // Parse out the final data
+            var finalMap = [];
+            for (i = 0; i < sortMap.length; i++){
+                finalMap.push(sortMap[i][0]);
+            }
+    
+            clusterMaps.push(finalMap);
+
+        }
+
+        console.log(clusterMaps);
+
+        database.ref("/mapClusters/").update(clusterMaps);
+
+        return clusters;
+    });
+
+    return retVal;
+}
+
 /**
  * cloudModStoreWeights
  * 
@@ -517,50 +743,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
                 timesChecked = 1;
             }
 
-            var score = 0;
-
-            // Get departments unique to each map
-            var refMapUnique = refMap.filter((e1) => {
-                return compMap.indexOf(e1) < 0;
-            });
-            var compMapUnique = compMap.filter((e1) => {
-                return refMap.indexOf(e1) < 0;
-            });
-    
-            // remove unique departments from each map
-            var refMapRem = refMap.filter((e1) => {
-                return refMapUnique.indexOf(e1) < 0;
-            });
-            var compMapRem = compMap.filter((e1) => {
-                return compMapUnique.indexOf(e1) < 0;
-            });
-    
-            // Calculate the mean squared difference of each department location
-            var meanDif = {};
-    
-            for (var i = 0; i < refMapRem.length; i++){
-                var dep = refMapRem[i];
-                if (!(dep in meanDif)) {
-                    meanDif[dep] = [i, -1];
-                }
-            }
-
-            for (i = 0; i < compMapRem.length; i++){
-                dep = compMapRem[i];
-                if (meanDif[dep][1] === -1) {
-                    meanDif[dep][1] = i;
-                }
-            }
-    
-            for (var key in meanDif){
-                var vals = meanDif[key];
-                score += (vals[0] - vals[1]) ** 2;
-            }
-    
-            score /= refMapRem.length;
-    
-            //score += refMapUnique.length;
-            //score += compMapUnique.length;
+            var score = calcStoreDist(refMap, compMap);
 
             // Calculate the new value
             var newVal = 1 - (score / maxScore);
@@ -789,6 +972,7 @@ exports.cloudReorgListFastest = function(data, context, database) {
     // Parse the data object
     var storeId = data.storeId;
     var listId = data.listId;
+    var cluster = data.cluster;
 
     var ref = database.ref('/lists/' + listId);
     var retItems = ref.once('value').then((snapshot) => {
@@ -819,8 +1003,14 @@ exports.cloudReorgListFastest = function(data, context, database) {
             locs.push(loc);  
         }
 
-        // Get teh store map
-        var map = getStoreMap(database, storeId);
+        // Get the store map
+        var map = null
+
+        if (cluster === null) {
+            map = getStoreMap(database, storeId);
+        } else {
+            map = cluster;
+        }
 
         return Promise.all([
             Promise.all(locs),

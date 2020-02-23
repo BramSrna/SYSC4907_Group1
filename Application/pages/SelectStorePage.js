@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import {
     StyleSheet,
     KeyboardAvoidingView,
-    ScrollView
+    ScrollView,
+    Platform,
+    Picker
 } from "react-native";
 import {
     Layout,
@@ -10,22 +12,34 @@ import {
     TopNavigation,
     TopNavigationAction,
     Autocomplete,
+    Text,
+    Modal
 } from 'react-native-ui-kitten';
 import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import { departments } from "../DepartmentList";
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
 const MAPS = "MapsPage";
 
+const MIN_DEPS_TO_GET = 1;
 
 var availableStores = [];
+var mapClusters = [];
+var choosenCluster = [];
 
 class SelectStorePage extends Component {
     constructor(props) {
         super(props);
+
+        // Use a list for keeping track of all the departments
+        this.currDepartments = [
+            {
+            },
+        ]
 
         this.state = {
             listId: "",
@@ -40,6 +54,11 @@ class SelectStorePage extends Component {
 
             value: '',
             data: [],
+
+            modalVisible: false,
+            depsToGet: MIN_DEPS_TO_GET,
+            arrayHolder: [],
+            dispDeps: [departments]
         };
     }
 
@@ -60,6 +79,7 @@ class SelectStorePage extends Component {
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
             sort: this.props.navigation.getParam("sort", "(Invalid Sort Method)"),
+            arrayHolder: [...this.currDepartments]
         });
         // Populate the Arrays for the autocomplete fields
         this.loadAvailableStores();
@@ -93,6 +113,10 @@ class SelectStorePage extends Component {
         var tempList = lf.getAvailableStores().then((value) => {
             availableStores = value;
         });
+
+        var tempClusters = lf.getMapClusters().then((value) => {
+            mapClusters = value;
+        })
     }
 
     /**
@@ -140,6 +164,186 @@ class SelectStorePage extends Component {
         }
     }
 
+    handleEnterButton = () => {
+        var choosen = this.state.arrayHolder;
+        var clusterCands = mapClusters;
+
+        for (var depInd = 0; depInd < choosen.length; depInd++) {
+            var newCands = [];
+            for (var clustInd = 0; clustInd < clusterCands.length; clustInd++) {
+                var currCluster = clusterCands[clustInd];
+                var currDep = choosen[depInd].department;
+                if ((depInd < currCluster.length) && (currDep === currCluster[depInd])) {
+                    newCands.push(currCluster);
+                }
+            }
+
+            if (newCands.length === 0) {
+                depInd = choosen.length + 1;
+            } else {
+                clusterCands = newCands;
+            }
+        }
+
+        this.choosenCluster = clusterCands[0];
+        console.log(this.choosenCluster);
+
+        this.setState({
+            modalVisible: false
+        });
+
+        this.navBack();
+    }
+
+    getDepartmentsForCluster() {
+        var depsToGet = 0;
+        var found = false;
+        var validDeps = [];
+        var currCombos = [];
+        for (var i = 0; i < mapClusters.length; i++) {
+            currCombos.push([]);
+        }
+        while(!found) {
+            var currVals = [];
+            for (var clusterInd = 0; clusterInd < mapClusters.length; clusterInd++) {
+                var val = null;
+                if (depsToGet >= mapClusters[clusterInd].length){
+                    val = depsToGet + clusterInd;
+                } else {
+                    val = mapClusters[clusterInd][depsToGet];
+                }
+                currVals.push(val);
+                currCombos[clusterInd] += val;
+            }
+
+            validDeps.push([...new Set(currVals)]);
+            found = new Set(currCombos).size === mapClusters.length;
+            depsToGet += 1;
+        }
+
+        if (depsToGet < MIN_DEPS_TO_GET) {
+            depsToGet = MIN_DEPS_TO_GET;
+        }
+
+        var dispDeps = [];
+
+        for (var validInd = 0; validInd < validDeps.length; validInd++) {
+            var temp = [];
+            for (var depInd = 0; depInd < validDeps[validInd].length; depInd++) {
+                var result = departments.find(obj => {
+                    return obj.text === validDeps[validInd][depInd];
+                });
+                temp.push(result);
+            }
+            dispDeps.push(temp);
+        }
+
+        this.currDepartments.length = 0;
+        for (var i = 0; i < depsToGet; i++) {
+            this.currDepartments.push({
+                department: dispDeps[i][0].text
+            });
+        }
+
+        this.setState({
+            modalVisible: true,
+            depsToGet: depsToGet,
+            arrayHolder: [...this.currDepartments],
+            dispDeps: dispDeps
+        })
+
+    }
+
+    updateDepartment = (ind, newVal) => {
+        // Set the new value in the current departments array
+        this.currDepartments[ind]["department"] = newVal;
+
+        // Update the state
+        if (this._isMounted) {
+            this.setState({
+                arrayHolder: [...this.currDepartments]
+            });
+        }
+    }
+
+    renderDepartmentGetter(index) {
+        const placeholder = {
+            label: 'Select a department...',
+            value: null
+        };
+
+        renderIosPicker = () => {
+            tempDepartments = [];
+            for (var i = 0; i < this.state.dispDeps[index].length; i++) {
+                currDepartment = this.state.dispDeps[index][i];
+                currDepartment.color = global.theme == light ? light["text-hint-color"] : dark["text-hint-color"];
+                tempDepartments.push(currDepartment);
+            }
+
+            return (
+                <RNPickerSelect
+                    style={styles.pickerIOS}
+                    key={index}
+                    items={tempDepartments}
+                    placeholder={placeholder}
+                    value={this.state.arrayHolder[index]['department']}
+                    onValueChange={(val) => this.updateDepartment(index, val)}
+                />
+            );
+        }
+
+        renderAndroidPicker = () => {
+            return (
+                <Picker
+                    style={styles.pickerAndroid}
+                    prompt={placeholder.label}
+                    selectedValue={this.state.arrayHolder[index]['department']}
+                    onValueChange={(val) => this.updateDepartment(index, val)}
+                >
+                    {
+                        this.state.dispDeps[index].map((v) => {
+                            return (
+                                <Picker.Item
+                                    key={index}
+                                    label={v.label}
+                                    value={v.value}
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                />
+                            );
+                        })
+                    }
+                </Picker>
+            );
+        }
+
+        return (
+            <Layout style={styles.listItem} level='2'>
+                <Layout level='2' style={styles.selectMenu}>
+                    {Platform.OS === 'ios' ? renderIosPicker() : renderAndroidPicker()}
+                </Layout>
+            </Layout>
+        );
+
+    }
+
+    renderGetClusterModal() {
+        var selectors = [];
+        for (var i = 0; i < this.state.depsToGet; i++) {
+            selectors.push(this.renderDepartmentGetter(i));
+        }
+        return (
+            <Layout
+                level='3'
+                style={styles.modalContainer}>
+                <Text>We need some quick info about the store. Please choose the closest department(s) to you:</Text>
+                {selectors}
+                <Button onPress={this.handleEnterButton}>
+                    ENTER
+                </Button>
+            </Layout>
+        );
+    }
+
 
     /**
     * submitStore
@@ -152,6 +356,17 @@ class SelectStorePage extends Component {
     * @returns None
     */
     submitStore = () => {
+        if (this.state.currStoreId === "") {
+            this.updateCurrStore(this.state.value);
+            this.getDepartmentsForCluster();
+        } else {
+            this.navBack();
+        }
+    };
+
+    navBack(){
+        console.log("----------------------------------------")
+        console.log(this.choosenCluster);
         this.props.navigation.navigate("CurrentListPage", {
             fromPage: "SelectStorePage",
             listName: this.state.listName,
@@ -160,9 +375,10 @@ class SelectStorePage extends Component {
             currStoreId: this.state.currStoreId,
             currStoreAddr: this.state.currStoreAddr,
             currStoreName: this.state.currStoreName,
-            sort: this.state.sort
+            sort: this.state.sort,
+            choosenCluster: this.choosenCluster
         });
-    };
+    }
 
     selectStore = location => {
         this.setState({ value: location });
@@ -195,6 +411,20 @@ class SelectStorePage extends Component {
                     alignment="center"
                     leftControl={renderMenuAction()}
                 />
+
+                <KeyboardAvoidingView behavior="position" enabled>
+                    <Modal
+                        visible={this.state.modalVisible}
+                        backdropStyle={styles.modalBackdrop}
+                        allowBackdrop={true}
+                        onBackdropPress={() => {
+                            this.setState({modalVisible: false});
+                        }}
+                    >
+                        {this.renderGetClusterModal()}
+                    </Modal>
+               </KeyboardAvoidingView>
+
                 <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
@@ -281,6 +511,40 @@ const styles = StyleSheet.create({
         marginTop: 9,
         margin: 4,
         borderRadius: 20,
+    },
+    modalContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 256,
+      padding: 16,
+    },
+    modalBackdrop: {
+        backgroundColor: 'black',
+        opacity: 0.75 
+    },
+    pickerIOS: {
+        marginHorizontal: 4,
+        borderRadius: 10,
+        borderWidth: 1,
+    },
+    pickerAndroid: {
+        marginHorizontal: 4,
+        borderRadius: 10,
+        borderWidth: 1,
+    },
+    selectMenu: {
+        flex: 1,
+        paddingHorizontal: 8,
+        minWidth: 60,
+    },
+    listItem: {
+        flex: 1,
+        marginVertical: 8,
+        padding: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        borderRadius: 10,
     },
 });
 

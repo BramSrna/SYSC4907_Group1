@@ -149,13 +149,18 @@ class CurrentList extends Component {
          listId: newListId
       });
 
-      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
+      console.log(this.props.navigation.state.params.currStoreTitle);
+
+      if (this.props.navigation.state.params.currStoreTitle && this.props.navigation.state.params.sort) {
          sortMethod = this.props.navigation.getParam("sort", ALPHABETICALLY);
 
          newStore = this.props.navigation.getParam("currStoreTitle", "(Invalid Store)");
          newStoreId = this.props.navigation.getParam("currStoreId", "(Invalid Store ID)");
          newStoreAddr = this.props.navigation.getParam("currStoreAddr", "(Invalid Store Address)");
          newStoreName = this.props.navigation.getParam("currStoreName", "(Invalid Store Name)");
+         newCluster = this.props.navigation.getParam("choosenCluster", null);
+
+         console.log(newStore);
 
          this._isMounted && this.setState({
             currStoreId: newStoreId,
@@ -167,9 +172,9 @@ class CurrentList extends Component {
          var autoState = false;
 
          if (sortMethod == FASTEST_PATH) {
-            this.reorganizeListFastest(newStoreId, newListId, this);
+            this.reorganizeListFastest(newStoreId, newListId, this, cluster = newCluster);
          } else if (sortMethod == FASTEST_PATH_AUTO_UPDATE) {
-            this.reorganizeListFastestAutoUpdate(newStoreId, newListId, this);
+            this.reorganizeListFastestAutoUpdate(newStoreId, newListId, this, cluster = newCluster);
    
             autoState = true;
          } else if (sortMethod == BY_LOCATION) {
@@ -755,20 +760,14 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListLoc(storeId, listId, context = this) {
-      // Check the current store in the state
-      if (context.checkIfCurrStoreValid(storeId, context)) {
-         // Reorganize the list
-         var tempList = lf.reorgListLoc(storeId, listId);
-         tempList.then((value) => {
-            // Update the local state of the list
-            context.updateListState(value.items, value.ids, {reorg: true, map: -1});
-         });
+      // Reorganize the list
+      var tempList = lf.reorgListLoc(storeId, listId);
+      tempList.then((value) => {
+         // Update the local state of the list
+         context.updateListState(value.items, value.ids, {reorg: true, map: -1});
+      });
 
-         return;
-      } else {
-         // If the current store is invalid, print an alert to the user
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
+      return;
    }
 
    /**
@@ -782,67 +781,35 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListFastest(storeId, listId, context = this) {
-      // Check the current store in the state
-      if (context.checkIfCurrStoreValid(storeId, context)) {
-         // Reorganize the list
-         var tempList = lf.reorgListFastest(storeId, listId);
-         tempList.then((value) => {
-            context.updateListState(value.items,
-                                    value.ids,
-                                    {reorg: true,
-                                     map: value.map});
-         });
+   reorganizeListFastest(storeId, listId, context = this, cluster = null) {
+      console.log(cluster);
+      // Reorganize the list
+      var tempList = lf.reorgListFastest(storeId, listId, cluster);
+      tempList.then((value) => {
+         context.updateListState(value.items,
+                                 value.ids,
+                                 {reorg: true,
+                                    map: value.map});
+      });
 
-         return;
-      } else {
-         // If the current store is invalid, print an alert to the user
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
+      return;
    }
 
-   reorganizeListFastestAutoUpdate(storeId, listId, context = this) {
-      // Check the current store in the state
-      if (context.checkIfCurrStoreValid(storeId, context)) {
-         // Reorganize the list
-         var tempList = lf.reorgListFastest(storeId, listId);
-         tempList.then((value) => {
-            context.updateListState(value.items,
-                                    value.ids,
-                                    {reorg: true,
-                                     map: value.map});
+   reorganizeListFastestAutoUpdate(storeId, listId, context = this, cluster = null) {
+      // Reorganize the list
+      var tempList = lf.reorgListFastest(storeId, listId, cluster);
+      tempList.then((value) => {
+         context.updateListState(value.items,
+                                 value.ids,
+                                 {reorg: true,
+                                    map: value.map});
 
-      
+   
 
-            context.localSort(PURCHASED);
-         });
+         context.localSort(PURCHASED);
+      });
 
-         return;
-      } else {
-         // If the current store is invalid, print an alert to the user
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
-   }
-
-   /**
-    * checkIfCurrStoreValid
-    * 
-    * Checks if the current store in the state is known
-    * in the database. Returns true if valid, and false otherwise.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   checkIfCurrStoreValid(currStoreId) {
-      // Check if the given id matches a known id
-      for (var i = 0; i < availableStores.length; i++) {
-         if (availableStores[i].id === currStoreId) {
-            return (true);
-         }
-      }
-
-      return (false);
+      return;
    }
 
    /**

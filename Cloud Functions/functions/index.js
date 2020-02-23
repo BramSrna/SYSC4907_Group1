@@ -107,3 +107,7 @@ exports.getMostPopularMap = functions.https.onCall((data, context) => {
 exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
     return reorgFuncs.cloudModStoreWeights(data, context, database);
 });
+
+exports.cloudDetermineClusters = functions.https.onCall((data, context) => {
+    return reorgFuncs.cloudDetermineClusters(data, context, database);
+});

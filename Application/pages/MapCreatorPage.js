@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
 import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
-import { departments } from "../DepartmentList"
+import { departments } from "../DepartmentList";
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import { dark, light } from '../assets/Themes.js';

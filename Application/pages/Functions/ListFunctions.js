@@ -529,6 +529,17 @@ class ListFunctions {
       return data;
    }
 
+   getMapClusters() {
+      var ref = firebase.database().ref("/mapClusters");
+      var retVal = ref.once("value").then((snapshot) => {
+         var ssv = snapshot.val();
+
+         return ssv;
+      });
+
+      return retVal;
+   }
+
    /**
     * getAvailableItems
     * 
@@ -583,14 +594,15 @@ class ListFunctions {
     * @param {String} storeId The ID of the store the user is in
     * @param {String} listId The ID of the list to rearrange
     */
-   async reorgListFastest(storeId, listId) {
+   async reorgListFastest(storeId, listId, cluster = null) {
       try {
          // Call the function to get the sorted list
          const {
             data
          } = await firebase.functions().httpsCallable('cloudReorgListFastest')({
             storeId: storeId,
-            listId: listId
+            listId: listId,
+            cluster: cluster
          });
 
          return data;
