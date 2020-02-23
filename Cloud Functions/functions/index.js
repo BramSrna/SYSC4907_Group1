@@ -108,6 +108,19 @@ exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
     return reorgFuncs.cloudModStoreWeights(data, context, database);
 });
 
+/**
+ * cloudDetermineClusters
+ * 
+ * Checks all store maps for clusters. Clusters are based in
+ * the similarity of each store's map. Global constants are
+ * used to determine the number of clusters to make.
+ * 
+ * @param {Database} database The database containing all of the information
+ * @param {String} storeId The id of the store
+ * @param {String} itemId The id of the item
+ * 
+ * @returns None 
+ */
 exports.cloudDetermineClusters = functions.https.onCall((data, context) => {
     return reorgFuncs.cloudDetermineClusters(data, context, database);
 });

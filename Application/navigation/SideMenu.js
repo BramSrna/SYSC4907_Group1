@@ -17,7 +17,7 @@ const REGISTER_AN_ITEM = "Register an Item";
 const SIGNOUT = "Sign Out";
 const EXCEL_PARSER = "Parse Excel File";
 
-const DEV_MODE_ENABLED = true;
+const DEV_MODE_ENABLED = false;
 
 class SideMenu extends Component {
     constructor(props) {

@@ -529,6 +529,15 @@ class ListFunctions {
       return data;
    }
 
+   /**
+    * getMapClusters
+    * 
+    * Loads all of the map clusters from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
    getMapClusters() {
       var ref = firebase.database().ref("/mapClusters");
       var retVal = ref.once("value").then((snapshot) => {
@@ -593,6 +602,9 @@ class ListFunctions {
     * 
     * @param {String} storeId The ID of the store the user is in
     * @param {String} listId The ID of the list to rearrange
+    * @param {Array} cluster Optional parameter.
+    *                        When given, it is used as the map for reordering.
+    *                        When not given, the map in the database is used.
     */
    async reorgListFastest(storeId, listId, cluster = null) {
       try {

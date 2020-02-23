@@ -149,8 +149,6 @@ class CurrentList extends Component {
          listId: newListId
       });
 
-      console.log(this.props.navigation.state.params.currStoreTitle);
-
       if (this.props.navigation.state.params.currStoreTitle && this.props.navigation.state.params.sort) {
          sortMethod = this.props.navigation.getParam("sort", ALPHABETICALLY);
 
@@ -159,8 +157,6 @@ class CurrentList extends Component {
          newStoreAddr = this.props.navigation.getParam("currStoreAddr", "(Invalid Store Address)");
          newStoreName = this.props.navigation.getParam("currStoreName", "(Invalid Store Name)");
          newCluster = this.props.navigation.getParam("choosenCluster", null);
-
-         console.log(newStore);
 
          this._isMounted && this.setState({
             currStoreId: newStoreId,
@@ -287,6 +283,7 @@ class CurrentList extends Component {
     * 
     * @param {Array}   newItems  The new array of Item objects
     * @param {Array}   newIds    The new array of ID objects
+    * OptionalParams is an object used to pass in several optional parameters:
     * @param {Boolean} reorg     If true, then the local arrays are
     *                            rearranged to match the given order.
     *                            Default is false
@@ -295,6 +292,7 @@ class CurrentList extends Component {
     * @param {Double} minPrice   The minimum price of the entire list
     * @param {Double} maxPrice   The maximum price of the entire list
     * @param {Integer} numUnknownPrice The number of items in the list with unknown prices
+    * @param {Array} map   The map used for rearranging the list
     * 
     * @returns None
     */
@@ -473,14 +471,14 @@ class CurrentList extends Component {
       var listId = this.state.listId;
       var itemIds = this.state.listItemIds;
 
-      console.log(ind);
-
       var that = this;
 
       lf.UpdatePurchasedBoolOfAnItemInAList(listId, itemIds[ind]).then((value) => {
+         // Update the list based on the last purchased item if autoupdate is enabled
          if (that.state.autoUpdate) {
             var items = that.state.listItems;
    
+            // Separate all items in the list based on if they have been selected yet
             var purchased = [];
             var toReorg = [];
             for (var i = 0; i < itemIds.length; i++) {
@@ -503,8 +501,10 @@ class CurrentList extends Component {
                }
             }
    
+            // Reorder the unpurchased items
             newOrder = that.reorderForAutoUpdate(toReorg, ind);
    
+            // Make the final list
             if (newOrder[0].item.purchased){
                purchased.push(newOrder[0]);
                newOrder.splice(0, 1);
@@ -526,10 +526,22 @@ class CurrentList extends Component {
       });
    }
 
+   /**
+    * reorderForAutoUpdate
+    * 
+    * Reorders the list based on its current state and the position
+    * of the last purchased item. Always trys to end the user at
+    * one end of the store. Places closest items to last selected
+    * item at top of list.
+    * 
+    * @param {Array} info The list to reorder
+    * @param {integer} ind The index of the last item selected
+    * 
+    * @returns The resorted array 
+    */
    reorderForAutoUpdate(info, ind) {
       var len = info.length;
       var midInd = len % 2 === 1 ? (len - 1) / 2 : len / 2;
-      console.log(ind, midInd, len);
 
       var newInd = -1;
 
@@ -782,7 +794,6 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListFastest(storeId, listId, context = this, cluster = null) {
-      console.log(cluster);
       // Reorganize the list
       var tempList = lf.reorgListFastest(storeId, listId, cluster);
       tempList.then((value) => {

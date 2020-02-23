@@ -43,11 +43,11 @@ class AddItemPage extends Component {
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
 
-            prevRecommended: [],
+            prevRecommended: [], // The previously recommended items
             recommendedItems: [], // The list of recommended items
             listItemIds: [], // The ids of the recommended items
 
-            toAdd: []
+            toAdd: [] // The recommended items the user wants to add to their list
         };
     }
 
@@ -190,8 +190,6 @@ class AddItemPage extends Component {
         var currItemIds = this.state.listItemIds;
         var currPrevRec = this.state.prevRecommended;
 
-        console.log(currPrevRec)
-
         var that = this;
 
         var ref = firebase.database().ref('/recommendations');
@@ -242,6 +240,10 @@ class AddItemPage extends Component {
                     added: false
                 };
 
+                // Add the item to final items if it is not currently in the
+                // user's list and it has not been previosuly recommended.
+                // Otherwise, if the item is not in the list, but has been
+                // previously recommended, add it to the backlog
                 if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
                     finalItems.push(toAdd);
                 } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
@@ -267,6 +269,7 @@ class AddItemPage extends Component {
                         added: false
                     };
 
+                    // Same as above
                     if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
                         finalItems.push(toAdd);
                     } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
@@ -275,6 +278,7 @@ class AddItemPage extends Component {
                 }
             }
 
+            // If we're out of items to recommend, reset the backlog and previosuly recommended items
             for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
                 finalItems.push(backlog[i]);
                 currPrevRec = [];
@@ -352,6 +356,17 @@ class AddItemPage extends Component {
         }
     }
 
+    /**
+     * handleAddRecommendedButton
+     * 
+     * Handler for the add recommended item button.
+     * Adds the item to the list of items to add
+     * and sets the item to added.
+     * 
+     * @param {Integer} ind The index of the item selected
+     * 
+     * @retunrs None
+     */
     handleAddRecommendedButton = (ind) => {
         // Get the list of recommended items
         var temp = this.state.recommendedItems;
@@ -387,32 +402,30 @@ class AddItemPage extends Component {
     };
 
     /**
-     * addItemFromRecommended
+     * handleRefreshButton
      * 
-     * Handler for the add item button for the
-     * recommended items.
+     * Handler for the refresh recommended items button.
+     * Refreshes the recommended items
      * 
-     * @param {Integer} ind The index of the recommend item in the list
+     * @param None
      * 
      * @returns None
      */
     handleRefreshButton() {
-        // Get the list of recommended items
         var currRecItems = this.state.recommendedItems;
         var currItemIds = this.state.listItemIds;
         var currPrevRec = this.state.prevRecommended;
 
-        console.log(currRecItems);
-
+        // Add all of the recommended items the user
+        // has selected to their list. Also update
+        // the previously recommended items
         for (var i = 0; i < currRecItems.length; i++) {
-            // Add the selected item to the list
             var item = currRecItems[i];
             if (item.added){
                 this.addItem(this.state.listId,
                     item.genName,
                     item.specName);
         
-                // Update the state of the user's list with the item they added
                 currItemIds.push(item.id);
             } else {
                 currPrevRec.push(item.id);
@@ -423,8 +436,6 @@ class AddItemPage extends Component {
             listItemIds: currItemIds,
             prevRecommended: currPrevRec
         });
-
-        console.log(currPrevRec);
 
         this.loadRecommendedItems();
     }
