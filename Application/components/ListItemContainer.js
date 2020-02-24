@@ -161,7 +161,14 @@ export default class ListItemContainer extends Component {
         return (
             <Layout style={styles.outerContainer} level={backgroundLevel} >
                 <Layout style={styles.listItemContainer} level={backgroundLevel}>
-                    <ListItem style={styles.listItemContainer} disabled={fromItemView} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                    <ListItem
+                        style={styles.listItemContainer}
+                        disabled={fromItemView}
+                        icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon}
+                        title={title}
+                        description={description}
+                        titleStyle={{ fontSize: 16 }} onPress={onPress}
+                    />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
                     <OverflowMenu

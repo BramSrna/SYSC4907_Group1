@@ -23,6 +23,8 @@ const globalComps = require('./Functions/GlobalComps');
 
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
+const DEFAULT_GEN_NAME = "";
+const DEFAULT_SPEC_NAME = null;
 
 // The number of items to recommend
 const NUM_REC_ITEMS = 10;
@@ -37,8 +39,8 @@ class AddItemPage extends Component {
             listName: "", // Name of current list
 
             itemName: "", // The item name entered in the autocomplete box
-            genName: "", // The generic name of the entered item
-            specName: null, // The specific name of the entered item
+            genName: DEFAULT_GEN_NAME, // The generic name of the entered item
+            specName: DEFAULT_SPEC_NAME, // The specific name of the entered item
             currItemId: "", // The id name of the entered item
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
@@ -344,11 +346,15 @@ class AddItemPage extends Component {
      * Handler for the add item button under
      * the autocomplete box.
      */
-    handleAddButton = () => {
-        // Add the item to the list
-        this.addItem(this.state.listId,
-            this.state.genName,
-            specName = this.state.specName);
+    handleAddButton = () => {        
+        this.addToggledRecommendedItems();
+
+        if (this.state.genName !== DEFAULT_GEN_NAME) {
+            // Add the item to the list
+            this.addItem(this.state.listId,
+                this.state.genName,
+                specName = this.state.specName);
+        }
 
         // Return to the list
         if (this._isMounted) {
@@ -401,17 +407,7 @@ class AddItemPage extends Component {
             specName = specName);
     };
 
-    /**
-     * handleRefreshButton
-     * 
-     * Handler for the refresh recommended items button.
-     * Refreshes the recommended items
-     * 
-     * @param None
-     * 
-     * @returns None
-     */
-    handleRefreshButton() {
+    addToggledRecommendedItems() {
         var currRecItems = this.state.recommendedItems;
         var currItemIds = this.state.listItemIds;
         var currPrevRec = this.state.prevRecommended;
@@ -436,7 +432,20 @@ class AddItemPage extends Component {
             listItemIds: currItemIds,
             prevRecommended: currPrevRec
         });
+    }
 
+    /**
+     * handleRefreshButton
+     * 
+     * Handler for the refresh recommended items button.
+     * Refreshes the recommended items
+     * 
+     * @param None
+     * 
+     * @returns None
+     */
+    handleRefreshButton() {
+        this.addToggledRecommendedItems();
         this.loadRecommendedItems();
     }
 
