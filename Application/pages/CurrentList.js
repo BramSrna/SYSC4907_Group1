@@ -154,7 +154,7 @@ class CurrentList extends Component {
 
          newStore = this.props.navigation.getParam("currStoreTitle", "(Invalid Store)");
          newStoreId = this.props.navigation.getParam("currStoreId", "(Invalid Store ID)");
-         newStoreAddr = this.props.navigation.getParam("currStoreAddr", "(Invalid Store Address)");
+         newStoreAddr = this.props.navigation.getParam("currStoreAddr", null);
          newStoreName = this.props.navigation.getParam("currStoreName", "(Invalid Store Name)");
          newCluster = this.props.navigation.getParam("choosenCluster", null);
 

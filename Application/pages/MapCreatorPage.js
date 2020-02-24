@@ -90,6 +90,10 @@ class MapCreatorPage extends Component {
                     listName = this.props.navigation.getParam("listName", null);
                     listId = this.props.navigation.getParam("listId", null);
 
+                    if ((currStoreAddr === null) || (currStoreAddr === "") || (currStoreAddr === undefined)) {
+                        currStoreAddr = DEFAULT_ADDRESS;
+                    }
+
                     // Populate the map if one is given
                     if (currMap.length !== 0) {
                         this.clearMap();
@@ -577,7 +581,6 @@ class MapCreatorPage extends Component {
                                 onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
                                 onSubmitEditing={() => this.refs.address.focus()}
                                 blurOnSubmit={false}
-                                disabled={this.state.modifyMode}
                             />
 
                             <Input style={styles.inputRow}
@@ -586,7 +589,6 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter store address...'
                                 value={this.state.address}
                                 onChangeText={(address) => this._mounted && this.setState({ address })}
-                                disabled={this.state.modifyMode}
                             />
 
                             <Input style={styles.inputRow}
@@ -595,7 +597,6 @@ class MapCreatorPage extends Component {
                                 placeholder='Enter franchise name...'
                                 value={this.state.franchiseName}
                                 onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
-                                disabled={this.state.modifyMode}
                             />
                         </Layout>
                     </Layout>

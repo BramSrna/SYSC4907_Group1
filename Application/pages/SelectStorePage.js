@@ -26,6 +26,7 @@ const NEW_STORE = "Register a store...";
 const MAPS = "MapsPage";
 
 const MIN_DEPS_TO_GET = 1;
+const MAXIMUM_MODAL_DEPS = 3;
 
 var availableStores = [];
 var mapClusters = [];
@@ -81,8 +82,12 @@ class SelectStorePage extends Component {
             sort: this.props.navigation.getParam("sort", "(Invalid Sort Method)"),
             arrayHolder: [...this.currDepartments]
         });
+
+        var that = this;
         // Populate the Arrays for the autocomplete fields
-        this.loadAvailableStores();
+        this.loadAvailableStores().then((value) => {
+            that.getDepartmentsForCluster();
+        });
     }
 
     /**
@@ -117,6 +122,8 @@ class SelectStorePage extends Component {
         var tempClusters = lf.getMapClusters().then((value) => {
             mapClusters = value;
         })
+
+        return Promise.all([tempList, tempClusters]);
     }
 
     /**
@@ -139,7 +146,7 @@ class SelectStorePage extends Component {
         } else {
             var id = ""; // Empty id to handle unknown stores
             var addr = "";
-            var storeName = "";
+            var storeName = newStore.toString();
 
             newStore = newStore.toString();
 
@@ -186,7 +193,6 @@ class SelectStorePage extends Component {
         }
 
         this.choosenCluster = clusterCands[0];
-        console.log(this.choosenCluster);
 
         this.setState({
             modalVisible: false
@@ -246,12 +252,10 @@ class SelectStorePage extends Component {
         }
 
         this.setState({
-            modalVisible: true,
             depsToGet: depsToGet,
             arrayHolder: [...this.currDepartments],
             dispDeps: dispDeps
-        })
-
+        });
     }
 
     updateDepartment = (ind, newVal) => {
@@ -264,6 +268,21 @@ class SelectStorePage extends Component {
                 arrayHolder: [...this.currDepartments]
             });
         }
+    }
+
+    stringifyNumber(n) {
+        var retVal = String(n);
+
+        if ((n % 10 === 1) && (n % 100 !== 11)) {
+            retVal += "st";
+        } else if ((n % 10 === 2) && (n % 100 !== 12)) {
+            retVal += "nd";
+        } else if ((n % 10 === 3) && (n % 100 !== 13)) {
+            retVal += "rd";
+        } else {
+            retVal += "th";
+        }
+        return retVal;
     }
 
     renderDepartmentGetter(index) {
@@ -317,8 +336,18 @@ class SelectStorePage extends Component {
         }
 
         return (
-            <Layout style={styles.listItem} level='2'>
-                <Layout level='2' style={styles.selectMenu}>
+            <Layout
+                key={index}
+                style={styles.listItem}
+                level='2'
+            >
+                <Layout
+                    level='2'
+                    style={styles.selectMenu}
+                >
+                    <Text>
+                        {this.stringifyNumber(index + 1) + " closest department: "}
+                    </Text>
                     {Platform.OS === 'ios' ? renderIosPicker() : renderAndroidPicker()}
                 </Layout>
             </Layout>
@@ -328,16 +357,17 @@ class SelectStorePage extends Component {
 
     renderGetClusterModal() {
         var selectors = [];
-        for (var i = 0; i < this.state.depsToGet; i++) {
+        for (var i = 0; ((i < this.state.depsToGet) && (i < MAXIMUM_MODAL_DEPS)); i++) {
             selectors.push(this.renderDepartmentGetter(i));
         }
+
         return (
             <Layout
                 level='3'
                 style={styles.modalContainer}>
                 <Text>We need some quick info about the store. Please choose the closest department(s) to you:</Text>
                 {selectors}
-                <Button onPress={this.handleEnterButton}>
+                <Button onPress={() => this.handleEnterButton()}>
                     ENTER
                 </Button>
             </Layout>
@@ -358,15 +388,14 @@ class SelectStorePage extends Component {
     submitStore = () => {
         if (this.state.currStoreId === "") {
             this.updateCurrStore(this.state.value);
-            this.getDepartmentsForCluster();
+        
+            this.setGetClusterModalVisible(true);
         } else {
             this.navBack();
         }
     };
 
     navBack(){
-        console.log("----------------------------------------")
-        console.log(this.choosenCluster);
         this.props.navigation.navigate("CurrentListPage", {
             fromPage: "SelectStorePage",
             listName: this.state.listName,
@@ -381,7 +410,30 @@ class SelectStorePage extends Component {
     }
 
     selectStore = location => {
-        this.setState({ value: location });
+        this.setState({
+            value: location
+        });
+    }
+
+    setGetClusterModalVisible = (newVal) => {
+        this.setState({
+            modalVisible: newVal
+        });
+    }
+
+    onChangeText = (value) => {
+        this.setState({
+            value: value,
+            data: [{ title: value }].concat(availableStores.filter(item => item.title.toLowerCase().includes(value.toLowerCase())).concat(availableStores[availableStores.length - 1]))
+        });
+    }
+
+    onSelect = ({ title }) => {
+        this.setState({
+            value: title
+        });
+
+        this.updateCurrStore(title);
     }
 
     render() {
@@ -391,18 +443,6 @@ class SelectStorePage extends Component {
                 onPress={() => this.props.navigation.goBack()}
             />
         );
-
-        const onSelect = ({ title }) => {
-            this.setState({ value: title });
-            this.updateCurrStore(title);
-        };
-
-        const onChangeText = (value) => {
-            this.setState({ value });
-            this.setState({
-                data: [{ title: value }].concat(availableStores.filter(item => item.title.toLowerCase().includes(value.toLowerCase())).concat(availableStores[availableStores.length - 1]))
-            });
-        };
 
         return (
             < React.Fragment >
@@ -417,9 +457,7 @@ class SelectStorePage extends Component {
                         visible={this.state.modalVisible}
                         backdropStyle={styles.modalBackdrop}
                         allowBackdrop={true}
-                        onBackdropPress={() => {
-                            this.setState({modalVisible: false});
-                        }}
+                        onBackdropPress={() => this.setGetClusterModalVisible(false)}
                     >
                         {this.renderGetClusterModal()}
                     </Modal>
@@ -438,15 +476,30 @@ class SelectStorePage extends Component {
                                             placeholder={'Enter a store name'}
                                             value={this.state.value}
                                             data={this.state.data}
-                                            onChangeText={onChangeText}
-                                            onSelect={onSelect}
+                                            onChangeText={(val) => this.onChangeText(val)}
+                                            onSelect={(val) => this.onSelect(val)}
                                         />
                                     </Layout>
+
                                     <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })}/>
                                 </Layout>
+
                                 <Layout style={styles.mainButtonGroup} >
-                                    <Button style={styles.mainPageButton} status='danger' onPress={() => this.props.navigation.goBack()}>{'Cancel'}</Button>
-                                    <Button style={styles.mainPageButton} status='primary' onPress={() => { this.submitStore() }}>{'Submit'}</Button>
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='danger'
+                                        onPress={() => this.props.navigation.goBack()}
+                                    >
+                                        {'Cancel'}
+                                    </Button>
+
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='primary'
+                                        onPress={() => this.submitStore()}
+                                    >
+                                        {'Submit'}
+                                    </Button>
                                 </Layout>
                             </Layout>
                         </Layout>
