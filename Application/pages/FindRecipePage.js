@@ -49,10 +49,10 @@ export default class FindRecipePage extends Component {
             style={styles.flatList}
             data={this.state.recipes}
             width="100%"
-            keyExtractor={item => item.title}
+            keyExtractor={(item, index) => item.title}
             renderItem={({ item }) => {
               return (
-                <Card key={"Key: " + item.title}>
+                <Card style={styles.card} key={"Key: " + item.title}>
                   <CardImage
                     source={{ uri: item.image }}
                   />
@@ -97,6 +97,6 @@ export default class FindRecipePage extends Component {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white'
+
   }
 });
