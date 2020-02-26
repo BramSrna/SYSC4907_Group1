@@ -30,6 +30,11 @@ exports.updaterecipecount = functions.database.ref('/recipes/{name}').onWrite((c
 // NOTE: The following are wrappers for functions found in other
 // files. They have to be here to be compiled.
 
+// HASEEB: Update daily recipes for day
+exports.updateRandomRecipesForDay = functions.https.onCall((data, context) => {
+
+})
+
 /**
  * cloudReorgListLoc
  * 
