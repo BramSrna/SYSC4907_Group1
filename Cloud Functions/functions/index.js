@@ -18,6 +18,15 @@ exports.updatesharedlistcount = functions.database.ref('/users/{uid}/lists/share
     return change.after.ref.parent.child('shared_count').set(change.after.numChildren());
 });
 
+exports.updaterecipecount = functions.database.ref('/recipes/{name}').onWrite((change, context) => {
+    return change.after.ref.parent.once('value').then((val) => {
+        var count = val.numChildren();
+        return change.after.ref.parent.update({
+            recipe_count: count
+        })
+    })
+});
+
 // NOTE: The following are wrappers for functions found in other
 // files. They have to be here to be compiled.
 
@@ -37,7 +46,7 @@ exports.updatesharedlistcount = functions.database.ref('/users/{uid}/lists/share
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListLoc = functions.https.onCall((data, context) => {
-   return reorgFuncs.cloudReorgListLoc(data, context, database);
+    return reorgFuncs.cloudReorgListLoc(data, context, database);
 });
 
 /**
@@ -54,7 +63,7 @@ exports.cloudReorgListLoc = functions.https.onCall((data, context) => {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
-   return reorgFuncs.cloudReorgListFastest(data, context, database);
+    return reorgFuncs.cloudReorgListFastest(data, context, database);
 });
 
 /**
