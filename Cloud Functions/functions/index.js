@@ -30,9 +30,59 @@ exports.updaterecipecount = functions.database.ref('/recipes/{name}').onWrite((c
 // NOTE: The following are wrappers for functions found in other
 // files. They have to be here to be compiled.
 
-// HASEEB: Update daily recipes for day
 exports.updateRandomRecipesForDay = functions.https.onCall((data, context) => {
+    const GetRecipePositions = (numberOfRecipes) => {
+        var pos = [];
+        while (pos.length < data.numRecipesToGet) {
+            var curInd = Math.round(Math.random() * numberOfRecipes);
+            if (!pos.includes(curInd)) {
+                pos.push(curInd);
+            }
+        }
+        return pos;
+    }
 
+    const ret = database.ref("/recipes/").once("value").then((snapshot) => {
+        var recipes = [];
+        if (snapshot.val()) {
+            var recipeNum = GetRecipePositions(snapshot.val().recipe_count);
+            var count = 1;
+            var total = 0;
+            for (var recipe in snapshot.val()) {
+                if (recipeNum.includes(count)) {
+                    recipes.push(snapshot.val()[recipe]);
+                    total++;
+                    if (total >= data.numRecipesToGet) {
+                        break;
+                    }
+                }
+                count++;
+            }
+            return {
+                string: "Got recipes.",
+                recipes: recipes
+            }
+        } else {
+            return {
+                string: "Cloud ERROR: Could not update daily recipes."
+            }
+        }
+    }).then((res) => {
+        if (res.string === "Got recipes.") {
+            var counter = 1;
+            for (var r in res.recipes) {
+                database.ref('/dailyRecipes/' + counter.toString()).set(res.recipes[r]);
+                counter++;
+            }
+            return {
+                string: "Daily recipes were updated."
+            }
+        } else {
+            return res;
+        }
+
+    });
+    return ret;
 })
 
 /**

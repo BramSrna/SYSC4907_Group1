@@ -9,21 +9,16 @@ class RecipeFunctions {
 
    // HASEEB: Change this to read from a new recipes table
    GetRandomRecipesFromDatabase(that) {
-      firebase.database().ref("/recipes/").once("value", function (snapshot) {
+      firebase.database().ref("/dailyRecipes/").once("value", function (snapshot) {
          var recipes = [];
          if (snapshot.val()) {
-            var recipeNum = GetRecipePositions(snapshot.numChildren());
-            var count = 1;
             var total = 0;
-            for (recipe in snapshot.val()) {
-               if (recipeNum.includes(count)) {
-                  recipes.push(snapshot.val()[recipe]);
-                  total++;
-                  if (total >= NUMBER_OF_RECIPES_TO_SHOW_USERS) {
-                     break;
-                  }
+            for (var recipe in snapshot.val()) {
+               recipes.push(snapshot.val()[recipe]);
+               total++;
+               if (total >= NUMBER_OF_RECIPES_TO_SHOW_USERS) {
+                  break;
                }
-               count++;
             }
             that.setState({
                recipes: recipes
@@ -35,23 +30,36 @@ class RecipeFunctions {
       })
    }
 
+   async updateRandomRecipesForDay() {
+      try {
+
+         const resp = await firebase.functions().httpsCallable('updateRandomRecipesForDay')({
+            numRecipesToGet: NUMBER_OF_RECIPES_TO_SHOW_USERS
+         }).then((val) => {
+            console.log(val.data.string)
+         });
+      } catch (e) {
+         console.error("Error calling cloud function: " + e);
+      }
+   }
+
    // Call this method once a day
-   AddRecipesToDatabase() {
-      firebase.database().ref('/globals/latestRecipeUpdate').once("value", function (snapshot) {
+   async AddRecipesToDatabase() {
+      firebase.database().ref('/globals/latestRecipeUpdate').once("value", (snapshot) => {
          if (snapshot.val()) {
             var currentDate = new Date().toUTCString();
             var currentDateSplit = currentDate.split(" ");
             var dateStr = snapshot.val().split(" ");
             if (dateStr[0] == currentDateSplit[0] && dateStr[1] == currentDateSplit[1] && dateStr[2] == currentDateSplit[2] && dateStr[3] == currentDateSplit[3]) {
-               console.log("Recipes were already update for today.")
+               console.log("Recipes were already added to the database today.")
             } else {
-               firebase.database().ref('/globals/latestRecipeUpdate').set(currentDate).then(function (snapshot) {
+               firebase.database().ref('/globals/latestRecipeUpdate').set(currentDate).then((snapshot) => {
                   let url = "https://api.spoonacular.com/recipes/random?number=" + NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB + "&apiKey=" + API_KEY;
                   fetch(url, {
                      method: "GET",
-                  }).then(function (response) {
+                  }).then((response) => {
                      if (response.status === 200) {
-                        response.json().then(function (json) {
+                        response.json().then((json) => {
                            // console.log(json.recipes)
                            for (var a = 0; a < json.recipes.length; a++) {
                               var data = json.recipes[a];
@@ -61,21 +69,21 @@ class RecipeFunctions {
                               title = title.replace(/\#/g, " ");
                               title = title.replace(/\[/g, " ");
                               title = title.replace(/\]/g, " ");
-                              firebase.database().ref('/recipes/' + title).set(data).then(function (snapshot) {
+                              firebase.database().ref('/recipes/' + title).set(data).then((snapshot) => {
                                  // console.log(snapshot);
                               });
                            }
                         });
-                        console.log("Recipes were just updated!")
+                        console.log("Recipes were added to the database.")
                      } else {
                         console.log("API did not respond well.")
                      }
-                  }, function (error) {
+                  }, ((error) => {
                      console.log(error.message)
-                  })
+                  }))
                });
 
-               // HASEEB: Update the daily recipes in Cloud
+               this.updateRandomRecipesForDay()
 
             }
 
@@ -84,17 +92,6 @@ class RecipeFunctions {
          }
       })
    }
-}
-
-function GetRecipePositions(numberOfRecipes) {
-   var pos = [];
-   while (pos.length < NUMBER_OF_RECIPES_TO_SHOW_USERS) {
-      var curInd = Math.round(Math.random() * numberOfRecipes);
-      if (!pos.includes(curInd)) {
-         pos.push(curInd);
-      }
-   }
-   return pos;
 }
 
 const rf = new RecipeFunctions();
