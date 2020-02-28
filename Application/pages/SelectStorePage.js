@@ -20,6 +20,8 @@ import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
 import { departments } from "../DepartmentList";
+import RNPickerSelect from 'react-native-picker-select';
+
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
@@ -209,11 +211,11 @@ class SelectStorePage extends Component {
         for (var i = 0; i < mapClusters.length; i++) {
             currCombos.push([]);
         }
-        while(!found) {
+        while (!found) {
             var currVals = [];
             for (var clusterInd = 0; clusterInd < mapClusters.length; clusterInd++) {
                 var val = null;
-                if (depsToGet >= mapClusters[clusterInd].length){
+                if (depsToGet >= mapClusters[clusterInd].length) {
                     val = depsToGet + clusterInd;
                 } else {
                     val = mapClusters[clusterInd][depsToGet];
@@ -326,7 +328,7 @@ class SelectStorePage extends Component {
                                     key={index}
                                     label={v.label}
                                     value={v.value}
-                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]}
                                 />
                             );
                         })
@@ -388,14 +390,14 @@ class SelectStorePage extends Component {
     submitStore = () => {
         if (this.state.currStoreId === "") {
             this.updateCurrStore(this.state.value);
-        
+
             this.setGetClusterModalVisible(true);
         } else {
             this.navBack();
         }
     };
 
-    navBack(){
+    navBack() {
         this.props.navigation.navigate("CurrentListPage", {
             fromPage: "SelectStorePage",
             listName: this.state.listName,
@@ -461,7 +463,7 @@ class SelectStorePage extends Component {
                     >
                         {this.renderGetClusterModal()}
                     </Modal>
-               </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
 
                 <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
@@ -481,7 +483,7 @@ class SelectStorePage extends Component {
                                         />
                                     </Layout>
 
-                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })}/>
+                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
                                 </Layout>
 
                                 <Layout style={styles.mainButtonGroup} >
@@ -566,14 +568,14 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     modalContainer: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: 256,
-      padding: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 256,
+        padding: 16,
     },
     modalBackdrop: {
         backgroundColor: 'black',
-        opacity: 0.75 
+        opacity: 0.75
     },
     pickerIOS: {
         marginHorizontal: 4,
