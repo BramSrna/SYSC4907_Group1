@@ -3,12 +3,10 @@ import {
    SectionList,
    StyleSheet,
    Alert,
-   Button
 } from "react-native";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Text, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Text, TopNavigation, TopNavigationAction, Button } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
-import { dark, light } from '../assets/Themes.js';
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
@@ -126,8 +124,8 @@ class YourContacts extends Component {
                leftControl={renderMenuAction()}
                rightControls={renderRightControls()}
             />
-            <Layout>
-               <SectionList style={this.state.share ? styles.share : styles.notShare}
+            <Layout style={styles.sectionListContainer}>
+               <SectionList
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
                   renderSectionHeader={({ section }) => {
                      if (this.state.share) {
@@ -181,24 +179,23 @@ class YourContacts extends Component {
             </Layout>
             {this.state.share &&
                <Layout>
-                  <Button
-                     title="SHARE"
-                     color="#13FF00"
+                  <Button style={styles.shareButton}
+                     status="success"
                      onPress={() => cf.ShareList(this.props, this.state.listName, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
                      })}
-                  />
+                  >{"SHARE"}</Button>
                </Layout>
             }
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );
    }
-
-
-
 }
 const styles = StyleSheet.create({
+   sectionListContainer: {
+      flex: 1,
+   },
    sectionHeaderContainer: {
       marginTop: 4,
       marginHorizontal: 4,
@@ -208,11 +205,9 @@ const styles = StyleSheet.create({
       paddingHorizontal: 8,
       paddingVertical: 4,
    },
-   notShare: {
-      height: '100%'
-   },
-   share: {
-      height: '88%'
+   shareButton: {
+      margin: 8,
+      borderRadius: 10,
    },
 });
 export default YourContacts;
