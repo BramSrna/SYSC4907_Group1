@@ -15,11 +15,14 @@ import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import StringSimilarity from "string-similarity";
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
 const MAPS = "MapsPage";
 
+const STRING_SIMILARITY_THRESHOLD = 0.30;
+const DATA_LOAD_DELAY = 100;
 
 var availableStores = [];
 
@@ -115,6 +118,7 @@ class SelectStorePage extends Component {
     * @returns None
     */
     updateCurrStore(newStore) {
+        console.log("Updating current store...");
         if (newStore.toString() == NEW_STORE) {
             this.props.navigation.navigate("MapCreatorPage", {
                 page: "CurrentListPage",
@@ -132,6 +136,25 @@ class SelectStorePage extends Component {
                 if (name === newStore) {
                     // Set the id of the store if known
                     id = availableStores[i].id;
+                }
+            }
+
+            // if exact match was not found look for similar strings
+            if (id == "") {
+                if(availableStores!=[]){
+                    var similarity = StringSimilarity.findBestMatch(newStore, availableStores.map(store => store.name));
+                    if (similarity.bestMatch.rating >= STRING_SIMILARITY_THRESHOLD) {
+                        id = availableStores.find(element => element.name == similarity.bestMatch.target).id;
+                        console.log("Similarity matched store id: " + id);
+                    }
+                    else {
+                        console.log("Similarity threshold: " + STRING_SIMILARITY_THRESHOLD + " too high for input: " + newStore);
+                        console.log("Best matched store name: " + similarity.bestMatch.target);
+                        console.log("Best matched store similarity rating: " + similarity.bestMatch.rating);
+                    }
+                }
+                else{
+                    console.log("availableStores was empty!");
                 }
             }
 
@@ -165,8 +188,10 @@ class SelectStorePage extends Component {
     };
 
     selectStore = location => {
+        console.log("Location received from MapsPage:");
         console.log(location);
         this.setState({ value: location });
+        setTimeout(() => { this.updateCurrStore(location) }, DATA_LOAD_DELAY);
     }
 
     render() {
