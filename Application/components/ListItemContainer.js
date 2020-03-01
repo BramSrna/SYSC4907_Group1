@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, BackHandler, } from 'react-native';
 import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon, CheckmarkIcon, CloseIcon } from "../assets/icons/icons.js";
+import { departments } from "../DepartmentList";
 
 /**
  * ListItemContainer - A simple list item container designed to be used within lists
@@ -85,17 +86,61 @@ export default class ListItemContainer extends Component {
         }
     }
 
+    getListItemStyle(propVals) {
+        var sheetStyle = styles.listItemContainer;
+
+        var retStyle = {};
+        for (var key in sheetStyle) {
+            retStyle[key] = sheetStyle[key];
+        }
+
+        var dep = propVals.department;
+        if ((dep !== undefined) && (dep !== null)) {
+            var col = "black";
+
+            for (var i = 0; i < departments.length; i++) {
+                if (departments[i].value === dep) {
+                    col = departments[i].colour;
+                    i = departments.length + 2;
+                }
+            }
+
+            retStyle.borderColor = col;
+            retStyle.borderWidth = 1;
+            retStyle.borderRadius = 8;
+        }
+
+        return retStyle;
+
+    }
+
     render() {
-        const { fromContactView = false, share = false, contact = false, pending = false, title = 'Lorem Ipsum', description = '', fromItemView = false, purchased = false, iconFill = '#8F9BB3', backgroundLevel = '3', onPress = () => { }, onDelete = () => { } } = this.props;
+        const { fromContactView = false,
+            share = false,
+            contact = false,
+            pending = false,
+            title = 'Lorem Ipsum',
+            description = '',
+            fromItemView = false,
+            purchased = false,
+            iconFill = '#8F9BB3',
+            backgroundLevel = '3',
+            onPress = () => { },
+            onDelete = () => { }
+        } = this.props;
+
         MenuIcon = () => (
             <Icon name='more-vertical-outline' fill={iconFill} />
         );
+
         CheckmarkCircleIcon = () => (
             <Icon name='checkmark-circle-outline' fill='green' />
         );
+
         RadioButtonOffIcon = () => (
             <Icon name='radio-button-off-outline' fill='orange' />
         );
+
         if (contact) {
             if (pending) {
                 return (
@@ -155,18 +200,24 @@ export default class ListItemContainer extends Component {
                 }
             }
         }
+
         return (
             <Layout style={styles.outerContainer} level={backgroundLevel} >
-                <Layout style={styles.listItemContainer} level={backgroundLevel}>
+                <Layout
+                    style={styles.listItemContainer}
+                    level={backgroundLevel}
+                >
                     <ListItem
-                        style={styles.listItemContainer}
+                        style={this.getListItemStyle(this.props)}
                         disabled={fromItemView}
                         icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon}
                         title={title}
                         description={description}
-                        titleStyle={{ fontSize: 16 }} onPress={onPress}
+                        titleStyle={{ fontSize: 16 }}
+                        onPress={onPress}
                     />
                 </Layout>
+
                 <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
                     <OverflowMenu
                         style={styles.overflowMenu}
@@ -174,7 +225,8 @@ export default class ListItemContainer extends Component {
                         data={fromItemView ? this.itemViewMenuData : this.listViewMenuData}
                         placement='left'
                         onSelect={this.onSelectMenuItem}
-                        onBackdropPress={this.onMenuActionPress}>
+                        onBackdropPress={this.onMenuActionPress}
+                    >
                         <Button
                             appearance='ghost'
                             icon={MenuIcon}
