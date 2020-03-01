@@ -37,6 +37,7 @@ class MapCreatorPage extends Component {
         // Use a list for keeping track of all the departments
         this.currDepartments = [
             {
+                department: departments[0].text.slice(0)
             },
         ]
 
@@ -150,7 +151,9 @@ class MapCreatorPage extends Component {
     */
     addDepartment = () => {
         // Add a department to the list
-        this.currDepartments.push({});
+        this.currDepartments.push({
+            department: departments[0].text.slice(0)
+        });
 
         // Rerender the screen
         if (this._mounted) {
