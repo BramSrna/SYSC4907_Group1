@@ -87,9 +87,7 @@ class MapsPage extends Component {
                 ',' + currentLocation.coords.longitude +
                 HERE_REQUEST_HEADER_2 + HERE_REQUEST_HEADER_3 +
                 '&apiKey=' + this.state.apiKey;
-            console.log('REQUEST STRING: ' + request);
             axios.get(request).then(result => {
-                // console.log(result);
                 this.setState({ storesApiRequestResult: result });
             }).catch(error => {
                 console.log(error);
@@ -100,7 +98,6 @@ class MapsPage extends Component {
     }
 
     handleMapRegionChange = currentCursorLocation => {
-        console.log(currentCursorLocation);
         this.setState({ currentCursorLocation: { coords: { latitude: currentCursorLocation.latitude, longitude: currentCursorLocation.longitude } } });
     };
 
@@ -149,8 +146,7 @@ class MapsPage extends Component {
                 onCalloutPress={() => this.selectStore(title + ' - ' + description)}
             />
         );
-
-        console.log(this.state.currentLocation);
+        
         return (
             <React.Fragment>
                 <TopNavigation

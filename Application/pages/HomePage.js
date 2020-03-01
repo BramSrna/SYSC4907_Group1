@@ -42,14 +42,12 @@ class HomePage extends Component {
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
     emailId = emailId.replace(/\./g, ",");
-    console.log(emailId);
     firebase
       .database()
       .ref("/userInfo/" + emailId)
       .once("value", function (snapshot) {
         if (!snapshot.val() || !snapshot.val().uid) {
           firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
-            // console.log(snapshot);
           });
         }
       });

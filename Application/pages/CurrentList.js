@@ -920,8 +920,6 @@ class CurrentList extends Component {
       currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
 
-      console.log(map);
-
       retVal = [];
 
       // Only render if the store is chosen

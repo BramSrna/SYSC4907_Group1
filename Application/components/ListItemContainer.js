@@ -66,7 +66,6 @@ export default class ListItemContainer extends Component {
         if (this.props.fromItemView) {
             if (index == 0) {
                 this.props.onDelete(this.props.listID, this.props.itemID);
-                // console.log("Delete item:" + this.props.itemID + " from List:" + this.props.listID);
             }
         } else {
             if (index == 0) {
@@ -80,7 +79,6 @@ export default class ListItemContainer extends Component {
             else if (index == 1) {
                 // Delete
                 this.props.onDelete(this.props.listID);
-                // console.log("Delete list:" + this.props.listID + " attempted");
             }
         }
     }

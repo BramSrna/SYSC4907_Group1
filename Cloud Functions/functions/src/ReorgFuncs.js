@@ -622,9 +622,6 @@ exports.cloudDetermineClusters = function(database) {
                 }
             }
 
-            //console.log(threshold, clusters.length);
-            //console.log(clusters);
-
             currNumClusters = clusters.length;
             threshold += 1;
         }
@@ -679,8 +676,6 @@ exports.cloudDetermineClusters = function(database) {
             clusterMaps.push(finalMap);
 
         }
-
-        console.log(clusterMaps);
 
         database.ref("/mapClusters/").update(clusterMaps);
 
