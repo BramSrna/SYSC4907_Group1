@@ -128,9 +128,7 @@ class NewContact extends Component {
          cf.SendContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
-
       }
-
    };
 
    renderModalElement = () => {
@@ -142,7 +140,7 @@ class NewContact extends Component {
             <Input
                style={styles.input}
                placeholder='Enter a group name'
-               onChangeText={(group) => this._isMounted && this.setState({ group })}
+               onChangeText={(group) => this._isMounted && this.setState({ group: group.trim() })}
                autoFocus={this.state.isDialogVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
@@ -183,7 +181,7 @@ class NewContact extends Component {
                            keyboardType="email-address"
                            autoCompleteType="email"
                            returnKeyType='next'
-                           onChangeText={(email) => this._isMounted && this.setState({ email })}
+                           onChangeText={(email) => this._isMounted && this.setState({ email: email.trim() })}
                            disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
                         />
                         <Input style={styles.inputRow}
@@ -192,7 +190,7 @@ class NewContact extends Component {
                            keyboardType="default"
                            placeholder='Enter a name'
                            value={this.state.name}
-                           onChangeText={(name) => this._isMounted && this.setState({ name })}
+                           onChangeText={(name) => this._isMounted && this.setState({ name: name.trim() })}
                         />
                         <Layout style={styles.mainInputGroup}>
                            <Layout style={styles.selectBoxContainer}>
