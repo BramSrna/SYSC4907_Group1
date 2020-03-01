@@ -131,19 +131,47 @@ class YourContacts extends Component {
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
                   renderSectionHeader={({ section }) => {
                      if (this.state.share) {
-                        return <Text style={[styles.sectionHeaderStyle, { backgroundColor: global.theme == light ? light["color-info-700"] : dark["color-info-700"] }]} category='s1' onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
+                        return (
+                           <Layout level='3' style={styles.sectionHeaderContainer}>
+                              <Text style={styles.sectionHeaderStyle} category='s1' onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
+                           </Layout>);
                      } else {
-                        return <Text style={[styles.sectionHeaderStyle, { backgroundColor: global.theme == light ? light["color-info-700"] : dark["color-info-700"] }]} category='s1'> {section.title} </Text>
+                        return (
+                           <Layout level='3' style={styles.sectionHeaderContainer}>
+                              <Text style={styles.sectionHeaderStyle} category='s1'> {section.title} </Text>
+                           </Layout>);
                      }
                   }}
                   renderItem={({ item }) => {
                      if (this.state.share) {
-                        return <ListItemContainer share={true} contact={true} title={item.name} purchased={this.CheckIfSelected(item.email)} fromItemView={false} onPress={() => { this.ShareContactPress(item.email) }} />;
+                        return (
+                           <ListItemContainer
+                              share={true}
+                              contact={true}
+                              title={item.name}
+                              purchased={this.CheckIfSelected(item.email)} fromItemView={false}
+                              onPress={() => { this.ShareContactPress(item.email) }} />
+                        );
                      } else {
                         if (item.status == "contact") {
-                           return <ListItemContainer contact={true} title={item.name} fromContactView={true} fromItemView={false} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
+                           return (
+                              <ListItemContainer
+                                 contact={true}
+                                 title={item.name}
+                                 fromContactView={true}
+                                 fromItemView={false}
+                                 onDelete={() => cf.DeleteContact(item.email)}
+                                 onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />
+                           );
                         } else if (item.status == "pending") {
-                           return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
+                           return (
+                              <ListItemContainer
+                                 title={item.email}
+                                 fromItemView={true}
+                                 contact={true}
+                                 acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }}
+                                 rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />
+                           );
                         }
                      }
 
@@ -171,10 +199,14 @@ class YourContacts extends Component {
 
 }
 const styles = StyleSheet.create({
+   sectionHeaderContainer: {
+      marginTop: 4,
+      marginHorizontal: 4,
+      borderRadius: 10,
+   },
    sectionHeaderStyle: {
       paddingHorizontal: 8,
       paddingVertical: 4,
-      marginTop:4,
    },
    notShare: {
       height: '100%'
@@ -182,16 +214,5 @@ const styles = StyleSheet.create({
    share: {
       height: '88%'
    },
-   SectionListItemStyle: {
-      fontSize: 15,
-      padding: 15,
-      color: '#000',
-      backgroundColor: '#F5F5F5',
-   },
-   acceptDeny: {
-      padding: 15,
-      backgroundColor: '#F5F5F5',
-
-   }
 });
 export default YourContacts;

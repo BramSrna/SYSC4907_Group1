@@ -83,3 +83,11 @@ export const ArrowBackIcon = (style) => (
 export const MapIcon = (style) => (
     <Icon {...style} name='map-outline' />
 );
+
+export const CheckmarkIcon = (style) => (
+    <Icon {...style} name='checkmark-outline' />
+);
+
+export const CloseIcon = (style) => (
+    <Icon {...style} name='close-outline' />
+);
