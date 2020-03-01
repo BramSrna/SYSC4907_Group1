@@ -40,6 +40,11 @@ const ORDER_ADDED = "ORDER_ADDED";
 const ALPHABETICALLY = "ALPHABETICALLY";
 const PURCHASED = "PURCHASED";
 
+const DEFAULT_STORE = "";
+const DEFAULT_STORE_ID = "";
+const DEFAULT_STORE_ADDR = "";
+const DEFAULT_STORE_NAME = "";
+
 class CurrentList extends Component {
    constructor(props) {
       super(props);
@@ -59,10 +64,10 @@ class CurrentList extends Component {
          isDialogVisible: false,
 
          orgMethod: organizationOptions[0],
-         currStore: "",
-         currStoreId: "",
-         currStoreAddr: "",
-         currStoreName: "",
+         currStore: DEFAULT_STORE,
+         currStoreId: DEFAULT_STORE_ID,
+         currStoreAddr: DEFAULT_STORE_ADDR,
+         currStoreName: DEFAULT_STORE_NAME,
          storeModalVisible: false,
          map: null,
 
@@ -381,7 +386,11 @@ class CurrentList extends Component {
          minPrice: minPrice === null ? this.state.minPrice : minPrice,
          maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
          numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
-         map: map === null ? this.state.map : map === -1 ? null : map
+         map: map === null ? this.state.map : map === -1 ? null : map,
+         currStoreId: map === -1 ? DEFAULT_STORE_ID : this.state.currStoreId,
+         currStore: map === -1 ? DEFAULT_STORE : this.state.currStore,
+         currStoreAddr: map === -1 ? DEFAULT_STORE_ADDR : this.state.currStoreAddr,
+         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName
       });
    }
 
@@ -750,7 +759,7 @@ class CurrentList extends Component {
 
       if (initItems === null) {
          // Update the list state to the reorganized values
-         this.updateListState(items, ids, {reorg: true});
+         this.updateListState(items, ids, {reorg: true, map: -1});
       }
 
       return {
@@ -911,10 +920,12 @@ class CurrentList extends Component {
       currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
 
+      console.log(map);
+
       retVal = [];
 
       // Only render if the store is chosen
-      if (currStore !== "") {
+      if (currStore !== DEFAULT_STORE) {
          return (
             <Layout style={styles.dashboard} >
                <Layout style={styles.dashboardOuterContainer} level='3' >

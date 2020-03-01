@@ -367,7 +367,7 @@ class SelectStorePage extends Component {
             <Layout
                 level='3'
                 style={styles.modalContainer}>
-                <Text>We need some quick info about the store. Please choose the closest department(s) to you:</Text>
+                <Text>We need some quick info about the store. Please choose the closest department(s) to you from the following options:</Text>
                 {selectors}
                 <Button onPress={() => this.handleEnterButton()}>
                     ENTER
