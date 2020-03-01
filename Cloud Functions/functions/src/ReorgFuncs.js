@@ -940,15 +940,18 @@ exports.cloudReorgListLoc = function(data, context, database) {
         // Get just the item names and ids
         items = [];
         ids = [];
+        retLocs = [];
         for (i = 0; i < locs.length; i++) {
             items.push(locs[i].item);
             ids.push(locs[i].id);
+            retLocs.push(locs[i].department);
         }
 
         // Return the information
         return {
             items: items,
             ids: ids,
+            locs: retLocs
         };
     });
 
@@ -1100,14 +1103,17 @@ exports.cloudReorgListFastest = function(data, context, database) {
         // Get the final items and ids
         items = [];
         ids = [];
+        retLocs = [];
         for (i = 0; i < locs.length; i++) {
             items.push(locs[i].item);
             ids.push(locs[i].id);
+            retLocs.push(locs[i].department);
         }
 
         return {
             items: items,
             ids: ids,
+            locs: retLocs,
             map: map
         };
     });

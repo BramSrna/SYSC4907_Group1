@@ -54,6 +54,7 @@ class CurrentList extends Component {
          listId: "",
          listItems: [],
          listItemIds: [],
+         listItemLocs: null,
          modalMode: 'item',
 
          firstLoadComplete: false,
@@ -304,6 +305,7 @@ class CurrentList extends Component {
    updateListState(newItems, newIds, optionalParams) {
       defaultParams = {
          reorg: false,
+         locs: null,
          userCount: null,
          minPrice: null,
          maxPrice: null,
@@ -321,15 +323,18 @@ class CurrentList extends Component {
       maxPrice = defaultParams.maxPrice;
       numUnknownPrice = defaultParams.numUnknownPrice;
       map = defaultParams.map;
+      locs = defaultParams.locs;
 
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
+      var localLocs = this.state.listItemLocs;
 
       if (reorg) {
          // If reorg is true, then just rearrange the current arrays
          localIds = newIds;
          localItems = newItems;
+         localLocs = locs;
       } else {
          // Get the list of items added and removed
          var itemsAdded = newIds.filter(x => !localIds.includes(x));
@@ -343,6 +348,10 @@ class CurrentList extends Component {
 
                localIds.push(newIds[ind]);
                localItems.push(newItems[ind]);
+
+               if (locs != null) {
+                  localLocs.push(locs[ind]);
+               }
             }
          } else if (itemsRemoved.length > 0) {
             // Items were removed
@@ -353,6 +362,10 @@ class CurrentList extends Component {
                if (ind > -1) {
                   localIds.splice(ind, 1);
                   localItems.splice(ind, 1);
+               }
+
+               if (localLocs != null) {
+                  localLocs.splice(ind, 1);
                }
             }
          } else {
@@ -382,6 +395,7 @@ class CurrentList extends Component {
          firstLoadComplete: true,
          listItems: localItems,
          listItemIds: localIds,
+         listItemLocs: localLocs,
          userCount: userCount === null ? this.state.userCount : userCount,
          minPrice: minPrice === null ? this.state.minPrice : minPrice,
          maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
@@ -432,6 +446,8 @@ class CurrentList extends Component {
     * @returns None
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
+      var locs = this.state.listItemLocs;
+      //console.log(locs);
       if ((!item.purchased) || (item.purchased && !this.state.hidePurchased)){
          return (
             <ListItemContainer
@@ -442,6 +458,7 @@ class CurrentList extends Component {
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
                onDelete={this.deleteItem}
+               department={((locs === null) || (locs === undefined)) ? null : locs[index]}
             />
          );
       }
@@ -730,11 +747,14 @@ class CurrentList extends Component {
       // Get the items and ids
       var items = [];
       var ids = [];
+      var locs = null;
 
       if (initItems === null) {
          // Get the items and ids
          items = this.state.listItems;
          ids = this.state.listItemIds;
+
+         locs = this.state.listItemLocs;
       } else {
          // Get the items and ids
          items = initItems;
@@ -744,7 +764,11 @@ class CurrentList extends Component {
       // Put the items and their ids in a nested list
       var temp = [];
       for (var j = 0; j < items.length; j++) {
-         temp.push({ "item": items[j], "id": ids[j] });
+         temp.push({
+            "item": items[j],
+            "id": ids[j],
+            "loc": locs === null ? null : locs[j]
+         });
       }
 
       // Rearrage the nested list to put it in alphabetical order
@@ -755,11 +779,15 @@ class CurrentList extends Component {
       for (var k = 0; k < temp.length; k++) {
          items[k] = temp[k].item;
          ids[k] = temp[k].id;
+
+         if (locs !== null) {
+            locs[k] = temp[k].loc;
+         }
       }
 
       if (initItems === null) {
          // Update the list state to the reorganized values
-         this.updateListState(items, ids, {reorg: true, map: -1});
+         this.updateListState(items, ids, {locs: locs, reorg: true, map: -1});
       }
 
       return {
@@ -785,7 +813,7 @@ class CurrentList extends Component {
       var tempList = lf.reorgListLoc(storeId, listId);
       tempList.then((value) => {
          // Update the local state of the list
-         context.updateListState(value.items, value.ids, {reorg: true, map: -1});
+         context.updateListState(value.items, value.ids, {locs: value.locs, reorg: true, map: -1});
       });
 
       return;
@@ -809,7 +837,8 @@ class CurrentList extends Component {
          context.updateListState(value.items,
                                  value.ids,
                                  {reorg: true,
-                                    map: value.map});
+                                  locs: value.locs,
+                                  map: value.map});
       });
 
       return;
@@ -822,7 +851,8 @@ class CurrentList extends Component {
          context.updateListState(value.items,
                                  value.ids,
                                  {reorg: true,
-                                    map: value.map});
+                                  locs: value.locs,
+                                  map: value.map});
 
    
 
@@ -920,7 +950,7 @@ class CurrentList extends Component {
       currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
 
-      console.log(map);
+      //console.log(map);
 
       retVal = [];
 
