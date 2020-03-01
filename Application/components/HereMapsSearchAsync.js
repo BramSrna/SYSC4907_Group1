@@ -14,7 +14,6 @@ export default class HereMapsSearchAsync extends Component {
             value: '',
             data: [],
             apiResponse: null,
-            typing: false,
             typingTimeout: 0,
         };
     }
@@ -36,7 +35,6 @@ export default class HereMapsSearchAsync extends Component {
 
                 this.setState({
                     value,
-                    typing: false,
                     typingTimeout: setTimeout(() => {
                         // console.log("CREATING REQUEST:= requestArray: " + requestArray);
                         const request = requestArray.slice(0, requestValueIndex).concat(value.trim()).concat(requestArray.slice(requestValueIndex + 1)).join('');

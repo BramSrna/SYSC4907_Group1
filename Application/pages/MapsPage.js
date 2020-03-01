@@ -36,6 +36,7 @@ const CURRENT_LOCATION_MARKER_TITLE = "Your Current Location";
 const CURRENT_LOCATION_MARKER_DESCRIPTION = "";
 const DEFAULT_MAX_LOCATIONS = 20;
 const MAP_ANIMATION_DURATION = 200;
+const DEFAULT_REQUEST_TIMEOUT = 500;
 
 
 const HERE_REQUEST_HEADER_1 =
@@ -73,6 +74,7 @@ class MapsPage extends Component {
             searchRequestParams: [],
             storesApiRequestResult: null,
             ready: false,
+            requestTimeout: 0,
         };
     }
 
@@ -195,9 +197,10 @@ class MapsPage extends Component {
 
     handleMapRegionChange = newRegion => {
         if (this.state.ready) {
-            this.getNearbyStores(newRegion);
-            // TODO: after getting nearby stores, 
-            // use delta calculations to make sure that api requests are only sent when out of current delta region.
+            if (this.state.requestTimeout) {
+                clearTimeout(this.state.requestTimeout);
+            }
+            setTimeout(() => { this.getNearbyStores(newRegion); }, DEFAULT_REQUEST_TIMEOUT);
             this.setSearchRequestParams(newRegion);
             this.setState({
                 currentCursorLocation: newRegion
