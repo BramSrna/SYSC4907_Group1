@@ -533,7 +533,7 @@ function calcStoreDist(refMap, compMap) {
 
 }
 
-exports.cloudDetermineClusters = function(data, context, database) {
+exports.cloudDetermineClusters = function(database) {
     var retVal = database.ref("/stores/").once("value").then((snapshot) => {
         var maps = [];
         var names = [];
@@ -568,15 +568,14 @@ exports.cloudDetermineClusters = function(data, context, database) {
             }
         }
 
-        const DESIRED_NUM_CLUSTERS = 5
-        const MAX_THRESHOLD = 20
+        const desiredNumClusters = Math.sqrt(maps.length);
 
         var threshold = 0;
         
         var currNumClusters = Number.MAX_SAFE_INTEGER;
         var clusters = [];
         var mapClusters = [];
-        while ((threshold < MAX_THRESHOLD) && (currNumClusters > DESIRED_NUM_CLUSTERS)) {
+        while (currNumClusters > desiredNumClusters) {
             clusters.length = 0;
             mapClusters.length = 0;
             for (i = 0; i < maps.length; i++) {
@@ -630,11 +629,7 @@ exports.cloudDetermineClusters = function(data, context, database) {
             threshold += 1;
         }
 
-        console.log(clusters);
-
-        if (threshold < MAX_THRESHOLD) {
-            threshold -= 1;
-        }
+        threshold -= 1;
 
         var clusterMaps = [];
 

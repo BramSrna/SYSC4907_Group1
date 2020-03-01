@@ -236,6 +236,8 @@ export function registerStore(storeName, address, map, franchiseName = null) {
                 }]
             }
 
+            console.log(toAdd);
+
             // Push the data to the database
             store = firebase.database().ref(storePath).update(toAdd);
         } else {
@@ -283,6 +285,8 @@ export function registerStore(storeName, address, map, franchiseName = null) {
                     });
                 }
             }
+
+            console.log(map);
 
             if (!mapExists) {
                 // Push the list to the database, if it has not been registered
