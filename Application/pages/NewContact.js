@@ -203,7 +203,7 @@ class NewContact extends Component {
                            </Layout>
                            <Button style={styles.groupButton} status="success" appearance='outline' onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >{"New Group"}</Button>
                         </Layout>
-                        <Button style={styles.button} onPress={() => this.handleAdd()} >{"Add Contact"}</Button>
+                        <Button style={styles.button} onPress={() => this.handleAdd()} >{(this.state.fromEdit) ? "Update Contact" : "Add Contact"}</Button>
                      </Layout>
                   </Layout>
                </ScrollView>
