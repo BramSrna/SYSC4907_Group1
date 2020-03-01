@@ -14,11 +14,13 @@ export default class HereMapsSearchAsync extends Component {
             value: '',
             data: [],
             apiResponse: null,
+            typing: false,
+            typingTimeout: 0,
         };
     }
 
     render() {
-        const { placeholder = 'Start typing to fetch options', requestArray = [], requestValueIndex = 0, backgroundLevel = '3', onValueSelected = () => { } } = this.props;
+        const { placeholder = 'Start typing to fetch options', requestArray = [], requestValueIndex = 0, backgroundLevel = '3', searchTimeout = 1000, onValueSelected = () => { } } = this.props;
 
         const onSelect = ({ title, position }) => {
             this.setState({ value: title });
@@ -26,24 +28,34 @@ export default class HereMapsSearchAsync extends Component {
         };
 
         const onChangeText = (value) => {
+
             if (value.length > 3) {
-                this.setState({ value });
-                // console.log("CREATING REQUEST:= requestArray: " + requestArray);
-                const request = requestArray.slice(0, requestValueIndex).concat(value.trim()).concat(requestArray.slice(requestValueIndex + 1)).join('');
-                console.log("CREATED REQUEST:= request: " + request);
-                axios
-                    .get(request)
-                    .then(result => {
-                        // console.log(result);
-                        var displayResult = [];
-                        result.data.results.items.forEach(element => {
-                            displayResult.push({ title: element.title + ' - ' + element.vicinity.replace(/[\n\r]/g, " "), position: { latitude: Number(element.position[0]), longitude: Number(element.position[1]) } });
-                        });
-                        this.setState({ data: displayResult });
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
+                if (this.state.typingTimeout) {
+                    clearTimeout(this.state.typingTimeout);
+                }
+
+                this.setState({
+                    value,
+                    typing: false,
+                    typingTimeout: setTimeout(() => {
+                        // console.log("CREATING REQUEST:= requestArray: " + requestArray);
+                        const request = requestArray.slice(0, requestValueIndex).concat(value.trim()).concat(requestArray.slice(requestValueIndex + 1)).join('');
+                        console.log("CREATED REQUEST:= request: " + request);
+                        axios
+                            .get(request)
+                            .then(result => {
+                                // console.log(result);
+                                var displayResult = [];
+                                result.data.results.items.forEach(element => {
+                                    displayResult.push({ title: element.title + ' - ' + element.vicinity.replace(/[\n\r]/g, " "), position: { latitude: Number(element.position[0]), longitude: Number(element.position[1]) } });
+                                });
+                                this.setState({ data: displayResult });
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
+                    }, searchTimeout)
+                });
             }
             else {
                 this.setState({ value });
