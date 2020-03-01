@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, BackHandler, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, BackHandler, } from 'react-native';
 import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
-import { ShareIcon, Trash2Icon } from "../assets/icons/icons.js";
+import { ShareIcon, Trash2Icon, CheckmarkIcon, CloseIcon } from "../assets/icons/icons.js";
 
 /**
  * ListItemContainer - A simple list item container designed to be used within lists
@@ -111,13 +111,10 @@ export default class ListItemContainer extends Component {
                                 placement='left'
                                 onSelect={this.onSelectMenuItem}
                                 onBackdropPress={this.onMenuActionPress}>
-                                <Layout style={styles.pending}>
-                                    <TouchableOpacity style={styles.acceptDeny}
-                                        onPress={() => this.props.acceptFunction()}>
-                                        <Image source={require("../assets/icons/accept.png")} /></TouchableOpacity>
-                                    <TouchableOpacity style={styles.acceptDeny}
-                                        onPress={() => this.props.rejectFunction()}>
-                                        <Image source={require("../assets/icons/cancel.png")} /></TouchableOpacity></Layout>
+                                <Layout style={styles.pending} level={backgroundLevel}>
+                                    <Button appearance='ghost' status='success' icon={CheckmarkIcon} onPress={() => this.props.acceptFunction()} />
+                                    <Button appearance='ghost' status='danger' icon={CloseIcon} onPress={() => this.props.rejectFunction()} />
+                                </Layout>
                             </OverflowMenu>
                         </Layout>
                     </Layout >
@@ -161,7 +158,14 @@ export default class ListItemContainer extends Component {
         return (
             <Layout style={styles.outerContainer} level={backgroundLevel} >
                 <Layout style={styles.listItemContainer} level={backgroundLevel}>
-                    <ListItem style={styles.listItemContainer} disabled={fromItemView} icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon} title={title} description={description} titleStyle={{ fontSize: 16 }} onPress={onPress} />
+                    <ListItem
+                        style={styles.listItemContainer}
+                        disabled={fromItemView}
+                        icon={purchased ? CheckmarkCircleIcon : RadioButtonOffIcon}
+                        title={title}
+                        description={description}
+                        titleStyle={{ fontSize: 16 }} onPress={onPress}
+                    />
                 </Layout>
                 <Layout style={styles.optionButtonContainer} level={backgroundLevel}>
                     <OverflowMenu
@@ -210,10 +214,9 @@ const styles = StyleSheet.create({
         shadowOpacity: .5,
         shadowOffset: { width: 4, height: 4 },
         elevation: 8,
-    }, acceptDeny: {
-        padding: 15,
-    }
-    , pending: {
-        flexDirection: 'row'
+    },
+    pending: {
+        flexDirection: 'row',
+        borderRadius: 10,
     }
 });
