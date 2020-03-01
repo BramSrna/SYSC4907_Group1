@@ -106,7 +106,7 @@ export default class ListItemContainer extends Component {
             }
 
             retStyle.borderColor = col;
-            retStyle.borderWidth = 2;
+            retStyle.borderWidth = 1;
             retStyle.borderRadius = 8;
         }
 
