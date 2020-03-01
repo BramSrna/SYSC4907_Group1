@@ -99,7 +99,6 @@ class NewContact extends Component {
    };
 
    handleCreate = () => {
-
       cf.AddNewGroup(this, this.state.group, this.state.allGroups)
    };
 
@@ -108,24 +107,24 @@ class NewContact extends Component {
    handleAdd = () => {
       var aGroup = "";
       if (this.state.group != DEFAULT_GROUP && this.state.group.text && this.state.group.text != 'Select a group...') {
-         aGroup = this.state.group.text
+         aGroup = this.state.group.text.trim();
       }
       //Try adding the contact
 
       if (this.state.fromPending) {
-         cf.AcceptContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
+         cf.AcceptContactRequest(this.props, this.state.email.trim(), this.state.name.trim(), aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
          if (this._isMounted) this.setState({ fromPending: false })
 
       } else if (this.state.fromEdit) {
-         cf.EditContact(this.props, this.state.email, this.state.name, aGroup, function (props) {
+         cf.EditContact(this.props, this.state.email.trim(), this.state.name.trim(), aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
          if (this._isMounted) this.setState({ fromEdit: false })
 
       } else {
-         cf.SendContactRequest(this.props, this.state.email, this.state.name, aGroup, function (props) {
+         cf.SendContactRequest(this.props, this.state.email.trim(), this.state.name.trim(), aGroup, function (props) {
             props.navigation.navigate("YourContacts")
          })
       }
@@ -140,7 +139,7 @@ class NewContact extends Component {
             <Input
                style={styles.input}
                placeholder='Enter a group name'
-               onChangeText={(group) => this._isMounted && this.setState({ group: group.trim() })}
+               onChangeText={(group) => this._isMounted && this.setState({ group })}
                autoFocus={this.state.isDialogVisible ? true : false}
             />
             <Layout style={styles.buttonContainer}>
@@ -181,7 +180,7 @@ class NewContact extends Component {
                            keyboardType="email-address"
                            autoCompleteType="email"
                            returnKeyType='next'
-                           onChangeText={(email) => this._isMounted && this.setState({ email: email.trim() })}
+                           onChangeText={(email) => this._isMounted && this.setState({ email })}
                            disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
                         />
                         <Input style={styles.inputRow}
@@ -190,7 +189,7 @@ class NewContact extends Component {
                            keyboardType="default"
                            placeholder='Enter a name'
                            value={this.state.name}
-                           onChangeText={(name) => this._isMounted && this.setState({ name: name.trim() })}
+                           onChangeText={(name) => this._isMounted && this.setState({ name })}
                         />
                         <Layout style={styles.mainInputGroup}>
                            <Layout style={styles.selectBoxContainer}>
