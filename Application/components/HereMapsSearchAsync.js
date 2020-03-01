@@ -20,13 +20,13 @@ export default class HereMapsSearchAsync extends Component {
     render() {
         const { placeholder = 'Start typing to fetch options', requestArray = [], requestValueIndex = 0, backgroundLevel = '3', onValueSelected = () => { } } = this.props;
 
-        const onSelect = ({ title }) => {
+        const onSelect = ({ title, position }) => {
             this.setState({ value: title });
-            onValueSelected(title);
+            onValueSelected(title, position);
         };
 
         const onChangeText = (value) => {
-            if (value.length > 6) {
+            if (value.length > 3) {
                 this.setState({ value });
                 // console.log("CREATING REQUEST:= requestArray: " + requestArray);
                 const request = requestArray.slice(0, requestValueIndex).concat(value.trim()).concat(requestArray.slice(requestValueIndex + 1)).join('');
@@ -37,7 +37,7 @@ export default class HereMapsSearchAsync extends Component {
                         // console.log(result);
                         var displayResult = [];
                         result.data.results.items.forEach(element => {
-                            displayResult.push({ title: element.title + ' - ' + element.vicinity.replace(/[\n\r]/g, " ") });
+                            displayResult.push({ title: element.title + ' - ' + element.vicinity.replace(/[\n\r]/g, " "), position: { latitude: Number(element.position[0]), longitude: Number(element.position[1]) } });
                         });
                         this.setState({ data: displayResult });
                     })

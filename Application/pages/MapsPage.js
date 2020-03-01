@@ -210,8 +210,16 @@ class MapsPage extends Component {
         this.props.navigation.goBack();
     };
 
-    autoCompleteSelected = selectedStore => {
+    autoCompleteSelected = (selectedStore, storePosition) => {
         console.log("RECEIVED selectedStore: " + selectedStore);
+        console.log("RECEIVED storePosition: latitude: " + storePosition.latitude + " longitude: " + storePosition.longitude);
+        const storeRegion = {
+            latitude: storePosition.latitude,
+            longitude: storePosition.longitude,
+            latitudeDelta: DEFAULT_LATITUDE_DELTA,
+            longitudeDelta: DEFAULT_LONGITUDE_DELTA,
+        }
+        this.map.animateToRegion(storeRegion, MAP_ANIMATION_DURATION)
     }
 
     render() {
