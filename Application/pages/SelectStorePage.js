@@ -19,13 +19,16 @@ import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import StringSimilarity from "string-similarity";
 import { departments } from "../DepartmentList";
 import RNPickerSelect from 'react-native-picker-select';
-
 
 const PAGE_TITLE = "Select Store";
 const NEW_STORE = "Register a store...";
 const MAPS = "MapsPage";
+
+const STRING_SIMILARITY_THRESHOLD = 0.30;
+const DATA_LOAD_DELAY = 100;
 
 const MIN_DEPS_TO_GET = 1;
 const MAXIMUM_MODAL_DEPS = 3;
@@ -139,6 +142,7 @@ class SelectStorePage extends Component {
     * @returns None
     */
     updateCurrStore(newStore) {
+        console.log("Updating current store...");
         if (newStore.toString() == NEW_STORE) {
             this.props.navigation.navigate("MapCreatorPage", {
                 previousPage: "CurrentListPage",
@@ -160,6 +164,25 @@ class SelectStorePage extends Component {
                     id = availableStores[i].id;
                     addr = availableStores[i].addr;
                     storeName = availableStores[i].storeName;
+                }
+            }
+
+            // if exact match was not found look for similar strings
+            if (id == "") {
+                if(availableStores!=[]){
+                    var similarity = StringSimilarity.findBestMatch(newStore, availableStores.map(store => store.title));
+                    if (similarity.bestMatch.rating >= STRING_SIMILARITY_THRESHOLD) {
+                        id = availableStores.find(element => element.title == similarity.bestMatch.target).id;
+                        console.log("Similarity matched store id: " + id);
+                    }
+                    else {
+                        console.log("Similarity threshold: " + STRING_SIMILARITY_THRESHOLD + " too high for input: " + newStore);
+                        console.log("Best matched store name: " + similarity.bestMatch.target);
+                        console.log("Best matched store similarity rating: " + similarity.bestMatch.rating);
+                    }
+                }
+                else{
+                    console.log("availableStores was empty!");
                 }
             }
 
@@ -412,9 +435,10 @@ class SelectStorePage extends Component {
     }
 
     selectStore = location => {
-        this.setState({
-            value: location
-        });
+        console.log("Location received from MapsPage:");
+        console.log(location);
+        this.setState({ value: location });
+        setTimeout(() => { this.updateCurrStore(location) }, DATA_LOAD_DELAY);
     }
 
     setGetClusterModalVisible = (newVal) => {
@@ -434,7 +458,6 @@ class SelectStorePage extends Component {
         this.setState({
             value: title
         });
-
         this.updateCurrStore(title);
     }
 
@@ -468,7 +491,6 @@ class SelectStorePage extends Component {
                 <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
-
                             <Layout style={styles.formInnerContainer}>
                                 <Layout style={styles.mainInputGroup}>
                                     <Layout style={styles.autocompleteContainer}>
@@ -482,7 +504,6 @@ class SelectStorePage extends Component {
                                             onSelect={(val) => this.onSelect(val)}
                                         />
                                     </Layout>
-
                                     <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
                                 </Layout>
 
