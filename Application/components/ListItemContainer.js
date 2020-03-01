@@ -263,6 +263,9 @@ const styles = StyleSheet.create({
     departmentColourContainer: {
         flex: 0.1,
     },
+    departmentColourContainer: {
+        flex: 0.1,
+    },
     optionButtonContainer: {
         borderRadius: 10,
     },
