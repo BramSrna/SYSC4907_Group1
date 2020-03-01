@@ -10,8 +10,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 
-
-
 // These are the default values for all of the input boxes
 const DEFAULT_NAME = ""
 const DEFAULT_GROUP = [];
@@ -140,7 +138,7 @@ class NewContact extends Component {
          <Layout
             level='3'
             style={styles.modalContainer}>
-            <Text category='h6' >Add New Group</Text>
+            <Text category='h6' >{"Create New Group"}</Text>
             <Input
                style={styles.input}
                placeholder='Enter a group name'
@@ -162,7 +160,7 @@ class NewContact extends Component {
       return (
          <React.Fragment>
             <TopNavigation
-               title="New Contact"
+               title={(this.state.fromPending || this.state.fromEdit) ? "Edit Contact" : "New Contact"}
                alignment='center'
                leftControl={renderMenuAction()}
             />
@@ -196,15 +194,19 @@ class NewContact extends Component {
                            value={this.state.name}
                            onChangeText={(name) => this._isMounted && this.setState({ name })}
                         />
-                        <Select style={styles.selectBox}
-                           label='Group'
-                           data={this.state.allGroups}
-                           placeholder='Select a group...'
-                           selectedOption={this.state.allGroups[0]}
-                           onSelect={(group) => this.handleChangeGroup(group)}
-                        />
-                        <Button style={styles.groupButton} onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >New Group</Button>
-                        <Button style={styles.button} onPress={() => this.handleAdd()} >Add Contact</Button>
+                        <Layout style={styles.mainInputGroup}>
+                           <Layout style={styles.selectBoxContainer}>
+                              <Select style={styles.selectBox}
+                                 label='Group'
+                                 data={this.state.allGroups}
+                                 placeholder='Select a group...'
+                                 selectedOption={this.state.allGroups[0]}
+                                 onSelect={(group) => this.handleChangeGroup(group)}
+                              />
+                           </Layout>
+                           <Button style={styles.groupButton} status="success" appearance='outline' onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >{"New Group"}</Button>
+                        </Layout>
+                        <Button style={styles.button} onPress={() => this.handleAdd()} >{"Add Contact"}</Button>
                      </Layout>
                   </Layout>
                </ScrollView>
@@ -242,8 +244,10 @@ const styles = StyleSheet.create({
    inputRow: {
       paddingVertical: 4,
    },
+   selectBoxContainer: {
+      flex: 1
+   },
    selectBox: {
-      width: '100%',
    },
    modalContainer: {
       flex: 1,
@@ -283,11 +287,15 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
    },
    groupButton: {
-      backgroundColor: '#00FF00',
-      flex: 1,
-      marginTop: 8,
-      width: '75%',
-   }
+      marginLeft: 8,
+      alignSelf: "flex-end"
+   },
+   mainInputGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+   },
 });
 
 export default NewContact;

@@ -8,6 +8,7 @@ import {
 import cf from "./Functions/ContactFunctions";
 import { Layout, Text, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
+import { dark, light } from '../assets/Themes.js';
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
@@ -47,14 +48,6 @@ class YourContacts extends Component {
    GetSectionListItem = item => {
       //Function for click on an item
       Alert.alert(item);
-   };
-   FlatListItemSeparator = () => {
-      return (
-         //Item Separator
-         <Layout
-            style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }}
-         />
-      );
    };
 
    ShareContactPress(email) {
@@ -135,13 +128,12 @@ class YourContacts extends Component {
             />
             <Layout>
                <SectionList style={this.state.share ? styles.share : styles.notShare}
-                  ItemSeparatorComponent={this.FlatListItemSeparator}
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
                   renderSectionHeader={({ section }) => {
                      if (this.state.share) {
-                        return <Text style={styles.SectionHeaderStyle} onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
+                        return <Text style={[styles.sectionHeaderStyle, { backgroundColor: global.theme == light ? light["color-info-700"] : dark["color-info-700"] }]} category='s1' onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
                      } else {
-                        return <Text style={styles.SectionHeaderStyle}> {section.title} </Text>
+                        return <Text style={[styles.sectionHeaderStyle, { backgroundColor: global.theme == light ? light["color-info-700"] : dark["color-info-700"] }]} category='s1'> {section.title} </Text>
                      }
                   }}
                   renderItem={({ item }) => {
@@ -179,11 +171,10 @@ class YourContacts extends Component {
 
 }
 const styles = StyleSheet.create({
-   SectionHeaderStyle: {
-      backgroundColor: '#CDDC89',
-      fontSize: 20,
-      padding: 5,
-      color: '#fff',
+   sectionHeaderStyle: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      marginTop:4,
    },
    notShare: {
       height: '100%'
