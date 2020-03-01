@@ -345,7 +345,6 @@ class ListFunctions {
                   var childRmvRef = firebase.database().ref("/lists/" + listId);
                   childRmvRef.remove();
                } else {
-                  console.log(listRetVal.user_count);
                   var newCount = listRetVal.user_count - 1;
                   childRmvRef = firebase.database().ref("/lists/" + listId);
                   childRmvRef.update({
@@ -492,15 +491,62 @@ class ListFunctions {
     * 
     * Loads the available stores from the database.
     * The available stores are all known stores.
+    * Puts the information into an array of objects
+    * with one object for each store.
     * 
     * @param   None
     * 
-    * @returns The available stores
+    * @returns The information about available stores
     */
    getAvailableStores() {
       // Call the function to load all available stores
-      var data = autocomplete.cloudLoadAvailableStores();
+      var data = autocomplete.cloudLoadAvailableStores().then((value) => {
+          // Get the stores and ids
+          var titles = value.titles;
+          var ids = value.ids;
+          var addrs = value.addrs;
+          var names = value.names;
+
+          // Save the names and ids to the state
+          var temp = [];
+          for (var i = 0; i < ids.length; i++) {
+              temp.push({
+                  title: titles[i],
+                  id: ids[i],
+                  addr: addrs[i],
+                  storeName: names[i]
+              });
+          }
+
+          temp.push({
+              title: "Register a store...",
+              id: -1
+          });
+
+          return temp;
+      });
+
       return data;
+   }
+
+   /**
+    * getMapClusters
+    * 
+    * Loads all of the map clusters from the database.
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
+   getMapClusters() {
+      var ref = firebase.database().ref("/mapClusters");
+      var retVal = ref.once("value").then((snapshot) => {
+         var ssv = snapshot.val();
+
+         return ssv;
+      });
+
+      return retVal;
    }
 
    /**
@@ -556,18 +602,20 @@ class ListFunctions {
     * 
     * @param {String} storeId The ID of the store the user is in
     * @param {String} listId The ID of the list to rearrange
+    * @param {Array} cluster Optional parameter.
+    *                        When given, it is used as the map for reordering.
+    *                        When not given, the map in the database is used.
     */
-   async reorgListFastest(storeId, listId) {
+   async reorgListFastest(storeId, listId, cluster = null) {
       try {
          // Call the function to get the sorted list
          const {
             data
          } = await firebase.functions().httpsCallable('cloudReorgListFastest')({
             storeId: storeId,
-            listId: listId
+            listId: listId,
+            cluster: cluster
          });
-
-         console.log(data);
 
          return data;
       } catch (e) {

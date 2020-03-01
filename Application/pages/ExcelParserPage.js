@@ -44,6 +44,23 @@ class ExcelParserPage extends Component {
         }
     }
 
+    async testClusters() {
+        try {
+           // Call the function to get the sorted list
+           const {data} = await firebase.functions().httpsCallable('cloudDetermineClusters')({
+
+           });
+
+           console.log(data);
+  
+           return null;
+        } catch (e) {
+           console.error(e);
+  
+           return (null);
+        }
+    }
+
     async parseFile() {
         var items = excelData["ITEMS"];
         var stores = excelData["STORES"];
@@ -130,8 +147,9 @@ class ExcelParserPage extends Component {
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
-                                <Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>
+                                {/**<Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>**/}
                                 <Button style={styles.button} onPress={this.testRecommend} >Test Recommend</Button>
+                                <Button style={styles.button} onPress={this.testClusters} >Test Clusters</Button>
                             </Layout>
                         </Layout>
                     </ScrollView>

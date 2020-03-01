@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
 import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
-import { departments } from "../DepartmentList"
+import { departments } from "../DepartmentList";
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
 import { dark, light } from '../assets/Themes.js';
@@ -42,11 +42,19 @@ class MapCreatorPage extends Component {
 
         this.state = {
             arrayHolder: [], // The departments added so far
+
             storeName: DEFAULT_STORE_NAME, // The name of the store
             franchiseName: DEFAULT_FRANCHISE_NAME, // The franchise name of the store
-            address: DEFAULT_ADDRESS, // The address of the store,
+            address: DEFAULT_ADDRESS, // The address of the store
+
             template: templates[0],
-            test: []
+            test: [],
+
+            modifyMode: false,
+            previousPage: null,
+            listName: null,
+            listId: null
+
         };
     }
 
@@ -72,6 +80,44 @@ class MapCreatorPage extends Component {
                 this.setState({
                     arrayHolder: [...this.currDepartments]
                 });
+                
+                // Initialize the page if information is passed in
+                previousPage = this.props.navigation.getParam("previousPage", null);
+                if (previousPage !== null) {
+                    currMap = this.props.navigation.getParam("currLayout", []);
+                    currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
+                    currStoreName = this.props.navigation.getParam("storeName", DEFAULT_STORE_NAME);
+                    listName = this.props.navigation.getParam("listName", null);
+                    listId = this.props.navigation.getParam("listId", null);
+
+                    if ((currStoreAddr === null) || (currStoreAddr === "") || (currStoreAddr === undefined)) {
+                        currStoreAddr = DEFAULT_ADDRESS;
+                    }
+
+                    // Populate the map if one is given
+                    if (currMap.length !== 0) {
+                        this.clearMap();
+    
+                        for (var i = 0; i < currMap.length; i++) {
+                            this.addDepWithValue(currMap[i]);
+                        }
+                    }
+
+                    modifyMode = false;
+
+                    if (currStoreName !== DEFAULT_STORE_NAME) {
+                        modifyMode = true;
+                    }
+    
+                    this.setState({
+                        address: currStoreAddr,
+                        storeName: currStoreName,
+                        modifyMode: modifyMode,
+                        previousPage: previousPage,
+                        listName: listName,
+                        listId: listId
+                    });
+                }
             }
         );
 
@@ -141,18 +187,26 @@ class MapCreatorPage extends Component {
         // Get the franchise name
         var tempFranchiseName = this.state.franchiseName === DEFAULT_FRANCHISE_NAME ? null : this.state.franchiseName;
 
-        // Save the store to the database
-        dbi.registerStore(this.state.storeName,
-            this.state.address,
-            deps,
-            tempFranchiseName);
+        Alert.alert("Map Saved! Thank you!");
 
-        Alert.alert("Map Saved! Thank you!")
-        if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
-            this.props.navigation.navigate("CurrentListPage", {
-                name: this.props.navigation.getParam("listName", "(Invalid Name)"),
-                listID: this.props.navigation.getParam("listId", "(Invalid List ID)")
+        // Register the map or modify weights depending on page
+        previousPage = this.state.previousPage;
+        if (previousPage !== null) {
+            // Save the store to the database
+            dbi.modStoreWeights(this.state.storeName,
+                                this.state.address,
+                                deps);
+
+            this.props.navigation.navigate(previousPage, {
+                listName: this.state.listName,
+                listID: this.state.listId
             });
+        } else {
+            // Save the store to the database
+            dbi.registerStore(this.state.storeName,
+                              this.state.address,
+                              deps,
+                              tempFranchiseName);
         }
     }
 
@@ -258,7 +312,7 @@ class MapCreatorPage extends Component {
 
         for(var i = 0; i < departments.length; i++) {
             this.addDepartment();
-            this.updateDepartment(i, departments[i].value);
+            this.updateDepartment(i, departments[i].text);
         }
     }
 
@@ -282,14 +336,7 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepartment();
-
-                    for(var j = 0; j < departments.length; j++) {
-                        if (departments[j].text.localeCompare(value[i]) == 0) {
-                            this.updateDepartment(i, departments[j].value);
-                            j = departments.length + 2;
-                        }
-                    }                
+                    this.addDepWithValue(value[i]);             
                 }
             }
         });
@@ -315,17 +362,30 @@ class MapCreatorPage extends Component {
                 this.clearMap();
 
                 for(var i = 0; i < value.length; i++) {
-                    this.addDepartment();
-
-                    for(var j = 0; j < departments.length; j++) {
-                        if (departments[j].text.localeCompare(value[i]) == 0) {
-                            this.updateDepartment(i, departments[j].value);
-                            j = departments.length + 2;
-                        }
-                    }
+                    this.addDepWithValue(value[i]);
                 }
             }
         });
+    }
+
+    /**
+     * addDepWithValue
+     * 
+     * Add a new department with the given value.
+     * 
+     * @param {String} name The value of the new department
+     * 
+     * @returns None
+     */
+    addDepWithValue(name) {
+        this.addDepartment();
+
+        for(var j = 0; j < departments.length; j++) {
+            if (departments[j].text === name) {
+                this.updateDepartment(this.currDepartments.length - 1, departments[j].text);
+                j = departments.length + 2;
+            }
+        }
     }
 
     /**
@@ -562,8 +622,21 @@ class MapCreatorPage extends Component {
                                 extraData={this.state.arrayHolder}
                             />
                             <Layout style={styles.mainButtonGroup} >
-                                <Button style={styles.mainPageButton} status='primary' onPress={this.addDepartment}>{'Add Department'}</Button>
-                                <Button style={styles.mainPageButton} status='success' onPress={this.handleSaveMap}>{'Save Map'}</Button>
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='primary'
+                                    onPress={this.addDepartment}
+                                >
+                                    {'Add Department'}
+                                </Button>
+
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='success'
+                                    onPress={this.handleSaveMap}
+                                >
+                                    {this.state.modifyMode ? 'Save Map And Go Back' : 'Save Map'}
+                                </Button>
                             </Layout>
                         </Layout>
                     </Layout>
