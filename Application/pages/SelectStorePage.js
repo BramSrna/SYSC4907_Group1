@@ -170,9 +170,11 @@ class SelectStorePage extends Component {
             // if exact match was not found look for similar strings
             if (id == "") {
                 if(availableStores!=[]){
-                    var similarity = StringSimilarity.findBestMatch(newStore, availableStores.map(store => store.name));
+                    console.log(newStore);
+                    console.log(availableStores.map(store => store.title));
+                    var similarity = StringSimilarity.findBestMatch(newStore, availableStores.map(store => store.title));
                     if (similarity.bestMatch.rating >= STRING_SIMILARITY_THRESHOLD) {
-                        id = availableStores.find(element => element.name == similarity.bestMatch.target).id;
+                        id = availableStores.find(element => element.title == similarity.bestMatch.target).id;
                         console.log("Similarity matched store id: " + id);
                     }
                     else {
