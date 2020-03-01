@@ -209,7 +209,9 @@ class MapsPage extends Component {
     };
 
     selectStore = location => {
-        this.props.navigation.state.params.selectStore(location);
+        if(this.props.navigation.state.params){
+            this.props.navigation.state.params.selectStore(location);
+        }
         this.props.navigation.goBack();
     };
 
