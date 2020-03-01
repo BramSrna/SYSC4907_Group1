@@ -110,14 +110,11 @@ export default class ListItemContainer extends Component {
             retStyle.borderRadius = 8;
         }
 
-        console.log(retStyle);
-
         return retStyle;
 
     }
 
     render() {
-        //console.log(this.props.department);
         const { fromContactView = false,
             share = false,
             contact = false,
@@ -259,12 +256,6 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 10,
         padding: 4,
-    },
-    departmentColourContainer: {
-        flex: 0.1,
-    },
-    departmentColourContainer: {
-        flex: 0.1,
     },
     optionButtonContainer: {
         borderRadius: 10,

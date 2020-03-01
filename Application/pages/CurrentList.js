@@ -447,7 +447,7 @@ class CurrentList extends Component {
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
       var locs = this.state.listItemLocs;
-      //console.log(locs);
+      
       if ((!item.purchased) || (item.purchased && !this.state.hidePurchased)){
          return (
             <ListItemContainer
@@ -949,8 +949,6 @@ class CurrentList extends Component {
       currStoreName = this.state.currStoreName;
       currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
-
-      //console.log(map);
 
       retVal = [];
 
