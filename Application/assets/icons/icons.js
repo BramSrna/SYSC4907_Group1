@@ -1,28 +1,5 @@
 import React from 'react';
-import { Image } from 'react-native';
 import { Icon } from 'react-native-ui-kitten';
-
-export const EmailIcon = (style) => (
-    <Image
-        style={style}
-        source={require("./icons8-mail-account-64.png")}
-    />
-);
-
-export const PasswordIcon = (style) => (
-    <Image
-        style={style}
-        source={require("./icons8-key-64.png")}
-    />
-);
-
-export const RefreshIcon = (style) => (
-    <Icon {...style} name='refresh-outline' />
-);
-
-export const CheckmarkIcon = (style) => (
-    <Icon {...style} name='checkmark-outline' />
-);
 
 export const MenuOutline = (style) => (
     <Icon {...style} name='menu-outline' />
@@ -90,4 +67,12 @@ export const ArrowBackIcon = (style) => (
 
 export const MapIcon = (style) => (
     <Icon {...style} name='map-outline' />
+);
+
+export const CheckmarkIcon = (style) => (
+    <Icon {...style} name='checkmark-outline' />
+);
+
+export const CloseIcon = (style) => (
+    <Icon {...style} name='close-outline' />
 );
