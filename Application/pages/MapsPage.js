@@ -246,7 +246,7 @@ class MapsPage extends Component {
                 onCalloutPress={() => this.selectStore(title + " - " + description)}
             />
         );
-
+        
         return (
             <React.Fragment>
                 <TopNavigation
