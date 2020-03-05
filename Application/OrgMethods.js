@@ -14,6 +14,7 @@ const options = [
     {text: "Alphabetically", label: "Alphabetically", value: "ALPHABETICALLY"},
     {text: "By Location", label: "By Location", value: "BY_LOCATION"},
     {text: "Fastest Path", label: "Fastest Path", value: "FASTEST_PATH"},
+    {text: "Fastest Path (Auto Update)", label: "Fastest Path (Auto Update)", value: "FASTEST_PATH_AUTO_UPDATE"},
     {text: "Purchased", label: "Purchased", value: "PURCHASED"}
 ];
 

@@ -13,11 +13,10 @@ import {
     Autocomplete,
     Text,
 } from 'react-native-ui-kitten';
-import { ArrowBackIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
-import { AddIcon } from '../assets/icons/icons.js';
+import { ArrowBackIcon, AddIcon, RefreshIcon, CheckmarkIcon } from '../assets/icons/icons.js';
 import * as firebase from 'firebase/app';
 import nm from '../pages/Functions/NotificationManager.js';
 
@@ -25,6 +24,8 @@ const globalComps = require('./Functions/GlobalComps');
 
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
+const DEFAULT_GEN_NAME = "";
+const DEFAULT_SPEC_NAME = null;
 
 // The number of items to recommend
 const NUM_REC_ITEMS = 10;
@@ -39,14 +40,17 @@ class AddItemPage extends Component {
             listName: "", // Name of current list
 
             itemName: "", // The item name entered in the autocomplete box
-            genName: "", // The generic name of the entered item
-            specName: null, // The specific name of the entered item
+            genName: DEFAULT_GEN_NAME, // The generic name of the entered item
+            specName: DEFAULT_SPEC_NAME, // The specific name of the entered item
             currItemId: "", // The id name of the entered item
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
 
+            prevRecommended: [], // The previously recommended items
             recommendedItems: [], // The list of recommended items
-            listItemIds: [] // The ids of the recommended items
+            listItemIds: [], // The ids of the recommended items
+
+            toAdd: [] // The recommended items the user wants to add to their list
         };
     }
 
@@ -188,6 +192,7 @@ class AddItemPage extends Component {
     loadRecommendedItems() {
         // Get the ids of the current items in the list
         var currItemIds = this.state.listItemIds;
+        var currPrevRec = this.state.prevRecommended;
 
         var that = this;
 
@@ -222,6 +227,7 @@ class AddItemPage extends Component {
 
             var finalItems = [];
             var ids = [];
+            var backlog = [];
 
             // Copy the top recommended items to the final list to recommend
             // as well as their ids, upto the maximum length
@@ -230,12 +236,23 @@ class AddItemPage extends Component {
                 var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
                 var id = recItems[i][0];
 
-                finalItems.push({
+                var toAdd = {
                     genName: info.genericName,
                     specName: info.specificName,
                     name: name,
-                    id: id
-                });
+                    id: id,
+                    added: false
+                };
+
+                // Add the item to final items if it is not currently in the
+                // user's list and it has not been previosuly recommended.
+                // Otherwise, if the item is not in the list, but has been
+                // previously recommended, add it to the backlog
+                if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                    finalItems.push(toAdd);
+                } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                    backlog.push(toAdd);
+                }
 
                 ids.push(id)
             }
@@ -248,21 +265,33 @@ class AddItemPage extends Component {
                     var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
                     var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
 
-                    // Check that the item is not already in the list
-                    if (!ids.includes(id)) {
-                        finalItems.push({
-                            genName: info.genericName,
-                            specName: info.specificName,
-                            name: name,
-                            id: id
-                        });
+                    var toAdd = {
+                        genName: info.genericName,
+                        specName: info.specificName,
+                        name: name,
+                        id: id,
+                        added: false
+                    };
+
+                    // Same as above
+                    if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                        finalItems.push(toAdd);
+                    } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                        backlog.push(toAdd);
                     }
                 }
             }
 
+            // If we're out of items to recommend, reset the backlog and previosuly recommended items
+            for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                finalItems.push(backlog[i]);
+                currPrevRec = [];
+            }
+
             // Save the list of recommended items
             that.setState({
-                recommendedItems: finalItems
+                recommendedItems: finalItems,
+                prevRecommended: currPrevRec
             });
         });
     }
@@ -319,16 +348,43 @@ class AddItemPage extends Component {
      * Handler for the add item button under
      * the autocomplete box.
      */
-    handleAddButton = () => {
-        // Add the item to the list
-        this.addItem(this.state.listId,
-            this.state.genName,
-            specName = this.state.specName);
+    handleAddButton = () => {        
+        this.addToggledRecommendedItems();
+
+        if (this.state.genName !== DEFAULT_GEN_NAME) {
+            // Add the item to the list
+            this.addItem(this.state.listId,
+                this.state.genName,
+                specName = this.state.specName);
+        }
 
         // Return to the list
         if (this._isMounted) {
             this.props.navigation.goBack();
         }
+    }
+
+    /**
+     * handleAddRecommendedButton
+     * 
+     * Handler for the add recommended item button.
+     * Adds the item to the list of items to add
+     * and sets the item to added.
+     * 
+     * @param {Integer} ind The index of the item selected
+     * 
+     * @retunrs None
+     */
+    handleAddRecommendedButton = (ind) => {
+        // Get the list of recommended items
+        var temp = this.state.recommendedItems;
+
+        // Add the selected item to the list
+        temp[ind].added = true;
+
+        this.setState({
+            recommendedItems: temp
+        });
     }
 
     /**
@@ -353,34 +409,45 @@ class AddItemPage extends Component {
             specName = specName);
     };
 
+    addToggledRecommendedItems() {
+        var currRecItems = this.state.recommendedItems;
+        var currItemIds = this.state.listItemIds;
+        var currPrevRec = this.state.prevRecommended;
+
+        // Add all of the recommended items the user
+        // has selected to their list. Also update
+        // the previously recommended items
+        for (var i = 0; i < currRecItems.length; i++) {
+            var item = currRecItems[i];
+            if (item.added){
+                this.addItem(this.state.listId,
+                    item.genName,
+                    item.specName);
+        
+                currItemIds.push(item.id);
+            } else {
+                currPrevRec.push(item.id);
+            }
+        }
+
+        this.setState({
+            listItemIds: currItemIds,
+            prevRecommended: currPrevRec
+        });
+    }
+
     /**
-     * addItemFromRecommended
+     * handleRefreshButton
      * 
-     * Handler for the add item button for the
-     * recommended items.
+     * Handler for the refresh recommended items button.
+     * Refreshes the recommended items
      * 
-     * @param {Integer} ind The index of the recommend item in the list
+     * @param None
      * 
      * @returns None
      */
-    addItemFromRecommended(ind) {
-        // Get the list of recommended items
-        var temp = this.state.recommendedItems;
-
-        // Add the selected item to the list
-        var item = temp[ind];
-        this.addItem(this.state.listId,
-            item.genName,
-            item.specName);
-
-        // Update the state of the user's list with the item they added
-        temp = this.state.listItemIds;
-        temp.push(item.id);
-        this.setState({
-            listItemIds: temp
-        });
-
-        // Reload the recommended items
+    handleRefreshButton() {
+        this.addToggledRecommendedItems();
         this.loadRecommendedItems();
     }
 
@@ -405,10 +472,10 @@ class AddItemPage extends Component {
                     </Layout>
                     <Layout style={styles.itemButtonContainer} level='1'>
                         <Button
-                            icon={AddIcon}
+                            icon={item.added ? CheckmarkIcon : AddIcon}
                             appearance='outline'
-                            status='danger'
-                            onPress={() => this.addItemFromRecommended(index)}
+                            status={item.added ? 'success' : 'danger'}
+                            onPress={() => this.handleAddRecommendedButton(index)}
                         />
                     </Layout>
 
@@ -481,9 +548,24 @@ class AddItemPage extends Component {
 
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
-                                <Text>
-                                    {'Recommended Items:'}
-                                </Text>
+                                <Layout style={styles.listItem} level='2'>
+                                    <Layout style={styles.listTextContainer} level='1'>
+                                        <Layout style={styles.itemTextContainer} level='1'>
+                                            <Text style={styles.itemText}>
+                                                Recommended Items:
+                                            </Text>
+                                        </Layout>
+                                        <Layout style={styles.itemButtonContainer} level='1'>
+                                            <Button
+                                                icon={RefreshIcon}
+                                                appearance='outline'
+                                                status='warning'
+                                                onPress={() => this.handleRefreshButton()}
+                                            />
+                                        </Layout>
+
+                                    </Layout>
+                                </Layout>
 
                                 <FlatList
                                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.

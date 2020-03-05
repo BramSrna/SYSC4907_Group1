@@ -16,7 +16,7 @@ import {
    Text,
    CheckBox
 } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon, BellIcon } from "../assets/icons/icons.js";
+import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -34,10 +34,16 @@ const PAGE_TITLE = "Current List";
 const NEW_STORE = "Register a store...";
 
 const FASTEST_PATH = "FASTEST_PATH";
+const FASTEST_PATH_AUTO_UPDATE = "FASTEST_PATH_AUTO_UPDATE";
 const BY_LOCATION = "BY_LOCATION";
 const ORDER_ADDED = "ORDER_ADDED";
 const ALPHABETICALLY = "ALPHABETICALLY";
 const PURCHASED = "PURCHASED";
+
+const DEFAULT_STORE = "";
+const DEFAULT_STORE_ID = "";
+const DEFAULT_STORE_ADDR = "";
+const DEFAULT_STORE_NAME = "";
 
 class CurrentList extends Component {
    constructor(props) {
@@ -48,6 +54,7 @@ class CurrentList extends Component {
          listId: "",
          listItems: [],
          listItemIds: [],
+         listItemLocs: null,
          modalMode: 'item',
 
          firstLoadComplete: false,
@@ -58,9 +65,12 @@ class CurrentList extends Component {
          isDialogVisible: false,
 
          orgMethod: organizationOptions[0],
-         currStore: "",
-         currStoreId: "",
+         currStore: DEFAULT_STORE,
+         currStoreId: DEFAULT_STORE_ID,
+         currStoreAddr: DEFAULT_STORE_ADDR,
+         currStoreName: DEFAULT_STORE_NAME,
          storeModalVisible: false,
+         map: null,
 
          currItemId: "",
          itemModalVisible: false,
@@ -137,38 +147,50 @@ class CurrentList extends Component {
     */
    SetNameAndCurrentItems() {
       // Set the current name and list id
-      console.log('SetNameAndCurrentItems');
+      newListName = this.props.navigation.getParam("listName", "(Invalid Name)");
+      newListId = this.props.navigation.getParam("listID", "(Invalid List ID)");
 
       this._isMounted && this.setState({
-         listName: this.props.navigation.getParam("name", "(Invalid Name)"),
-         listId: this.props.navigation.getParam("listID", "(Invalid List ID)")
+         listName: newListName,
+         listId: newListId
       });
-      if (this.props.navigation.state.params.currStoreId && this.props.navigation.state.params.sort) {
-         console.log('got extra navigation params: ' + this.props.navigation.getParam("sort", ALPHABETICALLY));
+
+      if (this.props.navigation.state.params.currStoreTitle && this.props.navigation.state.params.sort) {
+         sortMethod = this.props.navigation.getParam("sort", ALPHABETICALLY);
+
+         newStore = this.props.navigation.getParam("currStoreTitle", "(Invalid Store)");
+         newStoreId = this.props.navigation.getParam("currStoreId", "(Invalid Store ID)");
+         newStoreAddr = this.props.navigation.getParam("currStoreAddr", null);
+         newStoreName = this.props.navigation.getParam("currStoreName", "(Invalid Store Name)");
+         newCluster = this.props.navigation.getParam("choosenCluster", null);
+
          this._isMounted && this.setState({
-            currStoreId: this.props.navigation.getParam("currStoreId", "(Invalid Store ID)"),
+            currStoreId: newStoreId,
+            currStore: newStore,
+            currStoreAddr: newStoreAddr,
+            currStoreName: newStoreName
          });
-         if (this.props.navigation.getParam("sort", ALPHABETICALLY) == FASTEST_PATH) {
-            this.reorganizeListFastest(this);
-            console.log('reorganize based on fastest path');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == FASTEST_PATH) });
+
+         var autoState = false;
+
+         if (sortMethod == FASTEST_PATH) {
+            this.reorganizeListFastest(newStoreId, newListId, this, cluster = newCluster);
+         } else if (sortMethod == FASTEST_PATH_AUTO_UPDATE) {
+            this.reorganizeListFastestAutoUpdate(newStoreId, newListId, this, cluster = newCluster);
+   
+            autoState = true;
+         } else if (sortMethod == BY_LOCATION) {
+            this.reorganizeListLoc(newStoreId, newListId, this);
+         } else {
+            this.localSort(sortMethod);
          }
-         else if (this.props.navigation.getParam("sort", ALPHABETICALLY) == BY_LOCATION) {
-            this.reorganizeListLoc(this);
-            console.log('reorganize based on location');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == BY_LOCATION) });
-         }
-         else {
-            this.reorganizeListAlphabetically(this);
-            console.log('reorganize alphabetically');
-            this.setState({ orgMethod: organizationOptions.find(element => element.value == ALPHABETICALLY) });
-         }
+
+         this.setState({ orgMethod: organizationOptions.find(element => element.value == sortMethod),
+                         autoUpdate: autoState });
+      } else {
+         // Load the current contents of the list
+         this.loadCurrList(this, newListId);
       }
-
-      // Load the current contents of the list
-      this.loadCurrList(this,
-         this.props.navigation.getParam("listID", "(Invalid List ID)"));
-
    }
 
    /**
@@ -183,23 +205,8 @@ class CurrentList extends Component {
     */
    loadAvailableStores() {
       // Load the available stores and parses the data
-      var tempList = lf.getAvailableStores();
-      tempList.then((value) => {
-          // Get the stores and ids
-          var stores = value.stores;
-          var ids = value.ids;
-
-          // Save the names and ids to the state
-          var temp = [];
-          for (var i = 0; i < ids.length; i++) {
-              temp.push({
-                  name: stores[i],
-                  title: stores[i],
-                  id: ids[i]
-              });
-          }
-          temp.push({ name: NEW_STORE, title: NEW_STORE, id: -1 });
-          availableStores = temp;
+      var tempList = lf.getAvailableStores().then((value) => {
+          availableStores = value;
       });
   }
 
@@ -259,11 +266,11 @@ class CurrentList extends Component {
          // Update the state of the context
          that.updateListState(items,
                               ids,
-                              reorg = false,
-                              userCount = userCount,
-                              minPrice = minPrice.toFixed(2),
-                              maxPrice = maxPrice.toFixed(2),
-                              numUnknownPrice = numUnknownPrice);
+                              {reorg: false,
+                              userCount: userCount,
+                              minPrice: minPrice.toFixed(2),
+                              maxPrice: maxPrice.toFixed(2),
+                              numUnknownPrice: numUnknownPrice});
       });
    }
 
@@ -282,6 +289,7 @@ class CurrentList extends Component {
     * 
     * @param {Array}   newItems  The new array of Item objects
     * @param {Array}   newIds    The new array of ID objects
+    * OptionalParams is an object used to pass in several optional parameters:
     * @param {Boolean} reorg     If true, then the local arrays are
     *                            rearranged to match the given order.
     *                            Default is false
@@ -290,18 +298,43 @@ class CurrentList extends Component {
     * @param {Double} minPrice   The minimum price of the entire list
     * @param {Double} maxPrice   The maximum price of the entire list
     * @param {Integer} numUnknownPrice The number of items in the list with unknown prices
+    * @param {Array} map   The map used for rearranging the list
     * 
     * @returns None
     */
-   updateListState(newItems, newIds, reorg = false, userCount = null, minPrice = null, maxPrice = null, numUnknownPrice = null) {
+   updateListState(newItems, newIds, optionalParams) {
+      defaultParams = {
+         reorg: false,
+         locs: null,
+         userCount: null,
+         minPrice: null,
+         maxPrice: null,
+         numUnknownPrice: null,
+         map: null
+      }
+
+      for (key in optionalParams) {
+         defaultParams[key] = optionalParams[key];
+      }
+
+      reorg = defaultParams.reorg;
+      userCount = defaultParams.userCount;
+      minPrice = defaultParams.minPrice;
+      maxPrice = defaultParams.maxPrice;
+      numUnknownPrice = defaultParams.numUnknownPrice;
+      map = defaultParams.map;
+      locs = defaultParams.locs;
+
       // Get the current Arrays
       var localIds = this.state.listItemIds;
       var localItems = this.state.listItems;
+      var localLocs = this.state.listItemLocs;
 
       if (reorg) {
          // If reorg is true, then just rearrange the current arrays
          localIds = newIds;
          localItems = newItems;
+         localLocs = locs;
       } else {
          // Get the list of items added and removed
          var itemsAdded = newIds.filter(x => !localIds.includes(x));
@@ -315,6 +348,10 @@ class CurrentList extends Component {
 
                localIds.push(newIds[ind]);
                localItems.push(newItems[ind]);
+
+               if (locs != null) {
+                  localLocs.push(locs[ind]);
+               }
             }
          } else if (itemsRemoved.length > 0) {
             // Items were removed
@@ -325,6 +362,10 @@ class CurrentList extends Component {
                if (ind > -1) {
                   localIds.splice(ind, 1);
                   localItems.splice(ind, 1);
+               }
+
+               if (localLocs != null) {
+                  localLocs.splice(ind, 1);
                }
             }
          } else {
@@ -354,10 +395,16 @@ class CurrentList extends Component {
          firstLoadComplete: true,
          listItems: localItems,
          listItemIds: localIds,
+         listItemLocs: localLocs,
          userCount: userCount === null ? this.state.userCount : userCount,
          minPrice: minPrice === null ? this.state.minPrice : minPrice,
          maxPrice: maxPrice === null ? this.state.maxPrice : maxPrice,
          numUnknownPrice: numUnknownPrice === null ? this.state.numUnknownPrice : numUnknownPrice,
+         map: map === null ? this.state.map : map === -1 ? null : map,
+         currStoreId: map === -1 ? DEFAULT_STORE_ID : this.state.currStoreId,
+         currStore: map === -1 ? DEFAULT_STORE : this.state.currStore,
+         currStoreAddr: map === -1 ? DEFAULT_STORE_ADDR : this.state.currStoreAddr,
+         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName
       });
    }
 
@@ -399,6 +446,8 @@ class CurrentList extends Component {
     * @returns None
     */
    GenerateListItem(item, index) {// Pass more paremeters here...
+      var locs = this.state.listItemLocs;
+      
       if ((!item.purchased) || (item.purchased && !this.state.hidePurchased)){
          return (
             <ListItemContainer
@@ -409,6 +458,7 @@ class CurrentList extends Component {
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
                onDelete={this.deleteItem}
+               department={((locs === null) || (locs === undefined)) ? null : locs[index]}
             />
          );
       }
@@ -439,13 +489,119 @@ class CurrentList extends Component {
     * Handler for the user double-tapping on an items.
     * Toggles the purchased boolean on that item.
     * 
-    * @param {Integer} indexPosition   The index of the item that the user pressed on
+    * @param {Integer} ind   The index of the item that the user pressed on
     * 
     * @returns None
     */
-   HandleDoubleTapItem(indexPosition) {
-      lf.UpdatePurchasedBoolOfAnItemInAList(this.state.listId,
-         this.state.listItemIds[indexPosition])
+   HandleDoubleTapItem(ind) {
+      var listId = this.state.listId;
+      var itemIds = this.state.listItemIds;
+
+      var that = this;
+
+      lf.UpdatePurchasedBoolOfAnItemInAList(listId, itemIds[ind]).then((value) => {
+         // Update the list based on the last purchased item if autoupdate is enabled
+         if (that.state.autoUpdate) {
+            var items = that.state.listItems;
+   
+            // Separate all items in the list based on if they have been selected yet
+            var purchased = [];
+            var toReorg = [];
+            for (var i = 0; i < itemIds.length; i++) {
+               var currItem = items[i];
+               var currId = itemIds[i];
+   
+               var toAdd = {
+                  id: currId,
+                  item: currItem
+               };
+   
+               if ((!currItem.purchased) || (i === ind)){
+                  toReorg.push(toAdd);
+   
+                  if (i === ind) {
+                     ind = toReorg.length - 1;
+                  }
+               } else {
+                  purchased.push(toAdd);
+               }
+            }
+   
+            // Reorder the unpurchased items
+            newOrder = that.reorderForAutoUpdate(toReorg, ind);
+   
+            // Make the final list
+            if (newOrder[0].item.purchased){
+               purchased.push(newOrder[0]);
+               newOrder.splice(0, 1);
+            }
+            newOrder = newOrder.concat(purchased);
+   
+            var newIds = [];
+            var newItems = [];
+            for (var i = 0; i < newOrder.length; i++) {
+               newIds.push(newOrder[i].id);
+               newItems.push(newOrder[i].item);
+            }
+   
+            that.setState({
+               listItemIds: newIds,
+               listItems: newItems
+            });
+         }
+      });
+   }
+
+   /**
+    * reorderForAutoUpdate
+    * 
+    * Reorders the list based on its current state and the position
+    * of the last purchased item. Always trys to end the user at
+    * one end of the store. Places closest items to last selected
+    * item at top of list.
+    * 
+    * @param {Array} info The list to reorder
+    * @param {integer} ind The index of the last item selected
+    * 
+    * @returns The resorted array 
+    */
+   reorderForAutoUpdate(info, ind) {
+      var len = info.length;
+      var midInd = len % 2 === 1 ? (len - 1) / 2 : len / 2;
+
+      var newInd = -1;
+
+      var newOrder = [];
+      if ((len % 2 === 1) && (ind === midInd)){
+         newOrder.push(info[ind]);
+
+         var firstHalf = info.slice(0, midInd);
+         var secondHalf = info.slice(midInd + 1);
+
+         firstHalf.reverse();
+
+         newOrder = newOrder.concat(firstHalf);
+         newOrder = newOrder.concat(secondHalf);
+
+         info = newOrder;
+
+         newInd = 0;
+      } else {
+         if (ind >= midInd) {
+            info.reverse();
+            newInd = info.length - ind - 1;
+         } else {
+            newInd = ind;
+         }
+      }
+
+      if (info.length <= 2) {
+         return(info);
+      } else {
+         var secondHalf = info.splice(midInd);
+
+         return(this.reorderForAutoUpdate(info, newInd).concat(secondHalf));
+      }      
    }
 
    /**
@@ -494,14 +650,21 @@ class CurrentList extends Component {
                name: this.state.listName,
                listID: this.state.listId,
                sort: BY_LOCATION
-            })
+            });
             break;
          case FASTEST_PATH:
             this.props.navigation.navigate("SelectStorePage", {
                name: this.state.listName,
                listID: this.state.listId,
                sort: FASTEST_PATH
-            })
+            });
+            break;
+         case FASTEST_PATH_AUTO_UPDATE:
+            this.props.navigation.navigate("SelectStorePage", {
+               name: this.state.listName,
+               listID: this.state.listId,
+               sort: FASTEST_PATH_AUTO_UPDATE
+            });
             break;
          default:
             break;
@@ -509,7 +672,8 @@ class CurrentList extends Component {
 
       // Set the state
       this._isMounted && this.setState({
-         orgMethod: selection
+         orgMethod: selection,
+         autoUpdate: false
       });
    }
 
@@ -583,11 +747,14 @@ class CurrentList extends Component {
       // Get the items and ids
       var items = [];
       var ids = [];
+      var locs = null;
 
       if (initItems === null) {
          // Get the items and ids
          items = this.state.listItems;
          ids = this.state.listItemIds;
+
+         locs = this.state.listItemLocs;
       } else {
          // Get the items and ids
          items = initItems;
@@ -597,7 +764,11 @@ class CurrentList extends Component {
       // Put the items and their ids in a nested list
       var temp = [];
       for (var j = 0; j < items.length; j++) {
-         temp.push({ "item": items[j], "id": ids[j] });
+         temp.push({
+            "item": items[j],
+            "id": ids[j],
+            "loc": locs === null ? null : locs[j]
+         });
       }
 
       // Rearrage the nested list to put it in alphabetical order
@@ -608,11 +779,15 @@ class CurrentList extends Component {
       for (var k = 0; k < temp.length; k++) {
          items[k] = temp[k].item;
          ids[k] = temp[k].id;
+
+         if (locs !== null) {
+            locs[k] = temp[k].loc;
+         }
       }
 
       if (initItems === null) {
          // Update the list state to the reorganized values
-         this.updateListState(items, ids, reorg = true);
+         this.updateListState(items, ids, {locs: locs, reorg: true, map: -1});
       }
 
       return {
@@ -633,23 +808,15 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListLoc(context = this) {
-      console.log('reorganizeListLoc');
-      // Check the current store in the state
-      if (context.checkIfCurrStoreValid()) {
-         // Reorganize the list
-         var tempList = lf.reorgListLoc(context.state.currStoreId,
-            context.props.navigation.getParam("listID", "(Invalid List ID)"));
-         tempList.then((value) => {
-            // Update the local state of the list
-            context.updateListState(value.items, value.ids, reorg = true);
-         });
+   reorganizeListLoc(storeId, listId, context = this) {
+      // Reorganize the list
+      var tempList = lf.reorgListLoc(storeId, listId);
+      tempList.then((value) => {
+         // Update the local state of the list
+         context.updateListState(value.items, value.ids, {locs: value.locs, reorg: true, map: -1});
+      });
 
-         return;
-      } else {
-         // If the current store is invalid, print an alert to the user
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
+      return;
    }
 
    /**
@@ -663,44 +830,36 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListFastest(context = this) {
-      console.log('reorganizeListFastest');
-      // Check the current store in the state
-      if (context.checkIfCurrStoreValid()) {
-         // Reorganize the list
-         var tempList = lf.reorgListFastest(context.state.currStoreId,
-            context.props.navigation.getParam("listID", "(Invalid List ID)"));
-         tempList.then((value) => {
-            // Update the local state of the list
-            context.updateListState(value.items, value.ids, reorg = true);
-         });
+   reorganizeListFastest(storeId, listId, context = this, cluster = null) {
+      // Reorganize the list
+      var tempList = lf.reorgListFastest(storeId, listId, cluster);
+      tempList.then((value) => {
+         context.updateListState(value.items,
+                                 value.ids,
+                                 {reorg: true,
+                                  locs: value.locs,
+                                  map: value.map});
+      });
 
-         return;
-      } else {
-         // If the current store is invalid, print an alert to the user
-         Alert.alert("Sorry, we do not have information on that store!");
-      }
+      return;
    }
 
-   /**
-    * checkIfCurrStoreValid
-    * 
-    * Checks if the current store in the state is known
-    * in the database. Returns true if valid, and false otherwise.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   checkIfCurrStoreValid(context = this) {
-      // Check if the given id matches a known id
-      for (var i = 0; i < availableStores.length; i++) {
-         if (availableStores[i].id === context.state.currStoreId) {
-            return (true);
-         }
-      }
+   reorganizeListFastestAutoUpdate(storeId, listId, context = this, cluster = null) {
+      // Reorganize the list
+      var tempList = lf.reorgListFastest(storeId, listId, cluster);
+      tempList.then((value) => {
+         context.updateListState(value.items,
+                                 value.ids,
+                                 {reorg: true,
+                                  locs: value.locs,
+                                  map: value.map});
 
-      return (false);
+   
+
+         context.localSort(PURCHASED);
+      });
+
+      return;
    }
 
    /**
@@ -774,6 +933,55 @@ class CurrentList extends Component {
          </Layout>
       );
    };
+
+   /**
+    * renderStoreMapDashboard
+    * 
+    * Renders the dashboard for allowing users to view
+    * and edit a mapt after reorganizing the list
+    * 
+    * @param   None
+    * 
+    * @returns None
+    */
+   renderStoreMapDashboard = () => {
+      currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
+      map = this.state.map;
+
+      retVal = [];
+
+      // Only render if the store is chosen
+      if (currStore !== DEFAULT_STORE) {
+         return (
+            <Layout style={styles.dashboard} >
+               <Layout style={styles.dashboardOuterContainer} level='3' >
+                  <Layout style={[styles.dashboardInnerContainer, {flexDirection: 'row'}]}>
+                     <Text style={styles.dashboardText}>
+                        {currStore}
+                     </Text>
+
+                     {/** Show the map icon if a map is known */}
+                     {map === null ?
+                        <Text></Text> :
+                        <Button
+                           style={styles.mapButton}
+                           icon={MapIcon}
+                           onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
+                                                                                             storeName: currStoreName,
+                                                                                             storeAddr: currStoreAddr,
+                                                                                             listId: this.state.listId,
+                                                                                             listName: this.state.listName,
+                                                                                             previousPage: "CurrentListPage" })}
+                        />
+                     }
+                  </Layout>
+               </Layout>
+            </Layout>
+         );
+      }
+   }
 
    /**
     * setNotificationModalVisible
@@ -862,6 +1070,7 @@ class CurrentList extends Component {
                leftControl={renderMenuAction()}
                rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
+
             <Layout style={styles.ListContainer}>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
@@ -872,31 +1081,37 @@ class CurrentList extends Component {
                      {this.renderNotificationModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
+
                <Layout style={styles.selectContainer}>
                   <Select style={styles.selectBox}
-                     label={this.state.currStore === "" ? "Sort" : "Sort: (" + this.state.currStore + ")"}
                      data={organizationOptions}
                      placeholder='Select an organization method'
                      selectedOption={this.state.orgMethod}
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
                </Layout>
+
+               {this.renderStoreMapDashboard()}
+
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
                         <Text style={styles.dashboardText}>
                            Number of Items: {this.state.listItems.length}
                         </Text>
+
                         <Text style={styles.dashboardText}>
                            List shared with {this.state.userCount - 1} others
-                           </Text>
+                        </Text>
+                        {/* -1 here to make sure we dont include the current user */}
+
                         <Text style={styles.dashboardText}>
                            {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
                         </Text>
-                        {/* -1 here to make sure we dont include the current user */}
                      </Layout>
                   </Layout>
                </Layout>
+
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
                   style={styles.flatList}

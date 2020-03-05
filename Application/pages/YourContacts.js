@@ -3,10 +3,9 @@ import {
    SectionList,
    StyleSheet,
    Alert,
-   Button
 } from "react-native";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Text, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Text, TopNavigation, TopNavigationAction, Button } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
@@ -49,14 +48,6 @@ class YourContacts extends Component {
    GetSectionListItem = item => {
       //Function for click on an item
       Alert.alert(item);
-   };
-   FlatListItemSeparator = () => {
-      return (
-         //Item Separator
-         <Layout
-            style={{ height: 0.5, width: '100%', backgroundColor: '#C8C8C8' }}
-         />
-      );
    };
 
    ShareContactPress(email) {
@@ -135,25 +126,52 @@ class YourContacts extends Component {
                leftControl={renderMenuAction()}
                rightControls={renderRightControls()}
             />
-            <Layout>
-               <SectionList style={this.state.share ? styles.share : styles.notShare}
-                  ItemSeparatorComponent={this.FlatListItemSeparator}
+            <Layout style={styles.sectionListContainer}>
+               <SectionList
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
                   renderSectionHeader={({ section }) => {
                      if (this.state.share) {
-                        return <Text style={styles.SectionHeaderStyle} onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
+                        return (
+                           <Layout level='3' style={styles.sectionHeaderContainer}>
+                              <Text style={styles.sectionHeaderStyle} category='s1' onPress={() => { this.SectionShare(section) }}> {section.title} </Text>
+                           </Layout>);
                      } else {
-                        return <Text style={styles.SectionHeaderStyle}> {section.title} </Text>
+                        return (
+                           <Layout level='3' style={styles.sectionHeaderContainer}>
+                              <Text style={styles.sectionHeaderStyle} category='s1'> {section.title} </Text>
+                           </Layout>);
                      }
                   }}
                   renderItem={({ item }) => {
                      if (this.state.share) {
-                        return <ListItemContainer share={true} contact={true} title={item.name} purchased={this.CheckIfSelected(item.email)} fromItemView={false} onPress={() => { this.ShareContactPress(item.email) }} />;
+                        return (
+                           <ListItemContainer
+                              share={true}
+                              contact={true}
+                              title={item.name}
+                              purchased={this.CheckIfSelected(item.email)} fromItemView={false}
+                              onPress={() => { this.ShareContactPress(item.email) }} />
+                        );
                      } else {
                         if (item.status == "contact") {
-                           return <ListItemContainer contact={true} title={item.name} fromContactView={true} fromItemView={false} onDelete={() => cf.DeleteContact(item.email)} onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />;
+                           return (
+                              <ListItemContainer
+                                 contact={true}
+                                 title={item.name}
+                                 fromContactView={true}
+                                 fromItemView={false}
+                                 onDelete={() => cf.DeleteContact(item.email)}
+                                 onPress={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email, group: item.group, name: item.name, edit: true }) }} />
+                           );
                         } else if (item.status == "pending") {
-                           return <ListItemContainer title={item.email} fromItemView={true} contact={true} acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }} rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />;
+                           return (
+                              <ListItemContainer
+                                 title={item.email}
+                                 fromItemView={true}
+                                 contact={true}
+                                 acceptFunction={() => { this.props.navigation.navigate("NewContact", { groups: this.state.groupsWoPending, email: item.email }) }}
+                                 rejectFunction={() => cf.RejectContactRequest(item.email)} pending={true} />
+                           );
                         }
                      }
 
@@ -163,13 +181,12 @@ class YourContacts extends Component {
             </Layout>
             {this.state.listID != '' &&
                <Layout>
-                  <Button
-                     title="SHARE"
-                     color="#13FF00"
+                  <Button style={styles.shareButton}
+                     status="success"
                      onPress={() => cf.ShareList(this.props, this.state.listName, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
                      })}
-                  />
+                  >{"SHARE"}</Button>
                </Layout>
             }
             {this.state.recipeName != '' &&
@@ -187,33 +204,23 @@ class YourContacts extends Component {
          </React.Fragment >
       );
    }
-
-
-
 }
 const styles = StyleSheet.create({
-   SectionHeaderStyle: {
-      backgroundColor: '#CDDC89',
-      fontSize: 20,
-      padding: 5,
-      color: '#fff',
+   sectionListContainer: {
+      flex: 1,
    },
-   notShare: {
-      height: '100%'
+   sectionHeaderContainer: {
+      marginTop: 4,
+      marginHorizontal: 4,
+      borderRadius: 10,
    },
-   share: {
-      height: '88%'
+   sectionHeaderStyle: {
+      paddingHorizontal: 8,
+      paddingVertical: 4,
    },
-   SectionListItemStyle: {
-      fontSize: 15,
-      padding: 15,
-      color: '#000',
-      backgroundColor: '#F5F5F5',
+   shareButton: {
+      margin: 8,
+      borderRadius: 10,
    },
-   acceptDeny: {
-      padding: 15,
-      backgroundColor: '#F5F5F5',
-
-   }
 });
 export default YourContacts;
