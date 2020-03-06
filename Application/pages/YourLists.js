@@ -406,12 +406,19 @@ class YourLists extends Component {
 
       return (
          <React.Fragment>
-            <TopNavigation
-               title={"Select Lists..."}
-               alignment='center'
-               leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
-            />
+            {this.props.navigation.getParam("ingredients", false) &&
+               <TopNavigation
+                  title={"Select Lists..."}
+                  alignment='center'
+                  rightControls={renderRightControls()}
+               />}
+            {!this.props.navigation.getParam("ingredients", false) &&
+               <TopNavigation
+                  title={"Select Lists..."}
+                  alignment='center'
+                  leftControl={renderMenuAction()}
+                  rightControls={renderRightControls()}
+               />}
             <Layout style={styles.ListContainer}>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}

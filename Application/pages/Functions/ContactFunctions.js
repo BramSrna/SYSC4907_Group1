@@ -33,7 +33,7 @@ class ContactFunctions {
          .ref("/contacts/" + firebase.auth().currentUser.uid).off()
    }
 
-   ShareRecipe(props, recipeName, recipeUrl, usersToShareWith, callback) {
+   ShareRecipe(ingredients, props, recipeName, recipeUrl, usersToShareWith, callback) {
       var that = this;
       firebase
          .database()
@@ -62,7 +62,8 @@ class ContactFunctions {
                                        "name": recipeName,
                                        "title": title,
                                        "message": message,
-                                       "url": recipeUrl
+                                       "url": recipeUrl,
+                                       "ingredients": ingredients
                                     });
                                     break;
                                  }

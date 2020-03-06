@@ -18,9 +18,11 @@ class NotificationManager {
                listID: notification.data.listID
             })
 
-         } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name && notification.data.url) {
+         } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name && notification.data.url && notification.data.ingredients) {
             this.that.props.navigation.navigate("RecipeDetailsPage", {
-               url: aRecipe.spoonacularSourceUrl
+               url: notification.data.url,
+               ingredients: notification.data.ingredients,
+               name: data.notification.name
             })
          } else {
             this.that.props.navigation.navigate(notification.data.page)
@@ -41,11 +43,13 @@ class NotificationManager {
                body: notification.data.message,
                slideOutTime: 5000
             });
-         } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name && notification.data.url) {
+         } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name && notification.data.url && notification.data.ingredients) {
             this.that.popup.show({
                onPress: () => {
                   this.that.props.navigation.navigate("RecipeDetailsPage", {
-                     url: aRecipe.spoonacularSourceUrl
+                     url: notification.data.url,
+                     ingredients: notification.data.ingredients,
+                     name: data.notification.name
                   })
                },
                appIconSource: require('../../assets/icon.png'),

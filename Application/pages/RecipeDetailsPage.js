@@ -4,7 +4,7 @@ import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { TopNavigation, TopNavigationAction, Layout } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction, Layout, RangeDatepicker } from 'react-native-ui-kitten';
 import { MenuOutline, HeartIcon, ListIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
@@ -36,7 +36,8 @@ export default class RecipeDetailsPage extends Component {
         <TopNavigationAction {...props} icon={ListIcon} onPress={() => this.props.navigation.navigate("YourListsPage", {
           ingredients: this.props.navigation.getParam("ingredients", false)
         })} />
-        <TopNavigationAction {...props} icon={HeartIcon} onPress={() => console.log()} /></Layout>
+        <TopNavigationAction {...props} icon={HeartIcon} onPress={() => rf.AddFavouriteRecipe(this.props.navigation.getParam("name", "error"))} />
+      </Layout>
     );
 
     const renderRightControls = () => [

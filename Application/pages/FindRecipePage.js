@@ -68,7 +68,8 @@ export default class FindRecipePage extends Component {
                         this.props.navigation.navigate("YourContacts", {
                           share: true,
                           recipeName: item.title,
-                          recipeUrl: item.spoonacularSourceUrl
+                          recipeUrl: item.spoonacularSourceUrl,
+                          ingredients: item.extendedIngredients
                         })
                       }}
                       title="Share"
@@ -78,7 +79,8 @@ export default class FindRecipePage extends Component {
                       onPress={() => {
                         this.props.navigation.navigate("RecipeDetailsPage", {
                           url: item.spoonacularSourceUrl,
-                          ingredients: item.extendedIngredients
+                          ingredients: item.extendedIngredients,
+                          name: item.title
                         })
                       }}
                       title="Details"

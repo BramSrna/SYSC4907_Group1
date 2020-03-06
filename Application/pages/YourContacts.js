@@ -26,7 +26,8 @@ class YourContacts extends Component {
          listID: this.props.navigation.getParam("listID", ''),
          listName: this.props.navigation.getParam("listName", ''),
          recipeName: this.props.navigation.getParam("recipeName", ''),
-         recipeUrl: this.props.navigation.getParam("recipeUrl", '')
+         recipeUrl: this.props.navigation.getParam("recipeUrl", ''),
+         recipeIngredients: this.props.navigation.getParam("ingredients", '')
       });
       cf.GetContactInfo(this);
    }
@@ -120,12 +121,20 @@ class YourContacts extends Component {
       );
       return (
          <React.Fragment>
-            <TopNavigation
-               title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
-               alignment='center'
-               leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
-            />
+            {(this.state.listID != '' || this.state.recipeName != '') &&
+               <TopNavigation
+                  title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
+                  alignment='center'
+                  rightControls={renderRightControls()}
+               />
+            }
+            {(this.state.listID == '' && this.state.recipeName == '') &&
+               <TopNavigation
+                  title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
+                  alignment='center'
+                  leftControl={renderMenuAction()}
+                  rightControls={renderRightControls()}
+               />}
             <Layout style={styles.sectionListContainer}>
                <SectionList
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
@@ -194,7 +203,7 @@ class YourContacts extends Component {
                   <Button
                      title="SHARE"
                      color="#13FF00"
-                     onPress={() => cf.ShareRecipe(this.props, this.state.recipeName, this.state.recipeUrl, this.state.selected, function (props) {
+                     onPress={() => cf.ShareRecipe(this.state.recipeIngredients, this.props, this.state.recipeName, this.state.recipeUrl, this.state.selected, function (props) {
                         props.navigation.goBack()
                      })}
                   />
