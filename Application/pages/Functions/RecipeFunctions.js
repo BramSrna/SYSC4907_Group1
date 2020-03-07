@@ -1,11 +1,12 @@
 import * as firebase from "firebase";
+import { resolve } from "url";
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "30";
 const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
-   constructor() {}
+   constructor() { }
 
    GetRandomRecipesFromDatabase(that) {
       firebase.database().ref("/dailyRecipes/").once("value", function (snapshot) {
@@ -51,31 +52,15 @@ class RecipeFunctions {
    }
 
    GetFavouriteRecipes(that) {
-      var recipes = [];
-      async function getRecipe(id) {
-         firebase.database().ref("/recipes/" + id).once("value", function (snapshot) {
-            recipes.push(snapshot.val());
-         });
-      }
-
-      async function processRecipes(recipes) {
-         recipes.forEach(async (id) => {
-            await getRecipe(id)
-         })
-         that.setState({
-            recipes: recipes
-         })
-      }
-
       firebase.database().ref("/favRecipes/" + firebase.auth().currentUser.uid).once("value", function (snapshot) {
-         var recipeIds = [];
          if (snapshot.val()) {
             for (var recipe in snapshot.val()) {
-               recipeIds.push(recipe);
+               firebase.database().ref("/recipes/" + recipe).once("value", function (returnRecipe) {
+                  var recipes = that.state.recipes;
+                  recipes.push(returnRecipe.val());
+                  that.setState({ recipes: recipes });
+               })
             }
-            processRecipes(recipeIds);
-         } else {
-            console.log("Error: Could not get any recipes")
          }
       })
    }

@@ -24,7 +24,7 @@ class FavRecipesPage extends Component {
          () => {
             nm.setThat(this);
             this._isMounted = true;
-            rf.GetFavouriteRecipes(this);
+            rf.GetFavouriteRecipes(this)
          }
       );
 
@@ -42,12 +42,11 @@ class FavRecipesPage extends Component {
       return (
          <React.Fragment>
             <TopNavigation
-               title="Find a Recipe"
+               title="Favourite Recipes"
                alignment='center'
                leftControl={renderMenuAction()}
             />
             {this.state.recipes.length > 0 &&
-               console.log(this.state.recipes) &&
                <FlatList
                   contentContainerStyle={{ paddingBottom: 16 }}
                   style={styles.flatList}
