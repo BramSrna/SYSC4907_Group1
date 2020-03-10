@@ -13,6 +13,7 @@ import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
 import MapsPage from '../pages/MapsPage';
+import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -53,6 +54,9 @@ const StackNavigator = createStackNavigator({
     },
     MapsPage:{
         screen: MapsPage
+    },
+    PrivacyPolicyPage:{
+        screen: PrivacyPolicyPage
     }
 }, {
     initialRouteName: "Home",
@@ -118,6 +122,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Excel Parser"
+        }
+    },
+    PrivacyPolicyPage:{
+        screen: PrivacyPolicyPage,
+        navigationOptions:{
+            drawerLabel: "Privacy Policy"
         }
     }
 }, {

@@ -7,6 +7,8 @@ import { Layout, Text, } from 'react-native-ui-kitten';
 import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";
+const ABOUT_US = "About Us";
+const PRIVACY_POLICY = "Privacy Policy";
 const HOME = "Home";
 const CONTACTS = "Contacts";
 const YOUR_LISTS = "Your Lists";
@@ -76,7 +78,6 @@ class SideMenu extends Component {
                         <Layout style={styles.navSectionStyle} level='3'>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Home')}>
                                 {HOME}
-
                             </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourContacts')}>
                                 {CONTACTS}
@@ -103,6 +104,18 @@ class SideMenu extends Component {
                                 {REGISTER_AN_ITEM}
                             </Text>
                             {DEV_MODE_ENABLED && this.devModeRender()}
+                        </Layout>
+                    </Layout>
+                    <Layout style={styles.columnContainer}>
+                        <Layout style={styles.headingContainer} level='4'>
+                            <Text style={styles.sectionHeadingStyle}>
+                                {ABOUT_US}
+                            </Text>
+                        </Layout>
+                        <Layout style={styles.navSectionStyle} level='3'>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('PrivacyPolicyPage')}>
+                                {PRIVACY_POLICY}
+                            </Text>
                         </Layout>
                     </Layout>
                 </ScrollView>
