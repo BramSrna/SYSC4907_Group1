@@ -71,9 +71,7 @@ class FavRecipesPage extends Component {
                                  onPress={() => {
                                     this.props.navigation.navigate("YourContacts", {
                                        share: true,
-                                       recipeName: item.title,
-                                       recipeUrl: item.spoonacularSourceUrl,
-                                       ingredients: item.extendedIngredients
+                                       recipeName: item.title
                                     })
                                  }}
                                  title="Share"

@@ -10,6 +10,28 @@ const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 class RecipeFunctions {
    constructor() {}
 
+   GetUrlAndIngredientsFromName(recipeName, that) {
+      var recipeId = recipeName;
+      recipeId = recipeId.replace(/\./g, " ");
+      recipeId = recipeId.replace(/\$/g, " ");
+      recipeId = recipeId.replace(/\#/g, " ");
+      recipeId = recipeId.replace(/\[/g, " ");
+      recipeId = recipeId.replace(/\]/g, " ");
+      firebase
+         .database()
+         .ref("/recipes/" + recipeId)
+         .once("value", function (snapshot) {
+            if (snapshot.val()) {
+               console.log("HERE----------")
+               that.that.props.navigation.navigate("RecipeDetailsPage", {
+                  url: snapshot.val().spoonacularSourceUrl,
+                  ingredients: snapshot.val().extendedIngredients,
+                  name: recipeName
+               })
+            }
+         })
+   }
+
    UpdateFavouriteRecipe(that, recipeName) {
       var recipeId = recipeName;
       recipeId = recipeId.replace(/\./g, " ");

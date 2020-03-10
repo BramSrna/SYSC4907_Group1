@@ -26,8 +26,6 @@ class YourContacts extends Component {
          listID: this.props.navigation.getParam("listID", ''),
          listName: this.props.navigation.getParam("listName", ''),
          recipeName: this.props.navigation.getParam("recipeName", ''),
-         recipeUrl: this.props.navigation.getParam("recipeUrl", ''),
-         recipeIngredients: this.props.navigation.getParam("ingredients", '')
       });
       cf.GetContactInfo(this);
    }
@@ -202,10 +200,10 @@ class YourContacts extends Component {
                <Layout>
                   <Button style={styles.shareButton}
                      status="success"
-                     onPress={() => cf.ShareRecipe(this.state.recipeIngredients, this.props, this.state.recipeName, this.state.recipeUrl, this.state.selected, function (props) {
+                     onPress={() => cf.ShareRecipe(this.props, this.state.recipeName, this.state.selected, function (props) {
                         props.navigation.goBack()
                      })}
-                  >{"SHARE"}></Button>
+                  >{"SHARE"}</Button>
                </Layout>
             }
             <NotificationPopup ref={ref => this.popup = ref} />

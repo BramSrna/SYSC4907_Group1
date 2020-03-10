@@ -36,7 +36,7 @@ class ItemObj {
      */
     getPath() {
         var itemPath = "/items/" + this.genericName + "/" + this.specificName + "/";
-        return(itemPath);
+        return (itemPath);
     }
 
     /**
@@ -52,7 +52,7 @@ class ItemObj {
      */
     getId() {
         var itemId = this.genericName + "&" + this.specificName;
-        return(itemId);
+        return (itemId);
     }
 
     /**
@@ -74,7 +74,7 @@ class ItemObj {
         if ((this.specificName !== "null") && (this.specificName !== null)) {
             itemName += " (" + this.specificName + ")";
         }
-        return(itemName);
+        return (itemName);
 
     }
 
@@ -133,7 +133,7 @@ class StoreObj {
      */
     getPath() {
         var storePath = "/stores/" + this.address + "/" + this.storeName + "/";
-        return(storePath);
+        return (storePath);
     }
 
     /**
@@ -149,7 +149,7 @@ class StoreObj {
      */
     getId() {
         var storeId = this.address + "&" + this.storeName;
-        return(storeId);
+        return (storeId);
     }
 
     /**
@@ -165,7 +165,7 @@ class StoreObj {
      */
     getDispName() {
         var storeName = this.storeName + " - " + this.address;
-        return(storeName);
+        return (storeName);
 
     }
 
@@ -201,18 +201,18 @@ class StoreObj {
  * @returns The item object corresponding to the given data
  *          Null if no item found
  */
-const getItem = function(genericName, specificName = null){
+const getItem = function (genericName, specificName = null) {
     var itemInfo = firebase.database().ref("/items").once("value").then((snapshot) => {
         var ssv = snapshot.val();
         var item = null;
 
         // Parse the item table for the item
         for (var tempGenName in ssv) {
-            if (tempGenName === genericName) {
+            if (tempGenName.toUpperCase() === genericName.toUpperCase()) {
                 // Generic name subtable found
                 var temp = ssv[tempGenName];
                 for (var tempSpecName in temp) {
-                    if (((tempSpecName === "null") && (specificName === null)) || (tempSpecName === specificName)) {
+                    if (((tempSpecName === "null") && (specificName === null)) || (specificName != null && (tempSpecName.toUpperCase() === specificName.toUpperCase()))) {
                         // Item found
                         item = ssv[tempGenName][tempSpecName];
 
@@ -226,7 +226,7 @@ const getItem = function(genericName, specificName = null){
                                 // Parse each description
                                 var currDesc = descs[currDescId];
                                 var prices = currDesc.prices;
-                                if (prices){
+                                if (prices) {
                                     for (var i = 0; i < prices.length; i++) {
                                         // Update the price range with the new information
                                         var currPrice = prices[i];
@@ -251,7 +251,7 @@ const getItem = function(genericName, specificName = null){
                         } else {
                             item.finalPrice = {}
                         }
-                        
+
                         break;
                     }
                 }
@@ -278,7 +278,7 @@ const getItem = function(genericName, specificName = null){
  * 
  * @returns The store object, null if not found
  */
-const getStore = function(storeName, address) {
+const getStore = function (storeName, address) {
     var storeInfo = firebase.database().ref("/stores").once("value").then((snapshot) => {
         var ssv = snapshot.val();
         var store = null;

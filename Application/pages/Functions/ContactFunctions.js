@@ -10,7 +10,7 @@ class ContactFunctions {
    constructor() {}
 
    sendNotification = (token, title, body, data) => {
-
+      console.log("TOken: " + token)
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -33,7 +33,7 @@ class ContactFunctions {
          .ref("/contacts/" + firebase.auth().currentUser.uid).off()
    }
 
-   ShareRecipe(ingredients, props, recipeName, recipeUrl, usersToShareWith, callback) {
+   ShareRecipe(props, recipeName, usersToShareWith, callback) {
       var that = this;
       firebase
          .database()
@@ -62,8 +62,6 @@ class ContactFunctions {
                                        "name": recipeName,
                                        "title": title,
                                        "message": message,
-                                       "url": recipeUrl,
-                                       "ingredients": ingredients
                                     });
                                     break;
                                  }
