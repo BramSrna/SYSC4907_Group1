@@ -9,9 +9,6 @@ const PAGE_TITLE = "Privacy Policy";
 export default class PrivacyPolicyPage extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            menuVisible: false,
-        };
     }
 
     render() {
@@ -46,11 +43,9 @@ export default class PrivacyPolicyPage extends Component {
                             <Text style={styles.LeftAlignedText} category='p1'>{"Here's how Grocery List Manager uses this data:"}</Text>
                             <Layout style={styles.detailedTextContainer} level='3'>
                                 <Text style={styles.LeftAlignedText} category='s1'>{"User ID: "}<Text category='p1'>{"We generate a random identifer when you sign-up for an account."}</Text></Text>
-
                             </Layout>
                             <Layout style={styles.detailedTextContainer} level='3'>
                                 <Text style={styles.LeftAlignedText} category='s1'>{"Device Notification Token: "}<Text category='p1'>{"We temporatly store the device notification token to send push notifications as required by some of the features in the application."}</Text></Text>
-
                             </Layout>
                         </Layout>
                         <Layout style={styles.questionAnswer} level='2'>
