@@ -19,7 +19,8 @@ exports.updateSharedListCount = functions.database.ref('/users/{uid}/lists/share
 });
 
 exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
-    var retVal = database.ref("/globals/storeMapVals").once("value").then((snapshot) => {
+    var path = "/globals/storeMapVals";
+    var retVal = database.ref(path).once("value").then((snapshot) => {
         var ssv = snapshot.val();
 
         var prevUpdate;
@@ -28,12 +29,12 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
         if (ssv !== null) {
             prevUpdate = ssv.prevClusterUpdate;
             currCount = ssv.currCount;
-    
-            currCount += 1;
         } else {
             prevUpdate = 0;
-            currCount = 1;
+            currCount = 0;
         }
+
+        currCount += 1;
     
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
@@ -42,7 +43,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
             update = true;
         }
 
-        database.ref("/globals/storeMapVals").update({
+        database.ref(path).update({
             currCount: currCount,
             prevClusterUpdate: prevUpdate
         });

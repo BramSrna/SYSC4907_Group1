@@ -15,8 +15,6 @@ def calcSupport(itemSubset, allTransactions):
         if (itemSubset.issubset(currTransaction)):
             numIncludes += 1
 
-    print("CALC SUPPORT", itemSubset, numIncludes, len(allTransactions))
-
     support = float(numIncludes) / len(allTransactions)
 
     return support
@@ -41,8 +39,7 @@ def getSupportMap(allTransactions):
         for item in currTransaction:
             if item not in supportMap:
                 supp = calcSupport(set([item]), allTransactions)
-                supportMap[item] = supp   
-                print("SUPPORT", item, supp) 
+                supportMap[item] = supp
 
     return(supportMap)
 

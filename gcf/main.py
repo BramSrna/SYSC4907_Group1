@@ -16,6 +16,38 @@ firebase_admin.initialize_app(cred, {"databaseURL": "https://grocerylist-dd21a.f
 ITEMS_KEY = "items"
 GEN_NAME_KEY = "genName"
 
+def updateRules(event, context):
+    # gcloud functions deploy updateRules --trigger-event providers/google.firebase.database/eventTypes/ref.write --trigger-resource projects/_/instances/grocerylist-dd21a/refs/lists/{lid}/items --runtime python37 --allow-unauthenticated 
+    path = "/globals/listVals"
+
+    listRef = db.reference(path)
+    listVals = listRef.get()
+
+    prevUpdateKey = "PREV_UPDATE"
+    currCountKey = "CURR_COUNT"
+
+    prevUpdate = 0
+    currCount = 0
+
+    if ((listVals) and (prevUpdateKey in listVals)):
+        prevUpdate = listVals[prevUpdateKey]
+        currCount = listVals[currCountKey]
+
+    currCount += 1
+
+    update = False
+    if (currCount > prevUpdate * (1 + 0.1)):
+        genRules(event)
+        prevUpdate = currCount
+        update = True
+
+    newVals = {}
+    newVals[prevUpdateKey] = prevUpdate
+    newVals[currCountKey] = currCount
+
+    db.reference(path).update(newVals)
+
+
 def genRules(request):
     listRef = db.reference("/lists")
     lists = listRef.get()
@@ -31,12 +63,8 @@ def genRules(request):
                 currItems.append(itemId)
             listItems.append(currItems)
 
-    print("TRANSACTIONS", listItems)
-
     rules, supportMap = getRules(listItems)
     finalRules = []
-
-    print("HERE")
 
     for item in rules:
         for rule in rules[item]:
