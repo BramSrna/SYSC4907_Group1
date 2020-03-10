@@ -20,6 +20,7 @@ import FindRecipePage from '../pages/FindRecipePage';
 import MapsPage from '../pages/MapsPage';
 import RecipeDetailsPage from '../pages/RecipeDetailsPage';
 import FavRecipesPage from '../pages/FavRecipesPage';
+import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -69,6 +70,9 @@ const StackNavigator = createStackNavigator({
     },
     FavRecipesPage: {
         screen: FavRecipesPage
+    },
+    PrivacyPolicyPage: {
+        screen: PrivacyPolicyPage
     }
 }, {
     initialRouteName: "Home",
@@ -152,6 +156,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: "Your Favourite Recipes"
+        }
+    },
+    PrivacyPolicyPage: {
+        screen: PrivacyPolicyPage,
+        navigationOptions: {
+            drawerLabel: "Privacy Policy"
         }
     }
 }, {
