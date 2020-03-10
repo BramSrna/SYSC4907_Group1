@@ -126,7 +126,7 @@ class ListFunctions {
                         console.log("User did not give notification access " + snapshot.val()[user])
                      }
                   } else {
-                     // console.log("User did not log in correctly")
+                     console.log("User did not log in correctly")
                   }
                }
             } else {

@@ -9,13 +9,49 @@ const database = admin.database();
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
 //This function updates the created_count based on the number of items in a users created list
-exports.updatecreatedlistcount = functions.database.ref('/users/{uid}/lists/created').onWrite((change, context) => {
+exports.updateCreatedListCount = functions.database.ref('/users/{uid}/lists/created').onWrite((change, context) => {
     return change.after.ref.parent.child('created_count').set(change.after.numChildren());
 });
 
 //This function updates the shared_count based on the number of items in a users shared list
-exports.updatesharedlistcount = functions.database.ref('/users/{uid}/lists/shared').onWrite((change, context) => {
+exports.updateSharedListCount = functions.database.ref('/users/{uid}/lists/shared').onWrite((change, context) => {
     return change.after.ref.parent.child('shared_count').set(change.after.numChildren());
+});
+
+exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
+    var path = "/globals/storeMapVals";
+    var retVal = database.ref(path).once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var prevUpdate;
+        var currCount;
+
+        if (ssv !== null) {
+            prevUpdate = ssv.prevClusterUpdate;
+            currCount = ssv.currCount;
+        } else {
+            prevUpdate = 0;
+            currCount = 0;
+        }
+
+        currCount += 1;
+    
+        var update = false;
+        if (currCount > prevUpdate * (1 + 0.1)) {
+            reorgFuncs.cloudDetermineClusters(database);
+            prevUpdate = currCount;
+            update = true;
+        }
+
+        database.ref(path).update({
+            currCount: currCount,
+            prevClusterUpdate: prevUpdate
+        });
+
+        return update;
+    });
+
+    return retVal;
 });
 
 // NOTE: The following are wrappers for functions found in other
