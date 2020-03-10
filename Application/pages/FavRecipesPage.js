@@ -32,6 +32,7 @@ class FavRecipesPage extends Component {
    componentWillUnmount() {
       this.focusListener.remove()
       this._isMounted = false;
+      rf.RemoveListeners();
    }
 
 

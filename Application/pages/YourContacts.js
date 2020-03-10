@@ -200,13 +200,12 @@ class YourContacts extends Component {
             }
             {this.state.recipeName != '' &&
                <Layout>
-                  <Button
-                     title="SHARE"
-                     color="#13FF00"
+                  <Button style={styles.shareButton}
+                     status="success"
                      onPress={() => cf.ShareRecipe(this.state.recipeIngredients, this.props, this.state.recipeName, this.state.recipeUrl, this.state.selected, function (props) {
                         props.navigation.goBack()
                      })}
-                  />
+                  >{"SHARE"}></Button>
                </Layout>
             }
             <NotificationPopup ref={ref => this.popup = ref} />

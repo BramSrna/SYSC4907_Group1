@@ -1,12 +1,37 @@
 import * as firebase from "firebase";
-import { resolve } from "url";
+import {
+   resolve
+} from "url";
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "30";
 const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
-   constructor() { }
+   constructor() {}
+
+   UpdateFavouriteRecipe(that, recipeName) {
+      var recipeId = recipeName;
+      recipeId = recipeId.replace(/\./g, " ");
+      recipeId = recipeId.replace(/\$/g, " ");
+      recipeId = recipeId.replace(/\#/g, " ");
+      recipeId = recipeId.replace(/\[/g, " ");
+      recipeId = recipeId.replace(/\]/g, " ");
+      firebase
+         .database()
+         .ref("/favRecipes/" + firebase.auth().currentUser.uid + "/" + recipeId)
+         .once("value", function (snapshot) {
+            if (snapshot.val()) {
+               that.setState({
+                  favourite: true
+               })
+            } else {
+               that.setState({
+                  favourite: false
+               })
+            }
+         })
+   }
 
    GetRandomRecipesFromDatabase(that) {
       firebase.database().ref("/dailyRecipes/").once("value", function (snapshot) {
@@ -30,10 +55,9 @@ class RecipeFunctions {
       })
    }
 
-   AddFavouriteRecipe(recipeName) {
+   AddFavouriteRecipe(recipeName, callback) {
       var recipeId = recipeName;
       var currentUserId = firebase.auth().currentUser.uid;
-
       recipeId = recipeId.replace(/\./g, " ");
       recipeId = recipeId.replace(/\$/g, " ");
       recipeId = recipeId.replace(/\#/g, " ");
@@ -44,25 +68,39 @@ class RecipeFunctions {
          .ref("/favRecipes/" + currentUserId + "/" + recipeId)
          .once("value", function (snapshot) {
             if (!snapshot.val()) {
-               firebase.database().ref("/favRecipes/" + currentUserId + "/" + recipeId).set(recipeName).then(function (snapshot) {
-                  // console.log(snapshot);
-               });
+               firebase.database().ref("/favRecipes/" + currentUserId + "/" + recipeId).set(recipeName).then((val) => {
+                  callback(true)
+               })
+            } else {
+               firebase
+                  .database()
+                  .ref("/favRecipes/" + currentUserId + "/" + recipeId).remove().then((val) => {
+                     callback(false);
+                  })
             }
          });
    }
 
    GetFavouriteRecipes(that) {
-      firebase.database().ref("/favRecipes/" + firebase.auth().currentUser.uid).once("value", function (snapshot) {
+      firebase.database().ref("/favRecipes/" + firebase.auth().currentUser.uid).on("value", function (snapshot) {
          if (snapshot.val()) {
+            that.state.recipes = [];
             for (var recipe in snapshot.val()) {
                firebase.database().ref("/recipes/" + recipe).once("value", function (returnRecipe) {
                   var recipes = that.state.recipes;
                   recipes.push(returnRecipe.val());
-                  that.setState({ recipes: recipes });
+                  that.setState({
+                     recipes: recipes
+                  });
                })
             }
          }
       })
+   }
+
+   RemoveListeners() {
+      firebase.database().ref("/favRecipes/" + firebase.auth().currentUser.uid).off()
+
    }
 
    async updateRandomRecipesForDay() {

@@ -17,6 +17,16 @@ export const HeartIcon = (style) => ( <
     />
 );
 
+export const FilledInHeartIcon = (style) => ( <
+    Image style = {
+        style
+    }
+    source = {
+        require("./icons8-heart-outline-64.png")
+    }
+    />
+);
+
 export const ListIcon = (style) => ( <
     Image style = {
         style

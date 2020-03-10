@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { FlatList, KeyboardAvoidingView, BackHandler } from "react-native";
+import { FlatList, KeyboardAvoidingView, BackHandler, StyleSheet } from "react-native";
 import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
@@ -468,13 +468,12 @@ class YourLists extends Component {
                   />}
                {this.props.navigation.getParam("ingredients", false) &&
                   <Layout>
-                     <Button
-                        title="ADD TO LIST"
-                        color="#13FF00"
+                     <Button style={styles.shareButton}
+                        status="success"
                         onPress={() => lf.AddIngredientsToList(this.state.selectedIds, this.props.navigation.getParam("ingredients", false), this.props, function (props) {
                            props.navigation.goBack()
                         })}
-                     />
+                     >{"ADD TO LIST"}</Button>
                   </Layout>
                }
             </Layout>

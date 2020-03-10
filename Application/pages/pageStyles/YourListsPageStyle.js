@@ -1,8 +1,12 @@
 import {
-    StyleSheet
-  } from 'react-native';
+   StyleSheet
+} from 'react-native';
 
 export default StyleSheet.create({
+   shareButton: {
+      margin: 8,
+      borderRadius: 10,
+   },
    container: {
 
    },

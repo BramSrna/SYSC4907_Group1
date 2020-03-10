@@ -5,12 +5,13 @@ import rf from "./Functions/RecipeFunctions";
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { TopNavigation, TopNavigationAction, Layout, RangeDatepicker } from 'react-native-ui-kitten';
-import { MenuOutline, HeartIcon, ListIcon } from "../assets/icons/icons.js";
+import { MenuOutline, HeartIcon, FilledInHeartIcon, ListIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
 
   constructor(props) {
     super(props);
+    this.state = { favourite: false }
   }
 
   componentWillMount() {
@@ -19,6 +20,7 @@ export default class RecipeDetailsPage extends Component {
       () => {
         nm.setThat(this)
         this._isMounted = true;
+        rf.UpdateFavouriteRecipe(this, this.props.navigation.getParam("name", "error"))
 
       }
     );
@@ -29,6 +31,16 @@ export default class RecipeDetailsPage extends Component {
     this._isMounted = false;
   }
 
+  favouriteOrNot() {
+    if (this.state.favourite) {
+      return FilledInHeartIcon;
+
+    } else {
+      return HeartIcon;
+
+    }
+  }
+
   render() {
     const url = this.props.navigation.getParam("url", "http://www.google.ca");
     const AddAction = (props) => (
@@ -36,7 +48,7 @@ export default class RecipeDetailsPage extends Component {
         <TopNavigationAction {...props} icon={ListIcon} onPress={() => this.props.navigation.navigate("YourListsPage", {
           ingredients: this.props.navigation.getParam("ingredients", false)
         })} />
-        <TopNavigationAction {...props} icon={HeartIcon} onPress={() => rf.AddFavouriteRecipe(this.props.navigation.getParam("name", "error"))} />
+        <TopNavigationAction {...props} icon={this.favouriteOrNot()} onPress={() => rf.AddFavouriteRecipe(this.props.navigation.getParam("name", "error"), (bool) => { this.setState({ favourite: bool }) })} />
       </Layout>
     );
 
