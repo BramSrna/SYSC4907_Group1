@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, ScrollView, Image } from 'react-native';
-import { Layout, Text, TopNavigation, TopNavigationAction, Button, } from 'react-native-ui-kitten';
+import { Layout, Text, TopNavigation, TopNavigationAction, Button, } from '@ui-kitten/components';
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 

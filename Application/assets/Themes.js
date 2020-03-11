@@ -1,7 +1,7 @@
-import { light as lightTheme, dark as darkTheme} from '@eva-design/eva';
+import * as eva from '@eva-design/eva';
 
   export const dark = {
-    ...darkTheme,
+    ...eva.dark,
   
     "background-basic-color-1": "#222B45",
     "text-basic-color": "#FFFFFF",
@@ -10,7 +10,7 @@ import { light as lightTheme, dark as darkTheme} from '@eva-design/eva';
   };
 
   export const light = {
-    ...lightTheme,
+    ...eva.light,
   
     "background-basic-color-1": "#FFFFFF",
     "text-basic-color": "#222B45",

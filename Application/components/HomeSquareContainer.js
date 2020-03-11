@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableHighlight, } from 'react-native';
-import { Layout, Text, Icon, } from 'react-native-ui-kitten';
+import { Layout, Text, Icon, } from '@ui-kitten/components';
 
 /**
  * HomeSquareContainer - A simple shaped button designed for the home screen
@@ -8,7 +8,7 @@ import { Layout, Text, Icon, } from 'react-native-ui-kitten';
  * @property {string} icon - Icon name (currently only supports names from Eva Icons Pack: https://akveo.github.io/eva-icons/#/) (default: 'list-outline')
  * @property {integer} shape - 1 for Square, 2 for Rectangle (default: 1)
  * @property {string} iconFill - Color to fill the icon (default: #8F9BB3)
- * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '2') (see https://akveo.github.io/react-native-ui-kitten/docs/components/layout/api#layout for more details)
+ * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '2') (see https://akveo.github.io/@ui-kitten/components/docs/components/layout/api#layout for more details)
  * @property {GestureResponderEvent} onPress - onPress()
  * @property {integer} sizeValue - Sets the size of the container (default: 200)
  * @property {integer} marginValue - Sets the margin of the container (default: 8)
