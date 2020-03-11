@@ -12,7 +12,7 @@ import {
     TopNavigationAction,
     Autocomplete,
     Text,
-} from 'react-native-ui-kitten';
+} from '@ui-kitten/components';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";

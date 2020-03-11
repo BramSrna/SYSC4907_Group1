@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { KeyboardAvoidingView, Alert, StyleSheet, Image } from "react-native";
-import { Layout, Button, Input, Icon, Spinner } from 'react-native-ui-kitten';
+import { Layout, Button, Input, Icon, Spinner } from '@ui-kitten/components';
 import { ScrollView } from "react-native-gesture-handler";
 import Firebase from "firebase";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
