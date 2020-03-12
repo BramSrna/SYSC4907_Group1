@@ -1,4 +1,8 @@
-import { createDrawerNavigator, createAppContainer, createStackNavigator } from 'react-navigation';
+import {
+    createDrawerNavigator,
+    createAppContainer,
+    createStackNavigator
+} from 'react-navigation';
 import HomePage from '../pages/HomePage';
 import YourLists from '../pages/YourLists';
 import CurrentList from '../pages/CurrentList';
@@ -12,7 +16,10 @@ import NewContact from '../pages/NewContact';
 import ExcelParserPage from '../pages/ExcelParserPage';
 import AddItemPage from '../pages/AddItemPage';
 import SelectStorePage from '../pages/SelectStorePage';
+import FindRecipePage from '../pages/FindRecipePage';
 import MapsPage from '../pages/MapsPage';
+import RecipeDetailsPage from '../pages/RecipeDetailsPage';
+import FavRecipesPage from '../pages/FavRecipesPage';
 import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
 
 const StackNavigator = createStackNavigator({
@@ -52,10 +59,19 @@ const StackNavigator = createStackNavigator({
     SelectStorePage: {
         screen: SelectStorePage
     },
-    MapsPage:{
+    FindRecipePage: {
+        screen: FindRecipePage
+    },
+    MapsPage: {
         screen: MapsPage
     },
-    PrivacyPolicyPage:{
+    RecipeDetailsPage: {
+        screen: RecipeDetailsPage
+    },
+    FavRecipesPage: {
+        screen: FavRecipesPage
+    },
+    PrivacyPolicyPage: {
         screen: PrivacyPolicyPage
     }
 }, {
@@ -124,9 +140,27 @@ const MainDrawerNavigator = createDrawerNavigator({
             drawerLabel: "Excel Parser"
         }
     },
-    PrivacyPolicyPage:{
+    FindRecipePage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Search for a Recipe"
+        }
+    },
+    RecipeDetailsPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: () => null
+        }
+    },
+    FavRecipesPage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Your Favourite Recipes"
+        }
+    },
+    PrivacyPolicyPage: {
         screen: PrivacyPolicyPage,
-        navigationOptions:{
+        navigationOptions: {
             drawerLabel: "Privacy Policy"
         }
     }

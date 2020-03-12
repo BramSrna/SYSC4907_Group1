@@ -18,6 +18,15 @@ exports.updateSharedListCount = functions.database.ref('/users/{uid}/lists/share
     return change.after.ref.parent.child('shared_count').set(change.after.numChildren());
 });
 
+exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((change, context) => {
+    return change.after.ref.parent.once('value').then((val) => {
+        var count = val.numChildren();
+        return change.after.ref.parent.update({
+            recipe_count: count
+        })
+    })
+});
+
 exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
     var path = "/globals/storeMapVals";
     var retVal = database.ref(path).once("value").then((snapshot) => {
@@ -35,7 +44,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
         }
 
         currCount += 1;
-    
+
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
             reorgFuncs.cloudDetermineClusters(database);
@@ -57,6 +66,61 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
 // NOTE: The following are wrappers for functions found in other
 // files. They have to be here to be compiled.
 
+exports.updateRandomRecipesForDay = functions.https.onCall((data, context) => {
+    const GetRecipePositions = (numberOfRecipes) => {
+        var pos = [];
+        while (pos.length < data.numRecipesToGet) {
+            var curInd = Math.round(Math.random() * numberOfRecipes);
+            if (!pos.includes(curInd)) {
+                pos.push(curInd);
+            }
+        }
+        return pos;
+    }
+
+    const ret = database.ref("/recipes/").once("value").then((snapshot) => {
+        var recipes = [];
+        if (snapshot.val()) {
+            var recipeNum = GetRecipePositions(snapshot.val().recipe_count);
+            var count = 1;
+            var total = 0;
+            for (var recipe in snapshot.val()) {
+                if (recipeNum.includes(count)) {
+                    recipes.push(snapshot.val()[recipe]);
+                    total++;
+                    if (total >= data.numRecipesToGet) {
+                        break;
+                    }
+                }
+                count++;
+            }
+            return {
+                string: "Got recipes.",
+                recipes: recipes
+            }
+        } else {
+            return {
+                string: "Cloud ERROR: Could not update daily recipes."
+            }
+        }
+    }).then((res) => {
+        if (res.string === "Got recipes.") {
+            var counter = 1;
+            for (var r in res.recipes) {
+                database.ref('/dailyRecipes/' + counter.toString()).set(res.recipes[r]);
+                counter++;
+            }
+            return {
+                string: "Daily recipes were updated."
+            }
+        } else {
+            return res;
+        }
+
+    });
+    return ret;
+})
+
 /**
  * cloudReorgListLoc
  * 
@@ -73,7 +137,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListLoc = functions.https.onCall((data, context) => {
-   return reorgFuncs.cloudReorgListLoc(data, context, database);
+    return reorgFuncs.cloudReorgListLoc(data, context, database);
 });
 
 /**
@@ -90,7 +154,7 @@ exports.cloudReorgListLoc = functions.https.onCall((data, context) => {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
-   return reorgFuncs.cloudReorgListFastest(data, context, database);
+    return reorgFuncs.cloudReorgListFastest(data, context, database);
 });
 
 /**

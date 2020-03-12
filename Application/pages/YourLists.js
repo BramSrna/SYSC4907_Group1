@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FlatList, KeyboardAvoidingView, BackHandler } from "react-native";
-import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from '@ui-kitten/components';
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -19,6 +19,8 @@ class YourLists extends Component {
          listTitles: [],
          apiData: [],
          modalVisible: false,
+         selected: [],
+         selectedIds: []
       };
    }
 
@@ -356,6 +358,39 @@ class YourLists extends Component {
       });
    };
 
+   CheckIfSelected(list) {
+      var selected = this.state.selected
+      if (selected.includes(list)) {
+         return true;
+      } else {
+         return false;
+      }
+   }
+
+   AddListPress(index, list) {
+      var newSelected = this.state.selected
+      var newSelectedIds = this.state.selectedIds;
+      if (newSelected.includes(list)) {
+         for (var a = 0; a < newSelected.length; a++) {
+            if (newSelected[a] === list) {
+               newSelected.splice(a, 1);
+               a--;
+            }
+         }
+         for (var b = 0; b < newSelectedIds.length; b++) {
+            if (newSelectedIds[b] === this.state.apiData[index].key) {
+               newSelectedIds.splice(b, 1);
+               b--;
+            }
+         }
+         this.setState({ selected: newSelected, selectedIds: newSelectedIds });
+      } else {
+         newSelected.push(list)
+         newSelectedIds.push(this.state.apiData[index].key)
+         this.setState({ selected: newSelected, selectedIds: newSelectedIds });
+      }
+   }
+
    render() {
       const AddAction = (props) => (
          <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
@@ -371,12 +406,19 @@ class YourLists extends Component {
 
       return (
          <React.Fragment>
-            <TopNavigation
-               title={PAGE_TITLE}
-               alignment='center'
-               leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
-            />
+            {this.props.navigation.getParam("ingredients", false) &&
+               <TopNavigation
+                  title={"Select Lists..."}
+                  alignment='center'
+                  rightControls={renderRightControls()}
+               />}
+            {!this.props.navigation.getParam("ingredients", false) &&
+               <TopNavigation
+                  title={"Select Lists..."}
+                  alignment='center'
+                  leftControl={renderMenuAction()}
+                  rightControls={renderRightControls()}
+               />}
             <Layout style={styles.ListContainer}>
                <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
                   <Modal style={styles.modal}
@@ -387,31 +429,53 @@ class YourLists extends Component {
                      {this.renderModalElement()}
                   </Modal>
                </KeyboardAvoidingView>
-               <FlatList
-                  contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                  style={styles.flatList}
-                  data={this.state.listTitles}
-                  width="100%"
-                  keyExtractor={index => index.toString()}
-                  renderItem={({ item, index }) => (
-                     <ListItemContainer
-                        title={item}
-                        description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod}
-                        listName={item}
-                        onPress={this.GoToList.bind(this, item)}
-                        listIndex={index}
-                        listID={this.state.apiData[index].key}
-                        onDelete={this.deleteListWithID}                     
-                        navigate={() => {
-                           this.props.navigation.navigate("YourContacts", {
-                              share: true,
-                              listID: this.state.apiData[index].key,
-                              listName: item
-                           })
-                        }}
-                     />
-                  )}
-               />
+               {!this.props.navigation.getParam("ingredients", false) &&
+                  <FlatList
+                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                     style={styles.flatList}
+                     data={this.state.listTitles}
+                     width="100%"
+                     keyExtractor={index => index.toString()}
+                     renderItem={({ item, index }) => (
+                        <ListItemContainer
+                           title={item}
+                           description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod}
+                           listName={item}
+                           onPress={this.GoToList.bind(this, item)}
+                           listIndex={index}
+                           listID={this.state.apiData[index].key}
+                           onDelete={this.deleteListWithID}
+                           navigate={() => {
+                              this.props.navigation.navigate("YourContacts", {
+                                 share: true,
+                                 listID: this.state.apiData[index].key,
+                                 listName: item
+                              })
+                           }}
+                        />
+                     )}
+                  />}
+               {this.props.navigation.getParam("ingredients", false) &&
+                  <FlatList
+                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                     style={styles.flatList}
+                     data={this.state.listTitles}
+                     width="100%"
+                     keyExtractor={index => index.toString()}
+                     renderItem={({ item, index }) => (
+                        <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod} />
+                     )}
+                  />}
+               {this.props.navigation.getParam("ingredients", false) &&
+                  <Layout>
+                     <Button style={styles.shareButton}
+                        status="success"
+                        onPress={() => lf.AddIngredientsToList(this.state.selectedIds, this.props.navigation.getParam("ingredients", false), this.props, function (props) {
+                           props.navigation.goBack()
+                        })}
+                     >{"ADD TO LIST"}</Button>
+                  </Layout>
+               }
             </Layout>
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>

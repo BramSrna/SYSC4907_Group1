@@ -41,7 +41,7 @@ function createUserPath(userId) {
  * to manipulate the database.
  */
 class ListFunctions {
-   constructor() { }
+   constructor() {}
 
    /**
     * sendNotification
@@ -69,6 +69,21 @@ class ListFunctions {
             data: data
          })
       });
+   }
+
+   AddIngredientsToList(lists, ingredients, props, callback) {
+      for (var list in lists) {
+         for (var ingredient in ingredients) {
+            this.AddItemToList(
+               lists[list],
+               ingredients[ingredient].name,
+               1,
+               "aSize mL",
+               "aNote",
+               null);
+         }
+      }
+      callback(props);
    }
 
    /**
@@ -501,29 +516,29 @@ class ListFunctions {
    getAvailableStores() {
       // Call the function to load all available stores
       var data = autocomplete.cloudLoadAvailableStores().then((value) => {
-          // Get the stores and ids
-          var titles = value.titles;
-          var ids = value.ids;
-          var addrs = value.addrs;
-          var names = value.names;
+         // Get the stores and ids
+         var titles = value.titles;
+         var ids = value.ids;
+         var addrs = value.addrs;
+         var names = value.names;
 
-          // Save the names and ids to the state
-          var temp = [];
-          for (var i = 0; i < ids.length; i++) {
-              temp.push({
-                  title: titles[i],
-                  id: ids[i],
-                  addr: addrs[i],
-                  storeName: names[i]
-              });
-          }
+         // Save the names and ids to the state
+         var temp = [];
+         for (var i = 0; i < ids.length; i++) {
+            temp.push({
+               title: titles[i],
+               id: ids[i],
+               addr: addrs[i],
+               storeName: names[i]
+            });
+         }
 
-          temp.push({
-              title: "Register a store...",
-              id: -1
-          });
+         temp.push({
+            title: "Register a store...",
+            id: -1
+         });
 
-          return temp;
+         return temp;
       });
 
       return data;
@@ -637,7 +652,9 @@ class ListFunctions {
    async loadOptimizerMap(storeName, address) {
       try {
          // Call the function to get the sorted list
-         const {data} = await firebase.functions().httpsCallable('getOptimizedMap')({
+         const {
+            data
+         } = await firebase.functions().httpsCallable('getOptimizedMap')({
             storeName: storeName,
             address: address,
          });
@@ -662,7 +679,9 @@ class ListFunctions {
    async loadMostPopularList(storeName, address) {
       try {
          // Call the function to get the sorted list
-         const {data} = await firebase.functions().httpsCallable('getMostPopularMap')({
+         const {
+            data
+         } = await firebase.functions().httpsCallable('getMostPopularMap')({
             storeName: storeName,
             address: address,
          });

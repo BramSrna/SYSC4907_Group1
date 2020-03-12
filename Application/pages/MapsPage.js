@@ -10,7 +10,7 @@ import {
     Select,
     Text,
     CheckBox
-} from "@ui-kitten/components";
+} from "react-native-ui-kitten";
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import { dark, light } from "../assets/Themes.js";
 import NotificationPopup from "react-native-push-notification-popup";
@@ -21,6 +21,7 @@ import axios from "axios";
 import lf from "./Functions/ListFunctions";
 import HereMapsSearchAsync from "../components/HereMapsSearchAsync.js";
 // import axios from 'axios';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Select Location";
 const NO_LOCATION_PERMISSION =
@@ -84,6 +85,7 @@ class MapsPage extends Component {
 
     componentDidMount() {
         this._getLocationAsync();
+        nm.setThat(this)
     }
 
     async _getApiKey() {
@@ -177,7 +179,10 @@ class MapsPage extends Component {
                 );
             });
             return delta * 2;
-        } else return DEFAULT_LATITUDE_DELTA;
+        }
+        else {
+            return DEFAULT_LATITUDE_DELTA;
+        }
     }
 
     calculateLongitudeDelta(longitude) {
@@ -192,7 +197,10 @@ class MapsPage extends Component {
                 );
             });
             return delta * 2;
-        } else return DEFAULT_LONGITUDE_DELTA;
+        }
+        else {
+            return DEFAULT_LONGITUDE_DELTA;
+        }
     }
 
     handleMapRegionChange = newRegion => {
@@ -209,7 +217,7 @@ class MapsPage extends Component {
     };
 
     selectStore = location => {
-        if(this.props.navigation.state.params){
+        if (this.props.navigation.state.params) {
             this.props.navigation.state.params.selectStore(location);
         }
         this.props.navigation.goBack();

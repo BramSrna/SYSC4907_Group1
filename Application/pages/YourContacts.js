@@ -5,7 +5,7 @@ import {
    Alert,
 } from "react-native";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Text, TopNavigation, TopNavigationAction, Button } from '@ui-kitten/components';
+import { Layout, Text, TopNavigation, TopNavigationAction, Button } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import ListItemContainer from '../components/ListItemContainer.js';
 import NotificationPopup from 'react-native-push-notification-popup';
@@ -24,7 +24,8 @@ class YourContacts extends Component {
       this.setState({
          share: this.props.navigation.getParam("share", false),
          listID: this.props.navigation.getParam("listID", ''),
-         listName: this.props.navigation.getParam("listName", '')
+         listName: this.props.navigation.getParam("listName", ''),
+         recipeName: this.props.navigation.getParam("recipeName", ''),
       });
       cf.GetContactInfo(this);
    }
@@ -118,12 +119,20 @@ class YourContacts extends Component {
       );
       return (
          <React.Fragment>
-            <TopNavigation
-               title="Your Contacts"
-               alignment='center'
-               leftControl={renderMenuAction()}
-               rightControls={renderRightControls()}
-            />
+            {(this.state.listID != '' || this.state.recipeName != '') &&
+               <TopNavigation
+                  title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
+                  alignment='center'
+                  rightControls={renderRightControls()}
+               />
+            }
+            {(this.state.listID == '' && this.state.recipeName == '') &&
+               <TopNavigation
+                  title={(this.state.listID != '' || this.state.recipeName != '') ? "Select Contacts..." : "Your Contacts"}
+                  alignment='center'
+                  leftControl={renderMenuAction()}
+                  rightControls={renderRightControls()}
+               />}
             <Layout style={styles.sectionListContainer}>
                <SectionList
                   sections={this.state.share ? this.state.sectionsWoPending : this.state.sections}
@@ -177,12 +186,22 @@ class YourContacts extends Component {
                   keyExtractor={(item, index) => index}
                />
             </Layout>
-            {this.state.share &&
+            {this.state.listID != '' &&
                <Layout>
                   <Button style={styles.shareButton}
                      status="success"
                      onPress={() => cf.ShareList(this.props, this.state.listName, this.state.listID, this.state.selected, function (props) {
                         props.navigation.navigate("YourListsPage")
+                     })}
+                  >{"SHARE"}</Button>
+               </Layout>
+            }
+            {this.state.recipeName != '' &&
+               <Layout>
+                  <Button style={styles.shareButton}
+                     status="success"
+                     onPress={() => cf.ShareRecipe(this.props, this.state.recipeName, this.state.selected, function (props) {
+                        props.navigation.goBack()
                      })}
                   >{"SHARE"}</Button>
                </Layout>

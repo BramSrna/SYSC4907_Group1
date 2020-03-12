@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styles from './SideMenuStyle';
 import { NavigationActions } from 'react-navigation';
 import { ScrollView, } from 'react-native';
-import { Layout, Text, } from '@ui-kitten/components';
+import { Layout, Text, } from 'react-native-ui-kitten';
 import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";
@@ -12,12 +12,14 @@ const PRIVACY_POLICY = "Privacy Policy";
 const HOME = "Home";
 const CONTACTS = "Contacts";
 const YOUR_LISTS = "Your Lists";
+const SEARCH_RECIPE = "Find Recipes";
 const FEEDBACK = "Feedback";
 const ADD_ITEM_LOCATION = "Add Item Location";
 const MAP_A_STORE = "Map a Store";
 const REGISTER_AN_ITEM = "Register an Item";
 const SIGNOUT = "Sign Out";
 const EXCEL_PARSER = "Parse Excel File";
+const FAV_RECIPE_PAGE = "Your Favourite Recipes";
 
 const DEV_MODE_ENABLED = false;
 
@@ -56,7 +58,7 @@ class SideMenu extends Component {
         );
     }
 
-    returnDispalyName(){
+    returnDispalyName() {
         if (firebase.auth().currentUser != null && firebase.auth().currentUser.displayName != null) {
             return (
                 <Text style={styles.signedInText} appearance='hint'>Signed in as {firebase.auth().currentUser.displayName}</Text>
@@ -83,6 +85,12 @@ class SideMenu extends Component {
                             </Text>
                             <Text style={styles.navItemStyle} onPress={this.navigateToScreen('YourListsPage')}>
                                 {YOUR_LISTS}
+                            </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('FindRecipePage')}>
+                                {SEARCH_RECIPE}
+                            </Text>
+                            <Text style={styles.navItemStyle} onPress={this.navigateToScreen('FavRecipesPage')}>
+                                {FAV_RECIPE_PAGE}
                             </Text>
                         </Layout>
                     </Layout>

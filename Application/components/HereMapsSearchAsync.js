@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
-import { Layout, Autocomplete } from '@ui-kitten/components';
+import { Layout, Autocomplete } from 'react-native-ui-kitten';
 import axios from "axios";
 
 /**

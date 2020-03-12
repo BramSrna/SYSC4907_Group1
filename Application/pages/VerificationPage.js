@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet } from "react-native";
-import { Text, Layout, Button, ButtonGroup } from '@ui-kitten/components';
+import { Text, Layout, Button, ButtonGroup } from 'react-native-ui-kitten';
 import globalStyles from "./pageStyles/GlobalStyle";
 import FirebaseUser from "../components/FirebaseUser";
 import * as firebase from 'firebase';

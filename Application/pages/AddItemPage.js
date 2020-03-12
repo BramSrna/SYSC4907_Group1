@@ -12,12 +12,13 @@ import {
     TopNavigationAction,
     Autocomplete,
     Text,
-} from '@ui-kitten/components';
+} from 'react-native-ui-kitten';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
 import { ArrowBackIcon, AddIcon, RefreshIcon, CheckmarkIcon } from '../assets/icons/icons.js';
 import * as firebase from 'firebase/app';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const globalComps = require('./Functions/GlobalComps');
 
@@ -64,6 +65,7 @@ class AddItemPage extends Component {
     * @returns None
     */
     componentWillMount() {
+        nm.setThat(this);
         // set the mounted var
         this._isMounted = true;
 

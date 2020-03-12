@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { StyleSheet, Dimensions } from 'react-native';
-import { Layout, TopNavigation, TopNavigationAction, OverflowMenu, } from '@ui-kitten/components';
+import { Layout, TopNavigation, TopNavigationAction, OverflowMenu, } from 'react-native-ui-kitten';
 import { MenuOutline, SunIcon, MenuIcon } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";
@@ -11,11 +11,13 @@ import { Notifications } from 'expo'
 import * as Permissions from 'expo-permissions'
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
+import rf from "./Functions/RecipeFunctions";
 
 var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
 const CROWD_SOURCE_PAGE = "CrowdSourcePage";
-const CONTACTS = "YourContacts";
+const CONTACTS = "YourContacts"
+const RECIPE_PAGE = "FindRecipePage"
 const MAPS = "MapsPage";
 const MARGIN_RATIO = 30; // higher number = smaller margin
 
@@ -38,6 +40,7 @@ class HomePage extends Component {
   async load() {
     this._isMounted = true;
     nm.setThat(this)
+    rf.AddRecipesToDatabase();
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
@@ -181,8 +184,8 @@ class HomePage extends Component {
           <Layout style={styles.container} onLayout={this.onLayout} >
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Lists' icon='list-outline' onPress={() => this.props.navigation.navigate(YOUR_LISTS_PAGE)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Contacts' icon='people-outline' onPress={() => this.props.navigation.navigate(CONTACTS)} />
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' onPress={() => this.props.navigation.navigate(MAPS)}/>
-            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Search Recipes' icon='search-outline' />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Stores' icon='map-outline' onPress={() => this.props.navigation.navigate(MAPS)} />
+            <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Find Recipes' icon='search-outline' onPress={() => this.props.navigation.navigate(RECIPE_PAGE)} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Your Recommendations' icon='bulb-outline' shape={2} />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Shared With You' icon='share-outline' />
             <HomeSquareContainer sizeValue={sizeValue} marginValue={marginValue} name='Crowd-Source' icon='loader-outline' onPress={() => this.props.navigation.navigate(CROWD_SOURCE_PAGE)} />

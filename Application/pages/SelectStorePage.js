@@ -14,11 +14,12 @@ import {
     Autocomplete,
     Text,
     Modal
-} from '@ui-kitten/components';
+} from 'react-native-ui-kitten';
 import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import lf from "./Functions/ListFunctions";
+import nm from '../pages/Functions/NotificationManager.js';
 import StringSimilarity from "string-similarity";
 import { departments } from "../DepartmentList";
 import RNPickerSelect from 'react-native-picker-select';
@@ -80,7 +81,7 @@ class SelectStorePage extends Component {
     */
     componentWillMount() {
         this._isMounted = true;
-
+        nm.setThat(this)
         this.setState({
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
@@ -169,7 +170,7 @@ class SelectStorePage extends Component {
 
             // if exact match was not found look for similar strings
             if (id == "") {
-                if(availableStores!=[]){
+                if (availableStores != []) {
                     var similarity = StringSimilarity.findBestMatch(newStore, availableStores.map(store => store.title));
                     if (similarity.bestMatch.rating >= STRING_SIMILARITY_THRESHOLD) {
                         id = availableStores.find(element => element.title == similarity.bestMatch.target).id;
@@ -181,7 +182,7 @@ class SelectStorePage extends Component {
                         console.log("Best matched store similarity rating: " + similarity.bestMatch.rating);
                     }
                 }
-                else{
+                else {
                     console.log("availableStores was empty!");
                 }
             }

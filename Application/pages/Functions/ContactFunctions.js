@@ -7,10 +7,10 @@ import * as firebase from "firebase";
  * This class contains all the functions that the UI uses to manipulate the database.
  */
 class ContactFunctions {
-   constructor() { }
+   constructor() {}
 
    sendNotification = (token, title, body, data) => {
-
+      console.log("TOken: " + token)
       let response = fetch('https://exp.host/--/api/v2/push/send', {
          method: 'POST',
          headers: {
@@ -31,6 +31,56 @@ class ContactFunctions {
       firebase
          .database()
          .ref("/contacts/" + firebase.auth().currentUser.uid).off()
+   }
+
+   ShareRecipe(props, recipeName, usersToShareWith, callback) {
+      var that = this;
+      firebase
+         .database()
+         .ref("/userInfo/")
+         .once("value", function (snapshot) {
+            if (snapshot.val()) {
+               for (user in usersToShareWith) {
+                  var name = firebase.auth().currentUser.email;
+                  var tempEmail = usersToShareWith[user];
+                  var userInfoKey = tempEmail.replace(/\./g, ",");
+                  if (snapshot.val()[userInfoKey]) {
+                     var uidOfUserToShare = snapshot.val()[userInfoKey].uid
+                     var notificationToken = snapshot.val()[userInfoKey].notificationToken
+                     firebase
+                        .database()
+                        .ref("/contacts/" + uidOfUserToShare)
+                        .once("value", function (snapshot) {
+                           if (snapshot.val()) {
+                              for (contact in snapshot.val()) {
+                                 if (snapshot.val()[contact].email == name) {
+                                    name = snapshot.val()[contact].name;
+                                    var title = 'Grocery Shopping Recipe Sharing';
+                                    var message = name + ' has shared the following recipe with you: ' + recipeName;
+                                    that.sendNotification(notificationToken, title, message, {
+                                       "page": "RecipeDetailsPage",
+                                       "name": recipeName,
+                                       "title": title,
+                                       "message": message,
+                                    });
+                                    break;
+                                 }
+                              }
+                           } else {
+                              console.log("Contacts not configured properly")
+                           }
+                        })
+
+                     callback(props)
+
+                  } else {
+                     console.log("Could not get user info key")
+                  }
+               }
+            } else {
+               console.log("Could not get users")
+            }
+         })
    }
 
    EditContact(props, contactEmail, contactName, contactGroup, callback) {
@@ -436,7 +486,7 @@ class ContactFunctions {
             var groupsWithoutPending = [];
             var sectionsWithoutPending = [];
             snapshot.forEach(function (child) {
-               if (child.val().status == "sent") { } else if (child.val().status == "pending") {
+               if (child.val().status == "sent") {} else if (child.val().status == "pending") {
                   if (groupNames.includes("Pending")) {
                      pendingList["Pending"].push(child.val())
                   } else {
