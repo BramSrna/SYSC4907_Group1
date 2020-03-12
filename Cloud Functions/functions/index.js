@@ -18,7 +18,7 @@ exports.updateSharedListCount = functions.database.ref('/users/{uid}/lists/share
     return change.after.ref.parent.child('shared_count').set(change.after.numChildren());
 });
 
-exports.updaterecipecount = functions.database.ref('/recipes/{name}').onWrite((change, context) => {
+exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((change, context) => {
     return change.after.ref.parent.once('value').then((val) => {
         var count = val.numChildren();
         return change.after.ref.parent.update({
@@ -44,7 +44,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
         }
 
         currCount += 1;
-    
+
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
             reorgFuncs.cloudDetermineClusters(database);

@@ -1,7 +1,5 @@
 import * as firebase from "firebase";
-import {
-   resolve
-} from "url";
+import * as func from "./DBInterface"
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "30";
 const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
@@ -11,12 +9,8 @@ class RecipeFunctions {
    constructor() {}
 
    GetUrlAndIngredientsFromName(recipeName, that) {
-      var recipeId = recipeName;
-      recipeId = recipeId.replace(/\./g, " ");
-      recipeId = recipeId.replace(/\$/g, " ");
-      recipeId = recipeId.replace(/\#/g, " ");
-      recipeId = recipeId.replace(/\[/g, " ");
-      recipeId = recipeId.replace(/\]/g, " ");
+      var recipeId = func.replaceInvalidPathCharsGlobal(recipeName);
+
       firebase
          .database()
          .ref("/recipes/" + recipeId)
@@ -33,12 +27,8 @@ class RecipeFunctions {
    }
 
    UpdateFavouriteRecipe(that, recipeName) {
-      var recipeId = recipeName;
-      recipeId = recipeId.replace(/\./g, " ");
-      recipeId = recipeId.replace(/\$/g, " ");
-      recipeId = recipeId.replace(/\#/g, " ");
-      recipeId = recipeId.replace(/\[/g, " ");
-      recipeId = recipeId.replace(/\]/g, " ");
+      var recipeId = func.replaceInvalidPathCharsGlobal(recipeName);
+
       firebase
          .database()
          .ref("/favRecipes/" + firebase.auth().currentUser.uid + "/" + recipeId)
@@ -78,13 +68,9 @@ class RecipeFunctions {
    }
 
    AddFavouriteRecipe(recipeName, callback) {
-      var recipeId = recipeName;
       var currentUserId = firebase.auth().currentUser.uid;
-      recipeId = recipeId.replace(/\./g, " ");
-      recipeId = recipeId.replace(/\$/g, " ");
-      recipeId = recipeId.replace(/\#/g, " ");
-      recipeId = recipeId.replace(/\[/g, " ");
-      recipeId = recipeId.replace(/\]/g, " ");
+      var recipeId = func.replaceInvalidPathCharsGlobal(recipeName);
+
       firebase
          .database()
          .ref("/favRecipes/" + currentUserId + "/" + recipeId)
@@ -158,12 +144,8 @@ class RecipeFunctions {
                            // console.log(json.recipes)
                            for (var a = 0; a < json.recipes.length; a++) {
                               var data = json.recipes[a];
-                              var title = data.title;
-                              title = title.replace(/\./g, " ");
-                              title = title.replace(/\$/g, " ");
-                              title = title.replace(/\#/g, " ");
-                              title = title.replace(/\[/g, " ");
-                              title = title.replace(/\]/g, " ");
+                              var title = func.replaceInvalidPathCharsGlobal(data.title);
+
                               firebase.database().ref('/recipes/' + title).set(data).then((snapshot) => {
                                  // console.log(snapshot);
                               });

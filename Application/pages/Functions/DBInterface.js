@@ -2,17 +2,30 @@ import * as firebase from "firebase";
 
 const globalComps = require('./GlobalComps');
 
+export function replaceInvalidPathCharsGlobal(string) {
+    if (string !== null) {
+        string = string.
+        replace(".", "").
+        replace("#", "").
+        replace("$", "").
+        replace("[", "").
+        replace("]", "");
+    }
+
+    return (string);
+}
+
 function replaceInvalidPathChars(stringToMod) {
     if (stringToMod !== null) {
         stringToMod = stringToMod.
-                      replace(".", "").
-                      replace("#", "").
-                      replace("$", "").
-                      replace("[", "").
-                      replace("]", "");
+        replace(".", "").
+        replace("#", "").
+        replace("$", "").
+        replace("[", "").
+        replace("]", "");
     }
 
-    return(stringToMod);
+    return (stringToMod);
 }
 
 /**
@@ -43,12 +56,11 @@ function compArrays(array1, array2) {
             if (!array1[i].equals(array2[i])) {
                 return false;
             }
-        }           
-        else if (array1[i] !== array2[i]) { 
+        } else if (array1[i] !== array2[i]) {
             // Warning - two different object instances will never be equal: {x:20} != {x:20}
-            return false;   
-        }           
-    }       
+            return false;
+        }
+    }
     return true;
 }
 
@@ -176,20 +188,20 @@ export function registerItem(genericName, specificName = null, size = null, size
  */
 export async function modStoreWeights(storeName, address, map) {
     try {
-       // Call the function to get the sorted list
-       const {
-          data
-       } = await firebase.functions().httpsCallable('cloudModStoreWeights')({
-          storeName: storeName,
-          address: address,
-          map: map
-       });
+        // Call the function to get the sorted list
+        const {
+            data
+        } = await firebase.functions().httpsCallable('cloudModStoreWeights')({
+            storeName: storeName,
+            address: address,
+            map: map
+        });
 
-       return data;
+        return data;
     } catch (e) {
-       console.error(e);
+        console.error(e);
 
-       return (null);
+        return (null);
     }
 }
 
@@ -211,7 +223,7 @@ export async function modStoreWeights(storeName, address, map) {
 export function registerStore(storeName, address, map, franchiseName = null) {
     storeName = replaceInvalidPathChars(storeName);
     address = replaceInvalidPathChars(address);
-    
+
     // Get the path of the store
     var storePath = (new globalComps.StoreObj(address, storeName)).getPath();
 
@@ -240,7 +252,7 @@ export function registerStore(storeName, address, map, franchiseName = null) {
             store = firebase.database().ref(storePath).update(toAdd);
         } else {
             var maps = store.maps;
-            var mapExists = false;                
+            var mapExists = false;
 
             // Check if the map has been saved before
             for (var mapId in maps) {
@@ -252,8 +264,8 @@ export function registerStore(storeName, address, map, franchiseName = null) {
             }
 
             // Handle the franchise name
-            if (franchiseName !== null) {                    
-                var fNames = store.candFranchiseName;                    
+            if (franchiseName !== null) {
+                var fNames = store.candFranchiseName;
                 var franchiseNameCount = 0;
 
                 // Check if the franchise name has been registered before
@@ -390,10 +402,10 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
                 if ((tempLoc.aisleNum === aisleNum) &&
                     (tempLoc.department === itemDepartment) &&
                     (tempLoc.store === storeName)) {
-                        // location has already been saved
-                        locId = tempLocId;
-                        break;
-                    }
+                    // location has already been saved
+                    locId = tempLocId;
+                    break;
+                }
             }
 
             // If the location has already been saved, iterate the cound
@@ -431,10 +443,10 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
                 tempLoc = locs[tempLocId];
                 if ((tempLoc.aisleNum === aisleNum) &&
                     (tempLoc.department === itemDepartment)) {
-                        // location has already been saved
-                        locId = tempLocId;
-                        break;
-                    }
+                    // location has already been saved
+                    locId = tempLocId;
+                    break;
+                }
             }
 
             // If the location has already been saved, iterate the cound
