@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-import {
-   StyleSheet, FlatList
-} from "react-native";
-import { TopNavigation, TopNavigationAction, } from '@ui-kitten/components';
+import { StyleSheet, FlatList, Image } from "react-native";
 import { MenuOutline } from "../assets/icons/icons.js";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
-import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
+import { Layout, TopNavigation, TopNavigationAction, Card, Text, Button } from '@ui-kitten/components';
+import { dark, light } from '../assets/Themes.js';
 
 class FavRecipesPage extends Component {
    constructor(props) {
@@ -16,7 +14,6 @@ class FavRecipesPage extends Component {
          recipes: []
       }
    }
-
 
    componentWillMount() {
       this.focusListener = this.props.navigation.addListener(
@@ -27,7 +24,6 @@ class FavRecipesPage extends Component {
             rf.GetFavouriteRecipes(this)
          }
       );
-
    }
    componentWillUnmount() {
       this.focusListener.remove()
@@ -35,11 +31,45 @@ class FavRecipesPage extends Component {
       rf.RemoveListeners();
    }
 
-
    render() {
       const renderMenuAction = () => (
          <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
       );
+
+      const Header = (imageSource, title) => (
+         <React.Fragment>
+            <Image
+               style={styles.headerImage}
+               source={{ uri: imageSource }}
+            />
+            <Text
+               style={styles.headerText}
+               category='h5'>
+               {title}
+            </Text>
+         </React.Fragment>
+      );
+
+      const Footer = (onSharePress, onDetailsPress) => (
+         <Layout style={styles.footerContainer}>
+            <Layout style={styles.cardButtonGroup} >
+               <Button
+                  style={styles.cardButtonLeft}
+                  status='basic'
+                  onPress={onSharePress}
+               >
+                  {"SHARE"}
+               </Button>
+               <Button
+                  style={styles.cardButtonRight}
+                  onPress={onDetailsPress}
+               >
+                  {"DETAILS"}
+               </Button>
+            </Layout>
+         </Layout>
+      );
+
       return (
          <React.Fragment>
             <TopNavigation
@@ -49,47 +79,37 @@ class FavRecipesPage extends Component {
             />
             {this.state.recipes.length > 0 &&
                <FlatList
-                  contentContainerStyle={{ paddingBottom: 16 }}
+                  style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
                   style={styles.flatList}
                   data={this.state.recipes}
                   width="100%"
                   keyExtractor={(item, index) => item.title}
                   renderItem={({ item }) => {
                      return (
-                        <Card style={styles.card} key={"Key: " + item.title}>
-                           <CardImage
-                              source={{ uri: item.image }}
-                           />
-                           <CardTitle
-                              subtitle={item.title}
-                           />
-                           <CardContent text={"Serves " + item.servings + "\t\t\tReady in  " + item.readyInMinutes + " minutes"} />
-                           <CardAction
-                              separator={true}
-                              inColumn={false}>
-                              <CardButton
-                                 onPress={() => {
+                        <Layout style={styles.cardContainer}>
+                           <Card
+                              style={styles.card}
+                              appearance='filled'
+                              header={() => Header(item.image, item.title)}
+                              footer={() => Footer(
+                                 () => {
                                     this.props.navigation.navigate("YourContacts", {
                                        share: true,
                                        recipeName: item.title
                                     })
-                                 }}
-                                 title="Share"
-                                 color="#FEB557"
-                              />
-                              <CardButton
-                                 onPress={() => {
+                                 },
+                                 () => {
                                     this.props.navigation.navigate("RecipeDetailsPage", {
                                        url: item.spoonacularSourceUrl,
                                        ingredients: item.extendedIngredients,
                                        name: item.title
                                     })
-                                 }}
-                                 title="Details"
-                                 color="#FEB557"
-                              />
-                           </CardAction>
-                        </Card>
+                                 })}>
+                              <Text>
+                                 {"Serves " + item.servings + "\t\t\tReady in " + item.readyInMinutes + " minutes"}
+                              </Text>
+                           </Card>
+                        </Layout>
                      );
                   }}
                />}
@@ -100,6 +120,48 @@ class FavRecipesPage extends Component {
 }
 
 const styles = StyleSheet.create({
-
+   cardContainer: {
+      marginVertical: 4,
+      marginHorizontal: 8,
+      borderRadius: 20,
+      shadowColor: 'black',
+      shadowOpacity: .80,
+      shadowOffset: { width: 0, height: 0, },
+      backgroundColor: "#0000",
+      elevation: 6,
+   },
+   card: {
+      flex: 1,
+      borderRadius: 20,
+   },
+   headerImage: {
+      flex: 1,
+      height: 300,
+   },
+   headerText: {
+      marginHorizontal: 24,
+      marginVertical: 16,
+   },
+   footerContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+   },
+   cardButtonGroup: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+   },
+   cardButtonLeft: {
+      flex: 1,
+      padding: 8,
+      marginRight: 4,
+   },
+   cardButtonRight: {
+      flex: 1,
+      padding: 8,
+      marginLeft: 4,
+   },
 });
 export default FavRecipesPage;
