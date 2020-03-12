@@ -15,7 +15,7 @@ import {
    Select,
    Text,
    CheckBox
-} from '@ui-kitten/components';
+} from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";

@@ -10,7 +10,7 @@ import {
     Select,
     Text,
     CheckBox
-} from "@ui-kitten/components";
+} from "react-native-ui-kitten";
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import { dark, light } from "../assets/Themes.js";
 import NotificationPopup from "react-native-push-notification-popup";

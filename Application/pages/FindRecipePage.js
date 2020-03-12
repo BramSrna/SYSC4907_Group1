@@ -3,7 +3,7 @@ import NotificationPopup from 'react-native-push-notification-popup';
 import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { FlatList, StyleSheet } from 'react-native';
-import { TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import RecipesCard from '../components/RecipesCard.js';
 import { dark, light } from '../assets/Themes.js';
 import { MenuOutline } from "../assets/icons/icons.js";

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Layout, Text, Button, } from '@ui-kitten/components';
+import { Layout, Text, Button, } from 'react-native-ui-kitten';
 
 export default class RecipesCard extends Component {
     constructor(props) {

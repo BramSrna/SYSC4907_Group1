@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '@ui-kitten/components';
+import { Icon } from 'react-native-ui-kitten';
 
 export const HeartIcon = (style) => (<
     Icon {...style}

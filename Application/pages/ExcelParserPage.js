@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Text, Alert, KeyboardAvoidingView, StyleSheet } from "react-native";
-import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { Layout, Button, Input, Select, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { ScrollView } from "react-native-gesture-handler";
 import { dark, light } from '../assets/Themes.js';

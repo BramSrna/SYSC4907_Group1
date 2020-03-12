@@ -3,7 +3,7 @@ import { Image, Platform, StatusBar, StyleSheet, SafeAreaView, } from 'react-nat
 import { mapping, } from '@eva-design/eva';
 import { dark, light } from './assets/Themes.js';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
-import { ApplicationProvider, IconRegistry, Layout, Text } from '@ui-kitten/components';
+import { ApplicationProvider, IconRegistry, Layout, Text } from 'react-native-ui-kitten';
 import FirebaseConfig from './components/FirebaseConfig';
 import * as firebase from 'firebase';
 import RootNavigation from './navigation/RootNavigation';

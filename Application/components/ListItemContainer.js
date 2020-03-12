@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, BackHandler, } from 'react-native';
-import { Layout, ListItem, Icon, OverflowMenu, Button, } from '@ui-kitten/components';
+import { Layout, ListItem, Icon, OverflowMenu, Button, } from 'react-native-ui-kitten';
 import { ShareIcon, Trash2Icon, CheckmarkIcon, CloseIcon } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList";
 
@@ -9,7 +9,7 @@ import { departments } from "../DepartmentList";
  * @property {string} title - Text to be displayed (default: 'Lorem Ipsum')
  * @property {string} description - Text to be displayed below the name (default: 'Lorem Ipsum')
  * @property {string} iconFill - Color to fill the icon on the right of the container (default: #8F9BB3)
- * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '3') (see https://akveo.github.io/@ui-kitten/components/docs/components/layout/api#layout for more details)
+ * @property {string} backgroundLevel - Sets the level value of the ui-kitten Layout component (default: '3') (see https://akveo.github.io/react-native-ui-kitten/docs/components/layout/api#layout for more details)
  * @property {function} onPress - onPress()
  * @property {function} onDelete - onDelete()
  * @property {boolean} fromItemView - Determines if this component is being created from YourLists page or CurrentList page (default: false)
