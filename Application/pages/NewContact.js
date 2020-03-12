@@ -3,7 +3,7 @@ import {
    KeyboardAvoidingView, StyleSheet
 } from "react-native";
 import cf from "./Functions/ContactFunctions";
-import { Layout, Button, Text, Input, Modal, Select, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Button, Text, Input, Modal, Select, TopNavigation, TopNavigationAction, } from '@ui-kitten/components';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { dark, light } from '../assets/Themes.js';
 import { ScrollView } from "react-native-gesture-handler";

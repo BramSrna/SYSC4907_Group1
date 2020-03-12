@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FlatList, KeyboardAvoidingView, BackHandler, StyleSheet } from "react-native";
-import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from '@ui-kitten/components';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';

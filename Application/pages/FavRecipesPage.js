@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import {
    StyleSheet, FlatList
 } from "react-native";
-import { TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction, } from '@ui-kitten/components';
 import { MenuOutline } from "../assets/icons/icons.js";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';

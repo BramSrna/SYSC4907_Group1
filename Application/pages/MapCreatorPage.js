@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
-import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { MenuOutline } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList";
 import { FlatList } from "react-native-gesture-handler";

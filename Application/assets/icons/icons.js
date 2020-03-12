@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Icon
-} from 'react-native-ui-kitten';
+} from '@ui-kitten/components';
 import {
     Image
 } from 'react-native';

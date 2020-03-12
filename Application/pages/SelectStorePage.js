@@ -14,7 +14,7 @@ import {
     Autocomplete,
     Text,
     Modal
-} from 'react-native-ui-kitten';
+} from '@ui-kitten/components';
 import { ArrowBackIcon, MapIcon } from '../assets/icons/icons.js';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';

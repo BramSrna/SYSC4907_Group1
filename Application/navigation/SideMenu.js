@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import styles from './SideMenuStyle';
 import { NavigationActions } from 'react-navigation';
 import { ScrollView, } from 'react-native';
-import { Layout, Text, } from 'react-native-ui-kitten';
+import { Layout, Text, } from '@ui-kitten/components';
 import firebase from 'firebase';
 
 const YOUR_DATA = "Your Data";

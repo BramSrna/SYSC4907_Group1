@@ -4,7 +4,7 @@ import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { TopNavigation, TopNavigationAction, Layout, RangeDatepicker } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction, Layout, RangeDatepicker } from '@ui-kitten/components';
 import { MenuOutline, HeartIcon, FilledInHeartIcon, ListIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
