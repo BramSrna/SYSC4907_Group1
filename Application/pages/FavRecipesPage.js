@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { StyleSheet, FlatList, Image } from "react-native";
+import { StyleSheet, FlatList } from "react-native";
 import { MenuOutline } from "../assets/icons/icons.js";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
-import { Layout, TopNavigation, TopNavigationAction, Card, Text, Button } from '@ui-kitten/components';
+import { TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import RecipesCard from '../components/RecipesCard.js';
 import { dark, light } from '../assets/Themes.js';
 
 class FavRecipesPage extends Component {
