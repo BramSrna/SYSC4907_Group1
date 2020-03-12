@@ -12,7 +12,7 @@ export default class RecipesCard extends Component {
         return (
             <Layout style={styles.cardContainer} level='4'>
                 <Layout style={styles.card}>
-                    <Layout>
+                    <Layout style={styles.imageContainer}>
                         <Image
                             style={styles.headerImage}
                             source={{ uri: imageSource }}
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 8,
         borderRadius: 20,
         shadowColor: 'black',
-        shadowOpacity: .80,
+        shadowOpacity: .50,
         shadowOffset: { width: 0, height: 0, },
         backgroundColor: "#0000",
         elevation: 6,
@@ -61,6 +61,9 @@ const styles = StyleSheet.create({
     card: {
         flex: 1,
         margin: 4,
+        borderRadius: 20,
+    },
+    imageContainer: {
         borderRadius: 20,
     },
     headerImage: {
@@ -80,12 +83,13 @@ const styles = StyleSheet.create({
         margin: 8,
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: 20,
     },
     cardButtonGroup: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 10,
+        borderRadius: 20,
     },
     cardButtonLeft: {
         flex: 1,
