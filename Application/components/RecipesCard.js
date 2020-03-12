@@ -10,7 +10,7 @@ export default class RecipesCard extends Component {
     render() {
         const { title = 'Title', description = 'description', imageSource = '', onPress = () => { }, onSharePress = () => { }, onDetailsPress = () => { } } = this.props;
         return (
-            <Layout style={styles.cardContainer}>
+            <Layout style={styles.cardContainer} level='4'>
                 <Layout style={styles.card}>
                     <Layout>
                         <Image
@@ -18,10 +18,10 @@ export default class RecipesCard extends Component {
                             source={{ uri: imageSource }}
                         />
                     </Layout>
-                    <Layout>
-                        <Text category='h5'>{title}</Text>
+                    <Layout style={styles.title}>
+                        <Text category='h4'>{title}</Text>
                     </Layout>
-                    <Layout>
+                    <Layout style={styles.description}>
                         <Text category='p1'>{description}</Text>
                     </Layout>
                     <Layout style={styles.footerContainer}>
@@ -60,14 +60,24 @@ const styles = StyleSheet.create({
     },
     card: {
         flex: 1,
+        margin: 4,
         borderRadius: 20,
     },
     headerImage: {
         flex: 1,
         height: 300,
+        borderRadius: 20,
+    },
+    title: {
+        margin: 8,
+    },
+    description: {
+        marginHorizontal: 8,
+        marginBottom: 4,
     },
     footerContainer: {
         flex: 1,
+        margin: 8,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -81,10 +91,12 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 8,
         marginRight: 4,
+        borderRadius: 10,
     },
     cardButtonRight: {
         flex: 1,
         padding: 8,
         marginLeft: 4,
+        borderRadius: 10,
     },
 });
