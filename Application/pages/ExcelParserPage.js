@@ -50,8 +50,6 @@ class ExcelParserPage extends Component {
            const {data} = await firebase.functions().httpsCallable('cloudDetermineClusters')({
 
            });
-
-           console.log(data);
   
            return null;
         } catch (e) {
@@ -129,10 +127,6 @@ class ExcelParserPage extends Component {
             */
     
         }
-
-        //console.log(items.length, stores.length, locs.length);
-
-        console.log("Done Parsing.");
     }
 
     render() {

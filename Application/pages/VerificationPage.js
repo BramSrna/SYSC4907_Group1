@@ -18,7 +18,6 @@ class VerificationPage extends Component {
     var firebaseUser = new FirebaseUser();
     if (buttonId === VERIFY) {
       if (firebase.auth().currentUser.reload().then(() => { return firebase.auth().currentUser.emailVerified; })) {
-        console.log('VerificationPage: navigate to HomePage');
         firebaseUser.getIdToken();
       } else {
         Alert.alert("Email Not Verified", "Check email for verification link.");
