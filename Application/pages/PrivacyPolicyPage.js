@@ -4,6 +4,7 @@ import { Layout, Text, TopNavigation, TopNavigationAction, Button, } from 'react
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
 import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Privacy Policy";
 
@@ -19,6 +20,9 @@ export default class PrivacyPolicyPage extends Component {
         this.setState({
             registration: this.props.navigation.getParam('registration', false)
         });
+
+        // Set "that" for the notification manager
+        nm.setThat(this)
     }
 
     onDenyPress = () => {
