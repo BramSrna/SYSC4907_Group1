@@ -3,6 +3,7 @@ import { StyleSheet, ScrollView, Image } from 'react-native';
 import { Layout, Text, TopNavigation, TopNavigationAction, Button, } from 'react-native-ui-kitten';
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import NotificationPopup from 'react-native-push-notification-popup';
 
 const PAGE_TITLE = "Privacy Policy";
 
@@ -89,6 +90,7 @@ export default class PrivacyPolicyPage extends Component {
                         </Layout> : null}
                     </ScrollView>
                 </Layout>
+                <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
         );
     }
