@@ -23,6 +23,7 @@ class RegisterPage extends Component {
     secureTextEntry: true,
     registering: false,
     privacyPolicyAccepted: false,
+    returnedFromprivacyPolicy: false,
   }
 
   buttonListener = buttonId => {
@@ -34,8 +35,9 @@ class RegisterPage extends Component {
       this.props.navigation.navigate(ng.LOGINPAGE);
     } else if (buttonId === PRIVACY_POLICY) {
       this.props.navigation.navigate(ng.PRIVACYPOLICY, {
-        onAccept: () => this.setState({ privacyPolicyAccepted: true }),
-        onDeny: () => this.setState({ privacyPolicyAccepted: false }),
+        onAccept: () => this.setState({ privacyPolicyAccepted: true, returnedFromprivacyPolicy: true, }),
+        onDeny: () => this.setState({ privacyPolicyAccepted: false, returnedFromprivacyPolicy: true, }),
+        oldState: this.state,
         registration: true
       });
     }
@@ -77,7 +79,9 @@ class RegisterPage extends Component {
       () => {
         nm.setThat(this)
         this._isMount = true;
-        this.setState({ firstname: "", lastname: "", email: "", password: "" });
+        if (!this.state.returnedFromprivacyPolicy) {
+          this.setState({ firstname: "", lastname: "", email: "", password: "", confirmPassword: "", privacyPolicyAccepted: false, });
+        }
       }
     );
   }
