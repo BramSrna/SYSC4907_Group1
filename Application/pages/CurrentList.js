@@ -1003,7 +1003,7 @@ class CurrentList extends Component {
    renderPurchasedOption = () => {
       return (
          <React.Fragment>
-            <Text style={styles.dashboardText}>{"Hide Purchased Items"}</Text>
+            <Text style={styles.dashboardText}>{"Hide Purchased Items:"}</Text>
             <CheckBox
                checked={this.state.hidePurchased}
                onChange={(isChecked) => {

@@ -126,13 +126,13 @@ export const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      flexWrap:'wrap',
+      flexWrap: 'wrap',
       borderRadius: 10,
    },
    dashboardText: {
       marginHorizontal: 6,
    },
-   mapButton:{
-      borderRadius:20,
+   mapButton: {
+      borderRadius: 20,
    },
 });
