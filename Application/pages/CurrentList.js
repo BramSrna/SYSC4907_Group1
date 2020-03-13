@@ -439,6 +439,16 @@ class CurrentList extends Component {
       return (retStr);
    }
 
+   generatePriceString = (price1, price2) => {
+      var priceString = "";
+      if (price1 == price2) {
+         priceString += "Price: $" + price1.toFixed(2);
+      } else {
+         priceString += "Price: $" + price1.toFixed(2) + " - $" + price2.toFixed(2);
+      }
+      return (priceString);
+   }
+
    /**
     * GenerateListItem
     * 
@@ -457,7 +467,7 @@ class CurrentList extends Component {
             <ListItemContainer
                title={this.getDispName(item)}
                fromItemView={true}
-               description={item.price === undefined ? "" : "Price: " + item.price.minPrice.toFixed(2) + " - " + item.price.maxPrice.toFixed(2)}
+               description={item.price === undefined ? "" : this.generatePriceString(item.price.minPrice, item.price.maxPrice)}
                purchased={item.purchased}
                listID={this.state.listId}
                itemID={this.state.listItemIds[index]}
@@ -1035,6 +1045,41 @@ class CurrentList extends Component {
       });
    };
 
+   renderSharedInfo = () => {
+      var sharedInfo = "";
+      var userCount = this.state.userCount - 1;
+      if (userCount == 1) {
+         sharedInfo += "List shared with " + userCount + " person";
+      } else if (userCount > 1) {
+         sharedInfo += "List shared with " + userCount + " people";
+      }
+      return (
+         <Text style={styles.dashboardText}>
+            {sharedInfo}
+         </Text>
+      );
+   }
+
+   renderPrice = () => {
+      var priceString = "";
+      if (this.state.minPrice == this.state.maxPrice) {
+         priceString += "Price: $" + this.state.minPrice;
+      } else {
+         priceString += "Price: $" + this.state.minPrice + " - $" + this.state.maxPrice;
+      }
+      if (this.state.numUnknownPrice == 1) {
+         priceString += " (" + this.state.numUnknownPrice + " Unknown Price)";
+      } else if (this.state.numUnknownPrice > 0) {
+         priceString += " (" + this.state.numUnknownPrice + " Unknown Prices)";
+      }
+
+      return (
+         <Text style={styles.dashboardText}>
+            {priceString}
+         </Text>
+      );
+   }
+
    render() {
       const AddAction = () => (
          <TopNavigationAction
@@ -1106,13 +1151,8 @@ class CurrentList extends Component {
                         <Text style={styles.dashboardText}>
                            {"Number of Items: " + this.state.listItems.length}
                         </Text>
-                        <Text style={styles.dashboardText}>
-                           {"List shared with "}{this.state.userCount - 1}{" other(s)"}{/* -1 here to make sure we dont include the current user */}
-                        </Text>
-                        <Text style={styles.dashboardText}>
-                           {this.state.minPrice == this.state.maxPrice ? "Price: $" + this.state.minPrice : "Price: $" + this.state.minPrice + " - $" + this.state.maxPrice}
-                           {this.state.numUnknownPrice > 0 ? " [" + this.state.numUnknownPrice + " Unknown Price(s)]" : ""}
-                        </Text>
+                        {this.renderSharedInfo()}
+                        {this.renderPrice()}
                         {this.renderStoreMapDashboard()}
                         {this.renderPurchasedOption()}
                      </Layout>

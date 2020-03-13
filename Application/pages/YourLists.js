@@ -414,7 +414,7 @@ class YourLists extends Component {
                />}
             {!this.props.navigation.getParam("ingredients", false) &&
                <TopNavigation
-                  title={"Select Lists..."}
+                  title={PAGE_TITLE}
                   alignment='center'
                   leftControl={renderMenuAction()}
                   rightControls={renderRightControls()}
