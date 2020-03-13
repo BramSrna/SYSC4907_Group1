@@ -9,7 +9,8 @@ import nm from '../pages/Functions/NotificationManager.js';
 
 const REGISTER = "Register";
 const LOGIN = "Already Registered/Login";
-const BACK_TO_LOGIN = "Back To Login";
+const BACK_TO_LOGIN = "Back to Login";
+const PRIVACY_POLICY = "Accept Privacy Policy";
 
 class RegisterPage extends Component {
   userAlreadyLoggedIn = false;
@@ -20,7 +21,9 @@ class RegisterPage extends Component {
     password: "",
     confirmPassword: "",
     secureTextEntry: true,
-    registering: false
+    registering: false,
+    privacyPolicyAccepted: false,
+    returnedFromprivacyPolicy: false,
   }
 
   buttonListener = buttonId => {
@@ -30,6 +33,13 @@ class RegisterPage extends Component {
       this.props.navigation.navigate(ng.LOGINPAGE);
     } else if (buttonId === BACK_TO_LOGIN) {
       this.props.navigation.navigate(ng.LOGINPAGE);
+    } else if (buttonId === PRIVACY_POLICY) {
+      this.props.navigation.navigate(ng.PRIVACYPOLICY, {
+        onAccept: () => this.setState({ privacyPolicyAccepted: true, returnedFromprivacyPolicy: true, }),
+        onDeny: () => this.setState({ privacyPolicyAccepted: false, returnedFromprivacyPolicy: true, }),
+        oldState: this.state,
+        registration: true
+      });
     }
   };
 
@@ -69,10 +79,11 @@ class RegisterPage extends Component {
       () => {
         nm.setThat(this)
         this._isMount = true;
-        this.setState({ firstname: "", lastname: "", email: "", password: "" });
+        if (!this.state.returnedFromprivacyPolicy) {
+          this.setState({ firstname: "", lastname: "", email: "", password: "", confirmPassword: "", privacyPolicyAccepted: false, });
+        }
       }
     );
-
   }
 
   componentWillUnmount() {
@@ -171,13 +182,24 @@ class RegisterPage extends Component {
               secureTextEntry={this.state.secureTextEntry}
               onIconPress={this.onPasswordEyeIconPress}
               onChangeText={confirmPassword => this._isMount && this.setState({ confirmPassword })}
-              onSubmitEditing={() => this.refs.register.scrollTo}
+              onSubmitEditing={() => this.refs.privacypolicy.scrollTo}
               value={this.state.confirmPassword} />
           </Layout>
           <Layout style={styles.rowContainer}>
             <Button
               style={styles.button}
+              appearance='outline'
+              status={!this.state.privacyPolicyAccepted ? 'basic' : 'success'}
+              ref="privacypolicy"
+              onPress={() => this.buttonListener(PRIVACY_POLICY)}>
+              {PRIVACY_POLICY}
+            </Button>
+          </Layout>
+          <Layout style={styles.rowContainer}>
+            <Button
+              style={styles.button}
               ref="register"
+              disabled={!this.state.privacyPolicyAccepted}
               onPress={() => this.buttonListener(REGISTER)}>
               {REGISTER}
             </Button>

@@ -3,12 +3,36 @@ import { StyleSheet, ScrollView, Image } from 'react-native';
 import { Layout, Text, TopNavigation, TopNavigationAction, Button, } from 'react-native-ui-kitten';
 import { ArrowBackIcon } from "../assets/icons/icons.js";
 import globalStyles from "../pages/pageStyles/GlobalStyle";
+import NotificationPopup from 'react-native-push-notification-popup';
+import nm from '../pages/Functions/NotificationManager.js';
 
 const PAGE_TITLE = "Privacy Policy";
 
 export default class PrivacyPolicyPage extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            registration: false,
+        };
+    }
+
+    componentWillMount() {
+        this.setState({
+            registration: this.props.navigation.getParam('registration', false)
+        });
+
+        // Set "that" for the notification manager
+        nm.setThat(this)
+    }
+
+    onDenyPress = () => {
+        this.props.navigation.state.params.onDeny();
+        this.props.navigation.goBack();
+    }
+
+    onAcceptPress = () => {
+        this.props.navigation.state.params.onAccept();
+        this.props.navigation.goBack();
     }
 
     render() {
@@ -52,8 +76,25 @@ export default class PrivacyPolicyPage extends Component {
                             <Text style={styles.LeftAlignedText} category='s1'>{"What guidelines does Grocery List Manager follow for user data privacy?"}</Text>
                             <Text style={styles.LeftAlignedText} category='p1'>{"Grocery List Manager will act in accordance with Canada’s Personal Information Protection and Electronic Documents Act.\nWe will notify users of Grocery List Manager if this Privacy Policy ever changes and users will be provided with a summary of the changes."}</Text>
                         </Layout>
+                        {this.state.registration ? <Layout style={styles.userInputContainer}>
+                            <Layout style={styles.userInputButtonGroup} >
+                                <Button
+                                    style={styles.userInputButtonLeft}
+                                    status='danger'
+                                    onPress={this.onDenyPress}>
+                                    {"DENY"}
+                                </Button>
+                                <Button
+                                    style={styles.userInputButtonRight}
+                                    status='success'
+                                    onPress={this.onAcceptPress}>
+                                    {"ACCEPT"}
+                                </Button>
+                            </Layout>
+                        </Layout> : null}
                     </ScrollView>
                 </Layout>
+                <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
         );
     }
@@ -88,6 +129,31 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginVertical: 2,
         paddingTop: 2,
+        borderRadius: 10,
+    },
+    userInputContainer: {
+        flex: 1,
+        margin: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 20,
+    },
+    userInputButtonGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 20,
+    },
+    userInputButtonLeft: {
+        flex: 1,
+        padding: 8,
+        marginRight: 4,
+        borderRadius: 10,
+    },
+    userInputButtonRight: {
+        flex: 1,
+        padding: 8,
+        marginLeft: 4,
         borderRadius: 10,
     },
 });
