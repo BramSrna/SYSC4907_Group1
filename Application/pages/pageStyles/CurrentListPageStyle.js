@@ -132,4 +132,7 @@ export const styles = StyleSheet.create({
    dashboardText: {
       marginHorizontal: 6,
    },
+   mapButton:{
+      borderRadius:20,
+   },
 });

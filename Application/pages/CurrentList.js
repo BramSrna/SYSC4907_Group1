@@ -963,34 +963,47 @@ class CurrentList extends Component {
       // Only render if the store is chosen
       if (currStore !== DEFAULT_STORE) {
          return (
-            <Layout style={styles.dashboard} >
-               <Layout style={styles.dashboardOuterContainer} level='3' >
-                  <Layout style={[styles.dashboardInnerContainer, { flexDirection: 'row' }]}>
-                     <Text style={styles.dashboardText}>
-                        {currStore}
-                     </Text>
-
-                     {/** Show the map icon if a map is known */}
-                     {map === null ?
-                        <Text></Text> :
-                        <Button
-                           style={styles.mapButton}
-                           icon={MapIcon}
-                           onPress={() => this.props.navigation.navigate("MapCreatorPage", {
-                              currLayout: map,
-                              storeName: currStoreName,
-                              storeAddr: currStoreAddr,
-                              listId: this.state.listId,
-                              listName: this.state.listName,
-                              previousPage: "CurrentListPage"
-                           })}
-                        />
-                     }
-                  </Layout>
-               </Layout>
-            </Layout>
+            <React.Fragment>
+               <Text style={styles.dashboardText}>
+                  {"Current Layout: "}{currStore}
+               </Text>
+               {/** Show the map icon if a map is known */}
+               {map === null ?
+                  <Text></Text> :
+                  <Button
+                     style={styles.mapButton}
+                     size='tiny'
+                     status='basic'
+                     icon={MapIcon}
+                     onPress={() => this.props.navigation.navigate("MapCreatorPage", {
+                        currLayout: map,
+                        storeName: currStoreName,
+                        storeAddr: currStoreAddr,
+                        listId: this.state.listId,
+                        listName: this.state.listName,
+                        previousPage: "CurrentListPage"
+                     })}
+                  />
+               }
+            </React.Fragment>
          );
       }
+   }
+
+   renderPurchasedOption = () => {
+      return (
+         <React.Fragment>
+            <Text style={styles.dashboardText}>{"Hide Purchased Items"}</Text>
+            <CheckBox
+               checked={this.state.hidePurchased}
+               onChange={(isChecked) => {
+                  this._isMounted && this.setState({
+                     hidePurchased: isChecked
+                  })
+               }}
+            />
+         </React.Fragment>
+      );
    }
 
    /**
@@ -1040,18 +1053,6 @@ class CurrentList extends Component {
          />
       );
 
-      const HidePurchasedAction = (props) => (
-         <CheckBox
-            {...props}
-            checked={this.state.hidePurchased}
-            onChange={(isChecked) => {
-               this._isMounted && this.setState({
-                  hidePurchased: isChecked
-               })
-            }}
-         />
-      )
-
       const renderRightControls = (showBell = false) => {
          var rightControls = [];
 
@@ -1059,7 +1060,6 @@ class CurrentList extends Component {
             rightControls.push(<NotificationAction />);
          }
 
-         rightControls.push(<HidePurchasedAction />);
          rightControls.push(<AddAction />);
 
          return (rightControls);
@@ -1100,9 +1100,6 @@ class CurrentList extends Component {
                      onSelect={(selection) => this.handleReorg(selection)}
                   />
                </Layout>
-
-               {this.renderStoreMapDashboard()}
-
                <Layout style={styles.dashboard} >
                   <Layout style={styles.dashboardOuterContainer} level='3' >
                      <Layout style={styles.dashboardInnerContainer}>
@@ -1116,6 +1113,8 @@ class CurrentList extends Component {
                            {this.state.minPrice == this.state.maxPrice ? "Price: $" + this.state.minPrice : "Price: $" + this.state.minPrice + " - $" + this.state.maxPrice}
                            {this.state.numUnknownPrice > 0 ? " [" + this.state.numUnknownPrice + " Unknown Price(s)]" : ""}
                         </Text>
+                        {this.renderStoreMapDashboard()}
+                        {this.renderPurchasedOption()}
                      </Layout>
                   </Layout>
                </Layout>
