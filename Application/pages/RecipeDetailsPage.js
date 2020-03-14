@@ -78,6 +78,7 @@ export default class RecipeDetailsPage extends Component {
           {this.state.item &&
             <RecipeDetailsCard
               title={this.state.item.title}
+              ingredients={this.state.item.extendedIngredients}
               instructions={this.state.item.analyzedInstructions}
               imageSource={this.state.item.image}
               onAddPress={() => this.props.navigation.navigate("YourListsPage", {

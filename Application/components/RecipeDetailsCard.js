@@ -9,9 +9,9 @@ export default class RecipeDetailsCard extends Component {
     }
 
     render() {
-        const { title = 'Title', instructions = null, imageSource = '', onPress = () => { }, onSharePress = () => { }, onAddPress = () => { } } = this.props;
+        const { title = 'Title', instructions = null, ingredients = null, imageSource = '', onPress = () => { }, onSharePress = () => { }, onAddPress = () => { } } = this.props;
         return (
-            <Layout style={styles.cardContainer} level='4'>
+            <Layout style={styles.cardContainer}>
                 <Layout style={styles.card}>
                     <Layout style={styles.imageContainer}>
                         <Image
@@ -21,6 +21,31 @@ export default class RecipeDetailsCard extends Component {
                     </Layout>
                     <Layout style={styles.title}>
                         <Text category='h4'>{title}</Text>
+                    </Layout>
+                    <Layout>
+                        {ingredients &&
+                            <Layout style={styles.ingredientsContainer} >
+                                <Text category='label'>{"Ingredients:"}</Text>
+                                <FlatList
+                                    style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
+                                    data={ingredients}
+                                    width='100%'
+                                    horizontal={true}
+                                    keyExtractor={(item) => item.id.toString(2)}
+                                    renderItem={({ item }) => {
+                                        return (
+                                            <Button
+                                                appearance='outline'
+                                                status='success'
+                                                size='small'
+                                                style={styles.ingredientsButton}>
+                                                {" "}{item.original}
+                                            </Button>
+                                        );
+                                    }}
+                                />
+                            </Layout>
+                        }
                     </Layout>
                     <Layout style={styles.instructionsContainer}>
                         {instructions &&
@@ -82,6 +107,15 @@ const styles = StyleSheet.create({
     },
     title: {
         margin: 8,
+    },
+    ingredientsContainer: {
+        marginHorizontal: 8,
+        marginBottom: 4,
+    },
+    ingredientsButton: {
+        marginVertical:4,
+        marginRight: 8,
+        borderRadius: 20,
     },
     instructionsContainer: {
         marginHorizontal: 8,
