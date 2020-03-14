@@ -11,6 +11,16 @@ export const RefreshIcon = (style) => (<
     name='refresh-outline' />
 );
 
+export const ClipBoardIcon = (style) => (<
+    Icon {...style}
+    name='clipboard-outline' />
+);
+
+export const DoneAllIcon = (style) => (<
+    Icon {...style}
+    name='done-all-outline' />
+);
+
 export const FilledInHeartIcon = (style) => (<
     Icon {...style}
     name='heart' />

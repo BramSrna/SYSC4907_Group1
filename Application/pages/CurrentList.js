@@ -17,7 +17,14 @@ import {
    CheckBox,
    Spinner
 } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
+import { 
+   MenuOutline,
+   AddIcon,
+   BellIcon,
+   MapIcon,
+   ClipBoardIcon,
+   DoneAllIcon
+} from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -936,6 +943,15 @@ class CurrentList extends Component {
       lf.DeleteItemInList(listID, itemID);
    }
 
+   uncheckAllPurchasedItems = () => {
+      var listId = this.state.listId;
+      var itemIds = this.state.listItemIds;
+
+      for (var i = 0; i < itemIds.length; i++) {
+         lf.UpdatePurchasedBoolOfAnItemInAList(listId, itemIds[i], newVal = false);
+      }
+   }
+
    /**
     * renderNotificationModalElement
     * 
@@ -1023,7 +1039,7 @@ class CurrentList extends Component {
                         <Text> :</Text> :
                         <Button
                            style={styles.mapButton}
-                           icon={MapIcon}
+                           icon={ClipBoardIcon}
                            onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", { unknownItems: unknownItems,
                                                                                                    storeName: currStoreName,
                                                                                                    storeAddr: currStoreAddr,
@@ -1088,18 +1104,6 @@ class CurrentList extends Component {
          />
       );
 
-      const HidePurchasedAction = (props) => (
-         <CheckBox
-            {...props}
-            checked={this.state.hidePurchased}
-            onChange={(isChecked) => {
-               this._isMounted && this.setState({
-                  hidePurchased : isChecked
-               })
-            }}
-         />
-      )
-
       const renderRightControls = (showBell = false) => {
          var rightControls = [];
 
@@ -1107,7 +1111,6 @@ class CurrentList extends Component {
             rightControls.push(<NotificationAction />);
          }
 
-         rightControls.push(<HidePurchasedAction />);
          rightControls.push(<AddAction />);
 
          return(rightControls);
@@ -1166,6 +1169,34 @@ class CurrentList extends Component {
                            <Text style={styles.dashboardText}>
                               {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
                            </Text>
+
+                           <Layout style={styles.listTextContainer} level='1'>
+                              <Text style={styles.dashboardText}>
+                                 {"Hide Purchased Items: "}
+                              </Text>
+
+                              <CheckBox
+                                 // {...props}
+                                 checked={this.state.hidePurchased}
+                                 onChange={(isChecked) => {
+                                    this._isMounted && this.setState({
+                                       hidePurchased : isChecked
+                                    })
+                                 }}
+                              />
+                           </Layout>
+
+                           <Layout style={styles.listTextContainer} level='1'>
+                              <Text style={styles.dashboardText}>
+                                 {"Uncheck All Marked Items: "}
+                              </Text>
+
+                              <Button
+                                 style={styles.mapButton}
+                                 icon={DoneAllIcon}
+                                 onPress={this.uncheckAllPurchasedItems}
+                              />
+                           </Layout>
                         </Layout>
                      </Layout>
                   </Layout>

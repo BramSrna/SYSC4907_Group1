@@ -135,5 +135,11 @@ export const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-   }
+   },
+   listTextContainer: {
+       flexDirection: 'row',
+       width: '100%',
+       justifyContent: 'center',
+       alignItems: 'center',
+   },
 });

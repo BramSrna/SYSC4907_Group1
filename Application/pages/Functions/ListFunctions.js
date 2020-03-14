@@ -259,7 +259,7 @@ class ListFunctions {
     * 
     * @returns The new purchased state
     */
-   UpdatePurchasedBoolOfAnItemInAList(listId, itemId) {
+   UpdatePurchasedBoolOfAnItemInAList(listId, itemId, newVal = null) {
       // Get the path to the list
       var listPath = createListPath(listId);
 
@@ -268,13 +268,20 @@ class ListFunctions {
       var retVal = ref.once("value").then((snapshot) => {
          var currentBool = snapshot.val().purchased;
 
+         console.log(newVal);
+
+         var newPurchasedState = !currentBool;
+         if (newVal !== null) {
+            newPurchasedState = newVal;
+         }
+
          // Update the item with the new purchased state
          var newRef = firebase.database().ref(listPath + "/items/" + itemId);
          newRef.update({
-            purchased: !currentBool,
+            purchased: newPurchasedState,
          });
 
-         return !currentBool;
+         return newPurchasedState;
       });
 
       return retVal;
