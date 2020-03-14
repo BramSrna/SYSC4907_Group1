@@ -123,12 +123,16 @@ export const styles = StyleSheet.create({
    },
    dashboardInnerContainer: {
       padding: 8,
-      flexDirection: 'column',
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      flexWrap: 'wrap',
       borderRadius: 10,
    },
    dashboardText: {
-      marginHorizontal: 4,
+      marginHorizontal: 6,
+   },
+   mapButton: {
+      borderRadius: 20,
    },
 });

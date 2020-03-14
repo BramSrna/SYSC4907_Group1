@@ -391,6 +391,33 @@ class YourLists extends Component {
       }
    }
 
+   formatDate = (date) => {
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+      var strTime = hours + ':' + minutes + ' ' + ampm;
+      return date.getMonth() + 1 + "/" + date.getDate() + "/" + date.getFullYear() + " " + strTime;
+   }
+
+   renderItemDescription = (index) => {
+      var sharedCount = (this.state.apiData[index].uc) - 1;
+      var description = "";
+      if (sharedCount == 0) {
+         description += "Shared With: No one";
+      } else if (sharedCount == 1) {
+         description += "Shared With: 1 person";
+      } else {
+         description += "Shared With: " + sharedCount + " others";
+      }
+      var displayDateString = "";
+      displayDateString = new Date(Date.parse(this.state.apiData[index].lastMod));
+      description += "\nLast Modified: " + this.formatDate(displayDateString);
+      return (description);
+   }
+
    render() {
       const AddAction = (props) => (
          <TopNavigationAction {...props} icon={AddIcon} onPress={this.setModalVisible} />
@@ -414,7 +441,7 @@ class YourLists extends Component {
                />}
             {!this.props.navigation.getParam("ingredients", false) &&
                <TopNavigation
-                  title={"Select Lists..."}
+                  title={PAGE_TITLE}
                   alignment='center'
                   leftControl={renderMenuAction()}
                   rightControls={renderRightControls()}
@@ -439,7 +466,7 @@ class YourLists extends Component {
                      renderItem={({ item, index }) => (
                         <ListItemContainer
                            title={item}
-                           description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod}
+                           description={this.renderItemDescription(index)}
                            listName={item}
                            onPress={this.GoToList.bind(this, item)}
                            listIndex={index}
@@ -463,7 +490,7 @@ class YourLists extends Component {
                      width="100%"
                      keyExtractor={index => index.toString()}
                      renderItem={({ item, index }) => (
-                        <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod} />
+                        <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={this.renderItemDescription(index)} />
                      )}
                   />}
                {this.props.navigation.getParam("ingredients", false) &&
