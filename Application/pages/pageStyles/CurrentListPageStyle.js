@@ -122,15 +122,20 @@ export const styles = StyleSheet.create({
       borderRadius: 10,
    },
    dashboardInnerContainer: {
-      padding: 8,
+      paddingHorizontal: 8,
+      paddingBottom:8,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       flexWrap: 'wrap',
-      borderRadius: 10,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
    },
    dashboardText: {
       marginHorizontal: 6,
+   },
+   dashboardExpandButton:{
+      marginVertical: -8
    },
    mapButton: {
       borderRadius: 20,
@@ -141,9 +146,11 @@ export const styles = StyleSheet.create({
       alignItems: 'center',
    },
    listTextContainer: {
-       flexDirection: 'row',
-       width: '100%',
-       justifyContent: 'center',
-       alignItems: 'center',
+      flexDirection: 'row',
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
    },
 });

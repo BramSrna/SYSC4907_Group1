@@ -17,13 +17,15 @@ import {
    CheckBox,
    Spinner
 } from 'react-native-ui-kitten';
-import { 
+import {
    MenuOutline,
    AddIcon,
    BellIcon,
    MapIcon,
    ClipBoardIcon,
-   DoneAllIcon
+   DoneAllIcon,
+   MoveUpIcon,
+   MoveDownIcon,
 } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
@@ -99,7 +101,8 @@ class CurrentList extends Component {
          asyncWait: false,
 
          showDashboard: false,
-         showCrowdSourceDashboard: false
+         showCrowdSourceDashboard: false,
+         showAdditionalOptions: false,
       };
    }
 
@@ -852,12 +855,14 @@ class CurrentList extends Component {
       tempList.then((value) => {
          // Update the local state of the list
          context.updateListState(value.items,
-                                 value.ids,
-                                 {locs: value.locs,
-                                  reorg: true,
-                                  map: value.map,
-                                  unknownItems: value.unknownItems,
-                                  asyncWait: false});
+            value.ids,
+            {
+               locs: value.locs,
+               reorg: true,
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
+            });
       });
 
       return;
@@ -887,9 +892,10 @@ class CurrentList extends Component {
             {
                reorg: true,
                locs: value.locs,
-                                  map: value.map,
-                                  unknownItems: value.unknownItems,
-                                  asyncWait: false});
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
+            });
       });
 
       return;
@@ -908,9 +914,10 @@ class CurrentList extends Component {
             {
                reorg: true,
                locs: value.locs,
-                                  map: value.map,
-                                  unknownItems: value.unknownItems,
-                                  asyncWait: false});
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
+            });
 
 
 
@@ -1061,7 +1068,7 @@ class CurrentList extends Component {
          );
       }
    }
-   
+
    renderQuickCrowdSourceDashboard = () => {
       currStore = this.state.currStore;
       currStoreName = this.state.currStoreName;
@@ -1093,7 +1100,8 @@ class CurrentList extends Component {
                         listName: this.state.listName,
                         previousPage: "CurrentListPage",
                         items: allItems,
-                        locs: allLocs })}
+                        locs: allLocs
+                     })}
                   />
                }
             </React.Fragment>
@@ -1120,9 +1128,9 @@ class CurrentList extends Component {
    renderUncheckButton = () => {
       return (
          <React.Fragment>
-            <Text style={styles.dashboardText}>{"Uncheck All Marked Items:"}</Text>
+            <Text style={styles.dashboardText}>{"Uncheck All Purchased Items:"}</Text>
             <Button
-               size='small'
+               size='tiny'
                status='basic'
                style={styles.mapButton}
                icon={DoneAllIcon}
@@ -1242,7 +1250,7 @@ class CurrentList extends Component {
                rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
 
-            
+
             {!this.state.asyncWait &&
                <Layout style={styles.ListContainer}>
                   <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
@@ -1266,19 +1274,16 @@ class CurrentList extends Component {
                   <Layout style={styles.dashboard} >
                      <Layout style={styles.dashboardOuterContainer} level='3' >
                         <Layout style={styles.listTextContainer} level='1'>
-                           <Text style={styles.dashboardText}>
-                              {"Dashboard: "}
-                           </Text>
-
-                           <CheckBox
-                              // {...props}
-                              checked={this.state.showDashboard}
-                              onChange={(isChecked) => {
+                           <Button
+                              style={styles.dashboardExpandButton}
+                              appearance='ghost'
+                              status='basic'
+                              onPress={() => {
                                  this._isMounted && this.setState({
-                                    showDashboard : isChecked
+                                    showDashboard: !this.state.showDashboard
                                  })
                               }}
-                           />
+                           >{!this.state.showDashboard ? "Dashboard ↓" : "Dashboard ↑"}</Button>
                         </Layout>
 
                         {this.state.showDashboard &&
@@ -1292,8 +1297,20 @@ class CurrentList extends Component {
                               {this.renderStoreInfoDashboard()}
                               {this.renderStoreMapDashboard()}
                               {this.renderQuickCrowdSourceDashboard()}
-                              {this.renderUncheckButton()}
-                              {this.renderPurchasedOption()}
+
+                              <Button
+                                 size='tiny'
+                                 status='basic'
+                                 appearance='ghost'
+                                 icon={!this.state.showAdditionalOptions ? MoveDownIcon : MoveUpIcon}
+                                 onPress={() => {
+                                    this._isMounted && this.setState({
+                                       showAdditionalOptions: !this.state.showAdditionalOptions
+                                    })
+                                 }}
+                              />
+                              {this.state.showAdditionalOptions && this.renderUncheckButton()}
+                              {this.state.showAdditionalOptions && this.renderPurchasedOption()}
                            </Layout>
                         }
                      </Layout>
@@ -1314,7 +1331,7 @@ class CurrentList extends Component {
                   />
                </Layout>
             }
-            
+
 
             {this.state.asyncWait &&
                <Layout style={styles.loading}>
