@@ -1011,87 +1011,92 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   renderStoreMapDashboard = () => {
+   renderStoreInfoDashboard = () => {
       currStore = this.state.currStore;
-      currStoreName = this.state.currStoreName;
-      currStoreAddr = this.state.currStoreAddr;
-      map = this.state.map;
-      unknownItems = this.state.unknownItems;
-      allItems = this.state.listItems;
-      allLocs = this.state.listItemLocs;
-
-      retVal = [];
 
       // Only render if the store is chosen
       if (currStore !== DEFAULT_STORE) {
          return (
             <React.Fragment>
-                  <Layout style={styles.listTextContainer} level='1'>
-                     <Text style={styles.dashboardText}>
-                        {"Crowd-Source Dashboard: "}
-                     </Text>
+               <Text style={styles.dashboardText}>
+                  {"Current Store: "}{currStore}
+               </Text>
+            </React.Fragment>
+         );
+      }
+   }
 
-                     <CheckBox
-                        // {...props}
-                        checked={this.state.showCrowdSourceDashboard}
-                        onChange={(isChecked) => {
-                           this._isMounted && this.setState({
-                              showCrowdSourceDashboard : isChecked
-                           })
-                        }}
-                     />
-                  </Layout>
+   renderStoreMapDashboard = () => {
+      currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
+      map = this.state.map;
 
-                  {this.state.showCrowdSourceDashboard &&
-                     <Layout style={styles.dashboardInnerContainer}>
-                        <Layout style={styles.listTextContainer} level='1'>
-                           <Text style={styles.dashboardText}>
-                              {currStore}
-                           </Text>
-                           {/** Show the map icon if a map is known */}
-                           {map === null ?
-                              <Text> :</Text> :
-                              <Button
-                                 style={styles.mapButton}
-                     size='tiny'
+      // Only render if the store is chosen
+      if (currStore !== DEFAULT_STORE) {
+         return (
+            <React.Fragment>
+               <Text style={styles.dashboardText}>
+                  {"View Store Layout: "}
+               </Text>
+               {/** Show the map icon if a map is known */}
+               {map === null ?
+                  <Text></Text> :
+                  <Button
+                     style={styles.mapButton}
+                     size='small'
                      status='basic'
-                                 icon={MapIcon}
-                                 onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
+                     icon={MapIcon}
+                     onPress={() => this.props.navigation.navigate("MapCreatorPage", {
                         currLayout: map,
-                                                                                                   storeName: currStoreName,
-                                                                                                   storeAddr: currStoreAddr,
-                                                                                                   listId: this.state.listId,
-                                                                                                   listName: this.state.listName,
-                                                                                                   previousPage: "CurrentListPage" })}
+                        storeName: currStoreName,
+                        storeAddr: currStoreAddr,
+                        listId: this.state.listId,
+                        listName: this.state.listName,
+                        previousPage: "CurrentListPage"
                      })}
-                              />
-                           }
-                        </Layout>
+                  />
+               }
+            </React.Fragment>
+         );
+      }
+   }
+   
+   renderQuickCrowdSourceDashboard = () => {
+      currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
+      unknownItems = this.state.unknownItems;
+      allItems = this.state.listItems;
+      allLocs = this.state.listItemLocs;
 
-                        <Layout style={styles.listTextContainer} level='1'>
-                           <Text style={styles.dashboardText}>
-                              Quick Crowd Source
-                           </Text>
-
-                           {/** Show the map icon if a map is known */}
-                           {unknownItems === null ?
-                              <Text> :</Text> :
-                              <Button
-                                 style={styles.mapButton}
-                                 icon={ClipBoardIcon}
-                                 onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", { unknownItems: unknownItems,
-                                                                                                         storeName: currStoreName,
-                                                                                                         storeAddr: currStoreAddr,
-                                                                                                         listId: this.state.listId,
-                                                                                                         listName: this.state.listName,
-                                                                                                         previousPage: "CurrentListPage",
-                                                                                                         items: allItems,
-                                                                                                         locs: allLocs })}
-                              />
-                           }
-                        </Layout>
-                     </Layout>
-                  }
+      // Only render if the store is chosen
+      if (currStore !== DEFAULT_STORE) {
+         return (
+            <React.Fragment>
+               <Text style={styles.dashboardText}>
+                  {"Quick Crowd Source: "}
+               </Text>
+               {/** Show the map icon if a map is known */}
+               {unknownItems === null ?
+                  <Text></Text> :
+                  <Button
+                     style={styles.mapButton}
+                     size='small'
+                     status='basic'
+                     icon={ClipBoardIcon}
+                     onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", {
+                        unknownItems: unknownItems,
+                        storeName: currStoreName,
+                        storeAddr: currStoreAddr,
+                        listId: this.state.listId,
+                        listName: this.state.listName,
+                        previousPage: "CurrentListPage",
+                        items: allItems,
+                        locs: allLocs })}
+                  />
+               }
+            </React.Fragment>
          );
       }
    }
@@ -1107,6 +1112,21 @@ class CurrentList extends Component {
                      hidePurchased: isChecked
                   })
                }}
+            />
+         </React.Fragment>
+      );
+   }
+
+   renderUncheckButton = () => {
+      return (
+         <React.Fragment>
+            <Text style={styles.dashboardText}>{"Uncheck All Marked Items:"}</Text>
+            <Button
+               size='small'
+               status='basic'
+               style={styles.mapButton}
+               icon={DoneAllIcon}
+               onPress={this.uncheckAllPurchasedItems}
             />
          </React.Fragment>
       );
@@ -1262,52 +1282,22 @@ class CurrentList extends Component {
                         </Layout>
 
                         {this.state.showDashboard &&
-                           <Layout style={styles.dashboardInnerContainer}>                           
+                           <Layout style={styles.dashboardInnerContainer}>
                               <Text style={styles.dashboardText}>
-                                 Number of Items: {this.state.listItems.length}
-                              </Text>
-                        {this.renderSharedInfo()}
-                              <Text style={styles.dashboardText}>
-                                 List shared with {this.state.userCount - 1} others
-                              </Text>
-                              {/* // -1 here to make sure we dont include the current user */}
-                              <Text style={styles.dashboardText}>
-                                 {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
+                                 {"Number of Items: " + this.state.listItems.length}
                               </Text>
 
-                              <Layout style={styles.listTextContainer} level='1'>
-                                 <Text style={styles.dashboardText}>
-                                    {"Hide Purchased Items: "}
-                                 </Text>
-
-                                 <CheckBox
-                                    // {...props}
-                                    checked={this.state.hidePurchased}
-                                    onChange={(isChecked) => {
-                                       this._isMounted && this.setState({
-                                          hidePurchased : isChecked
-                                       })
-                                    }}
-                                 />
-                              </Layout>
-
-                              <Layout style={styles.listTextContainer} level='1'>
-                                 <Text style={styles.dashboardText}>
-                                    {"Uncheck All Marked Items: "}
-                                 </Text>
-
-                                 <Button
-                                    style={styles.mapButton}
-                                    icon={DoneAllIcon}
-                                    onPress={this.uncheckAllPurchasedItems}
-                                 />
-                              </Layout>
+                              {this.renderSharedInfo()}
+                              {this.renderPrice()}
+                              {this.renderStoreInfoDashboard()}
+                              {this.renderStoreMapDashboard()}
+                              {this.renderQuickCrowdSourceDashboard()}
+                              {this.renderUncheckButton()}
+                              {this.renderPurchasedOption()}
                            </Layout>
                         }
                      </Layout>
                   </Layout>
-
-                  {this.renderStoreMapDashboard()}
 
                   <FlatList
                      contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
