@@ -104,6 +104,8 @@ class AddItemPage extends Component {
     * @returns None
     */
     componentWillUnmount() {
+        this.addToggledRecommendedItems();
+        
         // Set the mounted var
         this._isMounted = false;
     }
