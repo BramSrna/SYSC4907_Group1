@@ -41,6 +41,12 @@ class SideMenu extends Component {
 
     signOutUser = async () => {
         try {
+            var currentUserEmail = firebase.auth().currentUser.email.toString();
+            var emailId = currentUserEmail.replace(/\./g, ",");
+            firebase
+                .database()
+                .ref("/userInfo/" + emailId + "/notificationToken")
+                .remove()
             await firebase.auth().signOut();
         } catch (e) {
             console.log(e);
