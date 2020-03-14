@@ -2,16 +2,20 @@ import React, { Component } from 'react';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
-import { StyleSheet } from 'react-native';
-import { WebView } from 'react-native-webview';
-import { TopNavigation, TopNavigationAction, Layout, RangeDatepicker } from 'react-native-ui-kitten';
-import { MenuOutline, HeartIcon, FilledInHeartIcon, ListIcon } from "../assets/icons/icons.js";
+import { StyleSheet, ScrollView } from 'react-native';
+import { TopNavigation, TopNavigationAction, Layout, Spinner } from 'react-native-ui-kitten';
+import RecipeDetailsCard from '../components/RecipeDetailsCard.js';
+import { dark, light } from '../assets/Themes.js';
+import { MenuOutline, HeartIcon, FilledInHeartIcon, ShareIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { favourite: false }
+    this.state = {
+      favourite: false,
+      item: null,
+    }
   }
 
   componentWillMount() {
@@ -20,8 +24,8 @@ export default class RecipeDetailsPage extends Component {
       () => {
         nm.setThat(this)
         this._isMounted = true;
+        this.setState({ item: this.props.navigation.getParam("item", null) });
         rf.UpdateFavouriteRecipe(this, this.props.navigation.getParam("name", "error"))
-
       }
     );
   }
@@ -34,20 +38,22 @@ export default class RecipeDetailsPage extends Component {
   favouriteOrNot() {
     if (this.state.favourite) {
       return FilledInHeartIcon;
-
     } else {
       return HeartIcon;
-
     }
   }
 
   render() {
-    const url = this.props.navigation.getParam("url", "http://www.google.ca");
     const AddAction = (props) => (
       <Layout style={{ flexDirection: "row" }}>
-        <TopNavigationAction {...props} icon={ListIcon} onPress={() => this.props.navigation.navigate("YourListsPage", {
-          ingredients: this.props.navigation.getParam("ingredients", false)
-        })} />
+        <TopNavigationAction {...props} icon={ShareIcon} onPress={() => {
+          this.props.navigation.navigate("YourContacts", {
+            share: true,
+            recipeName: this.state.item.title,
+            recipeUrl: this.state.item.spoonacularSourceUrl,
+            ingredients: this.state.item.extendedIngredients
+          });
+        }} />
         <TopNavigationAction {...props} icon={this.favouriteOrNot()} onPress={() => rf.AddFavouriteRecipe(this.props.navigation.getParam("name", "error"), (bool) => { this.setState({ favourite: bool }) })} />
       </Layout>
     );
@@ -67,10 +73,22 @@ export default class RecipeDetailsPage extends Component {
           leftControl={renderMenuAction()}
           rightControls={renderRightControls()}
         />
-        <WebView
-          source={{ uri: url }}
-          style={{ marginTop: 20 }}
-        />
+        <ScrollView
+          style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}>
+          {this.state.item &&
+            <RecipeDetailsCard
+              title={this.state.item.title}
+              instructions={this.state.item.analyzedInstructions}
+              imageSource={this.state.item.image}
+              onAddPress={() => this.props.navigation.navigate("YourListsPage", {
+                ingredients: this.props.navigation.getParam("ingredients", false)
+              })}
+            />
+          }
+          {!this.state.item &&
+            <Spinner />
+          }
+        </ScrollView>
         <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
@@ -78,5 +96,7 @@ export default class RecipeDetailsPage extends Component {
 }
 
 const styles = StyleSheet.create({
-
+  recipeDetailsContainer: {
+    flex: 1,
+  },
 });

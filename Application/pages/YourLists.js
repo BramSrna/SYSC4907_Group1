@@ -466,17 +466,17 @@ class YourLists extends Component {
                         <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={'Shared With: ' + ((this.state.apiData[index].uc) - 1) + ' People \nLast Modified: ' + this.state.apiData[index].lastMod} />
                      )}
                   />}
-               {this.props.navigation.getParam("ingredients", false) &&
-                  <Layout>
-                     <Button style={styles.shareButton}
-                        status="success"
-                        onPress={() => lf.AddIngredientsToList(this.state.selectedIds, this.props.navigation.getParam("ingredients", false), this.props, function (props) {
-                           props.navigation.goBack()
-                        })}
-                     >{"ADD TO LIST"}</Button>
-                  </Layout>
-               }
             </Layout>
+            {this.props.navigation.getParam("ingredients", false) &&
+               <Layout>
+                  <Button style={styles.shareButton}
+                     status="success"
+                     onPress={() => lf.AddIngredientsToList(this.state.selectedIds, this.props.navigation.getParam("ingredients", false), this.props, function (props) {
+                        props.navigation.goBack()
+                     })}
+                  >{"ADD TO LIST"}</Button>
+               </Layout>
+            }
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
