@@ -14,7 +14,8 @@ import {
    TopNavigationAction,
    Select,
    Text,
-   CheckBox
+   CheckBox,
+   Spinner
 } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
@@ -56,6 +57,7 @@ class CurrentList extends Component {
          listItemIds: [],
          listItemLocs: null,
          modalMode: 'item',
+         unknownItems: null,
 
          firstLoadComplete: false,
 
@@ -85,7 +87,9 @@ class CurrentList extends Component {
          maxPrice: 0,
          numUnknownPrice: 0,
 
-         hidePurchased: false
+         hidePurchased: false,
+
+         asyncWait: false
       };
    }
 
@@ -310,7 +314,9 @@ class CurrentList extends Component {
          minPrice: null,
          maxPrice: null,
          numUnknownPrice: null,
-         map: null
+         map: null,
+         unknownItems: null,
+         asyncWait: null
       }
 
       for (key in optionalParams) {
@@ -324,6 +330,8 @@ class CurrentList extends Component {
       numUnknownPrice = defaultParams.numUnknownPrice;
       map = defaultParams.map;
       locs = defaultParams.locs;
+      unknownItems = defaultParams.unknownItems;
+      asyncWait = defaultParams.asyncWait;
 
       // Get the current Arrays
       var localIds = this.state.listItemIds;
@@ -404,7 +412,9 @@ class CurrentList extends Component {
          currStoreId: map === -1 ? DEFAULT_STORE_ID : this.state.currStoreId,
          currStore: map === -1 ? DEFAULT_STORE : this.state.currStore,
          currStoreAddr: map === -1 ? DEFAULT_STORE_ADDR : this.state.currStoreAddr,
-         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName
+         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName,
+         unknownItems: unknownItems === null ? this.state.unknownItems : unknownItems,
+         asyncWait: asyncWait === null ? this.state.asyncWait : asyncWait
       });
    }
 
@@ -808,12 +818,22 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListLoc(storeId, listId, context = this) {
+   reorganizeListLoc(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
-      var tempList = lf.reorgListLoc(storeId, listId);
+      var tempList = lf.reorgListLoc(storeId, listId, cluster);
       tempList.then((value) => {
          // Update the local state of the list
-         context.updateListState(value.items, value.ids, {locs: value.locs, reorg: true, map: -1});
+         context.updateListState(value.items,
+                                 value.ids,
+                                 {locs: value.locs,
+                                  reorg: true,
+                                  map: value.map,
+                                  unknownItems: value.unknownItems,
+                                  asyncWait: false});
       });
 
       return;
@@ -831,6 +851,10 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListFastest(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
       var tempList = lf.reorgListFastest(storeId, listId, cluster);
       tempList.then((value) => {
@@ -838,13 +862,19 @@ class CurrentList extends Component {
                                  value.ids,
                                  {reorg: true,
                                   locs: value.locs,
-                                  map: value.map});
+                                  map: value.map,
+                                  unknownItems: value.unknownItems,
+                                  asyncWait: false});
       });
 
       return;
    }
 
    reorganizeListFastestAutoUpdate(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
       var tempList = lf.reorgListFastest(storeId, listId, cluster);
       tempList.then((value) => {
@@ -852,7 +882,9 @@ class CurrentList extends Component {
                                  value.ids,
                                  {reorg: true,
                                   locs: value.locs,
-                                  map: value.map});
+                                  map: value.map,
+                                  unknownItems: value.unknownItems,
+                                  asyncWait: false});
 
    
 
@@ -949,6 +981,9 @@ class CurrentList extends Component {
       currStoreName = this.state.currStoreName;
       currStoreAddr = this.state.currStoreAddr;
       map = this.state.map;
+      unknownItems = this.state.unknownItems;
+      allItems = this.state.listItems;
+      allLocs = this.state.listItemLocs;
 
       retVal = [];
 
@@ -964,7 +999,7 @@ class CurrentList extends Component {
 
                      {/** Show the map icon if a map is known */}
                      {map === null ?
-                        <Text></Text> :
+                        <Text> :</Text> :
                         <Button
                            style={styles.mapButton}
                            icon={MapIcon}
@@ -974,6 +1009,29 @@ class CurrentList extends Component {
                                                                                              listId: this.state.listId,
                                                                                              listName: this.state.listName,
                                                                                              previousPage: "CurrentListPage" })}
+                        />
+                     }
+                  </Layout>
+
+                  <Layout style={[styles.dashboardInnerContainer, {flexDirection: 'row'}]}>
+                     <Text style={styles.dashboardText}>
+                        Quick Crowd Source
+                     </Text>
+
+                     {/** Show the map icon if a map is known */}
+                     {unknownItems === null ?
+                        <Text> :</Text> :
+                        <Button
+                           style={styles.mapButton}
+                           icon={MapIcon}
+                           onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", { unknownItems: unknownItems,
+                                                                                                   storeName: currStoreName,
+                                                                                                   storeAddr: currStoreAddr,
+                                                                                                   listId: this.state.listId,
+                                                                                                   listName: this.state.listName,
+                                                                                                   previousPage: "CurrentListPage",
+                                                                                                   items: allItems,
+                                                                                                   locs: allLocs })}
                         />
                      }
                   </Layout>
@@ -1071,61 +1129,71 @@ class CurrentList extends Component {
                rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
 
-            <Layout style={styles.ListContainer}>
-               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
-                  <Modal style={styles.modal}
-                     allowBackdrop={true}
-                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setNotificationModalVisible}
-                     visible={this.state.notificationModalVisible}>
-                     {this.renderNotificationModalElement()}
-                  </Modal>
-               </KeyboardAvoidingView>
+            
+            {!this.state.asyncWait &&
+               <Layout style={styles.ListContainer}>
+                  <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
+                     <Modal style={styles.modal}
+                        allowBackdrop={true}
+                        backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+                        onBackdropPress={this.setNotificationModalVisible}
+                        visible={this.state.notificationModalVisible}>
+                        {this.renderNotificationModalElement()}
+                     </Modal>
+                  </KeyboardAvoidingView>
 
-               <Layout style={styles.selectContainer}>
-                  <Select style={styles.selectBox}
-                     data={organizationOptions}
-                     placeholder='Select an organization method'
-                     selectedOption={this.state.orgMethod}
-                     onSelect={(selection) => this.handleReorg(selection)}
-                  />
-               </Layout>
+                  <Layout style={styles.selectContainer}>
+                     <Select style={styles.selectBox}
+                        data={organizationOptions}
+                        placeholder='Select an organization method'
+                        selectedOption={this.state.orgMethod}
+                        onSelect={(selection) => this.handleReorg(selection)}
+                     />
+                  </Layout>
 
-               {this.renderStoreMapDashboard()}
+                  <Layout style={styles.dashboard} >
+                     <Layout style={styles.dashboardOuterContainer} level='3' >
+                        <Layout style={styles.dashboardInnerContainer}>
+                           <Text style={styles.dashboardText}>
+                              Number of Items: {this.state.listItems.length}
+                           </Text>
 
-               <Layout style={styles.dashboard} >
-                  <Layout style={styles.dashboardOuterContainer} level='3' >
-                     <Layout style={styles.dashboardInnerContainer}>
-                        <Text style={styles.dashboardText}>
-                           Number of Items: {this.state.listItems.length}
-                        </Text>
+                           <Text style={styles.dashboardText}>
+                              List shared with {this.state.userCount - 1} others
+                           </Text>
+                           {/* -1 here to make sure we dont include the current user */}
 
-                        <Text style={styles.dashboardText}>
-                           List shared with {this.state.userCount - 1} others
-                        </Text>
-                        {/* -1 here to make sure we dont include the current user */}
-
-                        <Text style={styles.dashboardText}>
-                           {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
-                        </Text>
+                           <Text style={styles.dashboardText}>
+                              {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
+                           </Text>
+                        </Layout>
                      </Layout>
                   </Layout>
-               </Layout>
 
-               <FlatList
-                  contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                  style={styles.flatList}
-                  data={this.state.listItems}
-                  width="100%"
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item, index }) => (
-                     <DoubleClick
-                        doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >
-                        {this.GenerateListItem(item, index)}
-                     </DoubleClick>
-                  )}
-               />
-            </Layout>
+                  {this.renderStoreMapDashboard()}
+
+                  <FlatList
+                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                     style={styles.flatList}
+                     data={this.state.listItems}
+                     width="100%"
+                     keyExtractor={(item, index) => index.toString()}
+                     renderItem={({ item, index }) => (
+                        <DoubleClick
+                           doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >
+                           {this.GenerateListItem(item, index)}
+                        </DoubleClick>
+                     )}
+                  />
+               </Layout>
+            }
+            
+
+            {this.state.asyncWait &&
+               <Layout style={styles.loading}>
+                  <Spinner />
+               </Layout>
+            }
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );

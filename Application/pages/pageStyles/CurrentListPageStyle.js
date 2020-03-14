@@ -131,4 +131,9 @@ export const styles = StyleSheet.create({
    dashboardText: {
       marginHorizontal: 4,
    },
+   loading: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+   }
 });

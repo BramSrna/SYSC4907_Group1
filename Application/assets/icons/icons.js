@@ -6,6 +6,11 @@ export const HeartIcon = (style) => (<
     name='heart-outline' />
 );
 
+export const RefreshIcon = (style) => (<
+    Icon {...style}
+    name='refresh-outline' />
+);
+
 export const FilledInHeartIcon = (style) => (<
     Icon {...style}
     name='heart' />

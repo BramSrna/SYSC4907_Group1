@@ -21,6 +21,7 @@ import MapsPage from '../pages/MapsPage';
 import RecipeDetailsPage from '../pages/RecipeDetailsPage';
 import FavRecipesPage from '../pages/FavRecipesPage';
 import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
+import QuickCrowdSourcePage from '../pages/QuickCrowdSourcePage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -73,6 +74,9 @@ const StackNavigator = createStackNavigator({
     },
     PrivacyPolicyPage: {
         screen: PrivacyPolicyPage
+    },
+    QuickCrowdSourcePage: {
+        screen: QuickCrowdSourcePage
     }
 }, {
     initialRouteName: "Home",
@@ -120,6 +124,12 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: StackNavigator,
         navigationOptions: {
             drawerLabel: () => null
+        }
+    },
+    QuickCrowdSourcePage: {
+        screen: StackNavigator,
+        navigationOptions: {
+            drawerLabel: "Quick Crowd Source"
         }
     },
     YourContacts: {

@@ -591,14 +591,15 @@ class ListFunctions {
     * 
     * @returns The sorted list
     */
-   async reorgListLoc(storeId, listId) {
+   async reorgListLoc(storeId, listId, cluster = null) {
       try {
          // Call the function to get the sorted list
          const {
             data
          } = await firebase.functions().httpsCallable('cloudReorgListLoc')({
             storeId: storeId,
-            listId: listId
+            listId: listId,
+            cluster: cluster
          });
 
          return data;

@@ -64,4 +64,9 @@ export default StyleSheet.create({
       margin: 4,
       borderRadius: 30,
    },
+   loading: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+   }
 });
