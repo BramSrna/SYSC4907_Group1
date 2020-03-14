@@ -96,7 +96,10 @@ class CurrentList extends Component {
 
          hidePurchased: false,
 
-         asyncWait: false
+         asyncWait: false,
+
+         showDashboard: false,
+         showCrowdSourceDashboard: false
       };
    }
 
@@ -1008,49 +1011,69 @@ class CurrentList extends Component {
          return (
             <Layout style={styles.dashboard} >
                <Layout style={styles.dashboardOuterContainer} level='3' >
-                  <Layout style={[styles.dashboardInnerContainer, {flexDirection: 'row'}]}>
+                  <Layout style={styles.listTextContainer} level='1'>
                      <Text style={styles.dashboardText}>
-                        {currStore}
+                        {"Crowd-Source Dashboard: "}
                      </Text>
 
-                     {/** Show the map icon if a map is known */}
-                     {map === null ?
-                        <Text> :</Text> :
-                        <Button
-                           style={styles.mapButton}
-                           icon={MapIcon}
-                           onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
-                                                                                             storeName: currStoreName,
-                                                                                             storeAddr: currStoreAddr,
-                                                                                             listId: this.state.listId,
-                                                                                             listName: this.state.listName,
-                                                                                             previousPage: "CurrentListPage" })}
-                        />
-                     }
+                     <CheckBox
+                        // {...props}
+                        checked={this.state.showCrowdSourceDashboard}
+                        onChange={(isChecked) => {
+                           this._isMounted && this.setState({
+                              showCrowdSourceDashboard : isChecked
+                           })
+                        }}
+                     />
                   </Layout>
 
-                  <Layout style={[styles.dashboardInnerContainer, {flexDirection: 'row'}]}>
-                     <Text style={styles.dashboardText}>
-                        Quick Crowd Source
-                     </Text>
+                  {this.state.showCrowdSourceDashboard &&
+                     <Layout style={styles.dashboardInnerContainer}>
+                        <Layout style={styles.listTextContainer} level='1'>
+                           <Text style={styles.dashboardText}>
+                              {currStore}
+                           </Text>
 
-                     {/** Show the map icon if a map is known */}
-                     {unknownItems === null ?
-                        <Text> :</Text> :
-                        <Button
-                           style={styles.mapButton}
-                           icon={ClipBoardIcon}
-                           onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", { unknownItems: unknownItems,
+                           {/** Show the map icon if a map is known */}
+                           {map === null ?
+                              <Text> :</Text> :
+                              <Button
+                                 style={styles.mapButton}
+                                 icon={MapIcon}
+                                 onPress={() => this.props.navigation.navigate("MapCreatorPage", { currLayout: map,
                                                                                                    storeName: currStoreName,
                                                                                                    storeAddr: currStoreAddr,
                                                                                                    listId: this.state.listId,
                                                                                                    listName: this.state.listName,
-                                                                                                   previousPage: "CurrentListPage",
-                                                                                                   items: allItems,
-                                                                                                   locs: allLocs })}
-                        />
-                     }
-                  </Layout>
+                                                                                                   previousPage: "CurrentListPage" })}
+                              />
+                           }
+                        </Layout>
+
+                        <Layout style={styles.listTextContainer} level='1'>
+                           <Text style={styles.dashboardText}>
+                              Quick Crowd Source
+                           </Text>
+
+                           {/** Show the map icon if a map is known */}
+                           {unknownItems === null ?
+                              <Text> :</Text> :
+                              <Button
+                                 style={styles.mapButton}
+                                 icon={ClipBoardIcon}
+                                 onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", { unknownItems: unknownItems,
+                                                                                                         storeName: currStoreName,
+                                                                                                         storeAddr: currStoreAddr,
+                                                                                                         listId: this.state.listId,
+                                                                                                         listName: this.state.listName,
+                                                                                                         previousPage: "CurrentListPage",
+                                                                                                         items: allItems,
+                                                                                                         locs: allLocs })}
+                              />
+                           }
+                        </Layout>
+                     </Layout>
+                  }
                </Layout>
             </Layout>
          );
@@ -1156,48 +1179,66 @@ class CurrentList extends Component {
 
                   <Layout style={styles.dashboard} >
                      <Layout style={styles.dashboardOuterContainer} level='3' >
-                        <Layout style={styles.dashboardInnerContainer}>
+                        <Layout style={styles.listTextContainer} level='1'>
                            <Text style={styles.dashboardText}>
-                              Number of Items: {this.state.listItems.length}
+                              {"Dashboard: "}
                            </Text>
 
-                           <Text style={styles.dashboardText}>
-                              List shared with {this.state.userCount - 1} others
-                           </Text>
-                           {/* -1 here to make sure we dont include the current user */}
-
-                           <Text style={styles.dashboardText}>
-                              {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
-                           </Text>
-
-                           <Layout style={styles.listTextContainer} level='1'>
-                              <Text style={styles.dashboardText}>
-                                 {"Hide Purchased Items: "}
-                              </Text>
-
-                              <CheckBox
-                                 // {...props}
-                                 checked={this.state.hidePurchased}
-                                 onChange={(isChecked) => {
-                                    this._isMounted && this.setState({
-                                       hidePurchased : isChecked
-                                    })
-                                 }}
-                              />
-                           </Layout>
-
-                           <Layout style={styles.listTextContainer} level='1'>
-                              <Text style={styles.dashboardText}>
-                                 {"Uncheck All Marked Items: "}
-                              </Text>
-
-                              <Button
-                                 style={styles.mapButton}
-                                 icon={DoneAllIcon}
-                                 onPress={this.uncheckAllPurchasedItems}
-                              />
-                           </Layout>
+                           <CheckBox
+                              // {...props}
+                              checked={this.state.showDashboard}
+                              onChange={(isChecked) => {
+                                 this._isMounted && this.setState({
+                                    showDashboard : isChecked
+                                 })
+                              }}
+                           />
                         </Layout>
+
+                        {this.state.showDashboard &&
+                           <Layout style={styles.dashboardInnerContainer}>                           
+                              <Text style={styles.dashboardText}>
+                                 Number of Items: {this.state.listItems.length}
+                              </Text>
+
+                              <Text style={styles.dashboardText}>
+                                 List shared with {this.state.userCount - 1} others
+                              </Text>
+                              {/* // -1 here to make sure we dont include the current user */}
+
+                              <Text style={styles.dashboardText}>
+                                 {"Price: " + this.state.minPrice + " - " + this.state.maxPrice + " (" + this.state.numUnknownPrice + " Prices Unknown)"}
+                              </Text>
+
+                              <Layout style={styles.listTextContainer} level='1'>
+                                 <Text style={styles.dashboardText}>
+                                    {"Hide Purchased Items: "}
+                                 </Text>
+
+                                 <CheckBox
+                                    // {...props}
+                                    checked={this.state.hidePurchased}
+                                    onChange={(isChecked) => {
+                                       this._isMounted && this.setState({
+                                          hidePurchased : isChecked
+                                       })
+                                    }}
+                                 />
+                              </Layout>
+
+                              <Layout style={styles.listTextContainer} level='1'>
+                                 <Text style={styles.dashboardText}>
+                                    {"Uncheck All Marked Items: "}
+                                 </Text>
+
+                                 <Button
+                                    style={styles.mapButton}
+                                    icon={DoneAllIcon}
+                                    onPress={this.uncheckAllPurchasedItems}
+                                 />
+                              </Layout>
+                           </Layout>
+                        }
                      </Layout>
                   </Layout>
 
