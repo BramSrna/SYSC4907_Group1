@@ -16,7 +16,7 @@ import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import { departments } from "../DepartmentList";
-import { MenuOutline } from "../assets/icons/icons.js";
+import { ArrowBackIcon } from "../assets/icons/icons.js";
 import styles from "../pages/pageStyles/QuickCrowdSourcePageStyle";
 import * as dbi from "./Functions/DBInterface";
 
@@ -59,7 +59,7 @@ class QuickCrowdSourcePage extends Component {
                 nm.setThat(this);
 
                 this._isMounted = true;
-                
+
                 // Initialize the page if information is passed in
                 var previousPage = this.props.navigation.getParam("previousPage", null);
                 if (previousPage !== null) {
@@ -90,7 +90,7 @@ class QuickCrowdSourcePage extends Component {
                             }
                         }
                     }
-    
+
                     this.setState({
                         storeName: currStoreName,
                         storeAddr: currStoreAddr,
@@ -143,10 +143,10 @@ class QuickCrowdSourcePage extends Component {
 
             // Add the value to the database
             dbi.addItemLoc(genName,
-                           storeName,
-                           storeAddr,
-                           aisleNum,
-                           department);
+                storeName,
+                storeAddr,
+                aisleNum,
+                department);
         }
 
         previousPage = this.state.previousPage;
@@ -209,7 +209,7 @@ class QuickCrowdSourcePage extends Component {
                                     key={index}
                                     label={v.label}
                                     value={v.value}
-                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]}
                                 />
                             );
                         })
@@ -236,7 +236,7 @@ class QuickCrowdSourcePage extends Component {
     }
 
     renderMenuAction = () => (
-        <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+        <TopNavigationAction icon={ArrowBackIcon} onPress={() => this.props.navigation.goBack()} />
     );
 
     render() {
