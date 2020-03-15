@@ -136,7 +136,6 @@ class QuickCrowdSourcePage extends Component {
             var currItem = locs[i];
 
             var genName = currItem.itemName;
-            var specName = null;
             var storeName = this.state.storeName;
             var storeAddr = this.state.storeAddr;
             var department = currItem.loc;
@@ -144,7 +143,6 @@ class QuickCrowdSourcePage extends Component {
 
             // Add the value to the database
             dbi.addItemLoc(genName,
-                           specName,
                            storeName,
                            storeAddr,
                            aisleNum,

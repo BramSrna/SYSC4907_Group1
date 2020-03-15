@@ -72,7 +72,6 @@ class CurrentList extends Component {
 
          itemName: "",
          genName: "",
-         specName: null,
          isDialogVisible: false,
 
          orgMethod: organizationOptions[0],
@@ -449,17 +448,7 @@ class CurrentList extends Component {
     * @returns The name to display to the user
     */
    getDispName(item) {
-      // Set the return string to just the generic name
-      var retStr = item.genName;
-
-      // If the specific name is given add it to the string
-      if ((item.specName !== undefined) &&
-         (item.specName !== null) &&
-         (item.specName !== "null")) {
-         retStr += " (" + item.specName + ")";
-      }
-
-      return (retStr);
+      return (item.genName);
    }
 
    generatePriceString = (price1, price2) => {
@@ -918,8 +907,6 @@ class CurrentList extends Component {
                unknownItems: value.unknownItems,
                asyncWait: false
             });
-
-
 
          context.localSort(PURCHASED);
       });

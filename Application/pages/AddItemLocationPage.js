@@ -14,7 +14,6 @@ const PAGE_TITLE = "Add Item Location";
 
 // These are the default values for all of the input boxes
 const DEFAULT_GENERIC_NAME = "";
-const DEFAULT_SPECIFIC_NAME = "";
 const DEFAULT_ITEM_DEPARTMENT = "Please select the department...";
 const DEFAULT_STORE_NAME = "";
 const DEFAULT_AISLE_NUM = "";
@@ -26,7 +25,6 @@ class AddItemLocationPage extends Component {
 
     this.state = {
       genericName: DEFAULT_GENERIC_NAME,
-      specificName: DEFAULT_SPECIFIC_NAME,
       itemDepartment: departments[0],
       storeName: DEFAULT_STORE_NAME,
       aisleNum: DEFAULT_AISLE_NUM,
@@ -144,12 +142,8 @@ class AddItemLocationPage extends Component {
       return;
     }
 
-    // Set the specific name
-    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
-
     // Add the value to the database
     dbi.addItemLoc(this.state.genericName,
-      tempSpecificName,
       this.state.storeName,
       this.state.address,
       this.state.aisleNum,
@@ -192,12 +186,6 @@ class AddItemLocationPage extends Component {
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
                   onChangeText={(genericName) => this._isMounted && this.setState({ genericName })}
-                />
-                <Input style={styles.inputRow}
-                  label='Specific Name'
-                  placeholder='Enter a specific name'
-                  value={this.state.specificName}
-                  onChangeText={(specificName) => this._isMounted && this.setState({ specificName })}
                 />
                 <Input style={styles.inputRow}
                   label='Store Name'

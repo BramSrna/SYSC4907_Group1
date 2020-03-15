@@ -25,7 +25,6 @@ const globalComps = require('./Functions/GlobalComps');
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
 const DEFAULT_GEN_NAME = "";
-const DEFAULT_SPEC_NAME = null;
 
 // The number of items to recommend
 const NUM_REC_ITEMS = 10;
@@ -41,7 +40,6 @@ class AddItemPage extends Component {
 
             itemName: "", // The item name entered in the autocomplete box
             genName: DEFAULT_GEN_NAME, // The generic name of the entered item
-            specName: DEFAULT_SPEC_NAME, // The specific name of the entered item
             currItemId: "", // The id name of the entered item
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
@@ -128,7 +126,6 @@ class AddItemPage extends Component {
             var items = value.items;
             var ids = value.ids;
             var genNames = value.genNames;
-            var specNames = value.specNames;
 
             // Save the item information
             var temp = [];
@@ -137,8 +134,7 @@ class AddItemPage extends Component {
                     name: items[i],
                     title: items[i],
                     id: ids[i],
-                    genName: genNames[i],
-                    specName: specNames[i]
+                    genName: genNames[i]
                 });
             }
 
@@ -235,12 +231,11 @@ class AddItemPage extends Component {
             // as well as their ids, upto the maximum length
             for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
                 var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
-                var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
+                var name = (new globalComps.ItemObj(info.name)).getDispName();
                 var id = recItems[i][0];
 
                 var toAdd = {
-                    genName: info.genericName,
-                    specName: info.specificName,
+                    genName: info.name,
                     name: name,
                     id: id,
                     added: false
@@ -265,11 +260,10 @@ class AddItemPage extends Component {
                 var id = topItems[i][0];
                 if (!currItemIds.includes(id)) {
                     var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
-                    var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
+                    var name = (new globalComps.ItemObj(info.name)).getDispName();
 
                     var toAdd = {
-                        genName: info.genericName,
-                        specName: info.specificName,
+                        genName: info.name,
                         name: name,
                         id: id,
                         added: false
@@ -318,7 +312,6 @@ class AddItemPage extends Component {
         } else {
             var id = ""; // Assume an empty id
             var genName = newItem; // Assume the given name is the generic name
-            var specName = null; // Assume no specific name has been given
 
             newItem = newItem.toString();
 
@@ -329,7 +322,6 @@ class AddItemPage extends Component {
                     // Set the data for the item if known
                     id = availableItems[i].id;
                     genName = availableItems[i].genName;
-                    specName = availableItems[i].specName;
                     break;
                 }
             }
@@ -338,7 +330,6 @@ class AddItemPage extends Component {
             this._isMounted && this.setState({
                 itemName: newItem,
                 genName: genName,
-                specName: specName,
                 currItemId: id
             });
         }
@@ -356,8 +347,7 @@ class AddItemPage extends Component {
         if (this.state.genName !== DEFAULT_GEN_NAME) {
             // Add the item to the list
             this.addItem(this.state.listId,
-                this.state.genName,
-                specName = this.state.specName);
+                this.state.genName);
         }
 
         // Return to the list
@@ -400,15 +390,14 @@ class AddItemPage extends Component {
     * 
     * @returns None
     */
-    addItem(listId, genName, specName) {
+    addItem(listId, genName) {
         // Add the item to the list
         lf.AddItemToList(
             listId,
             genName,
             1,
             "aSize mL",
-            "aNote",
-            specName = specName);
+            "aNote");
     };
 
     addToggledRecommendedItems() {
@@ -423,8 +412,7 @@ class AddItemPage extends Component {
             var item = currRecItems[i];
             if (item.added){
                 this.addItem(this.state.listId,
-                    item.genName,
-                    item.specName);
+                    item.genName);
         
                 currItemIds.push(item.id);
             } else {

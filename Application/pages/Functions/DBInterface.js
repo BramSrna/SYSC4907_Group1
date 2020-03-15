@@ -74,7 +74,7 @@ function compArrays(array1, array2) {
  * it has not been saved then the whole description is saved, otherwise
  * only the price is saved.
  * 
- * @param {String} genericName   The generic name of the item
+ * @param {String} name   The generic name of the item
  * @param {String} specificName The specific name of the item
  *                              Default is null
  * @param {Integer} size The size of the item in the given unit of measurement
@@ -86,22 +86,20 @@ function compArrays(array1, array2) {
  * 
  * @returns None
  */
-export function registerItem(genericName, specificName = null, size = null, sizeUnit = null, price = null) {
-    genericName = replaceInvalidPathChars(genericName);
-    specificName = replaceInvalidPathChars(specificName);
+export function registerItem(name, size = null, sizeUnit = null, price = null) {
+    name = replaceInvalidPathChars(name);
 
     // Get the path to the item
-    var itemPath = (new globalComps.ItemObj(genericName, specificName)).getPath();
+    var itemPath = (new globalComps.ItemObj(name)).getPath();
 
-    var itemInfo = globalComps.getItem(genericName, specificName).then((itemInfo) => {
+    var itemInfo = globalComps.getItem(name).then((itemInfo) => {
         var item = itemInfo.item;
 
         if (item === null) {
             // Register the full item if it has not been registered before
             // Format the data in a dictionary before saving
             var initialDesc = {
-                genericName: genericName,
-                specificName: specificName
+                name: name
             };
 
             if (size !== null) {
@@ -321,8 +319,7 @@ export function registerStore(storeName, address, map, franchiseName = null) {
  * not already been created. Adds the location if
  * if has not already been created.
  * 
- * @param {String} genericName The generic name of the item
- * @param {String} specificName The specific name of the item
+ * @param {String} name The generic name of the item
  * @param {String} storeName The name of the store
  * @param {String} address The address of the store
  * @param {Integer} aisleNum The aisle number of the item
@@ -330,9 +327,8 @@ export function registerStore(storeName, address, map, franchiseName = null) {
  * 
  * @returns None
  */
-export function addItemLoc(genericName, specificName, storeName, address, aisleNum, itemDepartment) {
-    genericName = replaceInvalidPathChars(genericName);
-    specificName = replaceInvalidPathChars(specificName);
+export function addItemLoc(name, storeName, address, aisleNum, itemDepartment) {
+    name = replaceInvalidPathChars(name);
     storeName = replaceInvalidPathChars(storeName);
     address = replaceInvalidPathChars(address);
 
@@ -359,7 +355,7 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
         var store = value[0];
 
         // Get the item object
-        var itemInfo = globalComps.getItem(genericName, specificName);
+        var itemInfo = globalComps.getItem(name);
 
         return Promise.all([store, itemInfo]);
     }).then((value) => {
@@ -368,7 +364,7 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
 
         // If the item has not been created, then register the item
         if (item === null) {
-            var temp = registerItem(genericName, specificName);
+            var temp = registerItem(name);
         }
 
         return Promise.all([store, item]);
@@ -378,7 +374,7 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
 
         // Create the store and item objects to get the paths and ids
         var tempStore = new globalComps.StoreObj(address, storeName);
-        var tempItem = new globalComps.ItemObj(genericName, specificName);
+        var tempItem = new globalComps.ItemObj(name);
 
         // Get the corresponding paths
         var storePath = tempStore.getPath();

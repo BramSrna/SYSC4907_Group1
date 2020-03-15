@@ -76,27 +76,22 @@ export function cloudLoadAvailableStores() {
        var dispNames = [];
        var itemIds = [];
        var genNames = [];
-       var specNames = [];
  
        var ssv = snapshot.val();
  
        if (ssv) {
-          for (var tempGenName in ssv) {
-             var subItems = ssv[tempGenName];
-             for (var tempSpecName in subItems) {
-                // Create a Store object corresponding to the current generic and specific names
-                var tempItem = new globalComps.ItemObj(tempGenName, tempSpecName);
- 
-                // Get the item ID and display name
-                var itemId = tempItem.getId();
-                var itemName = tempItem.getDispName();
- 
-                // Save the names and id
-                dispNames.push(itemName);
-                itemIds.push(itemId);
-                genNames.push(tempGenName);
-                specNames.push(tempSpecName);
-             }
+          for (var tempName in ssv) {
+            // Create a Store object corresponding to the current generic and specific names
+            var tempItem = new globalComps.ItemObj(tempName);
+
+            // Get the item ID and display name
+            var itemId = tempItem.getId();
+            var itemName = tempItem.getDispName();
+
+            // Save the names and id
+            dispNames.push(itemName);
+            itemIds.push(itemId);
+            genNames.push(tempName);
           }
        }
  
@@ -104,8 +99,7 @@ export function cloudLoadAvailableStores() {
        return {
           ids: itemIds,
           items: dispNames,
-          genNames: genNames,
-          specNames: specNames
+          genNames: genNames
        };
     });
  
