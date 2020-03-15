@@ -14,9 +14,19 @@ import {
    TopNavigationAction,
    Select,
    Text,
-   CheckBox
+   CheckBox,
+   Spinner
 } from 'react-native-ui-kitten';
-import { MenuOutline, AddIcon, BellIcon, MapIcon } from "../assets/icons/icons.js";
+import {
+   MenuOutline,
+   AddIcon,
+   BellIcon,
+   MapIcon,
+   ClipBoardIcon,
+   DoneAllIcon,
+   MoveUpIcon,
+   MoveDownIcon,
+} from "../assets/icons/icons.js";
 import DoubleClick from "react-native-double-tap";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -56,6 +66,7 @@ class CurrentList extends Component {
          listItemIds: [],
          listItemLocs: null,
          modalMode: 'item',
+         unknownItems: null,
 
          firstLoadComplete: false,
 
@@ -85,7 +96,13 @@ class CurrentList extends Component {
          maxPrice: 0,
          numUnknownPrice: 0,
 
-         hidePurchased: false
+         hidePurchased: false,
+
+         asyncWait: false,
+
+         showDashboard: false,
+         showCrowdSourceDashboard: false,
+         showAdditionalOptions: false,
       };
    }
 
@@ -314,7 +331,9 @@ class CurrentList extends Component {
          minPrice: null,
          maxPrice: null,
          numUnknownPrice: null,
-         map: null
+         map: null,
+         unknownItems: null,
+         asyncWait: null
       }
 
       for (key in optionalParams) {
@@ -328,6 +347,8 @@ class CurrentList extends Component {
       numUnknownPrice = defaultParams.numUnknownPrice;
       map = defaultParams.map;
       locs = defaultParams.locs;
+      unknownItems = defaultParams.unknownItems;
+      asyncWait = defaultParams.asyncWait;
 
       // Get the current Arrays
       var localIds = this.state.listItemIds;
@@ -408,7 +429,9 @@ class CurrentList extends Component {
          currStoreId: map === -1 ? DEFAULT_STORE_ID : this.state.currStoreId,
          currStore: map === -1 ? DEFAULT_STORE : this.state.currStore,
          currStoreAddr: map === -1 ? DEFAULT_STORE_ADDR : this.state.currStoreAddr,
-         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName
+         currStoreName: map === -1 ? DEFAULT_STORE_NAME : this.state.currStoreName,
+         unknownItems: unknownItems === null ? this.state.unknownItems : unknownItems,
+         asyncWait: asyncWait === null ? this.state.asyncWait : asyncWait
       });
    }
 
@@ -822,12 +845,24 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   reorganizeListLoc(storeId, listId, context = this) {
+   reorganizeListLoc(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
-      var tempList = lf.reorgListLoc(storeId, listId);
+      var tempList = lf.reorgListLoc(storeId, listId, cluster);
       tempList.then((value) => {
          // Update the local state of the list
-         context.updateListState(value.items, value.ids, { locs: value.locs, reorg: true, map: -1 });
+         context.updateListState(value.items,
+            value.ids,
+            {
+               locs: value.locs,
+               reorg: true,
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
+            });
       });
 
       return;
@@ -845,6 +880,10 @@ class CurrentList extends Component {
     * @returns None
     */
    reorganizeListFastest(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
       var tempList = lf.reorgListFastest(storeId, listId, cluster);
       tempList.then((value) => {
@@ -853,7 +892,9 @@ class CurrentList extends Component {
             {
                reorg: true,
                locs: value.locs,
-               map: value.map
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
             });
       });
 
@@ -861,6 +902,10 @@ class CurrentList extends Component {
    }
 
    reorganizeListFastestAutoUpdate(storeId, listId, context = this, cluster = null) {
+      this.setState({
+         asyncWait: true
+      });
+
       // Reorganize the list
       var tempList = lf.reorgListFastest(storeId, listId, cluster);
       tempList.then((value) => {
@@ -869,7 +914,9 @@ class CurrentList extends Component {
             {
                reorg: true,
                locs: value.locs,
-               map: value.map
+               map: value.map,
+               unknownItems: value.unknownItems,
+               asyncWait: false
             });
 
 
@@ -922,6 +969,15 @@ class CurrentList extends Component {
       lf.DeleteItemInList(listID, itemID);
    }
 
+   uncheckAllPurchasedItems = () => {
+      var listId = this.state.listId;
+      var itemIds = this.state.listItemIds;
+
+      for (var i = 0; i < itemIds.length; i++) {
+         lf.UpdatePurchasedBoolOfAnItemInAList(listId, itemIds[i], newVal = false);
+      }
+   }
+
    /**
     * renderNotificationModalElement
     * 
@@ -962,27 +1018,40 @@ class CurrentList extends Component {
     * 
     * @returns None
     */
-   renderStoreMapDashboard = () => {
+   renderStoreInfoDashboard = () => {
       currStore = this.state.currStore;
-      currStoreName = this.state.currStoreName;
-      currStoreAddr = this.state.currStoreAddr;
-      map = this.state.map;
-
-      retVal = [];
 
       // Only render if the store is chosen
       if (currStore !== DEFAULT_STORE) {
          return (
             <React.Fragment>
                <Text style={styles.dashboardText}>
-                  {"Current Layout: "}{currStore}
+                  {"Current Store: "}{currStore}
+               </Text>
+            </React.Fragment>
+         );
+      }
+   }
+
+   renderStoreMapDashboard = () => {
+      currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
+      map = this.state.map;
+
+      // Only render if the store is chosen
+      if (currStore !== DEFAULT_STORE) {
+         return (
+            <React.Fragment>
+               <Text style={styles.dashboardText}>
+                  {"View Store Layout: "}
                </Text>
                {/** Show the map icon if a map is known */}
                {map === null ?
                   <Text></Text> :
                   <Button
                      style={styles.mapButton}
-                     size='tiny'
+                     size='small'
                      status='basic'
                      icon={MapIcon}
                      onPress={() => this.props.navigation.navigate("MapCreatorPage", {
@@ -992,6 +1061,46 @@ class CurrentList extends Component {
                         listId: this.state.listId,
                         listName: this.state.listName,
                         previousPage: "CurrentListPage"
+                     })}
+                  />
+               }
+            </React.Fragment>
+         );
+      }
+   }
+
+   renderQuickCrowdSourceDashboard = () => {
+      currStore = this.state.currStore;
+      currStoreName = this.state.currStoreName;
+      currStoreAddr = this.state.currStoreAddr;
+      unknownItems = this.state.unknownItems;
+      allItems = this.state.listItems;
+      allLocs = this.state.listItemLocs;
+
+      // Only render if the store is chosen
+      if (currStore !== DEFAULT_STORE) {
+         return (
+            <React.Fragment>
+               <Text style={styles.dashboardText}>
+                  {"Quick Crowd Source: "}
+               </Text>
+               {/** Show the map icon if a map is known */}
+               {unknownItems === null ?
+                  <Text></Text> :
+                  <Button
+                     style={styles.mapButton}
+                     size='small'
+                     status='basic'
+                     icon={ClipBoardIcon}
+                     onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", {
+                        unknownItems: unknownItems,
+                        storeName: currStoreName,
+                        storeAddr: currStoreAddr,
+                        listId: this.state.listId,
+                        listName: this.state.listName,
+                        previousPage: "CurrentListPage",
+                        items: allItems,
+                        locs: allLocs
                      })}
                   />
                }
@@ -1011,6 +1120,21 @@ class CurrentList extends Component {
                      hidePurchased: isChecked
                   })
                }}
+            />
+         </React.Fragment>
+      );
+   }
+
+   renderUncheckButton = () => {
+      return (
+         <React.Fragment>
+            <Text style={styles.dashboardText}>{"Uncheck All Purchased Items:"}</Text>
+            <Button
+               size='tiny'
+               status='basic'
+               style={styles.mapButton}
+               icon={DoneAllIcon}
+               onPress={this.uncheckAllPurchasedItems}
             />
          </React.Fragment>
       );
@@ -1126,53 +1250,94 @@ class CurrentList extends Component {
                rightControls={renderRightControls(showBell = this.state.userCount > 1)}
             />
 
-            <Layout style={styles.ListContainer}>
-               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
-                  <Modal style={styles.modal}
-                     allowBackdrop={true}
-                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setNotificationModalVisible}
-                     visible={this.state.notificationModalVisible}>
-                     {this.renderNotificationModalElement()}
-                  </Modal>
-               </KeyboardAvoidingView>
 
-               <Layout style={styles.selectContainer}>
-                  <Select style={styles.selectBox}
-                     data={organizationOptions}
-                     placeholder='Select an organization method'
-                     selectedOption={this.state.orgMethod}
-                     onSelect={(selection) => this.handleReorg(selection)}
-                  />
-               </Layout>
-               <Layout style={styles.dashboard} >
-                  <Layout style={styles.dashboardOuterContainer} level='3' >
-                     <Layout style={styles.dashboardInnerContainer}>
-                        <Text style={styles.dashboardText}>
-                           {"Number of Items: " + this.state.listItems.length}
-                        </Text>
-                        {this.renderSharedInfo()}
-                        {this.renderPrice()}
-                        {this.renderStoreMapDashboard()}
-                        {this.renderPurchasedOption()}
+            {!this.state.asyncWait &&
+               <Layout style={styles.ListContainer}>
+                  <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
+                     <Modal style={styles.modal}
+                        allowBackdrop={true}
+                        backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+                        onBackdropPress={this.setNotificationModalVisible}
+                        visible={this.state.notificationModalVisible}>
+                        {this.renderNotificationModalElement()}
+                     </Modal>
+                  </KeyboardAvoidingView>
+
+                  <Layout style={styles.selectContainer}>
+                     <Select style={styles.selectBox}
+                        data={organizationOptions}
+                        placeholder='Select an organization method'
+                        selectedOption={this.state.orgMethod}
+                        onSelect={(selection) => this.handleReorg(selection)}
+                     />
+                  </Layout>
+                  <Layout style={styles.dashboard} >
+                     <Layout style={styles.dashboardOuterContainer} level='3' >
+                        <Layout style={styles.listTextContainer} level='1'>
+                           <Button
+                              style={styles.dashboardExpandButton}
+                              appearance='ghost'
+                              status='basic'
+                              onPress={() => {
+                                 this._isMounted && this.setState({
+                                    showDashboard: !this.state.showDashboard
+                                 })
+                              }}
+                           >{!this.state.showDashboard ? "Dashboard ↓" : "Dashboard ↑"}</Button>
+                        </Layout>
+
+                        {this.state.showDashboard &&
+                           <Layout style={styles.dashboardInnerContainer}>
+                              <Text style={styles.dashboardText}>
+                                 {"Number of Items: " + this.state.listItems.length}
+                              </Text>
+
+                              {this.renderSharedInfo()}
+                              {this.renderPrice()}
+                              {this.renderStoreInfoDashboard()}
+                              {this.renderStoreMapDashboard()}
+                              {this.renderQuickCrowdSourceDashboard()}
+
+                              <Button
+                                 size='tiny'
+                                 status='basic'
+                                 appearance='ghost'
+                                 icon={!this.state.showAdditionalOptions ? MoveDownIcon : MoveUpIcon}
+                                 onPress={() => {
+                                    this._isMounted && this.setState({
+                                       showAdditionalOptions: !this.state.showAdditionalOptions
+                                    })
+                                 }}
+                              />
+                              {this.state.showAdditionalOptions && this.renderUncheckButton()}
+                              {this.state.showAdditionalOptions && this.renderPurchasedOption()}
+                           </Layout>
+                        }
                      </Layout>
                   </Layout>
-               </Layout>
 
-               <FlatList
-                  contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                  style={styles.flatList}
-                  data={this.state.listItems}
-                  width="100%"
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item, index }) => (
-                     <DoubleClick
-                        doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >
-                        {this.GenerateListItem(item, index)}
-                     </DoubleClick>
-                  )}
-               />
-            </Layout>
+                  <FlatList
+                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                     style={styles.flatList}
+                     data={this.state.listItems}
+                     width="100%"
+                     keyExtractor={(item, index) => index.toString()}
+                     renderItem={({ item, index }) => (
+                        <DoubleClick
+                           doubleTap={() => { this.HandleDoubleTapItem(index) }} delay={500} >
+                           {this.GenerateListItem(item, index)}
+                        </DoubleClick>
+                     )}
+                  />
+               </Layout>
+            }
+
+
+            {this.state.asyncWait &&
+               <Layout style={styles.loading}>
+                  <Spinner />
+               </Layout>
+            }
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );

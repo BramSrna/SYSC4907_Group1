@@ -44,35 +44,37 @@ class FavRecipesPage extends Component {
                alignment='center'
                leftControl={renderMenuAction()}
             />
-            {this.state.recipes.length > 0 &&
-               <FlatList
-                  style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
-                  data={this.state.recipes}
-                  width="100%"
-                  keyExtractor={(item, index) => item.title}
-                  renderItem={({ item }) => {
-                     return (
-                        <RecipesCard
-                           imageSource={item.image}
-                           title={item.title}
-                           description={"Serves " + item.servings + "\t\t\tReady in " + item.readyInMinutes + " minutes"}
-                           onSharePress={() => {
-                              this.props.navigation.navigate("YourContacts", {
-                                 share: true,
-                                 recipeName: item.title,
-                              });
-                           }}
-                           onDetailsPress={() => {
-                              this.props.navigation.navigate("RecipeDetailsPage", {
-                                 url: item.spoonacularSourceUrl,
-                                 ingredients: item.extendedIngredients,
-                                 name: item.title
-                              });
-                           }}
-                        />
-                     );
-                  }}
-               />}
+            <Layout style={styles.outerContainer}>
+               {this.state.recipes.length > 0 &&
+                  <FlatList
+                     style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
+                     data={this.state.recipes}
+                     width="100%"
+                     keyExtractor={(item, index) => item.title}
+                     renderItem={({ item }) => {
+                        return (
+                           <RecipesCard
+                              imageSource={item.image}
+                              title={item.title}
+                              description={"Serves " + item.servings + "\t\t\tReady in " + item.readyInMinutes + " minutes"}
+                              onSharePress={() => {
+                                 this.props.navigation.navigate("YourContacts", {
+                                    share: true,
+                                    recipeName: item.title,
+                                 });
+                              }}
+                              onDetailsPress={() => {
+                                 this.props.navigation.navigate("RecipeDetailsPage", {
+                                    url: item.spoonacularSourceUrl,
+                                    ingredients: item.extendedIngredients,
+                                    name: item.title
+                                 });
+                              }}
+                           />
+                        );
+                     }}
+                  />}
+            </Layout>
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment>
       );
@@ -80,6 +82,8 @@ class FavRecipesPage extends Component {
 }
 
 const styles = StyleSheet.create({
-
+   outerContainer: {
+      flex: 1,
+   },
 });
 export default FavRecipesPage;

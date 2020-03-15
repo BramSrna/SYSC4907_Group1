@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FlatList, KeyboardAvoidingView, BackHandler } from "react-native";
-import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, } from 'react-native-ui-kitten';
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, Spinner} from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -20,7 +20,8 @@ class YourLists extends Component {
          apiData: [],
          modalVisible: false,
          selected: [],
-         selectedIds: []
+         selectedIds: [],
+         asyncWait: false
       };
    }
 
@@ -35,6 +36,10 @@ class YourLists extends Component {
     * @returns None
     */
    GenerateNeededData(that) {
+      that.setState({
+         asyncWait: true
+      });
+
       var uid = firebase.auth().currentUser.uid;
 
       var ref = firebase.database().ref("/users/" + uid + "/lists")
@@ -161,22 +166,15 @@ class YourLists extends Component {
             }
          }
       } else {
-         // Reorganizes the current state to match the given data
-         // without adding/removing anything
-         for (var i = 0; i < newApiData.length; i++) {
-            var id = newApiData[i];
-            var ind = localApiData.indexOf(id);
-
-            if (ind > -1) {
-               localListTitles[ind] = newListTitles[i];
-            }
-         }
+         localListTitles = newListTitles;
+         localApiData = newApiData;
       }
 
       // Updates the state
       if (this._isMount) this.setState({
          listTitles: localListTitles.slice(),
-         apiData: localApiData.slice()
+         apiData: localApiData.slice(),
+         asyncWait: false
       });
    }
 
@@ -446,55 +444,57 @@ class YourLists extends Component {
                   leftControl={renderMenuAction()}
                   rightControls={renderRightControls()}
                />}
-            <Layout style={styles.ListContainer}>
-               <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
-                  <Modal style={styles.modal}
-                     allowBackdrop={true}
-                     backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
-                     onBackdropPress={this.setModalVisible}
-                     visible={this.state.modalVisible}>
-                     {this.renderModalElement()}
-                  </Modal>
-               </KeyboardAvoidingView>
-               {!this.props.navigation.getParam("ingredients", false) &&
-                  <FlatList
-                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                     style={styles.flatList}
-                     data={this.state.listTitles}
-                     width="100%"
-                     keyExtractor={index => index.toString()}
-                     renderItem={({ item, index }) => (
-                        <ListItemContainer
-                           title={item}
+            {!this.state.asyncWait &&
+               <Layout style={styles.ListContainer}>
+                  <KeyboardAvoidingView style={styles.container} behavior="position" enabled>
+                     <Modal style={styles.modal}
+                        allowBackdrop={true}
+                        backdropStyle={{ backgroundColor: 'black', opacity: 0.75 }}
+                        onBackdropPress={this.setModalVisible}
+                        visible={this.state.modalVisible}>
+                        {this.renderModalElement()}
+                     </Modal>
+                  </KeyboardAvoidingView>
+                  {!this.props.navigation.getParam("ingredients", false) &&
+                     <FlatList
+                        contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                        style={styles.flatList}
+                        data={this.state.listTitles}
+                        width="100%"
+                        keyExtractor={index => index.toString()}
+                        renderItem={({ item, index }) => (
+                           <ListItemContainer
+                              title={item}
                            description={this.renderItemDescription(index)}
-                           listName={item}
-                           onPress={this.GoToList.bind(this, item)}
-                           listIndex={index}
-                           listID={this.state.apiData[index].key}
-                           onDelete={this.deleteListWithID}
-                           navigate={() => {
-                              this.props.navigation.navigate("YourContacts", {
-                                 share: true,
-                                 listID: this.state.apiData[index].key,
-                                 listName: item
-                              })
-                           }}
-                        />
-                     )}
-                  />}
-               {this.props.navigation.getParam("ingredients", false) &&
-                  <FlatList
-                     contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                     style={styles.flatList}
-                     data={this.state.listTitles}
-                     width="100%"
-                     keyExtractor={index => index.toString()}
-                     renderItem={({ item, index }) => (
+                              listName={item}
+                              onPress={this.GoToList.bind(this, item)}
+                              listIndex={index}
+                              listID={this.state.apiData[index].key}
+                              onDelete={this.deleteListWithID}
+                              navigate={() => {
+                                 this.props.navigation.navigate("YourContacts", {
+                                    share: true,
+                                    listID: this.state.apiData[index].key,
+                                    listName: item
+                                 })
+                              }}
+                           />
+                        )}
+                     />}
+                  {this.props.navigation.getParam("ingredients", false) &&
+                     <FlatList
+                        contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                        style={styles.flatList}
+                        data={this.state.listTitles}
+                        width="100%"
+                        keyExtractor={index => index.toString()}
+                        renderItem={({ item, index }) => (
                         <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={this.renderItemDescription(index)} />
-                     )}
-                  />}
-            </Layout>
-            {this.props.navigation.getParam("ingredients", false) &&
+                        )}
+                     />}
+               </Layout>
+            }
+            {!this.state.asyncWait && this.props.navigation.getParam("ingredients", false) &&
                <Layout>
                   <Button style={styles.shareButton}
                      status="success"
@@ -502,6 +502,11 @@ class YourLists extends Component {
                         props.navigation.goBack()
                      })}
                   >{"ADD TO LIST"}</Button>
+               </Layout>
+            }
+            {this.state.asyncWait &&
+               <Layout style={styles.loading}>
+                  <Spinner />
                </Layout>
             }
             <NotificationPopup ref={ref => this.popup = ref} />

@@ -399,9 +399,8 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
             var locId = null;
             for (var tempLocId in locs) {
                 var tempLoc = locs[tempLocId];
-                if ((tempLoc.aisleNum === aisleNum) &&
-                    (tempLoc.department === itemDepartment) &&
-                    (tempLoc.store === storeName)) {
+                if (((tempLoc.aisleNum === aisleNum) || ((tempLoc.aisleNum === undefined) && (aisleNum === null))) &&
+                    (tempLoc.department === itemDepartment)) {
                     // location has already been saved
                     locId = tempLocId;
                     break;
@@ -441,7 +440,7 @@ export function addItemLoc(genericName, specificName, storeName, address, aisleN
             locId = null;
             for (tempLocId in locs) {
                 tempLoc = locs[tempLocId];
-                if ((tempLoc.aisleNum === aisleNum) &&
+                if (((tempLoc.aisleNum === aisleNum) || ((tempLoc.aisleNum === undefined) && (aisleNum === null))) &&
                     (tempLoc.department === itemDepartment)) {
                     // location has already been saved
                     locId = tempLocId;

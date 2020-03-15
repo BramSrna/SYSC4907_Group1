@@ -378,11 +378,15 @@ function predictItemLoc(database, storeId, itemId) {
         var aisleNum = null;
         var aisleTags = [];
 
+        known = false;
+
         if (loc.department !== null){
             // If the location is known, then get the location's information
             department = loc.department;
             aisleNum = loc.aisleNum;
             aisleTags = loc.aisleTags;
+
+            known = true;
         } else {
             // If the location is unknown, predict it
             var storesWithItem = [];
@@ -474,6 +478,7 @@ function predictItemLoc(database, storeId, itemId) {
 
         // Return the average location
         return {
+            known: known,
             department : department,
             aisleNum : aisleNum,
             aisleTags : aisleTags
@@ -850,6 +855,7 @@ exports.cloudReorgListLoc = function(data, context, database) {
     // Parse the data object
     var listId = data.listId;
     var storeId = data.storeId;
+    var cluster = data.cluster;
 
     var ref = database.ref('/lists/' + listId);
     var retItems = ref.once('value').then((snapshot) => {
@@ -880,11 +886,26 @@ exports.cloudReorgListLoc = function(data, context, database) {
             locs.push(loc);  
         }
 
-        return Promise.all([Promise.all(locs), Promise.all(ids), Promise.all(items)]);
+        // Get the store map
+        var map = null
+
+        if (cluster === null) {
+            map = getStoreMap(database, storeId);
+        } else {
+            map = cluster;
+        }
+
+        return Promise.all([
+            Promise.all(locs),
+            Promise.all(ids),
+            Promise.all(items),
+            map
+        ]);
     }).then(result => {
         var predictedLocs = result[0];
         var ids = result[1];
         var items = result[2];
+        var map = result[3];
 
         // Copy all of the needed location information
         var locs = [];
@@ -896,7 +917,8 @@ exports.cloudReorgListLoc = function(data, context, database) {
                 id: ids[i],
                 department: loc.department,
                 aisleNum: loc.aisleNum,
-                aisleTags: loc.aisleTags
+                aisleTags: loc.aisleTags,
+                known: loc.known
             })
         }
 
@@ -931,17 +953,28 @@ exports.cloudReorgListLoc = function(data, context, database) {
         items = [];
         ids = [];
         retLocs = [];
+        unknownItems = [];
         for (i = 0; i < locs.length; i++) {
-            items.push(locs[i].item);
-            ids.push(locs[i].id);
-            retLocs.push(locs[i].department);
+            var item = locs[i].item;
+            var id = locs[i].id;
+            var dep = locs[i].department;
+
+            items.push(item);
+            ids.push(id);
+            retLocs.push(dep);
+
+            if (dep === null) {
+                unknownItems.push(item);
+            }
         }
 
         // Return the information
         return {
             items: items,
             ids: ids,
-            locs: retLocs
+            locs: retLocs,
+            unknownItems: unknownItems,
+            map: map
         };
     });
 
@@ -1027,7 +1060,8 @@ exports.cloudReorgListFastest = function(data, context, database) {
                 id: ids[i],
                 department: loc.department,
                 aisleNum: loc.aisleNum,
-                aisleTags: loc.aisleTags
+                aisleTags: loc.aisleTags,
+                known: loc.known
             };
 
             locs.push(toAdd);
@@ -1094,16 +1128,27 @@ exports.cloudReorgListFastest = function(data, context, database) {
         items = [];
         ids = [];
         retLocs = [];
+        unknownItems = [];
         for (i = 0; i < locs.length; i++) {
-            items.push(locs[i].item);
-            ids.push(locs[i].id);
-            retLocs.push(locs[i].department);
+            var item = locs[i].item;
+            var id = locs[i].id;
+            var dep = locs[i].department;
+
+            items.push(item);
+            ids.push(id);
+            retLocs.push(dep);
+
+            if (dep === null) {
+                unknownItems.push(item);
+            }
         }
 
+        // Return the information
         return {
             items: items,
             ids: ids,
             locs: retLocs,
+            unknownItems: unknownItems,
             map: map
         };
     });
