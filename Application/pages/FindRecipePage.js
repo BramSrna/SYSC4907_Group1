@@ -3,7 +3,7 @@ import NotificationPopup from 'react-native-push-notification-popup';
 import nm from './Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
 import { FlatList, StyleSheet } from 'react-native';
-import { TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction, Layout } from 'react-native-ui-kitten';
 import RecipesCard from '../components/RecipesCard.js';
 import { dark, light } from '../assets/Themes.js';
 import { MenuOutline } from "../assets/icons/icons.js";
@@ -45,38 +45,40 @@ export default class FindRecipePage extends Component {
           alignment='center'
           leftControl={renderMenuAction()}
         />
-        {this.state.recipes.length > 0 &&
-          <FlatList
-            style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
-            data={this.state.recipes}
-            width="100%"
-            keyExtractor={(item, index) => item.title}
-            renderItem={({ item }) => {
-              return (
-                <RecipesCard
-                  imageSource={item.image}
-                  title={item.title}
-                  description={"Serves " + item.servings + "\t\t\tReady in " + item.readyInMinutes + " minutes"}
-                  onSharePress={() => {
-                    this.props.navigation.navigate("YourContacts", {
-                      share: true,
-                      recipeName: item.title,
-                      recipeUrl: item.spoonacularSourceUrl,
-                      ingredients: item.extendedIngredients
-                    });
-                  }}
-                  onDetailsPress={() => {
-                    this.props.navigation.navigate("RecipeDetailsPage", {
-                      item: item,
-                      url: item.spoonacularSourceUrl,
-                      ingredients: item.extendedIngredients,
-                      name: item.title
-                    });
-                  }}
-                />
-              );
-            }}
-          />}
+        <Layout style={styles.outerContainer}>
+          {this.state.recipes.length > 0 &&
+            <FlatList
+              style={{ backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }}
+              data={this.state.recipes}
+              width="100%"
+              keyExtractor={(item, index) => item.title}
+              renderItem={({ item }) => {
+                return (
+                  <RecipesCard
+                    imageSource={item.image}
+                    title={item.title}
+                    description={"Serves " + item.servings + "\t\t\tReady in " + item.readyInMinutes + " minutes"}
+                    onSharePress={() => {
+                      this.props.navigation.navigate("YourContacts", {
+                        share: true,
+                        recipeName: item.title,
+                        recipeUrl: item.spoonacularSourceUrl,
+                        ingredients: item.extendedIngredients
+                      });
+                    }}
+                    onDetailsPress={() => {
+                      this.props.navigation.navigate("RecipeDetailsPage", {
+                        item: item,
+                        url: item.spoonacularSourceUrl,
+                        ingredients: item.extendedIngredients,
+                        name: item.title
+                      });
+                    }}
+                  />
+                );
+              }}
+            />}
+        </Layout>
         <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );
@@ -84,5 +86,7 @@ export default class FindRecipePage extends Component {
 }
 
 const styles = StyleSheet.create({
-
+  outerContainer: {
+    flex: 1,
+  },
 });
