@@ -121,20 +121,22 @@ export const styles = StyleSheet.create({
       padding: 8,
       borderRadius: 10,
    },
+   dashboardContainer: {
+      borderRadius: 10,
+   },
    dashboardInnerContainer: {
       paddingHorizontal: 8,
-      paddingBottom:8,
+      paddingBottom: 8,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       flexWrap: 'wrap',
-      borderBottomLeftRadius: 10,
-      borderBottomRightRadius: 10,
+      borderRadius: 10,
    },
    dashboardText: {
       marginHorizontal: 6,
    },
-   dashboardExpandButton:{
+   dashboardExpandButton: {
       marginVertical: -8
    },
    mapButton: {
@@ -150,7 +152,6 @@ export const styles = StyleSheet.create({
       width: '100%',
       justifyContent: 'center',
       alignItems: 'center',
-      borderTopLeftRadius: 10,
-      borderTopRightRadius: 10,
+      borderRadius: 10,
    },
 });

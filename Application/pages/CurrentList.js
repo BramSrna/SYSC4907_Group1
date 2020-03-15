@@ -1273,46 +1273,48 @@ class CurrentList extends Component {
                   </Layout>
                   <Layout style={styles.dashboard} >
                      <Layout style={styles.dashboardOuterContainer} level='3' >
-                        <Layout style={styles.listTextContainer} level='1'>
-                           <Button
-                              style={styles.dashboardExpandButton}
-                              appearance='ghost'
-                              status='basic'
-                              onPress={() => {
-                                 this._isMounted && this.setState({
-                                    showDashboard: !this.state.showDashboard
-                                 })
-                              }}
-                           >{!this.state.showDashboard ? "Dashboard ↓" : "Dashboard ↑"}</Button>
-                        </Layout>
-
-                        {this.state.showDashboard &&
-                           <Layout style={styles.dashboardInnerContainer}>
-                              <Text style={styles.dashboardText}>
-                                 {"Number of Items: " + this.state.listItems.length}
-                              </Text>
-
-                              {this.renderSharedInfo()}
-                              {this.renderPrice()}
-                              {this.renderStoreInfoDashboard()}
-                              {this.renderStoreMapDashboard()}
-                              {this.renderQuickCrowdSourceDashboard()}
-
+                        <Layout style={styles.dashboardContainer} >
+                           <Layout style={styles.listTextContainer} level='1'>
                               <Button
-                                 size='tiny'
-                                 status='basic'
+                                 style={styles.dashboardExpandButton}
                                  appearance='ghost'
-                                 icon={!this.state.showAdditionalOptions ? MoveDownIcon : MoveUpIcon}
+                                 status='basic'
                                  onPress={() => {
                                     this._isMounted && this.setState({
-                                       showAdditionalOptions: !this.state.showAdditionalOptions
+                                       showDashboard: !this.state.showDashboard
                                     })
                                  }}
-                              />
-                              {this.state.showAdditionalOptions && this.renderUncheckButton()}
-                              {this.state.showAdditionalOptions && this.renderPurchasedOption()}
+                              >{!this.state.showDashboard ? "Dashboard ↓" : "Dashboard ↑"}</Button>
                            </Layout>
-                        }
+
+                           {this.state.showDashboard &&
+                              <Layout style={styles.dashboardInnerContainer}>
+                                 <Text style={styles.dashboardText}>
+                                    {"Number of Items: " + this.state.listItems.length}
+                                 </Text>
+
+                                 {this.renderSharedInfo()}
+                                 {this.renderPrice()}
+                                 {this.renderStoreInfoDashboard()}
+                                 {this.renderStoreMapDashboard()}
+                                 {this.renderQuickCrowdSourceDashboard()}
+
+                                 <Button
+                                    size='tiny'
+                                    status='basic'
+                                    appearance='ghost'
+                                    icon={!this.state.showAdditionalOptions ? MoveDownIcon : MoveUpIcon}
+                                    onPress={() => {
+                                       this._isMounted && this.setState({
+                                          showAdditionalOptions: !this.state.showAdditionalOptions
+                                       })
+                                    }}
+                                 />
+                                 {this.state.showAdditionalOptions && this.renderUncheckButton()}
+                                 {this.state.showAdditionalOptions && this.renderPurchasedOption()}
+                              </Layout>
+                           }
+                        </Layout>
                      </Layout>
                   </Layout>
 
