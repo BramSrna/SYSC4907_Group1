@@ -75,14 +75,14 @@ class QuickCrowdSourcePage extends Component {
 
                         if (currLoc === null) {
                             this.currLocs.push({
-                                itemName: items[i].genName,
+                                itemName: items[i].name,
                                 loc: departments[0].text.slice(0)
                             });
                         } else {
                             for (var j = 0; j < departments.length; j++) {
                                 if (departments[j].text === locs[i]) {
                                     this.currLocs.push({
-                                        itemName: items[i].genName,
+                                        itemName: items[i].name,
                                         loc: departments[j].text.slice(0)
                                     });
                                     j = departments.length + 2;
@@ -195,6 +195,7 @@ class QuickCrowdSourcePage extends Component {
         }
 
         renderAndroidPicker = () => {
+            console.log(item);
             return (
                 <Picker
                     style={styles.pickerAndroid}

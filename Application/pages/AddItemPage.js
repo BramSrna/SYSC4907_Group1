@@ -196,71 +196,44 @@ class AddItemPage extends Component {
 
         var ref = firebase.database().ref('/recommendations');
         var retItems = ref.once('value').then((snapshot) => {
-            var newItems = {};
+            var newItems = {};            
+            var finalItems = [];
 
             // First check the rules
             // If an item is the precedent of a rule, add
             // the antecedent to the list of recommended items
             var ssv = snapshot.val();
-            for (var i = 0; i < currItemIds.length; i++) {
-                var itemId = currItemIds[i];
-                if (itemId in ssv) {
-                    var items = ssv[itemId];
-                    for (var newItemId in items) {
-                        var newItem = items[newItemId];
-                        if (!currItemIds.includes(newItem)) {
-                            if (!(newItem in newItems)) {
-                                newItems[newItem] = 0;
+            if (ssv){
+                for (var i = 0; i < currItemIds.length; i++) {
+                    var itemId = currItemIds[i];
+                    if (itemId in ssv) {
+                        var items = ssv[itemId];
+                        for (var newItemId in items) {
+                            var newItem = items[newItemId];
+                            if (!currItemIds.includes(newItem)) {
+                                if (!(newItem in newItems)) {
+                                    newItems[newItem] = 0;
+                                }
+                                newItems[newItem] += 1;
                             }
-                            newItems[newItem] += 1;
                         }
                     }
                 }
-            }
 
-            // Sort the current recommend items and
-            // the list of top items
-            var recItems = this.sortObjectByKeys(newItems);
-            var topItems = this.sortObjectByKeys(ssv.topItems);
+                // Sort the current recommend items and
+                // the list of top items
+                var recItems = this.sortObjectByKeys(newItems);
+                var topItems = this.sortObjectByKeys(ssv.topItems);
 
-            var finalItems = [];
-            var ids = [];
-            var backlog = [];
+                var ids = [];
+                var backlog = [];
 
-            // Copy the top recommended items to the final list to recommend
-            // as well as their ids, upto the maximum length
-            for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
-                var name = (new globalComps.ItemObj(info.name)).getDispName();
-                var id = recItems[i][0];
-
-                var toAdd = {
-                    genName: info.name,
-                    name: name,
-                    id: id,
-                    added: false
-                };
-
-                // Add the item to final items if it is not currently in the
-                // user's list and it has not been previosuly recommended.
-                // Otherwise, if the item is not in the list, but has been
-                // previously recommended, add it to the backlog
-                if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
-                    finalItems.push(toAdd);
-                } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
-                    backlog.push(toAdd);
-                }
-
-                ids.push(id)
-            }
-
-            // Fill the remaining space in the list of recommend items
-            // with the most popular items
-            for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                var id = topItems[i][0];
-                if (!currItemIds.includes(id)) {
-                    var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
+                // Copy the top recommended items to the final list to recommend
+                // as well as their ids, upto the maximum length
+                for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
                     var name = (new globalComps.ItemObj(info.name)).getDispName();
+                    var id = recItems[i][0];
 
                     var toAdd = {
                         genName: info.name,
@@ -269,19 +242,48 @@ class AddItemPage extends Component {
                         added: false
                     };
 
-                    // Same as above
+                    // Add the item to final items if it is not currently in the
+                    // user's list and it has not been previosuly recommended.
+                    // Otherwise, if the item is not in the list, but has been
+                    // previously recommended, add it to the backlog
                     if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
                         finalItems.push(toAdd);
                     } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
                         backlog.push(toAdd);
                     }
-                }
-            }
 
-            // If we're out of items to recommend, reset the backlog and previosuly recommended items
-            for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                finalItems.push(backlog[i]);
-                currPrevRec = [];
+                    ids.push(id)
+                }
+
+                // Fill the remaining space in the list of recommend items
+                // with the most popular items
+                for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    var id = topItems[i][0];
+                    if (!currItemIds.includes(id)) {
+                        var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
+                        var name = (new globalComps.ItemObj(info.name)).getDispName();
+
+                        var toAdd = {
+                            genName: info.name,
+                            name: name,
+                            id: id,
+                            added: false
+                        };
+
+                        // Same as above
+                        if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                            finalItems.push(toAdd);
+                        } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                            backlog.push(toAdd);
+                        }
+                    }
+                }
+
+                // If we're out of items to recommend, reset the backlog and previosuly recommended items
+                for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    finalItems.push(backlog[i]);
+                    currPrevRec = [];
+                }
             }
 
             // Save the list of recommended items

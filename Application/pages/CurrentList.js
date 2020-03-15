@@ -264,8 +264,8 @@ class CurrentList extends Component {
                var priceRange = item.price;
                if (priceRange !== undefined) {
                   // Price range known
-                  minPrice += priceRange.minPrice === undefined ? 0 : priceRange.minPrice;
-                  maxPrice += priceRange.maxPrice === undefined ? 0 : priceRange.maxPrice;
+                  minPrice += priceRange.minPrice === undefined ? 0 : parseFloat(priceRange.minPrice);
+                  maxPrice += priceRange.maxPrice === undefined ? 0 : parseFloat(priceRange.maxPrice);
                } else {
                   // Price unknown
                   numUnknownPrice += 1;
@@ -281,14 +281,18 @@ class CurrentList extends Component {
             userCount = ssv.user_count;
          }
 
+         console.log(typeof(minPrice));
+         minPrice = minPrice.toFixed(2);
+         maxPrice = maxPrice.toFixed(2);
+
          // Update the state of the context
          that.updateListState(items,
             ids,
             {
                reorg: false,
                userCount: userCount,
-               minPrice: minPrice.toFixed(2),
-               maxPrice: maxPrice.toFixed(2),
+               minPrice: minPrice,
+               maxPrice: maxPrice,
                numUnknownPrice: numUnknownPrice
             });
       });
@@ -448,15 +452,16 @@ class CurrentList extends Component {
     * @returns The name to display to the user
     */
    getDispName(item) {
-      return (item.genName);
+      console.log(item);
+      return (item.name);
    }
 
    generatePriceString = (price1, price2) => {
       var priceString = "";
       if (price1 == price2) {
-         priceString += "Price: $" + price1.toFixed(2);
+         priceString += "Price: $" + parseFloat(price1).toFixed(2);
       } else {
-         priceString += "Price: $" + price1.toFixed(2) + " - $" + price2.toFixed(2);
+         priceString += "Price: $" + parseFloat(price1).toFixed(2) + " - $" + parseFloat(price2).toFixed(2);
       }
       return (priceString);
    }
