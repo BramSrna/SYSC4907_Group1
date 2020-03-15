@@ -12,15 +12,12 @@ class ItemObj {
      * 
      * Creates a new item object
      * 
-     * @param {String} genericName The generic name of the object
-     * @param {String} specificName The specific name of the object
-     *                              default is null
+     * @param {String} name The generic name of the object
      * 
      * @returns None
      */
-    constructor(genericName, specificName = null) {
-        this.genericName = genericName;
-        this.specificName = specificName;
+    constructor(name) {
+        this.name = name;
     }
 
     /**
@@ -35,7 +32,7 @@ class ItemObj {
      * @returns The path to the item
      */
     getPath() {
-        var itemPath = "/items/" + this.genericName + "/" + this.specificName + "/";
+        var itemPath = "/items/" + this.name + "/";
         return (itemPath);
     }
 
@@ -51,7 +48,7 @@ class ItemObj {
      * @returns The id of the item
      */
     getId() {
-        var itemId = this.genericName + "&" + this.specificName;
+        var itemId = this.name;
         return (itemId);
     }
 
@@ -67,14 +64,7 @@ class ItemObj {
      * @returns The display name of the item
      */
     getDispName() {
-        // Initialize the name to the generic name
-        var itemName = this.genericName;
-
-        // If the specific name is not null, add it to the name
-        if ((this.specificName !== "null") && (this.specificName !== null)) {
-            itemName += " (" + this.specificName + ")";
-        }
-        return (itemName);
+        return (this.name);
 
     }
 
@@ -89,10 +79,8 @@ class ItemObj {
      * @returns The data of the item
      */
     static getInfoFromId(id) {
-        var parts = id.split("&");
         return {
-            genericName: parts[0],
-            specificName: parts[1]
+            name: id
         }
     }
 }
@@ -194,68 +182,57 @@ class StoreObj {
  * Retrives the item object from the given database
  * corresponding to the given generic name and specific name.
  * 
- * @param {String} genericName The generic name of the item
- * @param {String} specificName The specific name of the item
- *                              Default is null
+ * @param {String} name The generic name of the item
  * 
  * @returns The item object corresponding to the given data
  *          Null if no item found
  */
-const getItem = function (genericName, specificName = null) {
+const getItem = function(name) {
     var itemInfo = firebase.database().ref("/items").once("value").then((snapshot) => {
         var ssv = snapshot.val();
         var item = null;
 
         // Parse the item table for the item
-        for (var tempGenName in ssv) {
-            if (tempGenName.toUpperCase() === genericName.toUpperCase()) {
-                // Generic name subtable found
-                var temp = ssv[tempGenName];
-                for (var tempSpecName in temp) {
-                    if (((tempSpecName === "null") && (specificName === null)) || (specificName != null && (tempSpecName.toUpperCase() === specificName.toUpperCase()))) {
-                        // Item found
-                        item = ssv[tempGenName][tempSpecName];
+        for (var tempName in ssv) {
+            if (tempName.toUpperCase() === name.toUpperCase()) {
+                // Item found
+                item = ssv[tempName];
 
-                        // Get the final price of the item by
-                        // parsing all of the known prices from teh descriptions
-                        var minPrice = Number.MAX_SAFE_INTEGER;
-                        var maxPrice = -1;
-                        if (item !== null) {
-                            var descs = item.descs;
-                            for (var currDescId in descs) {
-                                // Parse each description
-                                var currDesc = descs[currDescId];
-                                var prices = currDesc.prices;
-                                if (prices) {
-                                    for (var i = 0; i < prices.length; i++) {
-                                        // Update the price range with the new information
-                                        var currPrice = prices[i];
-                                        if (currPrice < minPrice) {
-                                            minPrice = currPrice;
-                                        }
+                // Get the final price of the item by
+                // parsing all of the known prices from teh descriptions
+                var minPrice = Number.MAX_SAFE_INTEGER;
+                var maxPrice = -1;
+                if (item !== null) {
+                    var descs = item.descs;
+                    for (var currDescId in descs) {
+                        // Parse each description
+                        var currDesc = descs[currDescId];
+                        var prices = currDesc.prices;
+                        if (prices) {
+                            for (var i = 0; i < prices.length; i++) {
+                                // Update the price range with the new information
+                                var currPrice = prices[i];
+                                if (currPrice < minPrice) {
+                                    minPrice = currPrice;
+                                }
 
-                                        if (currPrice > maxPrice) {
-                                            maxPrice = currPrice;
-                                        }
-                                    }
+                                if (currPrice > maxPrice) {
+                                    maxPrice = currPrice;
                                 }
                             }
                         }
-
-                        if (maxPrice != -1) {
-                            // Add the final price range to the item
-                            item.finalPrice = {
-                                minPrice: minPrice,
-                                maxPrice: maxPrice
-                            }
-                        } else {
-                            item.finalPrice = {}
-                        }
-
-                        break;
                     }
                 }
-                break;
+
+                if (maxPrice != -1) {
+                    // Add the final price range to the item
+                    item.finalPrice = {
+                        minPrice: minPrice,
+                        maxPrice: maxPrice
+                    }
+                } else {
+                    item.finalPrice = {}
+                }
             }
         }
 

@@ -79,8 +79,7 @@ class ListFunctions {
                ingredients[ingredient].name,
                1,
                "aSize mL",
-               "aNote",
-               null);
+               "aNote");
          }
       }
       callback(props);
@@ -170,18 +169,17 @@ class ListFunctions {
     * @param {Integer} quantity: quantity of the item
     * @param {Integer} size: size of the item
     * @param {String} notes: additional notes regarding the item
-    * @param {String}   specName: The specific name of the item
     * 
     * @returns The id of the item
     */
-   AddItemToList(listId, genName, quantity, size, notes, specName = false, purchased = false) {
+   AddItemToList(listId, name, quantity, size, notes, purchased = false) {
       // Retrieve the item from the database
-      var retVal = globalComps.getItem(genName, specificName = specName).then((itemInfo) => {
+      var retVal = globalComps.getItem(name).then((itemInfo) => {
          var item = itemInfo.item;
 
          if (item === null) {
             // If the item has not been registered, then register it
-            var temp = dbInterface.registerItem(genName, specificName = specName);
+            var temp = dbInterface.registerItem(name);
          }
 
          return Promise.all([item]);
@@ -190,7 +188,7 @@ class ListFunctions {
 
          var listPath = createListPath(listId);
          // Get the id of the item
-         var itemId = (new globalComps.ItemObj(genName, specificName = specName)).getId();
+         var itemId = (new globalComps.ItemObj(name)).getId();
 
          var date = (new Date()).toString();
 
@@ -202,8 +200,7 @@ class ListFunctions {
 
          // Add the item to the list
          firebase.database().ref(listPath + "/items/" + itemId).update({
-            genName: genName,
-            specName: specName,
+            name: name,
             purchased: purchased,
             quantity: quantity,
             size: size,

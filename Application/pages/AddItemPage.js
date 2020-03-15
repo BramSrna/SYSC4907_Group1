@@ -25,7 +25,6 @@ const globalComps = require('./Functions/GlobalComps');
 const PAGE_TITLE = "Add Item";
 const NEW_ITEM = "Register an item...";
 const DEFAULT_GEN_NAME = "";
-const DEFAULT_SPEC_NAME = null;
 
 // The number of items to recommend
 const NUM_REC_ITEMS = 10;
@@ -41,7 +40,6 @@ class AddItemPage extends Component {
 
             itemName: "", // The item name entered in the autocomplete box
             genName: DEFAULT_GEN_NAME, // The generic name of the entered item
-            specName: DEFAULT_SPEC_NAME, // The specific name of the entered item
             currItemId: "", // The id name of the entered item
             value: '', // The current text entered in the autocomplete box
             data: [], // The data entered in the autocomplete box
@@ -128,7 +126,6 @@ class AddItemPage extends Component {
             var items = value.items;
             var ids = value.ids;
             var genNames = value.genNames;
-            var specNames = value.specNames;
 
             // Save the item information
             var temp = [];
@@ -137,8 +134,7 @@ class AddItemPage extends Component {
                     name: items[i],
                     title: items[i],
                     id: ids[i],
-                    genName: genNames[i],
-                    specName: specNames[i]
+                    genName: genNames[i]
                 });
             }
 
@@ -200,94 +196,94 @@ class AddItemPage extends Component {
 
         var ref = firebase.database().ref('/recommendations');
         var retItems = ref.once('value').then((snapshot) => {
-            var newItems = {};
+            var newItems = {};            
+            var finalItems = [];
 
             // First check the rules
             // If an item is the precedent of a rule, add
             // the antecedent to the list of recommended items
             var ssv = snapshot.val();
-            for (var i = 0; i < currItemIds.length; i++) {
-                var itemId = currItemIds[i];
-                if (itemId in ssv) {
-                    var items = ssv[itemId];
-                    for (var newItemId in items) {
-                        var newItem = items[newItemId];
-                        if (!currItemIds.includes(newItem)) {
-                            if (!(newItem in newItems)) {
-                                newItems[newItem] = 0;
+            if (ssv){
+                for (var i = 0; i < currItemIds.length; i++) {
+                    var itemId = currItemIds[i];
+                    if (itemId in ssv) {
+                        var items = ssv[itemId];
+                        for (var newItemId in items) {
+                            var newItem = items[newItemId];
+                            if (!currItemIds.includes(newItem)) {
+                                if (!(newItem in newItems)) {
+                                    newItems[newItem] = 0;
+                                }
+                                newItems[newItem] += 1;
                             }
-                            newItems[newItem] += 1;
                         }
                     }
                 }
-            }
 
-            // Sort the current recommend items and
-            // the list of top items
-            var recItems = this.sortObjectByKeys(newItems);
-            var topItems = this.sortObjectByKeys(ssv.topItems);
+                // Sort the current recommend items and
+                // the list of top items
+                var recItems = this.sortObjectByKeys(newItems);
+                var topItems = this.sortObjectByKeys(ssv.topItems);
 
-            var finalItems = [];
-            var ids = [];
-            var backlog = [];
+                var ids = [];
+                var backlog = [];
 
-            // Copy the top recommended items to the final list to recommend
-            // as well as their ids, upto the maximum length
-            for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
-                var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
-                var id = recItems[i][0];
-
-                var toAdd = {
-                    genName: info.genericName,
-                    specName: info.specificName,
-                    name: name,
-                    id: id,
-                    added: false
-                };
-
-                // Add the item to final items if it is not currently in the
-                // user's list and it has not been previosuly recommended.
-                // Otherwise, if the item is not in the list, but has been
-                // previously recommended, add it to the backlog
-                if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
-                    finalItems.push(toAdd);
-                } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
-                    backlog.push(toAdd);
-                }
-
-                ids.push(id)
-            }
-
-            // Fill the remaining space in the list of recommend items
-            // with the most popular items
-            for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                var id = topItems[i][0];
-                if (!currItemIds.includes(id)) {
-                    var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
-                    var name = (new globalComps.ItemObj(info.genericName, info.specificName)).getDispName();
+                // Copy the top recommended items to the final list to recommend
+                // as well as their ids, upto the maximum length
+                for (var i = 0; (i < recItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    var info = globalComps.ItemObj.getInfoFromId(recItems[i][0]);
+                    var name = (new globalComps.ItemObj(info.name)).getDispName();
+                    var id = recItems[i][0];
 
                     var toAdd = {
-                        genName: info.genericName,
-                        specName: info.specificName,
+                        genName: info.name,
                         name: name,
                         id: id,
                         added: false
                     };
 
-                    // Same as above
+                    // Add the item to final items if it is not currently in the
+                    // user's list and it has not been previosuly recommended.
+                    // Otherwise, if the item is not in the list, but has been
+                    // previously recommended, add it to the backlog
                     if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
                         finalItems.push(toAdd);
                     } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
                         backlog.push(toAdd);
                     }
-                }
-            }
 
-            // If we're out of items to recommend, reset the backlog and previosuly recommended items
-            for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
-                finalItems.push(backlog[i]);
-                currPrevRec = [];
+                    ids.push(id)
+                }
+
+                // Fill the remaining space in the list of recommend items
+                // with the most popular items
+                for (var i = 0; (i < topItems.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    var id = topItems[i][0];
+                    if (!currItemIds.includes(id)) {
+                        var info = globalComps.ItemObj.getInfoFromId(topItems[i][0]);
+                        var name = (new globalComps.ItemObj(info.name)).getDispName();
+
+                        var toAdd = {
+                            genName: info.name,
+                            name: name,
+                            id: id,
+                            added: false
+                        };
+
+                        // Same as above
+                        if ((!ids.includes(id)) && (!currPrevRec.includes(id))) {
+                            finalItems.push(toAdd);
+                        } else if ((!ids.includes(id)) && (currPrevRec.includes(id))) {
+                            backlog.push(toAdd);
+                        }
+                    }
+                }
+
+                // If we're out of items to recommend, reset the backlog and previosuly recommended items
+                for (var i = 0; (i < backlog.length) && (finalItems.length < NUM_REC_ITEMS); i++) {
+                    finalItems.push(backlog[i]);
+                    currPrevRec = [];
+                }
             }
 
             // Save the list of recommended items
@@ -318,7 +314,6 @@ class AddItemPage extends Component {
         } else {
             var id = ""; // Assume an empty id
             var genName = newItem; // Assume the given name is the generic name
-            var specName = null; // Assume no specific name has been given
 
             newItem = newItem.toString();
 
@@ -329,7 +324,6 @@ class AddItemPage extends Component {
                     // Set the data for the item if known
                     id = availableItems[i].id;
                     genName = availableItems[i].genName;
-                    specName = availableItems[i].specName;
                     break;
                 }
             }
@@ -338,7 +332,6 @@ class AddItemPage extends Component {
             this._isMounted && this.setState({
                 itemName: newItem,
                 genName: genName,
-                specName: specName,
                 currItemId: id
             });
         }
@@ -356,8 +349,7 @@ class AddItemPage extends Component {
         if (this.state.genName !== DEFAULT_GEN_NAME) {
             // Add the item to the list
             this.addItem(this.state.listId,
-                this.state.genName,
-                specName = this.state.specName);
+                this.state.genName);
         }
 
         // Return to the list
@@ -400,15 +392,14 @@ class AddItemPage extends Component {
     * 
     * @returns None
     */
-    addItem(listId, genName, specName) {
+    addItem(listId, genName) {
         // Add the item to the list
         lf.AddItemToList(
             listId,
             genName,
             1,
             "aSize mL",
-            "aNote",
-            specName = specName);
+            "aNote");
     };
 
     addToggledRecommendedItems() {
@@ -423,8 +414,7 @@ class AddItemPage extends Component {
             var item = currRecItems[i];
             if (item.added){
                 this.addItem(this.state.listId,
-                    item.genName,
-                    item.specName);
+                    item.genName);
         
                 currItemIds.push(item.id);
             } else {

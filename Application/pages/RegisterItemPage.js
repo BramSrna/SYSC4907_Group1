@@ -13,11 +13,10 @@ import styles from "./pageStyles/RegisterItemPageStyle";
 const PAGE_TITLE = "Register Item";
 
 // The default value for all input fields
-const DEFAULT_GENERIC_NAME = ""
-const DEFAULT_SPECIFIC_NAME = ""
-const DEFAULT_SIZE = ""
-const DEFAULT_SIZE_UNIT = ""
-const DEFAULT_PRICE = ""
+const DEFAULT_GENERIC_NAME = "";
+const DEFAULT_SIZE = "";
+const DEFAULT_SIZE_UNIT = "";
+const DEFAULT_PRICE = "";
 
 class RegisterItemPage extends Component {
   constructor(props) {
@@ -25,7 +24,6 @@ class RegisterItemPage extends Component {
 
     this.state = {
       genericName: DEFAULT_GENERIC_NAME,
-      specificName: DEFAULT_SPECIFIC_NAME,
       size: DEFAULT_SIZE,
       sizeUnit: units[0],
       price: DEFAULT_PRICE
@@ -74,14 +72,12 @@ class RegisterItemPage extends Component {
     }
 
     // Set all of the optional data
-    var tempSpecificName = this.state.specificName === DEFAULT_SPECIFIC_NAME ? null : this.state.specificName;
     var tempSize = this.state.size === DEFAULT_SIZE ? null : this.state.size;
     var tempSizeUnit = this.state.sizeUnit.value;
     var tempPrice = this.state.price === DEFAULT_PRICE ? null : this.state.price;
 
     // Register the item
     dbi.registerItem(this.state.genericName,
-      tempSpecificName,
       tempSize,
       tempSizeUnit,
       tempPrice);
@@ -141,12 +137,6 @@ class RegisterItemPage extends Component {
                   placeholder='Ex. Ketchup'
                   value={this.state.genericName}
                   onChangeText={(genericName) => this._isMount && this.setState({ genericName })}
-                />
-                <Input style={styles.inputRow}
-                  label='Specific Name'
-                  placeholder='Specific Name'
-                  value={this.state.specificName}
-                  onChangeText={(specificName) => this._isMount && this.setState({ specificName })}
                 />
                 <Input style={styles.inputRow}
                   label='Price'

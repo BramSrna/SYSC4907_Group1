@@ -75,14 +75,14 @@ class QuickCrowdSourcePage extends Component {
 
                         if (currLoc === null) {
                             this.currLocs.push({
-                                itemName: items[i].genName,
+                                itemName: items[i].name,
                                 loc: departments[0].text.slice(0)
                             });
                         } else {
                             for (var j = 0; j < departments.length; j++) {
                                 if (departments[j].text === locs[i]) {
                                     this.currLocs.push({
-                                        itemName: items[i].genName,
+                                        itemName: items[i].name,
                                         loc: departments[j].text.slice(0)
                                     });
                                     j = departments.length + 2;
@@ -136,7 +136,6 @@ class QuickCrowdSourcePage extends Component {
             var currItem = locs[i];
 
             var genName = currItem.itemName;
-            var specName = null;
             var storeName = this.state.storeName;
             var storeAddr = this.state.storeAddr;
             var department = currItem.loc;
@@ -144,7 +143,6 @@ class QuickCrowdSourcePage extends Component {
 
             // Add the value to the database
             dbi.addItemLoc(genName,
-                           specName,
                            storeName,
                            storeAddr,
                            aisleNum,
