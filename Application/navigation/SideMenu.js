@@ -2,9 +2,11 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styles from './SideMenuStyle';
 import { NavigationActions } from 'react-navigation';
-import { ScrollView, } from 'react-native';
-import { Layout, Text, } from 'react-native-ui-kitten';
+import { ScrollView } from 'react-native';
+import { Layout, Text, Button } from 'react-native-ui-kitten';
 import firebase from 'firebase';
+import { PersonIcon } from '../assets/icons/icons.js';
+import { dark, light } from '../assets/Themes.js';
 
 const YOUR_DATA = "Your Data";
 const ABOUT_US = "About Us";
@@ -23,7 +25,7 @@ const FAV_RECIPE_PAGE = "Your Favourite Recipes";
 
 const DEV_MODE_ENABLED = false;
 
-class SideMenu extends Component {
+export default class SideMenu extends Component {
     constructor(props) {
         super(props)
     }
@@ -66,16 +68,28 @@ class SideMenu extends Component {
 
     returnDispalyName() {
         if (firebase.auth().currentUser != null && firebase.auth().currentUser.displayName != null) {
-            return (
-                <Text style={styles.signedInText} appearance='hint'>Signed in as {firebase.auth().currentUser.displayName}</Text>
-            );
+            return (firebase.auth().currentUser.displayName);
         }
     }
 
     render() {
         return (
             <Layout style={styles.columnContainer} level='2'>
-                <ScrollView style={styles.container}>
+                <ScrollView style={[styles.container, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} >
+                    <Layout style={styles.profileOuterContainer} level='3'>
+                        <Layout style={styles.profileInnerContainer} level='2'>
+                            <Button
+                                style={styles.profileButton}
+                                appearance='outline'
+                                status='basic'
+                                icon={PersonIcon}
+                                onPress={this.navigateToScreen('UserAccountPage')}
+                            />
+                            <Layout style={styles.profileNameContainer} level='2'>
+                                <Text category='h4'>{this.returnDispalyName()}</Text>
+                            </Layout>
+                        </Layout>
+                    </Layout>
                     <Layout style={styles.columnContainer}>
                         <Layout style={styles.headingContainer} level='4'>
                             <Text style={styles.sectionHeadingStyle}>
@@ -134,7 +148,7 @@ class SideMenu extends Component {
                 </ScrollView>
                 <Layout style={styles.footerContainer} level='3'>
                     <Layout level='3'>
-                        {this.returnDispalyName()}
+                        <Text style={styles.signedInText} appearance='hint'>{"Signed in as "}{this.returnDispalyName()}</Text>
                     </Layout>
                     <Layout level='3'>
                         <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Logout')}>{SIGNOUT}</Text>
@@ -148,5 +162,3 @@ class SideMenu extends Component {
 SideMenu.propTypes = {
     navigation: PropTypes.object
 };
-
-export default SideMenu;

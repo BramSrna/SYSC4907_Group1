@@ -6,7 +6,7 @@ import { StyleSheet, ScrollView } from 'react-native';
 import { TopNavigation, TopNavigationAction, Layout, Spinner } from 'react-native-ui-kitten';
 import RecipeDetailsCard from '../components/RecipeDetailsCard.js';
 import { dark, light } from '../assets/Themes.js';
-import { MenuOutline, HeartIcon, FilledInHeartIcon, ShareIcon } from "../assets/icons/icons.js";
+import { ArrowBackIcon, HeartIcon, FilledInHeartIcon, ShareIcon } from "../assets/icons/icons.js";
 
 export default class RecipeDetailsPage extends Component {
 
@@ -63,7 +63,7 @@ export default class RecipeDetailsPage extends Component {
     ];
 
     const renderMenuAction = () => (
-      <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
+      <TopNavigationAction icon={ArrowBackIcon} onPress={() => this.props.navigation.goBack()} />
     );
     return (
       <React.Fragment>
