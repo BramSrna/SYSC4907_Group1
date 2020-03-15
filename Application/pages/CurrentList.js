@@ -1034,7 +1034,7 @@ class CurrentList extends Component {
          return (
             <React.Fragment>
                <Text style={styles.dashboardText}>
-                  {"View Store Layout: "}
+                  {"View Store Layout:"}
                </Text>
                {/** Show the map icon if a map is known */}
                {map === null ?
@@ -1043,6 +1043,7 @@ class CurrentList extends Component {
                      style={styles.mapButton}
                      size='small'
                      status='basic'
+                     appearance='outline'
                      icon={MapIcon}
                      onPress={() => this.props.navigation.navigate("MapCreatorPage", {
                         currLayout: map,
@@ -1072,7 +1073,7 @@ class CurrentList extends Component {
          return (
             <React.Fragment>
                <Text style={styles.dashboardText}>
-                  {"Quick Crowd Source: "}
+                  {"Quick Crowd Source:"}
                </Text>
                {/** Show the map icon if a map is known */}
                {unknownItems === null ?
@@ -1081,6 +1082,7 @@ class CurrentList extends Component {
                      style={styles.mapButton}
                      size='small'
                      status='basic'
+                     appearance='outline'
                      icon={ClipBoardIcon}
                      onPress={() => this.props.navigation.navigate("QuickCrowdSourcePage", {
                         unknownItems: unknownItems,

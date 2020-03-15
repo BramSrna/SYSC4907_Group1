@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
 import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
-import { MenuOutline } from "../assets/icons/icons.js";
+import { MenuOutline, ArrowBackIcon } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList";
 import { FlatList } from "react-native-gesture-handler";
 import * as firebase from "firebase";
@@ -24,10 +24,10 @@ const DEFAULT_ADDRESS = "";
 
 // The templates available for making maps quickly
 const templates = [
-    {text: "New Map", label: "New Map", value: "NEW_MAP"},
-    {text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH"},
-    {text: "Most Popular", label: "Most Popular", value: "MOST_POPULAR"},
-    {text: "Used By Optimizer", label: "Used By Optimizer", value: "USED_BY_OPTIMIZER"},
+    { text: "New Map", label: "New Map", value: "NEW_MAP" },
+    { text: "One Of Each", label: "One Of Each", value: "ONE_OF_EACH" },
+    { text: "Most Popular", label: "Most Popular", value: "MOST_POPULAR" },
+    { text: "Used By Optimizer", label: "Used By Optimizer", value: "USED_BY_OPTIMIZER" },
 ];
 
 class MapCreatorPage extends Component {
@@ -81,9 +81,9 @@ class MapCreatorPage extends Component {
                 this.setState({
                     arrayHolder: [...this.currDepartments]
                 });
-                
+
                 // Initialize the page if information is passed in
-                previousPage = this.props.navigation.getParam("previousPage", null);
+                var previousPage = this.props.navigation.getParam("previousPage", null);
                 if (previousPage !== null) {
                     currMap = this.props.navigation.getParam("currLayout", []);
                     currStoreAddr = this.props.navigation.getParam("storeAddr", DEFAULT_ADDRESS);
@@ -98,7 +98,7 @@ class MapCreatorPage extends Component {
                     // Populate the map if one is given
                     if (currMap.length !== 0) {
                         this.clearMap();
-    
+
                         for (var i = 0; i < currMap.length; i++) {
                             this.addDepWithValue(currMap[i]);
                         }
@@ -109,7 +109,7 @@ class MapCreatorPage extends Component {
                     if (currStoreName !== DEFAULT_STORE_NAME) {
                         modifyMode = true;
                     }
-    
+
                     this.setState({
                         address: currStoreAddr,
                         storeName: currStoreName,
@@ -160,7 +160,7 @@ class MapCreatorPage extends Component {
             this.setState({
                 arrayHolder: [...this.currDepartments]
             });
-        } 
+        }
     }
 
     /**
@@ -197,8 +197,8 @@ class MapCreatorPage extends Component {
         if (previousPage !== null) {
             // Save the store to the database
             dbi.modStoreWeights(this.state.storeName,
-                                this.state.address,
-                                deps);
+                this.state.address,
+                deps);
 
             this.props.navigation.navigate(previousPage, {
                 listName: this.state.listName,
@@ -207,9 +207,9 @@ class MapCreatorPage extends Component {
         } else {
             // Save the store to the database
             dbi.registerStore(this.state.storeName,
-                              this.state.address,
-                              deps,
-                              tempFranchiseName);
+                this.state.address,
+                deps,
+                tempFranchiseName);
         }
     }
 
@@ -313,7 +313,7 @@ class MapCreatorPage extends Component {
     addOneOfEach() {
         this.clearMap();
 
-        for(var i = 0; i < departments.length; i++) {
+        for (var i = 0; i < departments.length; i++) {
             this.addDepartment();
             this.updateDepartment(i, departments[i].text);
         }
@@ -338,8 +338,8 @@ class MapCreatorPage extends Component {
             } else {
                 this.clearMap();
 
-                for(var i = 0; i < value.length; i++) {
-                    this.addDepWithValue(value[i]);             
+                for (var i = 0; i < value.length; i++) {
+                    this.addDepWithValue(value[i]);
                 }
             }
         });
@@ -364,7 +364,7 @@ class MapCreatorPage extends Component {
             } else {
                 this.clearMap();
 
-                for(var i = 0; i < value.length; i++) {
+                for (var i = 0; i < value.length; i++) {
                     this.addDepWithValue(value[i]);
                 }
             }
@@ -383,7 +383,7 @@ class MapCreatorPage extends Component {
     addDepWithValue(name) {
         this.addDepartment();
 
-        for(var j = 0; j < departments.length; j++) {
+        for (var j = 0; j < departments.length; j++) {
             if (departments[j].text === name) {
                 this.updateDepartment(this.currDepartments.length - 1, departments[j].text);
                 j = departments.length + 2;
@@ -537,7 +537,7 @@ class MapCreatorPage extends Component {
                                     key={index}
                                     label={v.label}
                                     value={v.value}
-                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]} 
+                                    color={global.theme == light ? light["text-hint-color"] : dark["text-hint-color"]}
                                 />
                             );
                         })
@@ -564,13 +564,17 @@ class MapCreatorPage extends Component {
         <TopNavigationAction icon={MenuOutline} onPress={() => this.props.navigation.toggleDrawer()} />
     );
 
+    renderBackAction = () => (
+        <TopNavigationAction icon={ArrowBackIcon} onPress={() => this.props.navigation.goBack()} />
+    );
+
     render() {
         return (
             <React.Fragment>
                 <TopNavigation
                     title={PAGE_TITLE}
                     alignment="center"
-                    leftControl={this.renderMenuAction()}
+                    leftControl={this.state.previousPage == "CurrentListPage" ? this.renderBackAction() : this.renderMenuAction()}
                 />
                 <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                     <Layout style={styles.formOuterContainer} level='3'>
