@@ -22,6 +22,7 @@ import RecipeDetailsPage from '../pages/RecipeDetailsPage';
 import FavRecipesPage from '../pages/FavRecipesPage';
 import PrivacyPolicyPage from '../pages/PrivacyPolicyPage';
 import QuickCrowdSourcePage from '../pages/QuickCrowdSourcePage';
+import UserAccountPage from '../pages/UserAccountPage';
 
 const StackNavigator = createStackNavigator({
     Home: {
@@ -77,7 +78,10 @@ const StackNavigator = createStackNavigator({
     },
     QuickCrowdSourcePage: {
         screen: QuickCrowdSourcePage
-    }
+    },
+    UserAccountPage:{
+        screen:UserAccountPage
+    },
 }, {
     initialRouteName: "Home",
     headerMode: "none"
@@ -173,7 +177,13 @@ const MainDrawerNavigator = createDrawerNavigator({
         navigationOptions: {
             drawerLabel: "Privacy Policy"
         }
-    }
+    },
+    UserAccountPage:{
+        screen: UserAccountPage,
+        navigationOptions: {
+            drawerLabel: "User Account"
+        }
+    },
 }, {
     gesturesEnabled: false,
     contentComponent: SideMenu,

@@ -125,3 +125,8 @@ export const CloseIcon = (style) => (<
     Icon {...style}
     name='close-outline' />
 );
+
+export const PersonIcon = (style) => (<
+    Icon {...style}
+    name='person' />
+);

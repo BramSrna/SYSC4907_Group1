@@ -8,6 +8,24 @@ export default {
     container: {
         flex: 1,
     },
+    profileOuterContainer: {
+        margin: 4,
+        padding: 4,
+        borderRadius: 20,
+    },
+    profileInnerContainer: {
+        flexDirection: 'row',
+        borderRadius: 20,
+    },
+    profileButton: {
+        borderRadius: 20,
+    },
+    profileNameContainer: {
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius: 20,
+    },
     headingContainer: {
         padding: 4,
     },

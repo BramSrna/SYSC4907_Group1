@@ -70,6 +70,9 @@ class RegisterPage extends Component {
       if (this.state.password == this.state.confirmPassword) {
         return true;
       }
+      else {
+        return false;
+      }
     }
   }
 
