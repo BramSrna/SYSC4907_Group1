@@ -195,7 +195,6 @@ class QuickCrowdSourcePage extends Component {
         }
 
         renderAndroidPicker = () => {
-            console.log(item);
             return (
                 <Picker
                     style={styles.pickerAndroid}

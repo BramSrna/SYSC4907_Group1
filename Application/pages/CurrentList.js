@@ -281,7 +281,6 @@ class CurrentList extends Component {
             userCount = ssv.user_count;
          }
 
-         console.log(typeof(minPrice));
          minPrice = minPrice.toFixed(2);
          maxPrice = maxPrice.toFixed(2);
 
@@ -452,7 +451,6 @@ class CurrentList extends Component {
     * @returns The name to display to the user
     */
    getDispName(item) {
-      console.log(item);
       return (item.name);
    }
 
