@@ -31,7 +31,7 @@ export default class RecipeDetailsCard extends Component {
                                     data={ingredients}
                                     width='100%'
                                     horizontal={true}
-                                    keyExtractor={(item) => item.id.toString(2)}
+                                    keyExtractor={(item, index) => index.toString()}
                                     renderItem={({ item }) => {
                                         return (
                                             <Button
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     ingredientsButton: {
-        marginVertical:4,
+        marginVertical: 4,
         marginRight: 8,
         borderRadius: 20,
     },

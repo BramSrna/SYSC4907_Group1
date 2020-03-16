@@ -24,6 +24,7 @@ const EXCEL_PARSER = "Parse Excel File";
 const FAV_RECIPE_PAGE = "Your Favourite Recipes";
 
 const DEV_MODE_ENABLED = false;
+import * as Crypto from 'expo-crypto';
 
 export default class SideMenu extends Component {
     constructor(props) {
@@ -44,10 +45,13 @@ export default class SideMenu extends Component {
     signOutUser = async () => {
         try {
             var currentUserEmail = firebase.auth().currentUser.email.toString();
-            var emailId = currentUserEmail.replace(/\./g, ",");
+            const digest = await Crypto.digestStringAsync(
+                Crypto.CryptoDigestAlgorithm.SHA256,
+                currentUserEmail
+            );
             firebase
                 .database()
-                .ref("/userInfo/" + emailId + "/notificationToken")
+                .ref("/userInfo/" + digest + "/notificationToken")
                 .remove()
             await firebase.auth().signOut();
         } catch (e) {

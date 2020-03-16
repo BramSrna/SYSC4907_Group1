@@ -13,16 +13,14 @@ class NotificationManager {
    }
 
    _handleNotification = (notification) => {
-      console.log(notification)
       if (notification.origin == "selected") {
          if (notification.data.page == "CurrentListPage" && notification.data.name && notification.data.listID) {
             this.that.props.navigation.navigate(notification.data.page, {
-               name: notification.data.name,
+               listName: notification.data.name,
                listID: notification.data.listID
             })
 
          } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name) {
-            console.log("1")
 
             rf.GetUrlAndIngredientsFromName(notification.data.name, this);
 
@@ -35,7 +33,7 @@ class NotificationManager {
             this.that.popup.show({
                onPress: () => {
                   this.that.props.navigation.navigate(notification.data.page, {
-                     name: notification.data.name,
+                     listName: notification.data.name,
                      listID: notification.data.listID
                   })
                },
@@ -49,7 +47,6 @@ class NotificationManager {
          } else if (notification.data.page == "RecipeDetailsPage" && notification.data.name) {
             this.that.popup.show({
                onPress: () => {
-                  console.log("2")
                   rf.GetUrlAndIngredientsFromName(notification.data.name, this);
 
                },
