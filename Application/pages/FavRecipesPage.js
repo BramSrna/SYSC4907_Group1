@@ -4,7 +4,7 @@ import { MenuOutline } from "../assets/icons/icons.js";
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
-import { TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { TopNavigation, TopNavigationAction, Layout } from 'react-native-ui-kitten';
 import RecipesCard from '../components/RecipesCard.js';
 import { dark, light } from '../assets/Themes.js';
 
@@ -65,9 +65,9 @@ class FavRecipesPage extends Component {
                               }}
                               onDetailsPress={() => {
                                  this.props.navigation.navigate("RecipeDetailsPage", {
-                                    url: item.spoonacularSourceUrl,
-                                    ingredients: item.extendedIngredients,
-                                    name: item.title
+                                    item: item,
+                                    name: item.title,
+                                    ingredients: item.extendedIngredients
                                  });
                               }}
                            />

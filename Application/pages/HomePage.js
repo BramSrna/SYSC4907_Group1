@@ -12,6 +12,7 @@ import * as Permissions from 'expo-permissions'
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import rf from "./Functions/RecipeFunctions";
+import * as Crypto from 'expo-crypto';
 
 var PAGE_TITLE = "Home ";
 const YOUR_LISTS_PAGE = "YourListsPage";
@@ -44,13 +45,16 @@ class HomePage extends Component {
     // Make sure user information added to the database
     var currentUser = firebase.auth().currentUser;
     var emailId = currentUser.email.toString();
-    emailId = emailId.replace(/\./g, ",");
+    const digest = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      emailId
+    );
     firebase
       .database()
-      .ref("/userInfo/" + emailId)
+      .ref("/userInfo/" + digest)
       .once("value", function (snapshot) {
         if (!snapshot.val() || !snapshot.val().uid) {
-          firebase.database().ref('/userInfo/' + emailId).set({ uid: currentUser.uid }).then(function (snapshot) {
+          firebase.database().ref('/userInfo/' + digest).set({ uid: currentUser.uid }).then(function (snapshot) {
           });
         }
       });
@@ -78,7 +82,7 @@ class HomePage extends Component {
     let token = await Notifications.getExpoPushTokenAsync();
 
     try {
-      firebase.database().ref('/userInfo/' + emailId + '/notificationToken').set(token)
+      firebase.database().ref('/userInfo/' + digest + '/notificationToken').set(token)
       this._notificationSubscription = Notifications.addListener(nm._handleNotification);
     } catch (error) {
       console.log(error)

@@ -6,7 +6,7 @@ const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
-   constructor() {}
+   constructor() { }
 
    GetUrlAndIngredientsFromName(recipeName, that) {
       var recipeId = func.replaceInvalidPathCharsGlobal(recipeName);
@@ -16,11 +16,10 @@ class RecipeFunctions {
          .ref("/recipes/" + recipeId)
          .once("value", function (snapshot) {
             if (snapshot.val()) {
-               console.log("HERE----------")
                that.that.props.navigation.navigate("RecipeDetailsPage", {
-                  url: snapshot.val().spoonacularSourceUrl,
-                  ingredients: snapshot.val().extendedIngredients,
-                  name: recipeName
+                  item: snapshot.val(),
+                  name: snapshot.val().title,
+                  ingredients: snapshot.val().extendedIngredients
                })
             }
          })

@@ -2,6 +2,7 @@ import {
    Alert
 } from "react-native";
 import * as firebase from "firebase";
+import * as Crypto from 'expo-crypto';
 
 /**
  * This class contains all the functions that the UI uses to manipulate the database.
@@ -33,17 +34,20 @@ class ContactFunctions {
          .ref("/contacts/" + firebase.auth().currentUser.uid).off()
    }
 
-   ShareRecipe(props, recipeName, usersToShareWith, callback) {
+   async ShareRecipe(props, recipeName, usersToShareWith, callback) {
       var that = this;
       firebase
          .database()
          .ref("/userInfo/")
-         .once("value", function (snapshot) {
+         .once("value", async (snapshot) => {
             if (snapshot.val()) {
                for (user in usersToShareWith) {
                   var name = firebase.auth().currentUser.email;
-                  var tempEmail = usersToShareWith[user];
-                  var userInfoKey = tempEmail.replace(/\./g, ",");
+                  const hashedName = await Crypto.digestStringAsync(
+                     Crypto.CryptoDigestAlgorithm.SHA256,
+                     name
+                  );
+                  var userInfoKey = usersToShareWith[user];
                   if (snapshot.val()[userInfoKey]) {
                      var uidOfUserToShare = snapshot.val()[userInfoKey].uid
                      var notificationToken = snapshot.val()[userInfoKey].notificationToken
@@ -53,7 +57,7 @@ class ContactFunctions {
                         .once("value", function (snapshot) {
                            if (snapshot.val()) {
                               for (contact in snapshot.val()) {
-                                 if (snapshot.val()[contact].email == name) {
+                                 if (snapshot.val()[contact].email == hashedName) {
                                     name = snapshot.val()[contact].name;
                                     var title = 'Grocery Shopping Recipe Sharing';
                                     var message = name + ' has shared the following recipe with you: ' + recipeName;
@@ -108,19 +112,22 @@ class ContactFunctions {
          })
    }
 
-   ShareList(props, listName, listID, usersToShareWith, callback) {
+   async ShareList(props, listName, listID, usersToShareWith, callback) {
       // Update user count in lists and add to users shared list
       // Alert.alert("List " + listID + " will be shared with: " + usersToShareWith.toString());
       var that = this;
       firebase
          .database()
          .ref("/userInfo/")
-         .once("value", function (snapshot) {
+         .once("value", async (snapshot) => {
             if (snapshot.val()) {
                for (user in usersToShareWith) {
                   var name = firebase.auth().currentUser.email;
-                  var tempEmail = usersToShareWith[user];
-                  var userInfoKey = tempEmail.replace(/\./g, ",");
+                  const hashedName = await Crypto.digestStringAsync(
+                     Crypto.CryptoDigestAlgorithm.SHA256,
+                     name
+                  );
+                  var userInfoKey = usersToShareWith[user];
                   if (snapshot.val()[userInfoKey]) {
                      var uidOfUserToShare = snapshot.val()[userInfoKey].uid
                      var notificationToken = snapshot.val()[userInfoKey].notificationToken
@@ -148,7 +155,7 @@ class ContactFunctions {
                                              .once("value", function (snapshot) {
                                                 if (snapshot.val()) {
                                                    for (contact in snapshot.val()) {
-                                                      if (snapshot.val()[contact].email == name) {
+                                                      if (snapshot.val()[contact].email == hashedName) {
                                                          name = snapshot.val()[contact].name;
                                                          var title = 'Grocery Shopping List Sharing';
                                                          var message = name + ' has shared the following list with you: ' + listName;
@@ -189,7 +196,7 @@ class ContactFunctions {
          })
    }
 
-   DeleteContact(email) {
+   async DeleteContact(email) {
       var currentUser = firebase.auth().currentUser
       firebase
          .database()
@@ -205,7 +212,7 @@ class ContactFunctions {
                         .child(contact)
                         .remove();
 
-                     var userInfoKey = email.replace(/\./g, ",");
+                     var userInfoKey = email;
                      firebase
                         .database()
                         .ref("/userInfo/" + userInfoKey)
@@ -215,11 +222,15 @@ class ContactFunctions {
                               firebase
                                  .database()
                                  .ref("/contacts/" + uid)
-                                 .once("value", function (snapshot) {
+                                 .once("value", async (snapshot) => {
                                     if (snapshot.val()) {
+                                       const hashedEmail = await Crypto.digestStringAsync(
+                                          Crypto.CryptoDigestAlgorithm.SHA256,
+                                          currentUser.email
+                                       );
                                        for (var contact in snapshot.val()) {
 
-                                          if (snapshot.val()[contact].email == currentUser.email) {
+                                          if (snapshot.val()[contact].email == hashedEmail) {
 
                                              firebase
                                                 .database()
@@ -240,14 +251,18 @@ class ContactFunctions {
          })
    }
 
-   RejectContactRequest(requestEmail) {
+   async RejectContactRequest(requestEmail) {
       var currentUser = firebase.auth().currentUser
       firebase
          .database()
          .ref("/contacts/" + currentUser.uid)
-         .once("value", function (snapshot) {
+         .once("value", async (snapshot) => {
             if (snapshot.val()) {
                var ssv = snapshot.val()
+               const requestEmailHashed = await Crypto.digestStringAsync(
+                  Crypto.CryptoDigestAlgorithm.SHA256,
+                  requestEmail
+               );
                for (var contact in ssv) {
                   if (ssv[contact].email == requestEmail) {
                      firebase
@@ -256,7 +271,7 @@ class ContactFunctions {
                         .child(contact)
                         .remove();
 
-                     var userInfoKey = requestEmail.replace(/\./g, ",");
+                     var userInfoKey = requestEmailHashed;
                      firebase
                         .database()
                         .ref("/userInfo/" + userInfoKey)
@@ -266,11 +281,15 @@ class ContactFunctions {
                               firebase
                                  .database()
                                  .ref("/contacts/" + requestuid)
-                                 .once("value", function (snapshot) {
+                                 .once("value", async (snapshot) => {
                                     if (snapshot.val()) {
+                                       const hashedEmail = await Crypto.digestStringAsync(
+                                          Crypto.CryptoDigestAlgorithm.SHA256,
+                                          currentUser.email
+                                       );
                                        for (var contact in snapshot.val()) {
 
-                                          if (snapshot.val()[contact].email == currentUser.email) {
+                                          if (snapshot.val()[contact].email == hashedEmail) {
 
                                              firebase
                                                 .database()
@@ -293,26 +312,31 @@ class ContactFunctions {
          });
    }
 
-   AcceptContactRequest(props, contactEmail, contactName, contactGroup, callback) {
+   async AcceptContactRequest(props, contactEmail, contactName, contactGroup, callback) {
       var that = this
       var currentUser = firebase.auth().currentUser
       firebase
          .database()
          .ref("/contacts/" + currentUser.uid)
-         .once("value", function (snapshot) {
+         .once("value", async (snapshot) => {
             var ssv = snapshot.val();
             if (ssv) {
+               const changeEmail = await Crypto.digestStringAsync(
+                  Crypto.CryptoDigestAlgorithm.SHA256,
+                  contactEmail
+               );
                for (var contact in ssv) {
                   if (ssv[contact].email == contactEmail) {
                      firebase
                         .database()
                         .ref("/contacts/" + currentUser.uid + "/" + contact)
                         .update({
+                           "email": changeEmail,
                            "status": "contact",
                            "name": contactName,
                            "group": contactGroup
                         });
-                     var userInfoKey = contactEmail.replace(/\./g, ",");
+                     var userInfoKey = changeEmail;
                      var token = '';
                      var name = '';
                      firebase
@@ -325,11 +349,15 @@ class ContactFunctions {
                               firebase
                                  .database()
                                  .ref("/contacts/" + newuid)
-                                 .once("value", function (snapshot) {
+                                 .once("value", async (snapshot) => {
                                     var ssv = snapshot.val();
                                     if (ssv) {
+                                       const hashedEmail = await Crypto.digestStringAsync(
+                                          Crypto.CryptoDigestAlgorithm.SHA256,
+                                          currentUser.email
+                                       );
                                        for (var contact in ssv) {
-                                          if (ssv[contact].email == currentUser.email) {
+                                          if (ssv[contact].email == hashedEmail) {
                                              firebase
                                                 .database()
                                                 .ref("/contacts/" + newuid + "/" + contact)
@@ -385,7 +413,7 @@ class ContactFunctions {
       });
    }
 
-   SendContactRequest(props, email, name, group, callback) {
+   async SendContactRequest(props, email, name, group, callback) {
       var that = this;
       firebase.auth().fetchSignInMethodsForEmail(email)
          .then(function (signInMethods) {
@@ -397,11 +425,16 @@ class ContactFunctions {
                firebase
                   .database()
                   .ref("/contacts/" + uid)
-                  .once("value", function (snapshot) {
+                  .once("value", async (snapshot) => {
+                     const tempEmail = await Crypto.digestStringAsync(
+                        Crypto.CryptoDigestAlgorithm.SHA256,
+                        email
+                     );
                      var ssv = snapshot.val();
                      if (ssv) {
                         for (var contact in ssv) {
-                           if (ssv[contact].email == email) {
+
+                           if (ssv[contact].email == tempEmail) {
                               if (ssv[contact].status == "sent") {
                                  Alert.alert("You have already sent a contact request to this person!")
                                  return
@@ -422,18 +455,19 @@ class ContactFunctions {
                         .push({
                            name: name,
                            group: group,
-                           email: email,
+                           email: tempEmail,
                            status: "sent"
                         });
 
                      // Place contact request in other persons pending
-                     var userInfoKey = email.replace(/\./g, ",");
+                     var userInfoKey = tempEmail;
                      var token = '';
                      firebase
                         .database()
                         .ref("/userInfo/" + userInfoKey)
                         .once("value", function (snapshot) {
                            if (snapshot.val()) {
+                              // Keep email here so user knows who sent it
                               firebase
                                  .database()
                                  .ref("/contacts/" + snapshot.val().uid)

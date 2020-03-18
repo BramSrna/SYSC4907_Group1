@@ -69,9 +69,8 @@ export default class FindRecipePage extends Component {
                     onDetailsPress={() => {
                       this.props.navigation.navigate("RecipeDetailsPage", {
                         item: item,
-                        url: item.spoonacularSourceUrl,
-                        ingredients: item.extendedIngredients,
-                        name: item.title
+                        name: item.title,
+                        ingredients: item.extendedIngredients
                       });
                     }}
                   />
