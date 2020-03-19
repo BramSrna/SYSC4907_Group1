@@ -83,6 +83,12 @@ class RegisterItemPage extends Component {
       tempPrice);
 
     Alert.alert("Item saved successfully");
+    this.setState({
+      genericName: DEFAULT_GENERIC_NAME,
+      size: DEFAULT_SIZE,
+      sizeUnit: units[0],
+      price: DEFAULT_PRICE
+    });
     if (this.props.navigation.getParam("page", "(Invalid Name)") == "CurrentListPage") {
       this.props.navigation.navigate("CurrentListPage", {
         name: this.props.navigation.getParam("listName", "(Invalid Name)"),
