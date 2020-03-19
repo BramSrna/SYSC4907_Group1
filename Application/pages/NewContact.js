@@ -197,7 +197,7 @@ class NewContact extends Component {
                                  label='Group'
                                  data={this.state.allGroups}
                                  placeholder='Select a group...'
-                                 selectedOption={this.state.allGroups[0]}
+                                 selectedOption={this.state.group}
                                  onSelect={(group) => this.handleChangeGroup(group)}
                               />
                            </Layout>
