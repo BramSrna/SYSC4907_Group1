@@ -126,7 +126,7 @@ export function registerItem(name, size = null, sizeUnit = null, price = null) {
             }
 
             if (price !== null) {
-                initialDesc.prices = [price];
+                initialDesc.prices = { initialPrice: price };
             }
 
             // Push the dictionary to the table
@@ -166,7 +166,7 @@ export function registerItem(name, size = null, sizeUnit = null, price = null) {
                 }
 
                 if (price !== null) {
-                    toAdd.prices = [price];
+                    toAdd.prices = { initialPrice: price };
                 }
 
                 item = firebase.database().ref(itemPath + "descs").push(toAdd);
