@@ -28,6 +28,11 @@ function replaceInvalidPathChars(stringToMod) {
     return (stringToMod);
 }
 
+function formatText(string){
+    var newSrting = string.charAt(0).toUpperCase() + string.slice(1);
+    return newSrting.trim();
+}
+
 /**
  * compArrays
  * 
@@ -88,6 +93,7 @@ function compArrays(array1, array2) {
  */
 export function registerItem(name, size = null, sizeUnit = null, price = null) {
     name = replaceInvalidPathChars(name);
+    name = formatText(name);
 
     // Get the path to the item
     var itemPath = (new globalComps.ItemObj(name)).getPath();
