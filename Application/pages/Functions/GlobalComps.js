@@ -209,9 +209,9 @@ const getItem = function(name) {
                         var currDesc = descs[currDescId];
                         var prices = currDesc.prices;
                         if (prices) {
-                            for (var i = 0; i < prices.length; i++) {
+                            for (var priceId in prices) {
                                 // Update the price range with the new information
-                                var currPrice = prices[i];
+                                var currPrice = prices[priceId];
                                 if (currPrice < minPrice) {
                                     minPrice = currPrice;
                                 }
