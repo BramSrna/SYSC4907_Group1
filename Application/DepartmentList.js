@@ -26,7 +26,7 @@ const departmentList = [
     {text: "Deli", label: "Deli", value: "Deli", colour: "#f61dfc"},
     {text: "Desserts", label: "Desserts", value: "Desserts", colour: "#623286"},
     {text: "Drinks", label: "Drinks", value: "Drinks", colour: "#617dfa"},
-    {text: "Frozen Foods", label: "Frozen Foods", value: "Frozen Foods", colour: "#274447"},
+    {text: "Frozen Foods", label: "Frozen Foods", value: "Frozen Foods", colour: "#4287f5"},
     {text: "Health Foods", label: "Health Foods", value: "Health Foods", colour: "#ef2724"},
     {text: "Kitchen Of The World", label: "Kitchen Of The World", value: "Kitchen Of The World", colour: "#cec579"},
     {text: "Meal Replacements", label: "Meal Replacements", value: "Meal Replacements", colour: "#f3ab06"},
