@@ -342,9 +342,68 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
     }
 
     // Calculate the average similarity
-    similarity = similarity / maxNumItems;
+    if (maxNumItems !== 0) {
+        similarity = similarity / maxNumItems;
+    }
 
     return(similarity);
+}
+
+exports.cloudCalculateStoreSimilarities = function(database) {
+    // Load the stores table
+    var temp = loadAllStoreInfo(database);
+    var retItems = temp.then((value) => {
+        var knownStores = value.stores;
+
+        var storeIds = [];
+        // Check all known stores to check if they contain the target item
+        for (var tempAddress in knownStores){
+            for (var tempStoreName in knownStores[tempAddress]){
+                // Get the id of the current store
+                var tempStoreId = (new StoreObj(tempAddress, tempStoreName)).getId();
+                storeIds.push(tempStoreId);
+            }
+        }
+
+        var storesWithItem = {};        
+        // Calculate the similarity of all stores that contain the item
+        for (var i = 0; i < storeIds.length; i++) {
+            var id1 = storeIds[i];
+            storesWithItem[id1] = {};
+            for (var j = 0; j < storeIds.length; j++) {
+                var id2 = storeIds[j];
+                storesWithItem[id1][id2] = null;
+            }
+        }
+
+        // Calculate the similarity of all stores that contain the item
+        for (i = 0; i < storeIds.length; i++) {
+            id1 = storeIds[i];
+            for (j = 0; j < storeIds.length; j++) {
+                id2 = storeIds[j];
+
+                var score = null;
+                var check = storesWithItem[id2][id1];
+                if (check !== null) {
+                    score = check;
+                } else {
+                    var temp = calcStoreSimilarity(knownStores, storeIds[i], storeIds[j]);
+                    score = temp;
+                }
+                storesWithItem[id1][id2] = score;
+            }
+        }
+
+        database.ref("/storeSimilarities/").update(storesWithItem);
+
+        // Return the average location
+        return {
+            similarities: storesWithItem
+        }
+    });
+
+    return retItems;
+
 }
 
 /**
@@ -366,9 +425,15 @@ function calcStoreSimilarity(knownStores, storeId1, storeId2){
  */
 function predictItemLoc(database, storeId, itemId) {
     // Load the stores table
-    var temp = loadAllStoreInfo(database);
-    var retItems = temp.then((value) => {
-        var knownStores = value.stores;
+    var retItems = database.ref("storeSimilarities").once("value").then((snapshot) => {
+        return snapshot.val();
+    }).then((data) => {
+        var storeSimilarities = data;
+        var storeInfo = loadAllStoreInfo(database);
+        return Promise.all([storeSimilarities, storeInfo]);
+    }).then((data) => {
+        var storeSimilarities = data[0];
+        var knownStores = data[1].stores;
 
         // Check if the item location of the item in the
         // store is known
@@ -414,7 +479,7 @@ function predictItemLoc(database, storeId, itemId) {
 
             // Calculate the similarity of all stores that contain the item
             for (var i = 0; i < storesWithItem.length; i++) {
-                var temp = calcStoreSimilarity(knownStores, storeId, storesWithItem[i].id);
+                var temp = storeSimilarities[storeId][storesWithItem[i].id];
                 storesWithItem[i].score = temp;
             }
 
@@ -473,7 +538,6 @@ function predictItemLoc(database, storeId, itemId) {
             } else {
                 aisleNum = null;
             }
-
         }
 
         // Return the average location
@@ -488,7 +552,7 @@ function predictItemLoc(database, storeId, itemId) {
     return retItems;
 }
 
-function calcStoreDist(refMap, compMap) {
+function calcMapSimilarity(refMap, compMap) {
     var score = 0;
 
     // Get departments unique to each map
@@ -568,7 +632,7 @@ exports.cloudDetermineClusters = function(database) {
 
             for (var j = 0; j < maps.length; j++) {
                 var name2 = names[j];
-                var score = calcStoreDist(maps[i], maps[j]);
+                var score = calcMapSimilarity(maps[i], maps[j]);
                 compDict[name1][name2] = score;
             }
         }
@@ -738,7 +802,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
                 timesChecked = 1;
             }
 
-            var score = calcStoreDist(refMap, compMap);
+            var score = calcMapSimilarity(refMap, compMap);
 
             // Calculate the new value
             var newVal = 1 - (score / maxScore);
