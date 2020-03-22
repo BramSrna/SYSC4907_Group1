@@ -1,10 +1,18 @@
 const StoreObj = require('./StoreObj');
 
-var dbCache = {
-    storesMaps: {},
-    stores: null,
-    storeSimilarities: null,
-    lists: {}
+var dbCache = resetCache();
+
+function resetCache() {
+    dbCache = {
+        storesMaps: {},
+        stores: null,
+        storeSimilarities: null,
+        lists: {}
+    }
+}
+
+exports.clearCache = function() {
+    resetCache();
 }
 
 exports.loadStoresMaps = async function(database, storeId) {
@@ -31,6 +39,7 @@ exports.loadStoresMaps = async function(database, storeId) {
 
 exports.loadAllStores = async function(database) {
     if (dbCache.stores === null) {
+        console.log("HERE_1");
         // Load the stores table
         var dbStores = await database.ref('/stores').once('value').then((snapshot) => {
             var val = snapshot.val()
@@ -39,6 +48,7 @@ exports.loadAllStores = async function(database) {
         });
         return dbStores;
     } else {
+        console.log("HERE_2");
         return dbCache.stores;
     }
 }

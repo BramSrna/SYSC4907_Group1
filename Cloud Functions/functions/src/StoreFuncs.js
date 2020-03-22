@@ -241,7 +241,6 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
             // Check all known stores to check if they contain the target item
             for (var i = 0; i < locs.length; i++) {
                 var tempLoc = locs[i];
-                console.log(tempLoc);
                 if (tempLoc.department !== null) {
                     // If the store contains the item, then save the location
                     storesWithItem.push({
@@ -278,8 +277,6 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
             // Get the three most similar stores
             storesWithItem = storesWithItem.slice(0, 3);
 
-            console.log(storesWithItem);
-
             depCount = {};
             aisleCount = {};
 
@@ -301,8 +298,6 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
                     aisleCount[num] = 0;
                 }
             }
-
-            console.log(depCount);
 
             // Sort the locations based on their occurance counts
             department = Object.keys(depCount);
@@ -345,6 +340,8 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
  * @returns The map used by the optimizer
  */
 exports.getOptimizerMap = function(data, context, database) {
+    dbLoading.clearCache();
+
     var address = data.address;
     var storeName = data.storeName;
 
@@ -370,6 +367,8 @@ exports.getOptimizerMap = function(data, context, database) {
  * @returns The map with the highest weight
  */
 exports.getMostPopularMap = function(data, context, database) {
+    dbLoading.clearCache();
+
     var address = data.address;
     var storeName = data.storeName;
 
