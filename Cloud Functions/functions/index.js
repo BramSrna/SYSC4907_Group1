@@ -1,5 +1,7 @@
 'use strict';
-const reorgFuncs = require('./src/ReorgFuncs');
+const reorgFuncs = require('./src/Reorg');
+const clusterFuncs = require('./src/MapClustering');
+const storeFuncs = require('./src/StoreFuncs');
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
@@ -27,6 +29,42 @@ exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((c
     })
 });
 
+exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/items').onWrite((change, context) => {
+    var path = "/globals/storeItemVals";
+    var retVal = database.ref(path).once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var prevUpdate;
+        var currCount;
+
+        if (ssv !== null) {
+            prevUpdate = ssv.prevClusterUpdate;
+            currCount = ssv.currCount;
+        } else {
+            prevUpdate = 0;
+            currCount = 0;
+        }
+
+        currCount += 1;
+
+        var update = false;
+        if (currCount > prevUpdate * (1 + 0.1)) {
+            clusterFuncs.cloudCalculateStoreSimilarities(database);
+            prevUpdate = currCount;
+            update = true;
+        }
+
+        database.ref(path).update({
+            currCount: currCount,
+            prevClusterUpdate: prevUpdate
+        });
+
+        return update;
+    });
+
+    return retVal;
+});
+
 exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
     var path = "/globals/storeMapVals";
     var retVal = database.ref(path).once("value").then((snapshot) => {
@@ -47,7 +85,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
 
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
-            reorgFuncs.cloudDetermineClusters(database);
+            clusterFuncs.cloudDetermineClusters(database);
             prevUpdate = currCount;
             update = true;
         }
@@ -170,7 +208,7 @@ exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
  * @returns The map used by the optimizer
  */
 exports.getOptimizedMap = functions.https.onCall((data, context) => {
-    return reorgFuncs.getOptimizerMap(data, context, database);
+    return storeFuncs.getOptimizerMap(data, context, database);
 });
 
 /**
@@ -186,7 +224,7 @@ exports.getOptimizedMap = functions.https.onCall((data, context) => {
  * @returns The map with the highest weight
  */
 exports.getMostPopularMap = functions.https.onCall((data, context) => {
-    return reorgFuncs.getMostPopularMap(data, context, database);
+    return storeFuncs.getMostPopularMap(data, context, database);
 });
 
 /**
@@ -205,7 +243,7 @@ exports.getMostPopularMap = functions.https.onCall((data, context) => {
  * @returns None 
  */
 exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
-    return reorgFuncs.cloudModStoreWeights(data, context, database);
+    return clusterFuncs.cloudModStoreWeights(data, context, database);
 });
 
 /**
