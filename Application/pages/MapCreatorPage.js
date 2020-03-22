@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Alert, StyleSheet, Platform, Picker } from "react-native";
-import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction } from 'react-native-ui-kitten';
+import { Layout, Button, Select, ButtonGroup, Input, TopNavigation, TopNavigationAction, Spinner } from 'react-native-ui-kitten';
 import { MenuOutline, ArrowBackIcon } from "../assets/icons/icons.js";
 import { departments } from "../DepartmentList";
 import { FlatList } from "react-native-gesture-handler";
@@ -54,7 +54,9 @@ class MapCreatorPage extends Component {
             modifyMode: false,
             previousPage: null,
             listName: null,
-            listId: null
+            listId: null,
+
+            asyncWait: false
 
         };
     }
@@ -298,6 +300,10 @@ class MapCreatorPage extends Component {
             default:
                 break;
         }
+
+        this.setState({
+            template: template
+        });
     }
 
     /**
@@ -331,6 +337,9 @@ class MapCreatorPage extends Component {
      * @returns None
      */
     loadMostPopularMap() {
+        this.setState({
+            asyncWait: true
+        });
         var map = lf.loadMostPopularList(this.state.storeName, this.state.address);
         map.then((value) => {
             if ((value === null) || (value.length === 0)) {
@@ -342,6 +351,9 @@ class MapCreatorPage extends Component {
                     this.addDepWithValue(value[i]);
                 }
             }
+            this.setState({
+                asyncWait: false
+            });
         });
     }
 
@@ -357,6 +369,9 @@ class MapCreatorPage extends Component {
      * @returns None
      */
     getOptimizerMap() {
+        this.setState({
+            asyncWait: true
+        });
         var map = lf.loadOptimizerMap(this.state.storeName, this.state.address);
         map.then((value) => {
             if ((value === null) || (value.length === 0)) {
@@ -368,6 +383,9 @@ class MapCreatorPage extends Component {
                     this.addDepWithValue(value[i]);
                 }
             }
+            this.setState({
+                asyncWait: false
+            });
         });
     }
 
@@ -576,78 +594,85 @@ class MapCreatorPage extends Component {
                     alignment="center"
                     leftControl={this.state.previousPage == "CurrentListPage" ? this.renderBackAction() : this.renderMenuAction()}
                 />
-                <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-                    <Layout style={styles.formOuterContainer} level='3'>
-                        <Layout style={styles.formInnerContainer}>
-                            <Input style={styles.inputRow}
-                                label='Store Name'
-                                ref="storename"
-                                placeholder='Enter store name...'
-                                returnKeyType='next'
-                                value={this.state.storeName}
-                                onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
-                                onSubmitEditing={() => this.refs.address.focus()}
-                                blurOnSubmit={false}
-                            />
+                {!this.state.asyncWait &&
+                    <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+                        <Layout style={styles.formOuterContainer} level='3'>
+                            <Layout style={styles.formInnerContainer}>
+                                <Input style={styles.inputRow}
+                                    label='Store Name'
+                                    ref="storename"
+                                    placeholder='Enter store name...'
+                                    returnKeyType='next'
+                                    value={this.state.storeName}
+                                    onChangeText={(storeName) => this._mounted && this.setState({ storeName })}
+                                    onSubmitEditing={() => this.refs.address.focus()}
+                                    blurOnSubmit={false}
+                                />
 
-                            <Input style={styles.inputRow}
-                                label='Store Address'
-                                ref="address"
-                                placeholder='Enter store address...'
-                                value={this.state.address}
-                                onChangeText={(address) => this._mounted && this.setState({ address })}
-                            />
+                                <Input style={styles.inputRow}
+                                    label='Store Address'
+                                    ref="address"
+                                    placeholder='Enter store address...'
+                                    value={this.state.address}
+                                    onChangeText={(address) => this._mounted && this.setState({ address })}
+                                />
 
-                            <Input style={styles.inputRow}
-                                label='Franchise Name'
-                                ref="fName"
-                                placeholder='Enter franchise name...'
-                                value={this.state.franchiseName}
-                                onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
-                            />
-                        </Layout>
-                    </Layout>
-
-                    <Layout style={styles.formOuterContainer} level='3'>
-                        <Select style={styles.selectBox}
-                            label='Templates'
-                            data={templates}
-                            placeholder='Use a map template'
-                            selectedOption={this.state.template}
-                            onSelect={(template) => this.handleTemplateChange({ template })}
-                        />
-                    </Layout>
-
-                    <Layout style={styles.formOuterContainer} level='3'>
-                        <Layout style={styles.formInnerContainer}>
-                            <FlatList
-                                style={styles.flatList}
-                                width="100%"
-                                data={this.state.arrayHolder}
-                                renderItem={({ item, index }) => this.renderListElem(index)}
-                                keyExtractor={(item, index) => index.toString()}
-                                extraData={this.state.arrayHolder}
-                            />
-                            <Layout style={styles.mainButtonGroup} >
-                                <Button
-                                    style={styles.mainPageButton}
-                                    status='primary'
-                                    onPress={this.addDepartment}
-                                >
-                                    {'Add Department'}
-                                </Button>
-
-                                <Button
-                                    style={styles.mainPageButton}
-                                    status='success'
-                                    onPress={this.handleSaveMap}
-                                >
-                                    {this.state.modifyMode ? 'Save Map And Go Back' : 'Save Map'}
-                                </Button>
+                                <Input style={styles.inputRow}
+                                    label='Franchise Name'
+                                    ref="fName"
+                                    placeholder='Enter franchise name...'
+                                    value={this.state.franchiseName}
+                                    onChangeText={(franchiseName) => this._mounted && this.setState({ franchiseName })}
+                                />
                             </Layout>
                         </Layout>
+
+                        <Layout style={styles.formOuterContainer} level='3'>
+                            <Select style={styles.selectBox}
+                                label='Templates'
+                                data={templates}
+                                placeholder='Use a map template'
+                                selectedOption={this.state.template}
+                                onSelect={(template) => this.handleTemplateChange({ template })}
+                            />
+                        </Layout>
+
+                        <Layout style={styles.formOuterContainer} level='3'>
+                            <Layout style={styles.formInnerContainer}>
+                                <FlatList
+                                    style={styles.flatList}
+                                    width="100%"
+                                    data={this.state.arrayHolder}
+                                    renderItem={({ item, index }) => this.renderListElem(index)}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    extraData={this.state.arrayHolder}
+                                />
+                                <Layout style={styles.mainButtonGroup} >
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='primary'
+                                        onPress={this.addDepartment}
+                                    >
+                                        {'Add Department'}
+                                    </Button>
+
+                                    <Button
+                                        style={styles.mainPageButton}
+                                        status='success'
+                                        onPress={this.handleSaveMap}
+                                    >
+                                        {this.state.modifyMode ? 'Save Map And Go Back' : 'Save Map'}
+                                    </Button>
+                                </Layout>
+                            </Layout>
+                        </Layout>
+                    </ScrollView>
+                }
+                {this.state.asyncWait &&
+                    <Layout style={styles.loading}>
+                        <Spinner />
                     </Layout>
-                </ScrollView>
+                }
                 <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment>
         );

@@ -95,6 +95,10 @@ export default StyleSheet.create({
         marginHorizontal: 4,
         borderRadius: 10,
         borderWidth: 1,
-
     },
+    loading: {
+       flex: 1,
+       justifyContent: 'center',
+       alignItems: 'center',
+    }
 });

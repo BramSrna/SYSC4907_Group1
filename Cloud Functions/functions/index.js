@@ -1,5 +1,7 @@
 'use strict';
-const reorgFuncs = require('./src/ReorgFuncs');
+const reorgFuncs = require('./src/Reorg');
+const clusterFuncs = require('./src/MapClustering');
+const storeFuncs = require('./src/StoreFuncs');
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
@@ -47,7 +49,7 @@ exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/
 
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
-            reorgFuncs.cloudCalculateStoreSimilarities(database);
+            clusterFuncs.cloudCalculateStoreSimilarities(database);
             prevUpdate = currCount;
             update = true;
         }
@@ -83,7 +85,7 @@ exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps'
 
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
-            reorgFuncs.cloudDetermineClusters(database);
+            clusterFuncs.cloudDetermineClusters(database);
             prevUpdate = currCount;
             update = true;
         }
@@ -206,7 +208,7 @@ exports.cloudReorgListFastest = functions.https.onCall((data, context) => {
  * @returns The map used by the optimizer
  */
 exports.getOptimizedMap = functions.https.onCall((data, context) => {
-    return reorgFuncs.getOptimizerMap(data, context, database);
+    return storeFuncs.getOptimizerMap(data, context, database);
 });
 
 /**
@@ -222,7 +224,7 @@ exports.getOptimizedMap = functions.https.onCall((data, context) => {
  * @returns The map with the highest weight
  */
 exports.getMostPopularMap = functions.https.onCall((data, context) => {
-    return reorgFuncs.getMostPopularMap(data, context, database);
+    return storeFuncs.getMostPopularMap(data, context, database);
 });
 
 /**
@@ -241,7 +243,7 @@ exports.getMostPopularMap = functions.https.onCall((data, context) => {
  * @returns None 
  */
 exports.cloudModStoreWeights = functions.https.onCall((data, context) => {
-    return reorgFuncs.cloudModStoreWeights(data, context, database);
+    return clusterFuncs.cloudModStoreWeights(data, context, database);
 });
 
 /**
