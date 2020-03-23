@@ -155,7 +155,7 @@ exports.cloudReorgListLoc = function(data, context, database) {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListFastest = function(data, context, database) {
-    dbLoading.clearCache();
+    // dbLoading.clearCache();
     // Parse the data object
     var storeId = data.storeId;
     var listId = data.listId;

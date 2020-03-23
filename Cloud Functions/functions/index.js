@@ -2,6 +2,8 @@
 const reorgFuncs = require('./src/Reorg');
 const clusterFuncs = require('./src/MapClustering');
 const storeFuncs = require('./src/StoreFuncs');
+const dbLoading = require('./src/DBLoading');
+const storeObj = require('./src/StoreObj');
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
@@ -29,6 +31,57 @@ exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((c
     })
 });
 
+exports.storesObserver = functions.database.ref('/stores').onWrite((change, context) => {
+    dbLoading.clearStoresCache();
+});
+
+exports.storeSimilaritiesObserver = functions.database.ref('/storeSimilarities').onWrite((change, context) => {
+    dbLoading.clearStoreSimilaritiesCache();
+});
+
+exports.listsObserver = functions.database.ref('/lists/{listId}').onWrite((change, context) => {
+    dbLoading.clearListsCache(context.params.listId);
+});
+
+exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
+    var store = new storeObj.StoreObj(context.params.addr, context.params.name);
+    dbLoading.clearListsCache(store.getId());
+
+    var path = "/globals/storeMapVals";
+    var retVal = database.ref(path).once("value").then((snapshot) => {
+        var ssv = snapshot.val();
+
+        var prevUpdate;
+        var currCount;
+
+        if (ssv !== null) {
+            prevUpdate = ssv.prevClusterUpdate;
+            currCount = ssv.currCount;
+        } else {
+            prevUpdate = 0;
+            currCount = 0;
+        }
+
+        currCount += 1;
+
+        var update = false;
+        if (currCount > prevUpdate * (1 + 0.1)) {
+            clusterFuncs.cloudDetermineClusters(database);
+            prevUpdate = currCount;
+            update = true;
+        }
+
+        database.ref(path).update({
+            currCount: currCount,
+            prevClusterUpdate: prevUpdate
+        });
+
+        return update;
+    });
+
+    return retVal;
+});
+
 exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/items').onWrite((change, context) => {
     var path = "/globals/storeItemVals";
     var retVal = database.ref(path).once("value").then((snapshot) => {
@@ -50,42 +103,6 @@ exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
             clusterFuncs.cloudCalculateStoreSimilarities(database);
-            prevUpdate = currCount;
-            update = true;
-        }
-
-        database.ref(path).update({
-            currCount: currCount,
-            prevClusterUpdate: prevUpdate
-        });
-
-        return update;
-    });
-
-    return retVal;
-});
-
-exports.updateClusterCount = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
-    var path = "/globals/storeMapVals";
-    var retVal = database.ref(path).once("value").then((snapshot) => {
-        var ssv = snapshot.val();
-
-        var prevUpdate;
-        var currCount;
-
-        if (ssv !== null) {
-            prevUpdate = ssv.prevClusterUpdate;
-            currCount = ssv.currCount;
-        } else {
-            prevUpdate = 0;
-            currCount = 0;
-        }
-
-        currCount += 1;
-
-        var update = false;
-        if (currCount > prevUpdate * (1 + 0.1)) {
-            clusterFuncs.cloudDetermineClusters(database);
             prevUpdate = currCount;
             update = true;
         }

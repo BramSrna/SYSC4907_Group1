@@ -13,8 +13,33 @@ function resetCache() {
     return clearCache;
 }
 
-exports.clearCache = function() {
-    dbCache = resetCache();
+// exports.clearCache = function() {
+//     dbCache = resetCache();
+// }
+
+exports.clearStoresMapsCache = function(storeId) {
+    // Get the store's info from the id
+    var info = StoreObj.StoreObj.getInfoFromId(storeId);
+    var address = info.address;
+    var storeName = info.storeName;
+
+    // Get the path to the store
+    var storePath = (new StoreObj.StoreObj(address, storeName)).getPath();
+    
+    delete dbCache.storesMaps[storePath];
+
+}
+
+exports.clearStoresCache = function() {
+    dbCache.stores = null;
+}
+
+exports.clearStoreSimilaritiesCache = function() {
+    dbCache.storeSimilarities = null;
+}
+
+exports.clearListsCache = function(listId) {
+    delete dbCache.lists[listId];
 }
 
 exports.loadStoresMaps = async function(database, storeId) {
@@ -60,7 +85,7 @@ exports.loadAllStores = function(database) {
 exports.loadStoreSimilarities = function(database) {
     if (dbCache.storeSimilarities === null) {
         // Load the stores table
-        var dbStoreSimilarities = database.ref("storeSimilarities").once("value").then((snapshot) => {
+        var dbStoreSimilarities = database.ref("/storeSimilarities").once("value").then((snapshot) => {
             var val = snapshot.val();
             dbCache.storeSimilarities = val;
             return val;
