@@ -107,7 +107,6 @@ function sortList(database, listId, storeId, cluster, sortFunction) {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListLoc = function(data, context, database) {
-    //dbLoading.clearCache();
     // Parse the data object
     var listId = data.listId;
     var storeId = data.storeId;
@@ -155,7 +154,6 @@ exports.cloudReorgListLoc = function(data, context, database) {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListFastest = function(data, context, database) {
-    // dbLoading.clearCache();
     // Parse the data object
     var storeId = data.storeId;
     var listId = data.listId;

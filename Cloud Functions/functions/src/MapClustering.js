@@ -143,8 +143,6 @@ function calcMapSimilarity(refMap, compMap) {
 }
 
 exports.cloudDetermineClusters = function(database) {
-    // dbLoading.clearCache();
-
     var retVal = dbLoading.loadAllStores(database).then((ssv) => {        
         var maps = [];
         var names = [];
@@ -296,8 +294,6 @@ exports.cloudDetermineClusters = function(database) {
 }
 
 exports.cloudCalculateStoreSimilarities = function(database) {
-    // dbLoading.clearCache();
-
     // Load the stores table
     var retVal = dbLoading.loadAllStores(database).then((knownStores) => {
         var storeIds = [];
@@ -380,8 +376,6 @@ exports.cloudCalculateStoreSimilarities = function(database) {
  * @returns None 
  */
 exports.cloudModStoreWeights = function(data, context, database) {
-    // dbLoading.clearCache();
-
     var address = data.address;
     var storeName = data.storeName;
     var refMap = data.map;

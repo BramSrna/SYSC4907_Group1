@@ -340,8 +340,6 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
  * @returns The map used by the optimizer
  */
 exports.getOptimizerMap = function(data, context, database) {
-    // dbLoading.clearCache();
-
     var address = data.address;
     var storeName = data.storeName;
 
@@ -367,8 +365,6 @@ exports.getOptimizerMap = function(data, context, database) {
  * @returns The map with the highest weight
  */
 exports.getMostPopularMap = function(data, context, database) {
-    // dbLoading.clearCache();
-
     var address = data.address;
     var storeName = data.storeName;
 
