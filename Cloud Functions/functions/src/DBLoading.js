@@ -3,16 +3,18 @@ const StoreObj = require('./StoreObj');
 var dbCache = resetCache();
 
 function resetCache() {
-    dbCache = {
+    var clearCache = {
         storesMaps: {},
         stores: null,
         storeSimilarities: null,
         lists: {}
     }
+
+    return clearCache;
 }
 
 exports.clearCache = function() {
-    resetCache();
+    dbCache = resetCache();
 }
 
 exports.loadStoresMaps = async function(database, storeId) {
@@ -26,56 +28,60 @@ exports.loadStoresMaps = async function(database, storeId) {
 
     if (!(storePath in dbCache.storesMaps)) {
         // Get the current state of the store's maps
-        var dbMap = await database.ref(storePath + "maps").once("value").then((snapshot) => {
-            var val = snapshot.val();            
+        var dbMap = database.ref(storePath + "maps").once("value").then((snapshot) => {
+            var val = snapshot.val();
             dbCache.storesMaps[storePath] = val;
             return val;
         });
+        dbCache.storesMaps[storePath] = dbMap;
         return dbMap;
     } else {
-        return dbCache.storesMaps[storePath];
+        return Promise.resolve(dbCache.storesMaps[storePath]);
     }
 }
 
-exports.loadAllStores = async function(database) {
+exports.loadAllStores = function(database) {
     if (dbCache.stores === null) {
         console.log("HERE_1");
         // Load the stores table
-        var dbStores = await database.ref('/stores').once('value').then((snapshot) => {
+        var dbStores = database.ref('/stores').once('value').then((snapshot) => {
             var val = snapshot.val()
             dbCache.stores = val;
             return val;
         });
+        dbCache.stores = dbStores;
         return dbStores;
     } else {
         console.log("HERE_2");
-        return dbCache.stores;
+        return Promise.resolve(dbCache.stores);
     }
 }
 
-exports.loadStoreSimilarities = async function(database) {
+exports.loadStoreSimilarities = function(database) {
     if (dbCache.storeSimilarities === null) {
         // Load the stores table
-        var dbStoreSimilarities = await database.ref("storeSimilarities").once("value").then((snapshot) => {
+        var dbStoreSimilarities = database.ref("storeSimilarities").once("value").then((snapshot) => {
             var val = snapshot.val();
             dbCache.storeSimilarities = val;
             return val;
         });
+        dbCache.storeSimilarities = dbStoreSimilarities;
         return dbStoreSimilarities;
     } else {
-        return dbCache.storeSimilarities;
+        return Promise.resolve(dbCache.storeSimilarities);
     }
 }
 
-exports.loadList = async function(database, listId) {
+exports.loadList = function(database, listId) {
     if (!(listId in dbCache.lists)) {
-        var dbList = await database.ref('/lists/' + listId).once('value').then((snapshot) => {
+        var dbList = database.ref('/lists/' + listId).once('value').then((snapshot) => {
             var val = snapshot.val();
             dbCache.lists[listId] = val;
             return val;
         });
+        dbCache.lists[listId] = dbList;
         return dbList;
     } else {
-        return dbCache.lists[listId];
+        return Promise.resolve(dbCache.lists[listId]);
     }
 }
