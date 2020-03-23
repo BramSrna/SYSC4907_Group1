@@ -13,9 +13,9 @@ function resetCache() {
     return clearCache;
 }
 
-// exports.clearCache = function() {
-//     dbCache = resetCache();
-// }
+exports.clearCache = function() {
+    dbCache = resetCache();
+}
 
 exports.clearStoresMapsCache = function(storeId) {
     // Get the store's info from the id
