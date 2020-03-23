@@ -1,14 +1,6 @@
 const storeFuncs = require('./StoreFuncs');
 const dbLoading = require('./DBLoading');
 
-function quickTest(database) {
-    return dbLoading.loadAllStores(database).then((data) => {
-        return dbLoading.loadAllStores(database);
-    }).then((data) => {
-        return dbLoading.loadAllStores(database);
-    });
-}
-
 function sortList(database, listId, storeId, cluster, sortFunction) {
     var retVal = Promise.all([dbLoading.loadStoreSimilarities(database), dbLoading.loadList(database, listId)]).then((data) => {
         var storeSimilarities = data[0];
@@ -115,7 +107,6 @@ function sortList(database, listId, storeId, cluster, sortFunction) {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListLoc = function(data, context, database) {
-    dbLoading.clearCache();
     // Parse the data object
     var listId = data.listId;
     var storeId = data.storeId;
@@ -163,8 +154,6 @@ exports.cloudReorgListLoc = function(data, context, database) {
  * @returns The new order of the items and ids
  */
 exports.cloudReorgListFastest = function(data, context, database) {
-    dbLoading.clearCache();
-    quickTest(database);
     // Parse the data object
     var storeId = data.storeId;
     var listId = data.listId;
