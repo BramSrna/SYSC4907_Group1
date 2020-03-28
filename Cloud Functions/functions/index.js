@@ -102,7 +102,7 @@ exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/
 
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
-            clusterFuncs.cloudCalculateStoreSimilarities(database);
+            clusterFuncs.cloudUpdateStoreSimilarities(database, context.params.addr, context.params.name);
             prevUpdate = currCount;
             update = true;
         }

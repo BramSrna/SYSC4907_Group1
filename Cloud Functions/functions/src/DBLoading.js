@@ -67,7 +67,6 @@ exports.loadStoresMaps = async function(database, storeId) {
 
 exports.loadAllStores = function(database) {
     if (dbCache.stores === null) {
-        console.log("HERE_1");
         // Load the stores table
         var dbStores = database.ref('/stores').once('value').then((snapshot) => {
             var val = snapshot.val()
@@ -77,7 +76,6 @@ exports.loadAllStores = function(database) {
         dbCache.stores = dbStores;
         return dbStores;
     } else {
-        console.log("HERE_2");
         return Promise.resolve(dbCache.stores);
     }
 }
