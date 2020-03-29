@@ -33,14 +33,20 @@ exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((c
 
 exports.storesObserver = functions.database.ref('/stores').onWrite((change, context) => {
     dbLoading.clearStoresCache();
+
+    return true;
 });
 
 exports.storeSimilaritiesObserver = functions.database.ref('/storeSimilarities').onWrite((change, context) => {
     dbLoading.clearStoreSimilaritiesCache();
+
+    return true;
 });
 
 exports.listsObserver = functions.database.ref('/lists/{listId}').onWrite((change, context) => {
     dbLoading.clearListsCache(context.params.listId);
+
+    return true;
 });
 
 exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {

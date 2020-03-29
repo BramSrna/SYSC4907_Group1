@@ -15,7 +15,7 @@ const StoreObj = require('./StoreObj');
  * @returns The similarity with 1 being the highest and 0 being the lowest
  */
 function calcStoreSimilarity(database, storeId1, storeId2){
-    if (storeId1 === store2) {
+    if (storeId1 === storeId2) {
         return Promise.resolve(1);
     } else {
         var retVal = Promise.all([storeFuncs.getStoreFromId(database, storeId1), storeFuncs.getStoreFromId(database, storeId2)]).then((data) => {
@@ -137,7 +137,9 @@ function calcMapSimilarity(refMap, compMap) {
         score += (vals[0] - vals[1]) ** 2;
     }
 
-    score /= refMapRem.length;
+    if (refMapRem.length > 0) {
+        score /= refMapRem.length;
+    }
     
     //score += refMapUnique.length;
     //score += compMapUnique.length;
@@ -394,23 +396,17 @@ exports.cloudUpdateStoreSimilarities = function(database, address, storeName) {
         var similarityDict = data[2];
         var idToUpdate = data[3];
 
-        console.log(storeIds);
-
         var listInd = 0;
         for (var idInd = 0; idInd < storeIds.length; idInd++) {
             var refId = storeIds[idInd];
 
             var score = similarityList[listInd];
 
-            console.log(score);
-
             similarityDict[refId][idToUpdate] = score;
             similarityDict[idToUpdate][refId] = score;
 
             listInd += 1;
         }
-
-        console.log(similarityDict);
 
         database.ref("/storeSimilarities/").update(similarityDict);
 
@@ -466,7 +462,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
             var compMap = tempMapObj.map;
             var timesChecked = tempMapObj.timesChecked;
 
-            if (timesChecked === undefined) {
+            if ((timesChecked === undefined) || (timesChecked === null)) {
                 timesChecked = 1;
             }
 
@@ -481,6 +477,8 @@ exports.cloudModStoreWeights = function(data, context, database) {
             // Calculte the new weight
             timesChecked += 1;
             var newWeight = (weight * (timesChecked - 1) + newVal) / timesChecked;
+
+            console.log(timesChecked, weight, newVal);
 
             // Save the new data
             database.ref(storePath + "maps/" + tempMapId).update({
