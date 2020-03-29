@@ -43,7 +43,7 @@ exports.storeSimilaritiesObserver = functions.database.ref('/storeSimilarities')
     return true;
 });
 
-exports.listsObserver = functions.database.ref('/lists/{listId}').onWrite((change, context) => {
+exports.listsObserver = functions.database.ref('/lists/{listId}/items').onWrite((change, context) => {
     dbLoading.clearListsCache(context.params.listId);
 
     return true;
@@ -51,7 +51,7 @@ exports.listsObserver = functions.database.ref('/lists/{listId}').onWrite((chang
 
 exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
     var store = new storeObj.StoreObj(context.params.addr, context.params.name);
-    dbLoading.clearListsCache(store.getId());
+    dbLoading.clearStoresMapsCache(store.getId());
 
     var path = "/globals/storeMapVals";
     var retVal = database.ref(path).once("value").then((snapshot) => {

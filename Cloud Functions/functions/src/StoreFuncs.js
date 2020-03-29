@@ -259,20 +259,7 @@ exports.predictItemLoc = function(database, storeSimilarities, storeId, itemId) 
             }
 
             // Sort the stores with the item based on their score
-            storesWithItem.sort((a, b) => {
-                var valueA, valueB;
-
-                valueA = a.score;
-                valueB = b.score;
-
-                if (valueA < valueB) {
-                    return -1;
-                } else if (valueA > valueB) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            })
+            storesWithItem.sort((a, b) => b.score - a.score);
 
             // Get the three most similar stores
             storesWithItem = storesWithItem.slice(0, 3);
