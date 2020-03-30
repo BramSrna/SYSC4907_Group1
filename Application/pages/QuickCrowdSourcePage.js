@@ -11,12 +11,13 @@ import {
     TopNavigation,
     TopNavigationAction,
     Text,
+    ButtonGroup
 } from 'react-native-ui-kitten';
 import { dark, light } from '../assets/Themes.js';
 import NotificationPopup from 'react-native-push-notification-popup';
 import nm from '../pages/Functions/NotificationManager.js';
 import { departments } from "../DepartmentList";
-import { ArrowBackIcon } from "../assets/icons/icons.js";
+import { ArrowBackIcon, MoveUpIcon, MoveDownIcon } from "../assets/icons/icons.js";
 import styles from "../pages/pageStyles/QuickCrowdSourcePageStyle";
 import * as dbi from "./Functions/DBInterface";
 
@@ -131,7 +132,9 @@ class QuickCrowdSourcePage extends Component {
     }
 
     handleSaveLocations = () => {
+        var deps = [];
         var locs = this.currLocs;
+
         for (var i = 0; i < locs.length; i++) {
             var currItem = locs[i];
 
@@ -141,13 +144,21 @@ class QuickCrowdSourcePage extends Component {
             var department = currItem.loc;
             var aisleNum = null;
 
+            deps.push(department);
+
             // Add the value to the database
             dbi.addItemLoc(genName,
-                storeName,
-                storeAddr,
-                aisleNum,
-                department);
+                           storeName,
+                           storeAddr,
+                           aisleNum,
+                           department);
         }
+
+        deps = Array.from(new Set(deps));
+
+        dbi.modStoreWeights(this.state.storeName,
+                            this.state.storeAddr,
+                            deps);
 
         previousPage = this.state.previousPage;
         if (previousPage !== null) {
@@ -155,6 +166,40 @@ class QuickCrowdSourcePage extends Component {
                 listName: this.state.listName,
                 listID: this.state.listId
             });
+        }
+    }
+
+    upButtonPressed = (ind) => {
+        // Check if the index is at the top of the list
+        if (ind != 0) {
+            // Swap the element at the index with the one above it
+            var aboveItem = this.currLocs[ind - 1];
+            this.currLocs[ind - 1] = this.currLocs[ind];
+            this.currLocs[ind] = aboveItem;
+
+            // Update the state
+            if (this._isMounted) {
+                this.setState({
+                    arrayHolder: [...this.currLocs]
+                });
+            }
+        }
+    }
+
+    downButtonPressed = (ind) => {
+        // Check if the index is at the bottom of the list
+        if (ind != this.currLocs.length - 1) {
+            // Swap the element at the index with the below it
+            var belowItem = this.currLocs[ind + 1];
+            this.currLocs[ind + 1] = this.currLocs[ind];
+            this.currLocs[ind] = belowItem;
+
+            // Update the state
+            if (this._isMounted) {
+                this.setState({
+                    arrayHolder: [...this.currLocs]
+                });
+            }
         }
     }
 
@@ -221,6 +266,11 @@ class QuickCrowdSourcePage extends Component {
         return (
             <Layout style={styles.listItem} level='2'>
                 <Layout style={styles.listTextContainer} level='1'>
+                    <ButtonGroup appearance='outline' status='primary'>
+                        <Button icon={MoveUpIcon} onPress={() => this.upButtonPressed(index)} />
+                        <Button icon={MoveDownIcon} onPress={() => this.downButtonPressed(index)} />
+                    </ButtonGroup>
+
                     <Layout style={styles.itemTextContainer} level='1'>
                         <Text style={styles.itemText}>
                             {item.itemName}

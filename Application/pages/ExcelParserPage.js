@@ -73,16 +73,15 @@ class ExcelParserPage extends Component {
             var sizeUnit = tempItem["sizeUnit"];
             var specName = tempItem["specificName"];
 
-            /**
-            // Register the item
-            dbi.registerItem(genName,
-                             specName,
-                             size,
-                             sizeUnit,
-                             price);
+            // console.log(genName, price, size, sizeUnit, specName);
 
-            await sleep(50);
-            */
+            // // Register the items
+            // dbi.registerItem(genName,
+            //                  size,
+            //                  sizeUnit,
+            //                  price);
+
+            // await sleep(50);
         }
 
         for (var i = 0; i < stores.length; i++) {
@@ -94,15 +93,15 @@ class ExcelParserPage extends Component {
             var aisleTags = tempStore["aisleTags"];
             var address = tempStore["address"];
 
-            /**
-            // Register the store
-            dbi.registerStore(storeName,
-                              address,
-                              map,
-                              fName);
+            // console.log(storeName, address, fName);
 
-            await sleep(50);
-            */
+            // // Register the stores
+            // dbi.registerStore(storeName,
+            //                   address,
+            //                   map,
+            //                   fName);
+
+            // await sleep(50);
         }
 
         for (var i = 0; i < locs.length; i++) {
@@ -115,16 +114,16 @@ class ExcelParserPage extends Component {
             var specName = tempLoc["specificName"];
             var storeName = tempLoc["storeName"];
 
-            /**
-            dbi.addItemLoc(genName,
-                           specName,
-                           storeName,
-                           address,
-                           aisleNum,
-                           department);
+            // console.log(genName, specName, storeName, address, aisleNum, department);
 
-            await sleep(50);
-            */
+            // // Register the item locations
+            // dbi.addItemLoc(genName,
+            //                storeName,
+            //                address,
+            //                aisleNum,
+            //                department);
+
+            // await sleep(50);
     
         }
     }
@@ -141,7 +140,7 @@ class ExcelParserPage extends Component {
                     <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
                         <Layout style={styles.formOuterContainer} level='3'>
                             <Layout style={styles.formInnerContainer}>
-                                {/**<Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>**/}
+                                <Button style={styles.button} onPress={this.parseFile} >Parse Excel File</Button>
                                 <Button style={styles.button} onPress={this.testRecommend} >Test Recommend</Button>
                                 <Button style={styles.button} onPress={this.testClusters} >Test Clusters</Button>
                             </Layout>

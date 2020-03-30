@@ -15,81 +15,85 @@ const StoreObj = require('./StoreObj');
  * @returns The similarity with 1 being the highest and 0 being the lowest
  */
 function calcStoreSimilarity(database, storeId1, storeId2){
-    var retVal = Promise.all([storeFuncs.getStoreFromId(database, storeId1), storeFuncs.getStoreFromId(database, storeId2)]).then((data) => {
-        var store1 = data[0];
-        var store2 = data[1];
+    if (storeId1 === storeId2) {
+        return Promise.resolve(1);
+    } else {
+        var retVal = Promise.all([storeFuncs.getStoreFromId(database, storeId1), storeFuncs.getStoreFromId(database, storeId2)]).then((data) => {
+            var store1 = data[0];
+            var store2 = data[1];
 
-        // Get the two stores' items
-        var items1 = [];
-        if (store1 !== null) {
-            items1 = store1.items;
-        }
+            // Get the two stores' items
+            var items1 = [];
+            if (store1 !== null) {
+                items1 = store1.items;
+            }
 
-        var items2 = [];
-        if (store2 !== null) {
-            items2 = store2.items;
-        }
+            var items2 = [];
+            if (store2 !== null) {
+                items2 = store2.items;
+            }
 
-        var itemIntersect = [];
-        var maxNumItems = 0;
+            var itemIntersect = [];
+            var maxNumItems = 0;
 
-        // Get the items common between both sets of items
-        for (var itemId in items1){
-            maxNumItems += 1;
+            // Get the items common between both sets of items
+            for (var itemId in items1){
+                maxNumItems += 1;
 
-            for (var itemId2 in items2){
-                if (itemId === itemId2) {
-                    itemIntersect.push(itemId);
+                for (var itemId2 in items2){
+                    if (itemId === itemId2) {
+                        itemIntersect.push(itemId);
+                    }
                 }
             }
-        }
 
-        var locs1 = [];
-        var locs2 = [];
+            var locs1 = [];
+            var locs2 = [];
 
-        // Calculate the similarity between the two items' locations
-        for (var i = 0; i < itemIntersect.length; i++) {
-            itemId = itemIntersect[i];
+            // Calculate the similarity between the two items' locations
+            for (var i = 0; i < itemIntersect.length; i++) {
+                itemId = itemIntersect[i];
 
-            // Get the location of both items in their respective stores
-            locs1.push(storeFuncs.getItemLocInStore(database, storeId1, itemId));
-            locs2.push(storeFuncs.getItemLocInStore(database, storeId2, itemId));
-        }
+                // Get the location of both items in their respective stores
+                locs1.push(storeFuncs.getItemLocInStore(database, storeId1, itemId));
+                locs2.push(storeFuncs.getItemLocInStore(database, storeId2, itemId));
+            }
 
-        return Promise.all([locs1, locs2, itemIntersect, maxNumItems]);
-    }).then((data) => {
-        var locs1 = data[0];
-        var locs2 = data[1];
-        var itemIntersect = data[2];
-        var maxNumItems = data[3];
+            return Promise.all([locs1, locs2, itemIntersect, maxNumItems]);
+        }).then((data) => {
+            var locs1 = data[0];
+            var locs2 = data[1];
+            var itemIntersect = data[2];
+            var maxNumItems = data[3];
 
-        var similarity = 0;
+            var similarity = 0;
 
-        // Calculate the similarity between the two items' locations
-        for (var i = 0; i < itemIntersect.length; i++) {
-            itemId = itemIntersect[i];
+            // Calculate the similarity between the two items' locations
+            for (var i = 0; i < itemIntersect.length; i++) {
+                itemId = itemIntersect[i];
 
-            // Get the location of both items in their respective stores
-            var loc1 = locs1[i];
-            var loc2 = locs2[i];
+                // Get the location of both items in their respective stores
+                var loc1 = locs1[i];
+                var loc2 = locs2[i];
 
-            // Compare the departments and aisles
-            var depComp = loc1.department === loc1.department ? 1 : 0;
-            var aisleComp = loc1.aisleNum === loc2.aisleNum ? 1 : 0;
+                // Compare the departments and aisles
+                var depComp = loc1.department === loc1.department ? 1 : 0;
+                var aisleComp = loc1.aisleNum === loc2.aisleNum ? 1 : 0;
 
-            // Calculate and update the similarity
-            similarity += (0.8 * depComp) + (0.2 * aisleComp);
-        }
+                // Calculate and update the similarity
+                similarity += (0.8 * depComp) + (0.2 * aisleComp);
+            }
 
-        // Calculate the average similarity
-        if (maxNumItems !== 0) {
-            similarity = similarity / maxNumItems;
-        }
+            // Calculate the average similarity
+            if (maxNumItems !== 0) {
+                similarity = similarity / maxNumItems;
+            }
 
-        return(similarity);
-    });
+            return(similarity);
+        });
 
-    return retVal;
+        return retVal;
+    }
 }
 
 function calcMapSimilarity(refMap, compMap) {
@@ -133,7 +137,9 @@ function calcMapSimilarity(refMap, compMap) {
         score += (vals[0] - vals[1]) ** 2;
     }
 
-    score /= refMapRem.length;
+    if (refMapRem.length > 0) {
+        score /= refMapRem.length;
+    }
     
     //score += refMapUnique.length;
     //score += compMapUnique.length;
@@ -360,6 +366,58 @@ exports.cloudCalculateStoreSimilarities = function(database) {
     return retVal;
 }
 
+exports.cloudUpdateStoreSimilarities = function(database, address, storeName) {
+    // Load the stores table
+    var retVal = Promise.all([dbLoading.loadAllStores(database), dbLoading.loadStoreSimilarities(database)]).then((data) => {
+        var knownStores = data[0];
+        var similarityDict = data[1];
+
+        var idToUpdate = (new StoreObj.StoreObj(address, storeName)).getId();
+
+        var storeIds = [];
+        for (var tempAddress in knownStores){
+            for (var tempStoreName in knownStores[tempAddress]){
+                var tempStoreId = (new StoreObj.StoreObj(tempAddress, tempStoreName)).getId();
+                storeIds.push(tempStoreId);
+            }
+        }
+
+        var similarityList = [];
+        for (i = 0; i < storeIds.length; i++) {
+            var refId = storeIds[i];
+            var score = calcStoreSimilarity(knownStores, refId, idToUpdate);
+            similarityList.push(score);
+        }
+
+        return Promise.all([Promise.all(similarityList), Promise.all(storeIds), similarityDict, idToUpdate]);
+    }).then((data) => {
+        var similarityList = data[0];
+        var storeIds = data[1];
+        var similarityDict = data[2];
+        var idToUpdate = data[3];
+
+        var listInd = 0;
+        for (var idInd = 0; idInd < storeIds.length; idInd++) {
+            var refId = storeIds[idInd];
+
+            var score = similarityList[listInd];
+
+            similarityDict[refId][idToUpdate] = score;
+            similarityDict[idToUpdate][refId] = score;
+
+            listInd += 1;
+        }
+
+        database.ref("/storeSimilarities/").update(similarityDict);
+
+        return {
+            similarities: similarityDict
+        }
+    });
+
+    return retVal;
+}
+
 /**
  * cloudModStoreWeights
  * 
@@ -404,7 +462,7 @@ exports.cloudModStoreWeights = function(data, context, database) {
             var compMap = tempMapObj.map;
             var timesChecked = tempMapObj.timesChecked;
 
-            if (timesChecked === undefined) {
+            if ((timesChecked === undefined) || (timesChecked === null)) {
                 timesChecked = 1;
             }
 
@@ -419,6 +477,8 @@ exports.cloudModStoreWeights = function(data, context, database) {
             // Calculte the new weight
             timesChecked += 1;
             var newWeight = (weight * (timesChecked - 1) + newVal) / timesChecked;
+
+            console.log(timesChecked, weight, newVal);
 
             // Save the new data
             database.ref(storePath + "maps/" + tempMapId).update({

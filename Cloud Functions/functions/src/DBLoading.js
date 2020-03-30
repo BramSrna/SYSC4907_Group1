@@ -42,7 +42,7 @@ exports.clearListsCache = function(listId) {
     delete dbCache.lists[listId];
 }
 
-exports.loadStoresMaps = async function(database, storeId) {
+exports.loadStoresMaps = async function(database, storeId, forceReload = false) {
     // Get the store's info from the id
     var info = StoreObj.StoreObj.getInfoFromId(storeId);
     var address = info.address;
@@ -51,7 +51,7 @@ exports.loadStoresMaps = async function(database, storeId) {
     // Get the path to the store
     var storePath = (new StoreObj.StoreObj(address, storeName)).getPath();
 
-    if (!(storePath in dbCache.storesMaps)) {
+    if ((!(storePath in dbCache.storesMaps)) || forceReload) {
         // Get the current state of the store's maps
         var dbMap = database.ref(storePath + "maps").once("value").then((snapshot) => {
             var val = snapshot.val();
@@ -65,9 +65,8 @@ exports.loadStoresMaps = async function(database, storeId) {
     }
 }
 
-exports.loadAllStores = function(database) {
-    if (dbCache.stores === null) {
-        console.log("HERE_1");
+exports.loadAllStores = function(database, forceReload = false) {
+    if ((dbCache.stores === null) || forceReload) {
         // Load the stores table
         var dbStores = database.ref('/stores').once('value').then((snapshot) => {
             var val = snapshot.val()
@@ -77,13 +76,12 @@ exports.loadAllStores = function(database) {
         dbCache.stores = dbStores;
         return dbStores;
     } else {
-        console.log("HERE_2");
         return Promise.resolve(dbCache.stores);
     }
 }
 
-exports.loadStoreSimilarities = function(database) {
-    if (dbCache.storeSimilarities === null) {
+exports.loadStoreSimilarities = function(database, forceReload = false) {
+    if ((dbCache.storeSimilarities === null) || forceReload) {
         // Load the stores table
         var dbStoreSimilarities = database.ref("/storeSimilarities").once("value").then((snapshot) => {
             var val = snapshot.val();
@@ -97,8 +95,8 @@ exports.loadStoreSimilarities = function(database) {
     }
 }
 
-exports.loadList = function(database, listId) {
-    if (!(listId in dbCache.lists)) {
+exports.loadList = function(database, listId, forceReload = false) {
+    if ((!(listId in dbCache.lists)) || forceReload) {
         var dbList = database.ref('/lists/' + listId).once('value').then((snapshot) => {
             var val = snapshot.val();
             dbCache.lists[listId] = val;

@@ -1,8 +1,16 @@
 const storeFuncs = require('./StoreFuncs');
 const dbLoading = require('./DBLoading');
 
+function checkForNoneType(val) {
+    if ((val === null) || (val === undefined)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function sortList(database, listId, storeId, cluster, sortFunction) {
-    var retVal = Promise.all([dbLoading.loadStoreSimilarities(database), dbLoading.loadList(database, listId)]).then((data) => {
+    var retVal = Promise.all([dbLoading.loadStoreSimilarities(database), dbLoading.loadList(database, listId, true)]).then((data) => {
         var storeSimilarities = data[0];
         var list = data[1];
 
@@ -16,6 +24,8 @@ function sortList(database, listId, storeId, cluster, sortFunction) {
                 ids.push(item);
             }
         }
+
+        console.log(ids);
 
         // Get the locations of all items in the store
         var predictedLocs = [];
@@ -122,14 +132,16 @@ exports.cloudReorgListLoc = function(data, context, database) {
         aisleA = a.aisleNum;
         aisleB = b.aisleNum;
 
-        if (depA < depB) {
+        console.log(depA, depB);
+
+        if ((depA < depB) || checkForNoneType(depB)) {
                 return -1;
-        } else if (depA > depB) {
+        } else if ((depA > depB) || checkForNoneType(depA)) {
                 return 1;
         } else {
-            if (aisleA - aisleB < 0) {
+            if ((aisleA - aisleB < 0) || checkForNoneType(aisleB)) {
                 return - 1;
-            } else if (aisleA - aisleB > 0) {
+            } else if ((aisleA - aisleB > 0) || checkForNoneType(aisleA)) {
                 return 1;
             } else {
                 return 0;
@@ -178,34 +190,27 @@ exports.cloudReorgListFastest = function(data, context, database) {
         depIndA = Object.keys(map).find(key => map[key] === depA);
         depIndB = Object.keys(map).find(key => map[key] === depB);
 
-        if (depIndA === undefined) {
-            depIndA = -1;
-        }
-
-        if (depIndB === undefined) {
-            depIndB = -1;
-            }
-
-        if (depIndA - depIndB < 0) {
+        if ((depIndA - depIndB < 0) || checkForNoneType(depIndB)) {
             return -1;
-        } else if (depIndA - depIndB > 0) {
+        } else if ((depIndA - depIndB > 0) || checkForNoneType(depIndA)) {
             return 1;
         } else {
             if (depIndA === -1) {
-                if (depIndA - depIndB < 0) {
+                if ((depIndA - depIndB < 0) || checkForNoneType(depIndB)) {
                     return -1;
-                } else if (depIndA - depIndB > 0) {
+                } else if ((depIndA - depIndB > 0) || checkForNoneType(depIndA)) {
                     return 1;
                 }
             }
-            if (aisleA - aisleB < 0) {
+
+            if ((aisleA - aisleB < 0) || checkForNoneType(aisleB)) {
                 return - 1;
-            } else if (aisleA - aisleB > 0) {
+            } else if ((aisleA - aisleB > 0) || checkForNoneType(aisleA)) {
                 return 1;
             } else {
-                if (nameA < nameB) {
+                if ((nameA < nameB) || checkForNoneType(nameB)) {
                     return -1;
-                } else if (nameA > nameB) {
+                } else if ((nameA > nameB) || checkForNoneType(nameA)) {
                     return 1;
                 } else {
                     return 0;

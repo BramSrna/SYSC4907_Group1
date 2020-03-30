@@ -33,19 +33,25 @@ exports.updateRecipeCount = functions.database.ref('/recipes/{name}').onWrite((c
 
 exports.storesObserver = functions.database.ref('/stores').onWrite((change, context) => {
     dbLoading.clearStoresCache();
+
+    return true;
 });
 
 exports.storeSimilaritiesObserver = functions.database.ref('/storeSimilarities').onWrite((change, context) => {
     dbLoading.clearStoreSimilaritiesCache();
+
+    return true;
 });
 
-exports.listsObserver = functions.database.ref('/lists/{listId}').onWrite((change, context) => {
+exports.listsObserver = functions.database.ref('/lists/{listId}/items').onWrite((change, context) => {
     dbLoading.clearListsCache(context.params.listId);
+
+    return true;
 });
 
 exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps').onWrite((change, context) => {
     var store = new storeObj.StoreObj(context.params.addr, context.params.name);
-    dbLoading.clearListsCache(store.getId());
+    dbLoading.clearStoresMapsCache(store.getId());
 
     var path = "/globals/storeMapVals";
     var retVal = database.ref(path).once("value").then((snapshot) => {
@@ -83,7 +89,10 @@ exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps'
 });
 
 exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/items').onWrite((change, context) => {
-    var path = "/globals/storeItemVals";
+    var store = new storeObj.StoreObj(context.params.addr, context.params.name);
+
+    var path = "/globals/storeItemVals/" + store.getId() + "/";
+
     var retVal = database.ref(path).once("value").then((snapshot) => {
         var ssv = snapshot.val();
 
@@ -102,7 +111,7 @@ exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/
 
         var update = false;
         if (currCount > prevUpdate * (1 + 0.1)) {
-            clusterFuncs.cloudCalculateStoreSimilarities(database);
+            clusterFuncs.cloudUpdateStoreSimilarities(database, context.params.addr, context.params.name);
             prevUpdate = currCount;
             update = true;
         }
