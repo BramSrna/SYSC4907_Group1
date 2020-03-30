@@ -89,7 +89,10 @@ exports.storesMapsObserver = functions.database.ref('/stores/{addr}/{name}/maps'
 });
 
 exports.updateStoreSimilarities = functions.database.ref('/stores/{addr}/{name}/items').onWrite((change, context) => {
-    var path = "/globals/storeItemVals";
+    var store = new storeObj.StoreObj(context.params.addr, context.params.name);
+
+    var path = "/globals/storeItemVals/" + store.getId() + "/";
+
     var retVal = database.ref(path).once("value").then((snapshot) => {
         var ssv = snapshot.val();
 
