@@ -2,6 +2,8 @@
 
 # Crowd-source grocery store layouts for dynamically sorted shopping list
 
+Create an app that rearranges your grocery list according to the layout of the grocery store in which you find yourself. The locations of different items within each store will be crowd-sourced. Use of appropriate mobile development tools to ensure cross-platform deployment is key. AWS or other online hosting services should be used for supporting the project. Machine learning (e.g. collaborative filtering) could be developed to guess the locations of items, if their location is known in other stores but not the current store. An online layout editor could also be created for roughly describing the physical location of different sections (produce, dairy, deli, bakery, etc).
+
 ## Setting Up
 
 ### Needed Tools
