@@ -2,6 +2,8 @@
 
 # Crowd-source grocery store layouts for dynamically sorted shopping list
 
+Create an app that rearranges your grocery list according to the layout of the grocery store in which you find yourself. The locations of different items within each store will be crowd-sourced. Use of appropriate mobile development tools to ensure cross-platform deployment is key. AWS or other online hosting services should be used for supporting the project. Machine learning (e.g. collaborative filtering) could be developed to guess the locations of items, if their location is known in other stores but not the current store. An online layout editor could also be created for roughly describing the physical location of different sections (produce, dairy, deli, bakery, etc).
+
 ## Familiarizing Yourself With The Project
 - Read the Project Report: "\SYSC4907_Group1\Project report.docx"
 - Watch the Project Demo Video: "\SYSC4907_Group1\Project Demo Video.m4v"
@@ -26,32 +28,32 @@
 - This is not needed if you don't intend on making database changes (i.e. Your only changing the UI, only need to read from the DB, etc).
 
 - To make a database, use Firebase https://firebase.google.com/
--- Press "Go to console" in the top-right
--- Press "Add Project"
--- In your database, click "Database" in the left navigation bar
--- Click "Create Database"
--- Select "Start in production mode"
--- Click "Next" then "Done"
--- Click "Start Collection", then enter a Collection ID. On the next page, select Auto-ID and "Save"
--- On the top of the page, there is a dropdown menu that says "Cloud Firestore". Select it and switch to "Realtime Database".
--- In the triple-dot dropdown menu in the topo right, press import JSON. Then press "Browse" and select the "FIREBASE_INIT_INFO.json" from the cloned github repo.
+- Press "Go to console" in the top-right
+- Press "Add Project"
+- In your database, click "Database" in the left navigation bar
+- Click "Create Database"
+- Select "Start in production mode"
+- Click "Next" then "Done"
+- Click "Start Collection", then enter a Collection ID. On the next page, select Auto-ID and "Save"
+- On the top of the page, there is a dropdown menu that says "Cloud Firestore". Select it and switch to "Realtime Database".
+- In the triple-dot dropdown menu in the topo right, press import JSON. Then press "Browse" and select the "FIREBASE_INIT_INFO.json" from the cloned github repo.
 
--- From the left sidebar, select "Authentication"
--- Press "Set up sign-in method"
--- Enable "Email/Password" and "Google"
+- From the left sidebar, select "Authentication"
+- Press "Set up sign-in method"
+- Enable "Email/Password" and "Google"
 
--- From the left sidebar, select the gear icon beside "Project Overview"
--- At the bottom of the page, under "Your Apps", press the icon that looks like: "</>"
--- Enter a nickname for the app and save the app.
--- Under the "Your Apps" card, select the "Config" radio button.
--- Copy the json, then in your IDE open "\SYSC4907_Group1\Application\components\FirebaseConfig.js" and replace that object with the one for your database.
--- Also put the info in "\SYSC4907_Group1\gcf\main.py"
+- From the left sidebar, select the gear icon beside "Project Overview"
+- At the bottom of the page, under "Your Apps", press the icon that looks like: "</>"
+- Enter a nickname for the app and save the app.
+- Under the "Your Apps" card, select the "Config" radio button.
+- Copy the json, then in your IDE open "\SYSC4907_Group1\Application\components\FirebaseConfig.js" and replace that object with the one for your database.
+- Also put the info in "\SYSC4907_Group1\gcf\main.py"
 
--- From the left sidebar, select the gear icon beside "Project Overview"
--- Select "Service Accounts"
--- Make sure the "Node.js" radio button is selected
--- Select "Generate new private key" and then "Generate Key"
--- Set your computer's "GOOGLE_APPLICATION_CREDENTIALS" environment variable to the path to the file that was just downloaded.
+- From the left sidebar, select the gear icon beside "Project Overview"
+- Select "Service Accounts"
+- Make sure the "Node.js" radio button is selected
+- Select "Generate new private key" and then "Generate Key"
+- Set your computer's "GOOGLE_APPLICATION_CREDENTIALS" environment variable to the path to the file that was just downloaded.
 
 ##### Here Maps Setup
 - This part is only necessary if you need to modify the Map interface for selecting stores.
@@ -76,6 +78,8 @@ Only do the following after you made your own database:
 
 ## Running the app
 - In your terminal, go to "\SYSC4907_Group1\Application" and run "npm start"
+- Wait for the QR code to appear in your terminal
+- Open Expo and scan the QR code. The app will load and run on your phone. Shake your phone to open the dev menu once you scanned the code.
 
 ## Making Changes
 
