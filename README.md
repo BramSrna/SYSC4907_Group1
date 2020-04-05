@@ -2,6 +2,10 @@
 
 # Crowd-source grocery store layouts for dynamically sorted shopping list
 
+## Familiarizing Yourself With The Project
+- Read the Project Report: "\SYSC4907_Group1\Project report.docx"
+- Watch the Project Demo Video: "\SYSC4907_Group1\Project Demo Video.m4v"
+
 ## Setting Up
 
 ### Needed Tools
@@ -92,4 +96,18 @@ If your modifying the cloud functions, we recommend you follow the following pro
 - After getting the necessary reviews, overwrite the old function with your new one and redploy the functions
 
 The reason that we recommend this procedure is because pushing an overwrite, even if its on a personal branch, will change it for everyone, so it is good to wait until the change is complete before overwriting it.
+
+### Pushing Cloud Functions
+The following commands can be used to push cloud functions:
+
+To push Javascript Cloud Functions:
+- Go to "\SYSC4907_Group1\Cloud Functions\functions"
+- Run "firebase deploy" to deploy all of the cloud function
+- Run "firebase deploy --only functions:FUNCTION_NAME" to only deploy a function name FUNCTION_NAME
+- Your function must be in "\SYSC4907_Group1\Cloud Functions\functions\index.js" to be deployed
+
+To push Python Cloud Functions:
+- Go to "\SYSC4907_Group1\gcf"
+- Run "gcloud functions deploy FUNCTION_NAME --runtime python37 --trigger-http --allow-unauthenticated" to deploy HTTP-triggered functions
+- Run "gcloud functions deploy updateRules --trigger-event TRIGGER_EVENT --trigger-resource DATABASE_TRIGGER_PATH --runtime python37 --allow-unauthenticated" to deploy database-write-triggered functions
 
