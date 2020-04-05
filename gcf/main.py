@@ -1,4 +1,5 @@
 import sys
+import json
 import flask
 import firebase_admin
 import firebase_admin
@@ -10,8 +11,23 @@ sys.path.insert(1, './RecommendItemFiles')
 
 from RecommendItems import getRules
 
-cred = credentials.Certificate("./grocerylist-dd21a-firebase-adminsdk-6uwbb-0f0ee1448b.json")
-firebase_admin.initialize_app(cred, {"databaseURL": "https://grocerylist-dd21a.firebaseio.com"})
+# firebaseConfigInfo = {}
+# with open("../FirebaseConfigInfo.json") as f:
+#     firebaseConfigInfo = json.load(f)
+
+# print(firebaseConfigInfo)
+
+# cred = credentials.Certificate("./grocerylist-dd21a-firebase-adminsdk-6uwbb-0f0ee1448b.json")
+# firebase_admin.initialize_app(cred, {"databaseURL": "https://grocerylist-dd21a.firebaseio.com"})
+firebase_admin.initialize_app(options = {
+    "apiKey": "AIzaSyCxqsnU4HPKeMmWRH0rIyRV-Lg-o6lEglw",
+    "authDomain": "grocerylist-dd21a.firebaseapp.com",
+    "databaseURL": "https://grocerylist-dd21a.firebaseio.com",
+    "projectId": "grocerylist-dd21a",
+    "storageBucket": "grocerylist-dd21a.appspot.com",
+    "messagingSenderId": "328195735241",
+    "appId": "1:328195735241:web:204a3f948681e77d"
+})
 
 ITEMS_KEY = "items"
 GEN_NAME_KEY = "genName"
