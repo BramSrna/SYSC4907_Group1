@@ -16,9 +16,6 @@ export default class FindRecipePage extends Component {
       recipes: []
     };
     rf.GetRandomRecipesFromDatabase(this);
-  }
-
-  componentWillMount() {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {

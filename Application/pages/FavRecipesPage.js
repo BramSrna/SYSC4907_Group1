@@ -14,9 +14,6 @@ class FavRecipesPage extends Component {
       this.state = {
          recipes: []
       }
-   }
-
-   componentWillMount() {
       this.focusListener = this.props.navigation.addListener(
          "willFocus",
          () => {
@@ -26,6 +23,7 @@ class FavRecipesPage extends Component {
          }
       );
    }
+
    componentWillUnmount() {
       this.focusListener.remove()
       this._isMounted = false;

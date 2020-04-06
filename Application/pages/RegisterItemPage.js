@@ -28,19 +28,6 @@ class RegisterItemPage extends Component {
       sizeUnit: units[0],
       price: DEFAULT_PRICE
     };
-  }
-
-  /**
-   * componentWillMount
-   * 
-   * Function called when the component has mounted.
-   * Sets the context of the notification manager.
-   * 
-   * @param None
-   * 
-   * @returns None
-   */
-  componentWillMount() {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
@@ -48,8 +35,9 @@ class RegisterItemPage extends Component {
         nm.setThat(this)
       }
     );
-
   }
+
+
   componentWillUnmount() {
     this.focusListener.remove()
     this._isMount = false;

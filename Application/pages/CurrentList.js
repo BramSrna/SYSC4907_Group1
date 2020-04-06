@@ -103,6 +103,20 @@ class CurrentList extends Component {
          showCrowdSourceDashboard: false,
          showAdditionalOptions: false,
       };
+      this._isMounted = true;
+
+      // Set "that" for the notification manager
+      nm.setThat(this)
+
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.SetNameAndCurrentItems();
+         }
+      );
+
+      // Populate the Arrays for the autocomplete fields
+      this.loadAvailableStores();
    }
 
    /**
@@ -119,36 +133,6 @@ class CurrentList extends Component {
       firebase.database().ref('/lists/' + this.props.navigation.getParam("listID", "(Invalid List ID)")).off()
       this.focusListener.remove();
       this._isMounted = false;
-   }
-
-   /**
-    * componentWillMount
-    * 
-    * Function called after component mounts.
-    * Adds a focus listener to the component.
-    * Populates the arrays for the autocomplete fields.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   componentWillMount() {
-      this._isMounted = true;
-
-      // Set "that" for the notification manager
-      nm.setThat(this)
-
-      // Need this because componentWillMount only gets called once,
-      // therefore add willFocus listener for when the user comes back
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this.SetNameAndCurrentItems();
-         }
-      );
-
-      // Populate the Arrays for the autocomplete fields
-      this.loadAvailableStores();
    }
 
    /**

@@ -67,27 +67,14 @@ class SelectStorePage extends Component {
             arrayHolder: [],
             dispDeps: [departments]
         };
-    }
-
-    /**
-    * componentWillMount
-    * 
-    * Function called after component mounts.
-    * Populates the arrays for the autocomplete fields.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-    componentWillMount() {
         this._isMounted = true;
         nm.setThat(this)
-        this.setState({
+        this.state = {
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
             sort: this.props.navigation.getParam("sort", "(Invalid Sort Method)"),
             arrayHolder: [...this.currDepartments]
-        });
+        };
 
         var that = this;
         // Populate the Arrays for the autocomplete fields

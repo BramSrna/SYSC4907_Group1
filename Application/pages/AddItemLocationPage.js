@@ -32,24 +32,6 @@ class AddItemLocationPage extends Component {
     };
 
     this.handleChangeDepartment = this.handleChangeDepartment.bind(this);
-  }
-
-  componentWillUnmount() {
-    this.focusListener.remove();
-    this._isMounted = false;
-  }
-
-  /**
-   * componentWillMount
-   * 
-   * Function to call when the page is mounted. Sets
-   * the value of "that" for the notification manager.
-   * 
-   * @param None
-   * 
-   * @returns None
-   */
-  componentWillMount() {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
@@ -57,6 +39,11 @@ class AddItemLocationPage extends Component {
         nm.setThat(this)
       }
     );
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
+    this._isMounted = false;
   }
 
   /**

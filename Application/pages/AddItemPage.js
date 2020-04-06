@@ -50,29 +50,17 @@ class AddItemPage extends Component {
 
             toAdd: [] // The recommended items the user wants to add to their list
         };
-    }
 
-    /**
-    * componentWillMount
-    * 
-    * Function called before component mounts.
-    * Populates the arrays for the autocomplete fields.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-    componentWillMount() {
         nm.setThat(this);
         // set the mounted var
         this._isMounted = true;
 
         // Save the current state of the list
-        this.setState({
+        this.state = {
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
             listItemIds: this.props.navigation.getParam("listItemIds", "(Invalid List Item IDs")
-        });
+        };
 
         // Populate the Arrays for the autocomplete fields
         this.loadAvailableItems();
@@ -103,7 +91,7 @@ class AddItemPage extends Component {
     */
     componentWillUnmount() {
         this.addToggledRecommendedItems();
-        
+
         // Set the mounted var
         this._isMounted = false;
     }
@@ -189,21 +177,21 @@ class AddItemPage extends Component {
      */
     loadRecommendedItems() {
         // Get the ids of the current items in the list
-        var currItemIds = this.state.listItemIds;
-        var currPrevRec = this.state.prevRecommended;
+        var currItemIds = this.state.listItemIds ? this.state.listItemIds : [];
+        var currPrevRec = this.state.prevRecommended ? this.state.prevRecommended : [];
 
         var that = this;
 
         var ref = firebase.database().ref('/recommendations');
         var retItems = ref.once('value').then((snapshot) => {
-            var newItems = {};            
+            var newItems = {};
             var finalItems = [];
 
             // First check the rules
             // If an item is the precedent of a rule, add
             // the antecedent to the list of recommended items
             var ssv = snapshot.val();
-            if (ssv){
+            if (ssv) {
                 for (var i = 0; i < currItemIds.length; i++) {
                     var itemId = currItemIds[i];
                     if (itemId in ssv) {
@@ -343,7 +331,7 @@ class AddItemPage extends Component {
      * Handler for the add item button under
      * the autocomplete box.
      */
-    handleAddButton = () => {        
+    handleAddButton = () => {
         this.addToggledRecommendedItems();
 
         if (this.state.genName !== DEFAULT_GEN_NAME) {
@@ -412,10 +400,10 @@ class AddItemPage extends Component {
         // the previously recommended items
         for (var i = 0; i < currRecItems.length; i++) {
             var item = currRecItems[i];
-            if (item.added){
+            if (item.added) {
                 this.addItem(this.state.listId,
                     item.genName);
-        
+
                 currItemIds.push(item.id);
             } else {
                 currPrevRec.push(item.id);

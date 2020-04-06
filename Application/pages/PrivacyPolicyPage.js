@@ -14,12 +14,9 @@ export default class PrivacyPolicyPage extends Component {
         this.state = {
             registration: false,
         };
-    }
-
-    componentWillMount() {
-        this.setState({
+        this.state = {
             registration: this.props.navigation.getParam('registration', false)
-        });
+        };
 
         // Set "that" for the notification manager
         nm.setThat(this)

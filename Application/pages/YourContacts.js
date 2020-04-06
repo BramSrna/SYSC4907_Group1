@@ -15,6 +15,12 @@ class YourContacts extends Component {
    constructor(props) {
       super(props);
       this.state = { listName: '', listID: '', sections: [], groups: [], share: false, selected: [], sectionsWoPending: [], groupsWoPending: [], sectionsSelected: [] };
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
    }
 
    load() {
@@ -28,16 +34,9 @@ class YourContacts extends Component {
          recipeName: this.props.navigation.getParam("recipeName", ''),
       });
       cf.GetContactInfo(this);
-   }
-   componentWillMount() {
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this.load();
-         }
-      );
 
    }
+
    componentWillUnmount() {
       cf.RemoveYourContactsPageListeners()
       this.focusListener.remove()

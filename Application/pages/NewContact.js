@@ -27,6 +27,12 @@ class NewContact extends Component {
          allGroups: [],
          fromPending: false, fromEdit: false
       };
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
    }
    load() {
       nm.setThat(this)
@@ -71,16 +77,6 @@ class NewContact extends Component {
          temp = temp.concat(this.props.navigation.getParam("groups", []))
          this.setState({ email: email, fromPending: bool, allGroups: temp, fromEdit: false });
       }
-   }
-
-   componentWillMount() {
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this.load();
-         }
-      );
-
    }
 
    componentWillUnmount() {

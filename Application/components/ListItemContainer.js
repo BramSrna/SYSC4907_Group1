@@ -25,11 +25,6 @@ export default class ListItemContainer extends Component {
         };
     }
 
-    componentWillMount() {
-    }
-
-    componentWillUnmount() {
-    }
 
     listViewMenuData = [
         { title: 'Share', icon: ShareIcon },

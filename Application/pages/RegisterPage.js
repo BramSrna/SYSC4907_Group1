@@ -13,18 +13,33 @@ const BACK_TO_LOGIN = "Back to Login";
 const PRIVACY_POLICY = "Accept Privacy Policy";
 
 class RegisterPage extends Component {
-  userAlreadyLoggedIn = false;
-  state = {
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    secureTextEntry: true,
-    registering: false,
-    privacyPolicyAccepted: false,
-    returnedFromprivacyPolicy: false,
+
+  constructor(props) {
+    super(props);
+    userAlreadyLoggedIn = false;
+    this.state = {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      secureTextEntry: true,
+      registering: false,
+      privacyPolicyAccepted: false,
+      returnedFromprivacyPolicy: false,
+    }
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        nm.setThat(this)
+        this._isMount = true;
+        if (!this.state.returnedFromprivacyPolicy) {
+          this.state = { firstname: "", lastname: "", email: "", password: "", confirmPassword: "", privacyPolicyAccepted: false, };
+        }
+      }
+    );
   }
+
 
   buttonListener = buttonId => {
     if (buttonId === REGISTER) {
@@ -74,19 +89,6 @@ class RegisterPage extends Component {
         return false;
       }
     }
-  }
-
-  componentWillMount() {
-    this.focusListener = this.props.navigation.addListener(
-      "willFocus",
-      () => {
-        nm.setThat(this)
-        this._isMount = true;
-        if (!this.state.returnedFromprivacyPolicy) {
-          this.setState({ firstname: "", lastname: "", email: "", password: "", confirmPassword: "", privacyPolicyAccepted: false, });
-        }
-      }
-    );
   }
 
   componentWillUnmount() {
