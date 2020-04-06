@@ -86,7 +86,7 @@ Only do the following after you made your own database:
 ### Making a PR
 We used the following strategy when making PRs
 - Write your code in a new personal branch
-- After it's done, rebase your branch and make your Press
+- After it's done, rebase your branch and make your Pull Request
 - Assign reviewers if you want someone specific to review your commit
 - Link the issue to the commit if applicable. Also move the card for the feature on the Kanban board to "up for review"
 - Once you get your review and make any necessary changes, then merge the change
