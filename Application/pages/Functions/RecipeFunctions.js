@@ -2,7 +2,6 @@ import * as firebase from "firebase";
 import * as func from "./DBInterface"
 
 const NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB = "30";
-const API_KEY = "f5c21b2e7dc148caa483192e83219c74"; // 50/1.01 calls/day allowed
 const NUMBER_OF_RECIPES_TO_SHOW_USERS = 20;
 
 class RecipeFunctions {
@@ -133,30 +132,35 @@ class RecipeFunctions {
             if (dateStr[0] == currentDateSplit[0] && dateStr[1] == currentDateSplit[1] && dateStr[2] == currentDateSplit[2] && dateStr[3] == currentDateSplit[3]) {
                console.log("Recipes were already added to the database today.")
             } else {
-               firebase.database().ref('/globals/latestRecipeUpdate').set(currentDate).then((snapshot) => {
-                  let url = "https://api.spoonacular.com/recipes/random?number=" + NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB + "&apiKey=" + API_KEY;
-                  fetch(url, {
-                     method: "GET",
-                  }).then((response) => {
-                     if (response.status === 200) {
-                        response.json().then((json) => {
-                           // console.log(json.recipes)
-                           for (var a = 0; a < json.recipes.length; a++) {
-                              var data = json.recipes[a];
-                              var title = func.replaceInvalidPathCharsGlobal(data.title);
+               firebase.database().ref('/globals/spoonacularApiKey').once("value", (snapshot) => {
+                  var apiKey = snapshot.val();
+                  return apiKey;
+               }).then((apiKey) => {
+                  firebase.database().ref('/globals/latestRecipeUpdate').set(currentDate).then((snapshot) => {
+                     let url = "https://api.spoonacular.com/recipes/random?number=" + NUMBER_OF_RECIPES_TO_GET_FROM_API_TO_STORE_IN_DB + "&apiKey=" + apiKey;
+                     fetch(url, {
+                        method: "GET",
+                     }).then((response) => {
+                        if (response.status === 200) {
+                           response.json().then((json) => {
+                              // console.log(json.recipes)
+                              for (var a = 0; a < json.recipes.length; a++) {
+                                 var data = json.recipes[a];
+                                 var title = func.replaceInvalidPathCharsGlobal(data.title);
 
-                              firebase.database().ref('/recipes/' + title).set(data).then((snapshot) => {
-                                 // console.log(snapshot);
-                              });
-                           }
-                        });
-                        console.log("Recipes were added to the database.")
-                     } else {
-                        console.log("API did not respond well.")
-                     }
-                  }, ((error) => {
-                     console.log(error.message)
-                  }))
+                                 firebase.database().ref('/recipes/' + title).set(data).then((snapshot) => {
+                                    // console.log(snapshot);
+                                 });
+                              }
+                           });
+                           console.log("Recipes were added to the database.")
+                        } else {
+                           console.log("API did not respond well.")
+                        }
+                     }, ((error) => {
+                        console.log(error.message)
+                     }))
+                  });
                });
 
                this.updateRandomRecipesForDay()
