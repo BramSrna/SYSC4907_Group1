@@ -35,10 +35,14 @@ class AddItemLocationPage extends Component {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
-        this._isMounted = true;
         nm.setThat(this)
       }
     );
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+
   }
 
   componentWillUnmount() {
@@ -164,47 +168,45 @@ class AddItemLocationPage extends Component {
           alignment="center"
           leftControl={this.renderMenuAction()}
         />
-        <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
-          <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-            <Layout style={styles.formOuterContainer} level='3'>
-              <Layout style={styles.formInnerContainer}>
-                <Input style={styles.inputRow}
-                  label='Generic Name'
-                  placeholder='Ex. Ketchup'
-                  value={this.state.genericName}
-                  onChangeText={(genericName) => this._isMounted && this.setState({ genericName })}
-                />
-                <Input style={styles.inputRow}
-                  label='Store Name'
-                  placeholder='Enter the store name'
-                  value={this.state.storeName}
-                  onChangeText={(storeName) => this._isMounted && this.setState({ storeName })}
-                />
-                <Input style={styles.inputRow}
-                  label='Address'
-                  placeholder='Enter the address'
-                  value={this.state.address}
-                  onChangeText={(address) => this._isMounted && this.setState({ address })}
-                />
-                <Select style={styles.selectBox}
-                  label='Item Department'
-                  data={departments}
-                  placeholder='Select a department'
-                  selectedOption={this.state.itemDepartment}
-                  onSelect={(itemDepartment) => this._isMounted && this.setState({ itemDepartment })}
-                />
-                <Input style={styles.inputRow}
-                  label='Aisle Number'
-                  placeholder='Enter the aisle number'
-                  keyboardType="numeric"
-                  value={this.state.aisleNum}
-                  onChangeText={(aisleNum) => this._isMounted && this.setState({ aisleNum })}
-                />
-                <Button style={styles.button} onPress={this.handleAdd} >Add Item Location</Button>
-              </Layout>
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+          <Layout style={styles.formOuterContainer} level='3'>
+            <Layout style={styles.formInnerContainer}>
+              <Input style={styles.inputRow}
+                label='Generic Name'
+                placeholder='Ex. Ketchup'
+                value={this.state.genericName}
+                onChangeText={(genericName) => this._isMounted && this.setState({ genericName })}
+              />
+              <Input style={styles.inputRow}
+                label='Store Name'
+                placeholder='Enter the store name'
+                value={this.state.storeName}
+                onChangeText={(storeName) => this._isMounted && this.setState({ storeName })}
+              />
+              <Input style={styles.inputRow}
+                label='Address'
+                placeholder='Enter the address'
+                value={this.state.address}
+                onChangeText={(address) => this._isMounted && this.setState({ address })}
+              />
+              <Select style={styles.selectBox}
+                label='Item Department'
+                data={departments}
+                placeholder='Select a department'
+                selectedOption={this.state.itemDepartment}
+                onSelect={(itemDepartment) => this._isMounted && this.setState({ itemDepartment })}
+              />
+              <Input style={styles.inputRow}
+                label='Aisle Number'
+                placeholder='Enter the aisle number'
+                keyboardType="numeric"
+                value={this.state.aisleNum}
+                onChangeText={(aisleNum) => this._isMounted && this.setState({ aisleNum })}
+              />
+              <Button style={styles.button} onPress={this.handleAdd} >Add Item Location</Button>
             </Layout>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          </Layout>
+        </ScrollView>
         <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment>
     );

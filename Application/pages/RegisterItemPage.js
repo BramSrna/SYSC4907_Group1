@@ -31,10 +31,13 @@ class RegisterItemPage extends Component {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
-        this._isMount = true;
         nm.setThat(this)
       }
     );
+  }
+
+  componentDidMount() {
+    this._isMount = true;
   }
 
 
@@ -122,43 +125,41 @@ class RegisterItemPage extends Component {
           alignment="center"
           leftControl={this.renderMenuAction()}
         />
-        <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
-          <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-            <Layout style={styles.formOuterContainer} level='3'>
-              <Layout style={styles.formInnerContainer}>
-                <Input style={styles.inputRow}
-                  label='Generic Name'
-                  placeholder='Ex. Ketchup'
-                  value={this.state.genericName}
-                  onChangeText={(genericName) => this._isMount && this.setState({ genericName })}
-                />
-                <Input style={styles.inputRow}
-                  label='Price'
-                  placeholder='Price'
+        <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+          <Layout style={styles.formOuterContainer} level='3'>
+            <Layout style={styles.formInnerContainer}>
+              <Input style={styles.inputRow}
+                label='Generic Name'
+                placeholder='Ex. Ketchup'
+                value={this.state.genericName}
+                onChangeText={(genericName) => this._isMount && this.setState({ genericName })}
+              />
+              <Input style={styles.inputRow}
+                label='Price'
+                placeholder='Price'
+                keyboardType='numeric'
+                value={this.state.price}
+                onChangeText={(price) => this._isMount && this.setState({ price })}
+              />
+              <Layout style={styles.horizontalInnerContainer}>
+                <Input style={styles.inputLeftColumn}
+                  label='Size'
+                  placeholder='Size'
                   keyboardType='numeric'
-                  value={this.state.price}
-                  onChangeText={(price) => this._isMount && this.setState({ price })}
+                  value={this.state.size}
+                  onChangeText={(size) => this._isMount && this.setState({ size })}
                 />
-                <Layout style={styles.horizontalInnerContainer}>
-                  <Input style={styles.inputLeftColumn}
-                    label='Size'
-                    placeholder='Size'
-                    keyboardType='numeric'
-                    value={this.state.size}
-                    onChangeText={(size) => this._isMount && this.setState({ size })}
-                  />
-                  <Select style={styles.inputRightColumn}
-                    data={units}
-                    placeholder='Unit'
-                    selectedOption={this.state.sizeUnit}
-                    onSelect={(sizeUnit) => this._isMount && this.setState({ sizeUnit })}
-                  />
-                </Layout>
-                <Button style={styles.button} onPress={this.handleRegister} >Register Item</Button>
+                <Select style={styles.inputRightColumn}
+                  data={units}
+                  placeholder='Unit'
+                  selectedOption={this.state.sizeUnit}
+                  onSelect={(sizeUnit) => this._isMount && this.setState({ sizeUnit })}
+                />
               </Layout>
+              <Button style={styles.button} onPress={this.handleRegister} >Register Item</Button>
             </Layout>
-          </ScrollView>
-        </KeyboardAvoidingView>
+          </Layout>
+        </ScrollView>
         <NotificationPopup ref={ref => this.popup = ref} />
       </React.Fragment >
     );
