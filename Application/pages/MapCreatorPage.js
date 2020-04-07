@@ -64,8 +64,6 @@ class MapCreatorPage extends Component {
             () => {
                 nm.setThat(this);
 
-                this._mounted = true;
-
                 this.state = {
                     arrayHolder: [...this.currDepartments]
                 };
@@ -109,6 +107,10 @@ class MapCreatorPage extends Component {
                 }
             }
         );
+    }
+
+    componentDidMount() {
+        this._mounted = true;
     }
 
     /**
