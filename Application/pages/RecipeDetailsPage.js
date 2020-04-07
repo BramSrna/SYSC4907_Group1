@@ -21,7 +21,9 @@ export default class RecipeDetailsPage extends Component {
       () => {
         nm.setThat(this)
         this._isMounted = true;
-        this.state = { item: this.props.navigation.getParam("item", null) };
+        this.setState({
+          item: this.props.navigation.getParam("item", null)
+        });
         rf.UpdateFavouriteRecipe(this, this.props.navigation.getParam("name", "error"))
       }
     );

@@ -32,12 +32,15 @@ class RegisterPage extends Component {
       "willFocus",
       () => {
         nm.setThat(this)
-        this._isMount = true;
         if (!this.state.returnedFromprivacyPolicy) {
           this.state = { firstname: "", lastname: "", email: "", password: "", confirmPassword: "", privacyPolicyAccepted: false, };
         }
       }
     );
+  }
+
+  componentDidMount() {
+    this._isMount = true;
   }
 
 
@@ -225,11 +228,9 @@ class RegisterPage extends Component {
   render() {
     return (
       <Layout style={globalStyles.defaultContainer}>
-        <KeyboardAvoidingView behavior="padding">
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {this.renderCurrentState()}
-          </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {this.renderCurrentState()}
+        </ScrollView>
       </Layout>
     );
   }

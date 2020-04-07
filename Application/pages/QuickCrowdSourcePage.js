@@ -79,14 +79,14 @@ class QuickCrowdSourcePage extends Component {
                         }
                     }
 
-                    this.state = {
+                    this.setState({
                         storeName: currStoreName,
                         storeAddr: currStoreAddr,
                         previousPage: previousPage,
                         listName: listName,
                         listId: listId,
                         arrayHolder: this.currLocs
-                    };
+                    });
                 }
             }
         );

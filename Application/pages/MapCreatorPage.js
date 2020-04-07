@@ -96,14 +96,16 @@ class MapCreatorPage extends Component {
                         modifyMode = true;
                     }
 
-                    this.state = {
+                    this.setState({
                         address: currStoreAddr,
                         storeName: currStoreName,
                         modifyMode: modifyMode,
                         previousPage: previousPage,
                         listName: listName,
                         listId: listId
-                    };
+                    });
+
+                    console.log(currStoreName);
                 }
             }
         );

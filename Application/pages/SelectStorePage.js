@@ -476,46 +476,44 @@ class SelectStorePage extends Component {
                     </Modal>
                 </KeyboardAvoidingView>
 
-                <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
-                    <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-                        <Layout style={styles.formOuterContainer} level='3'>
-                            <Layout style={styles.formInnerContainer}>
-                                <Layout style={styles.mainInputGroup}>
-                                    <Layout style={styles.autocompleteContainer}>
-                                        <Autocomplete
-                                            ref={(input) => { this.autoCompleteInput = input; }}
-                                            style={styles.autocomplete}
-                                            placeholder={'Enter a store name'}
-                                            value={this.state.value}
-                                            data={this.state.data}
-                                            onChangeText={(val) => this.onChangeText(val)}
-                                            onSelect={(val) => this.onSelect(val)}
-                                        />
-                                    </Layout>
-                                    <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
+                <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Layout style={styles.formInnerContainer}>
+                            <Layout style={styles.mainInputGroup}>
+                                <Layout style={styles.autocompleteContainer}>
+                                    <Autocomplete
+                                        ref={(input) => { this.autoCompleteInput = input; }}
+                                        style={styles.autocomplete}
+                                        placeholder={'Enter a store name'}
+                                        value={this.state.value}
+                                        data={this.state.data}
+                                        onChangeText={(val) => this.onChangeText(val)}
+                                        onSelect={(val) => this.onSelect(val)}
+                                    />
                                 </Layout>
+                                <Button style={styles.mapButton} icon={MapIcon} onPress={() => this.props.navigation.navigate(MAPS, { selectStore: this.selectStore })} />
+                            </Layout>
 
-                                <Layout style={styles.mainButtonGroup} >
-                                    <Button
-                                        style={styles.mainPageButton}
-                                        status='danger'
-                                        onPress={() => this.props.navigation.goBack()}
-                                    >
-                                        {'Cancel'}
-                                    </Button>
+                            <Layout style={styles.mainButtonGroup} >
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='danger'
+                                    onPress={() => this.props.navigation.goBack()}
+                                >
+                                    {'Cancel'}
+                                </Button>
 
-                                    <Button
-                                        style={styles.mainPageButton}
-                                        status='primary'
-                                        onPress={() => this.submitStore()}
-                                    >
-                                        {'Submit'}
-                                    </Button>
-                                </Layout>
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='primary'
+                                    onPress={() => this.submitStore()}
+                                >
+                                    {'Submit'}
+                                </Button>
                             </Layout>
                         </Layout>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                    </Layout>
+                </ScrollView>
                 <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment >
         );

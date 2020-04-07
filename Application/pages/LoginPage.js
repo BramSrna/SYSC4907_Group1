@@ -25,13 +25,16 @@ class LoginPage extends Component {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
-        this._isMounted = true;
         this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
         if (this.userAlreadyLoggedIn) {
           this.props.navigation.navigate(ng.HOMEPAGE);
         }
       }
     );
+  }
+
+  componentDidMount() {
+    this._isMounted = true;    
   }
 
 
@@ -179,15 +182,13 @@ class LoginPage extends Component {
   render() {
     return (
       <Layout style={globalStyles.defaultContainer}>
-        <KeyboardAvoidingView behavior="padding">
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <Image
-              style={{ width: 300, height: 300 }}
-              source={require('../assets/splash.png')}
-            />
-            {this.renderCurrentState()}
-          </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Image
+            style={{ width: 300, height: 300 }}
+            source={require('../assets/splash.png')}
+          />
+          {this.renderCurrentState()}
+        </ScrollView>
       </Layout>
     );
   }

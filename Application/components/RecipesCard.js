@@ -13,10 +13,12 @@ export default class RecipesCard extends Component {
             <Layout style={styles.cardContainer} level='4'>
                 <Layout style={styles.card}>
                     <Layout style={styles.imageContainer}>
+                        {imageSource !== '' && 
                         <Image
                             style={styles.headerImage}
                             source={{ uri: imageSource }}
                         />
+                        }
                     </Layout>
                     <Layout style={styles.title}>
                         <Text category='h4'>{title}</Text>
