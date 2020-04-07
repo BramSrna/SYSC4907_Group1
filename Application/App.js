@@ -79,9 +79,7 @@ export default class App extends Component {
       );
     }
     return (
-      <Layout style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />}
-        {Platform.OS === 'android' && <Layout style={{ marginTop: StatusBar.currentHeight }} />}
+      <Layout style={styles.container}><StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
     );
