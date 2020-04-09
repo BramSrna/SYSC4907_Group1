@@ -24,9 +24,6 @@ class CrowdSourcePage extends Component {
       height: Dimensions.get("window").height,
     };
     this.onLayout = this.onLayout.bind(this);
-  }
-
-  componentWillMount() {
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
@@ -34,7 +31,6 @@ class CrowdSourcePage extends Component {
         this._isMounted = true;
       }
     );
-
   }
 
   componentWillUnmount() {

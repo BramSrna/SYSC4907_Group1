@@ -27,10 +27,15 @@ class NewContact extends Component {
          allGroups: [],
          fromPending: false, fromEdit: false
       };
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this.load();
+         }
+      );
    }
    load() {
       nm.setThat(this)
-      this._isMounted = true;
       if (this.props.navigation.getParam("edit", false)) {
          var email = this.props.navigation.getParam("email", DEFAULT_EMAIL);
          var name = this.props.navigation.getParam("name", DEFAULT_NAME);
@@ -73,14 +78,8 @@ class NewContact extends Component {
       }
    }
 
-   componentWillMount() {
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this.load();
-         }
-      );
-
+   componentDidMount() {
+      this._isMounted = true;
    }
 
    componentWillUnmount() {
@@ -168,46 +167,44 @@ class NewContact extends Component {
                visible={this.state.isDialogVisible}>
                {this.renderModalElement()}
             </Modal>
-            <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
-               <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-                  <Layout style={styles.formOuterContainer} level='3'>
-                     <Layout style={styles.formInnerContainer}>
-                        <Input style={styles.inputRow}
-                           label='Email'
-                           placeholder='Enter an email'
-                           value={this.state.email}
-                           autoCapitalize="none"
-                           keyboardType="email-address"
-                           autoCompleteType="email"
-                           returnKeyType='next'
-                           onChangeText={(email) => this._isMounted && this.setState({ email })}
-                           disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
-                        />
-                        <Input style={styles.inputRow}
-                           label='Name'
-                           autoCapitalize="words"
-                           keyboardType="default"
-                           placeholder='Enter a name'
-                           value={this.state.name}
-                           onChangeText={(name) => this._isMounted && this.setState({ name })}
-                        />
-                        <Layout style={styles.mainInputGroup}>
-                           <Layout style={styles.selectBoxContainer}>
-                              <Select style={styles.selectBox}
-                                 label='Group'
-                                 data={this.state.allGroups}
-                                 placeholder='Select a group...'
-                                 selectedOption={this.state.group}
-                                 onSelect={(group) => this.handleChangeGroup(group)}
-                              />
-                           </Layout>
-                           <Button style={styles.groupButton} status="success" appearance='outline' onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >{"New Group"}</Button>
+            <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+               <Layout style={styles.formOuterContainer} level='3'>
+                  <Layout style={styles.formInnerContainer}>
+                     <Input style={styles.inputRow}
+                        label='Email'
+                        placeholder='Enter an email'
+                        value={this.state.email}
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        autoCompleteType="email"
+                        returnKeyType='next'
+                        onChangeText={(email) => this._isMounted && this.setState({ email })}
+                        disabled={(this.state.fromPending || this.state.fromEdit) ? true : false}
+                     />
+                     <Input style={styles.inputRow}
+                        label='Name'
+                        autoCapitalize="words"
+                        keyboardType="default"
+                        placeholder='Enter a name'
+                        value={this.state.name}
+                        onChangeText={(name) => this._isMounted && this.setState({ name })}
+                     />
+                     <Layout style={styles.mainInputGroup}>
+                        <Layout style={styles.selectBoxContainer}>
+                           <Select style={styles.selectBox}
+                              label='Group'
+                              data={this.state.allGroups}
+                              placeholder='Select a group...'
+                              selectedOption={this.state.group}
+                              onSelect={(group) => this.handleChangeGroup(group)}
+                           />
                         </Layout>
-                        <Button style={styles.button} onPress={() => this.handleAdd()} >{(this.state.fromEdit) ? "Update Contact" : "Add Contact"}</Button>
+                        <Button style={styles.groupButton} status="success" appearance='outline' onPress={() => this._isMounted && this.setState({ isDialogVisible: true })} >{"New Group"}</Button>
                      </Layout>
+                     <Button style={styles.button} onPress={() => this.handleAdd()} >{(this.state.fromEdit) ? "Update Contact" : "Add Contact"}</Button>
                   </Layout>
-               </ScrollView>
-            </KeyboardAvoidingView>
+               </Layout>
+            </ScrollView>
             <NotificationPopup ref={ref => this.popup = ref} />
          </React.Fragment >
       );

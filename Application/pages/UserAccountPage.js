@@ -17,16 +17,14 @@ export default class UserAccountPage extends Component {
             secureTextEntry: true,
             updatingPassword: false,
         }
-    }
-
-    componentWillMount() {
         this.focusListener = this.props.navigation.addListener(
             "willFocus",
             () => {
                 this._isMount = true;
-                this.setState({ oldPassword: "", newPassword: "", confirmNewPassword: "", secureTextEntry: true, });
+                this.state = { oldPassword: "", newPassword: "", confirmNewPassword: "", secureTextEntry: true, };
             }
         );
+
     }
 
     updatePassword = () => {

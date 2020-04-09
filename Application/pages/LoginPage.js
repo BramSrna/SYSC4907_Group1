@@ -12,13 +12,31 @@ const REGISTER = "Register";
 const FORGOT_PASSWORD = "Forgot your password?";
 
 class LoginPage extends Component {
-  userAlreadyLoggedIn = false;
-  state = {
-    email: "",
-    password: "",
-    secureTextEntry: true,
-    authenticating: false
+
+  constructor(props) {
+    super(props);
+    userAlreadyLoggedIn = false;
+    this.state = {
+      email: "",
+      password: "",
+      secureTextEntry: true,
+      authenticating: false
+    }
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
+        if (this.userAlreadyLoggedIn) {
+          this.props.navigation.navigate(ng.HOMEPAGE);
+        }
+      }
+    );
   }
+
+  componentDidMount() {
+    this._isMounted = true;    
+  }
+
 
   buttonListener = buttonId => {
     if (buttonId == LOGIN) {
@@ -53,9 +71,9 @@ class LoginPage extends Component {
   }
 
   authenticateUser = (email, password) => {
-    Firebase.auth().signInWithEmailAndPassword(email, password).then(function(firebaseUser) {
+    Firebase.auth().signInWithEmailAndPassword(email, password).then(function (firebaseUser) {
       return true;
-    }).catch(function(error) {
+    }).catch(function (error) {
       var errorCode = error.code;
       var errorMessage = error.message;
       Alert.alert("Invalid Email/Password", "Please enter a valid email/password.");
@@ -77,20 +95,6 @@ class LoginPage extends Component {
   componentWillUnmount() {
     this.focusListener.remove()
     this._isMounted = false;
-  }
-
-  componentWillMount() {
-    this.focusListener = this.props.navigation.addListener(
-      "willFocus",
-      () => {
-        this._isMounted = true;
-        this.userAlreadyLoggedIn = this.userIsCurrentlyLoggedIn();
-        if (this.userAlreadyLoggedIn) {
-          this.props.navigation.navigate(ng.HOMEPAGE);
-        }
-      }
-    );
-
   }
 
   renderPasswordEyeIcon = (style) => {
@@ -178,15 +182,13 @@ class LoginPage extends Component {
   render() {
     return (
       <Layout style={globalStyles.defaultContainer}>
-        <KeyboardAvoidingView behavior="padding">
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <Image
-              style={{ width: 300, height: 300 }}
-              source={require('../assets/splash.png')}
-            />
-            {this.renderCurrentState()}
-          </ScrollView>
-        </KeyboardAvoidingView>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Image
+            style={{ width: 300, height: 300 }}
+            source={require('../assets/splash.png')}
+          />
+          {this.renderCurrentState()}
+        </ScrollView>
       </Layout>
     );
   }

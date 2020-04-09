@@ -77,10 +77,8 @@ class MapsPage extends Component {
             ready: false,
             requestTimeout: 0,
         };
-    }
-
-    componentWillMount() {
         this._getApiKey();
+
     }
 
     componentDidMount() {
@@ -254,7 +252,7 @@ class MapsPage extends Component {
                 onCalloutPress={() => this.selectStore(title + " - " + description)}
             />
         );
-        
+
         return (
             <React.Fragment>
                 <TopNavigation

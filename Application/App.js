@@ -24,9 +24,9 @@ export default class App extends Component {
       isAuthenticated: false,
       theme: 'dark',
     };
-
-    //Temprory Solution to remove Timer warning on android
-    YellowBox.ignoreWarnings(['Setting a timer']);
+    //Temprory Solution to remove Timer warning on android, hide virtualized lists error from user, but not console.
+    // Placing a flat list inside scrollview negates the advantages of flatlist so we get this warning.
+    YellowBox.ignoreWarnings(['Setting a timer', 'VirtualizedLists should never be nested']);
     const _console = _.clone(console);
     console.warn = message => {
       if (message.indexOf('Setting a timer') <= -1) {
@@ -39,6 +39,8 @@ export default class App extends Component {
     }
 
     firebase.auth().onIdTokenChanged(this.onAuthStateChanged); // User is signed in or token was refreshed
+    SplashScreen.preventAutoHide();
+
   }
 
   onAuthStateChanged = (user) => {
@@ -53,10 +55,6 @@ export default class App extends Component {
     if (this.state.isAuthenticated) {
       lf.GetTheme(this);
     }
-  }
-
-  componentWillMount() {
-    SplashScreen.preventAutoHide();
   }
 
   componentWillUnmount() {
@@ -81,9 +79,7 @@ export default class App extends Component {
       );
     }
     return (
-      <Layout style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />}
-        {Platform.OS === 'android' && <Layout style={{ marginTop: StatusBar.currentHeight }} />}
+      <Layout style={styles.container}><StatusBar barStyle={global.theme == light ? 'dark-content' : 'light-content'} />
         {(this.state.isAuthenticated) ? <MainDrawerNavigator /> : <RootNavigation />}
       </Layout>
     );

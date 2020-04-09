@@ -59,30 +59,14 @@ class MapCreatorPage extends Component {
             asyncWait: false
 
         };
-    }
-
-    /**
-    * componentWillMount
-    * 
-    * Function called after component was mounted.
-    * Sets the context of the notification manager.
-    * Sets the mounted boolean and the arrayHolder value.
-    * 
-    * @params  None
-    * 
-    * @return None
-    */
-    componentWillMount() {
         this.focusListener = this.props.navigation.addListener(
             "willFocus",
             () => {
                 nm.setThat(this);
 
-                this._mounted = true;
-
-                this.setState({
+                this.state = {
                     arrayHolder: [...this.currDepartments]
-                });
+                };
 
                 // Initialize the page if information is passed in
                 var previousPage = this.props.navigation.getParam("previousPage", null);
@@ -120,10 +104,15 @@ class MapCreatorPage extends Component {
                         listName: listName,
                         listId: listId
                     });
+
+                    console.log(currStoreName);
                 }
             }
         );
+    }
 
+    componentDidMount() {
+        this._mounted = true;
     }
 
     /**

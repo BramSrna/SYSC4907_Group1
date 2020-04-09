@@ -41,19 +41,6 @@ class QuickCrowdSourcePage extends Component {
             listName: null,
             listId: null
         };
-    }
-
-    /**
-    * componentWillMount
-    * 
-    * Function called before component mounts.
-    * Populates the arrays for the autocomplete fields.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-    componentWillMount() {
         this.focusListener = this.props.navigation.addListener(
             "willFocus",
             () => {
@@ -148,17 +135,17 @@ class QuickCrowdSourcePage extends Component {
 
             // Add the value to the database
             dbi.addItemLoc(genName,
-                           storeName,
-                           storeAddr,
-                           aisleNum,
-                           department);
+                storeName,
+                storeAddr,
+                aisleNum,
+                department);
         }
 
         deps = Array.from(new Set(deps));
 
         dbi.modStoreWeights(this.state.storeName,
-                            this.state.storeAddr,
-                            deps);
+            this.state.storeAddr,
+            deps);
 
         previousPage = this.state.previousPage;
         if (previousPage !== null) {

@@ -35,40 +35,38 @@ class ForgotPasswordPage extends Component {
     render() {
         return (
             <Layout style={globalStyles.defaultContainer}>
-                <KeyboardAvoidingView behavior="padding">
-                    <ScrollView contentContainerStyle={styles.scrollContainer}>
-                        <Layout style={styles.columnContainer}>
-                            <Layout style={styles.rowContainer}>
-                                <Input
-                                    style={styles.input}
-                                    placeholder="Enter your email..."
-                                    ref="email"
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    autoCompleteType="email"
-                                    onChangeText={email => this.setState({ email })}
-                                    onSubmitEditing={() => this.refs.reset.scrollTo}
-                                    value={this.state.email} />
-                            </Layout>
-                            <Layout style={styles.rowContainer}>
-                                <Button
-                                    style={styles.button}
-                                    ref="reset"
-                                    onPress={this.resetPassword}>
-                                    {RESETPASS}
-                                </Button>
-                            </Layout>
-                            <Layout style={styles.rowContainer}>
-                                <Button
-                                    style={styles.button}
-                                    ref="backToLogin"
-                                    onPress={this.onBackToLoginPress}>
-                                    {BACK_TO_LOGIN}
-                                </Button>
-                            </Layout>
+                <ScrollView contentContainerStyle={styles.scrollContainer}>
+                    <Layout style={styles.columnContainer}>
+                        <Layout style={styles.rowContainer}>
+                            <Input
+                                style={styles.input}
+                                placeholder="Enter your email..."
+                                ref="email"
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                autoCompleteType="email"
+                                onChangeText={email => this.setState({ email })}
+                                onSubmitEditing={() => this.refs.reset.scrollTo}
+                                value={this.state.email} />
                         </Layout>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                        <Layout style={styles.rowContainer}>
+                            <Button
+                                style={styles.button}
+                                ref="reset"
+                                onPress={this.resetPassword}>
+                                {RESETPASS}
+                            </Button>
+                        </Layout>
+                        <Layout style={styles.rowContainer}>
+                            <Button
+                                style={styles.button}
+                                ref="backToLogin"
+                                onPress={this.onBackToLoginPress}>
+                                {BACK_TO_LOGIN}
+                            </Button>
+                        </Layout>
+                    </Layout>
+                </ScrollView>
             </Layout>
         );
     }

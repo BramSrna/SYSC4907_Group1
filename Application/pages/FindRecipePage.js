@@ -12,13 +12,13 @@ export default class FindRecipePage extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       recipes: []
     };
-    rf.GetRandomRecipesFromDatabase(this);
-  }
 
-  componentWillMount() {
+    rf.GetRandomRecipesFromDatabase(this);
+
     this.focusListener = this.props.navigation.addListener(
       "willFocus",
       () => {
@@ -53,6 +53,7 @@ export default class FindRecipePage extends Component {
               width="100%"
               keyExtractor={(item, index) => item.title}
               renderItem={({ item }) => {
+                console.log(item.image);
                 return (
                   <RecipesCard
                     imageSource={item.image}

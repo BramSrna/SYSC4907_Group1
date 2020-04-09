@@ -31,6 +31,12 @@ class HomePage extends Component {
       menuVisible: false,
     };
     this.onLayout = this.onLayout.bind(this);
+    this.focusListener = this.props.navigation.addListener(
+      "willFocus",
+      () => {
+        this.load();
+      }
+    );
   }
 
   componentWillUnmount() {
@@ -87,15 +93,6 @@ class HomePage extends Component {
     } catch (error) {
       console.log(error)
     }
-  }
-
-  async componentWillMount() {
-    this.focusListener = this.props.navigation.addListener(
-      "willFocus",
-      () => {
-        this.load();
-      }
-    );
   }
 
   /**

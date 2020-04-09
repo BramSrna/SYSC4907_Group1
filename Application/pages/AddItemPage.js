@@ -50,29 +50,16 @@ class AddItemPage extends Component {
 
             toAdd: [] // The recommended items the user wants to add to their list
         };
-    }
 
-    /**
-    * componentWillMount
-    * 
-    * Function called before component mounts.
-    * Populates the arrays for the autocomplete fields.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-    componentWillMount() {
         nm.setThat(this);
         // set the mounted var
-        this._isMounted = true;
 
         // Save the current state of the list
-        this.setState({
+        this.state = {
             listName: this.props.navigation.getParam("name", "(Invalid Name)"),
             listId: this.props.navigation.getParam("listID", "(Invalid List ID)"),
             listItemIds: this.props.navigation.getParam("listItemIds", "(Invalid List Item IDs")
-        });
+        };
 
         // Populate the Arrays for the autocomplete fields
         this.loadAvailableItems();
@@ -89,6 +76,7 @@ class AddItemPage extends Component {
      * @returns None
      */
     componentDidMount() {
+        this._isMounted = true;
         this.loadRecommendedItems();
     }
 
@@ -103,7 +91,7 @@ class AddItemPage extends Component {
     */
     componentWillUnmount() {
         this.addToggledRecommendedItems();
-        
+
         // Set the mounted var
         this._isMounted = false;
     }
@@ -189,21 +177,21 @@ class AddItemPage extends Component {
      */
     loadRecommendedItems() {
         // Get the ids of the current items in the list
-        var currItemIds = this.state.listItemIds;
-        var currPrevRec = this.state.prevRecommended;
+        var currItemIds = this.state.listItemIds ? this.state.listItemIds : [];
+        var currPrevRec = this.state.prevRecommended ? this.state.prevRecommended : [];
 
         var that = this;
 
         var ref = firebase.database().ref('/recommendations');
         var retItems = ref.once('value').then((snapshot) => {
-            var newItems = {};            
+            var newItems = {};
             var finalItems = [];
 
             // First check the rules
             // If an item is the precedent of a rule, add
             // the antecedent to the list of recommended items
             var ssv = snapshot.val();
-            if (ssv){
+            if (ssv) {
                 for (var i = 0; i < currItemIds.length; i++) {
                     var itemId = currItemIds[i];
                     if (itemId in ssv) {
@@ -329,7 +317,7 @@ class AddItemPage extends Component {
             }
 
             // Update the state
-            this._isMounted && this.setState({
+            this.setState({
                 itemName: newItem,
                 genName: genName,
                 currItemId: id
@@ -343,13 +331,19 @@ class AddItemPage extends Component {
      * Handler for the add item button under
      * the autocomplete box.
      */
-    handleAddButton = () => {        
+    handleAddButton = () => {
         this.addToggledRecommendedItems();
 
         if (this.state.genName !== DEFAULT_GEN_NAME) {
+            var name = this.state.genName;
+            if ((name === undefined) || (name === DEFAULT_GEN_NAME)) {
+                name = this.state.value;
+            }
+
+            console.log("ADD", name, this.state.value);
+
             // Add the item to the list
-            this.addItem(this.state.listId,
-                this.state.genName);
+            this.addItem(this.state.listId, name);
         }
 
         // Return to the list
@@ -393,6 +387,8 @@ class AddItemPage extends Component {
     * @returns None
     */
     addItem(listId, genName) {
+        console.log("ADD_ITEM", listId, genName, this.state.value);
+
         // Add the item to the list
         lf.AddItemToList(
             listId,
@@ -412,10 +408,10 @@ class AddItemPage extends Component {
         // the previously recommended items
         for (var i = 0; i < currRecItems.length; i++) {
             var item = currRecItems[i];
-            if (item.added){
+            if (item.added) {
                 this.addItem(this.state.listId,
                     item.genName);
-        
+
                 currItemIds.push(item.id);
             } else {
                 currPrevRec.push(item.id);
@@ -503,74 +499,72 @@ class AddItemPage extends Component {
                     alignment="center"
                     leftControl={renderMenuAction()}
                 />
-                <KeyboardAvoidingView style={[styles.avoidingView, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]} behavior="padding" enabled keyboardVerticalOffset={24}>
-                    <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
-                        <Layout style={styles.formOuterContainer} level='3'>
-                            <Layout style={styles.formInnerContainer}>
-                                <Autocomplete
-                                    ref={(input) => { this.autoCompleteInput = input; }}
-                                    style={styles.autocomplete}
-                                    placeholder='Enter an item'
-                                    value={this.state.value}
-                                    data={this.state.data}
-                                    onChangeText={onChangeText}
-                                    onSelect={onSelect}
-                                />
+                <ScrollView style={[styles.scrollContainer, { backgroundColor: global.theme == light ? light["background-basic-color-1"] : dark["background-basic-color-1"] }]}>
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Layout style={styles.formInnerContainer}>
+                            <Autocomplete
+                                ref={(input) => { this.autoCompleteInput = input; }}
+                                style={styles.autocomplete}
+                                placeholder='Enter an item'
+                                value={this.state.value}
+                                data={this.state.data}
+                                onChangeText={onChangeText}
+                                onSelect={onSelect}
+                            />
 
-                                <Layout style={styles.mainButtonGroup} >
-                                    <Button
-                                        style={styles.mainPageButton}
-                                        status='danger'
-                                        onPress={() => this.props.navigation.goBack()}
-                                    >
-                                        {'Cancel'}
-                                    </Button>
+                            <Layout style={styles.mainButtonGroup} >
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='danger'
+                                    onPress={() => this.props.navigation.goBack()}
+                                >
+                                    {'Cancel'}
+                                </Button>
 
-                                    <Button
-                                        style={styles.mainPageButton}
-                                        status='primary'
-                                        onPress={this.handleAddButton}
-                                    >
-                                        {'Add Item'}
-                                    </Button>
-                                </Layout>
-
+                                <Button
+                                    style={styles.mainPageButton}
+                                    status='primary'
+                                    onPress={this.handleAddButton}
+                                >
+                                    {'Add Item'}
+                                </Button>
                             </Layout>
+
                         </Layout>
+                    </Layout>
 
-                        <Layout style={styles.formOuterContainer} level='3'>
-                            <Layout style={styles.formInnerContainer}>
-                                <Layout style={styles.listItem} level='2'>
-                                    <Layout style={styles.listTextContainer} level='1'>
-                                        <Layout style={styles.itemTextContainer} level='1'>
-                                            <Text style={styles.itemText}>
-                                                Recommended Items:
-                                            </Text>
-                                        </Layout>
-                                        <Layout style={styles.itemButtonContainer} level='1'>
-                                            <Button
-                                                icon={RefreshIcon}
-                                                appearance='outline'
-                                                status='warning'
-                                                onPress={() => this.handleRefreshButton()}
-                                            />
-                                        </Layout>
-
+                    <Layout style={styles.formOuterContainer} level='3'>
+                        <Layout style={styles.formInnerContainer}>
+                            <Layout style={styles.listItem} level='2'>
+                                <Layout style={styles.listTextContainer} level='1'>
+                                    <Layout style={styles.itemTextContainer} level='1'>
+                                        <Text style={styles.itemText}>
+                                            Recommended Items:
+                                        </Text>
                                     </Layout>
-                                </Layout>
+                                    <Layout style={styles.itemButtonContainer} level='1'>
+                                        <Button
+                                            icon={RefreshIcon}
+                                            appearance='outline'
+                                            status='warning'
+                                            onPress={() => this.handleRefreshButton()}
+                                        />
+                                    </Layout>
 
-                                <FlatList
-                                    contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
-                                    style={styles.flatList}
-                                    data={this.state.recommendedItems}
-                                    width="100%"
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item, index }) => this.renderListElem(item, index)}
-                                />
+                                </Layout>
                             </Layout>
+
+                            <FlatList
+                                contentContainerStyle={{ paddingBottom: 16 }}// This paddingBottom is to make the last item in the flatlist to be visible.
+                                style={styles.flatList}
+                                data={this.state.recommendedItems}
+                                width="100%"
+                                keyExtractor={(item, index) => index.toString()}
+                                renderItem={({ item, index }) => this.renderListElem(item, index)}
+                            />
                         </Layout>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                    </Layout>
+                </ScrollView>
                 <NotificationPopup ref={ref => this.popup = ref} />
             </React.Fragment >
         );

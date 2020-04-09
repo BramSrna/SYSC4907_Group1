@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { FlatList, KeyboardAvoidingView, BackHandler } from "react-native";
-import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, Spinner} from 'react-native-ui-kitten';
+import { Layout, Button, Text, Input, Modal, TopNavigation, TopNavigationAction, Spinner } from 'react-native-ui-kitten';
 import { MenuOutline, AddIcon } from "../assets/icons/icons.js";
 import lf from "./Functions/ListFunctions";
 import ListItemContainer from '../components/ListItemContainer.js';
@@ -23,6 +23,17 @@ class YourLists extends Component {
          selectedIds: [],
          asyncWait: false
       };
+      this.focusListener = this.props.navigation.addListener(
+         "willFocus",
+         () => {
+            this._isMount = true;
+            // Set the context of the notification manager
+            nm.setThat(this)
+
+            // Load the needed data
+            this.GenerateNeededData(this);
+         }
+      );
    }
 
    /**
@@ -176,32 +187,6 @@ class YourLists extends Component {
          apiData: localApiData.slice(),
          asyncWait: false
       });
-   }
-
-   /**
-    * componentWillMount
-    * 
-    * Function called once the component has been mounted.
-    * Sets the context of the notification manager and
-    * loads the needed data.
-    * 
-    * @param   None
-    * 
-    * @returns None
-    */
-   componentWillMount() {
-      this.focusListener = this.props.navigation.addListener(
-         "willFocus",
-         () => {
-            this._isMount = true;
-            // Set the context of the notification manager
-            nm.setThat(this)
-
-            // Load the needed data
-            this.GenerateNeededData(this);
-         }
-      );
-
    }
    componentWillUnmount() {
       lf.RemoveYourListsPageListeners()
@@ -465,7 +450,7 @@ class YourLists extends Component {
                         renderItem={({ item, index }) => (
                            <ListItemContainer
                               title={item}
-                           description={this.renderItemDescription(index)}
+                              description={this.renderItemDescription(index)}
                               listName={item}
                               onPress={this.GoToList.bind(this, item)}
                               listIndex={index}
@@ -489,7 +474,7 @@ class YourLists extends Component {
                         width="100%"
                         keyExtractor={index => index.toString()}
                         renderItem={({ item, index }) => (
-                        <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={this.renderItemDescription(index)} />
+                           <ListItemContainer share={true} contact={true} title={item} purchased={this.CheckIfSelected(item)} fromItemView={false} onPress={() => { this.AddListPress(index, item) }} description={this.renderItemDescription(index)} />
                         )}
                      />}
                </Layout>
